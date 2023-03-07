@@ -105,21 +105,21 @@ class Event extends AdminController {
         $this->template->set_meta_title(lang('Event.heading_title'));
 
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()){
-              
-                $filename = $this->request->getFile('report');
-                $originalname = $filename->getClientName();
+            //print_r($this->request->getPost());exit;
+            // $filename = $this->request->getFile('report');
+            //$originalname = $filename->getClientName();
 
 
-                if($filename->isValid()){
-                   $filename->store();
-                }
-                
-                $name = $filename->getName();
+            // if($filename->isValid()){
+            //    $filename->store();
+            // }
+
+            // $name = $filename->getName();
                 // $temp_name = $filename->getTempName();
                 // $arr_file = explode(".",$name);
                 // $extension = end($arr_file);
 
-            $id=$this->eventModel->addEvent($this->request->getPost(),$originalname);
+            $id = $this->eventModel->addEvent($this->request->getPost());
             $this->session->setFlashdata('message', 'Event Saved Successfully.');
 
             return redirect()->to(admin_url('event'));
@@ -129,34 +129,22 @@ class Event extends AdminController {
         $this->getForm();
     }
 
-    public function edit(){
-       $this->template->set_meta_title(lang('Event.heading_title'));
+    protected function validateForm()
+    {
 
-         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()){
-            $id=$this->uri->getSegment(4);
+        $validation = \Config\Services::validation();
+        $id = $this->uri->getSegment(4);
 
-            $this->eventModel->editEvent($id,$this->request->getPost());
-			$this->session->setFlashdata('message', 'Event Updated Successfully.');
+        $rules = $this->eventModel->validationRules;
 
-            return redirect()->to(admin_url('event'));
-
+        if ($this->validate($rules)) {
+            return true;
+        } else {
+            //printr($validation->getErrors());
+            $this->error['warning'] = "Warning: Please check the form carefully for errors!";
+            return false;
         }
-        $this->getForm();
-    }
-
-    public function delete(){
-		if ($this->request->getPost('selected')){
-			$selected = $this->request->getPost('selected');
-		}else{
-			$selected = (array) $this->uri->getSegment(4);
-		}
-		$this->eventModel->deleteEvent($selected);
-		
-		//$this->slugModel->whereIn('route_id', $selected)->delete();
-		
-		$this->session->setFlashdata('message', 'Event deleted Successfully.');
-		return redirect()->to(admin_url('event'));
-	
+        return !$this->error;
     }
 
     protected function getForm(){
@@ -226,7 +214,7 @@ class Event extends AdminController {
                 'thumb'      => resize($thumb, 100, 100),
                 'title'		 => $event_image['title'],
                 'link'		 => $event_image['link'],
-                'description'=> $event_image['description'] 
+                'description' => $event_image['description']
             );
         }
         $data['no_image'] = resize('no_image.png', 100, 100);
@@ -234,22 +222,36 @@ class Event extends AdminController {
         echo $this->template->view('Admin\Event\Views\eventForm',$data);
     }
 
-    protected function validateForm() {
+    public function edit()
+    {
+        $this->template->set_meta_title(lang('Event.heading_title'));
 
-        $validation =  \Config\Services::validation();
-		$id=$this->uri->getSegment(4);
-		
-		$rules = $this->eventModel->validationRules;
-		
-        if ($this->validate($rules)){
-			return true;
-    	}
-		else{
-			//printr($validation->getErrors());
-			$this->error['warning']="Warning: Please check the form carefully for errors!";
-			return false;
-    	}
-        return !$this->error;
+        if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
+            $id = $this->uri->getSegment(4);
+
+            $this->eventModel->editEvent($id, $this->request->getPost());
+            $this->session->setFlashdata('message', 'Event Updated Successfully.');
+
+            return redirect()->to(admin_url('event'));
+
+        }
+        $this->getForm();
+    }
+
+    public function delete()
+    {
+        if ($this->request->getPost('selected')) {
+            $selected = $this->request->getPost('selected');
+        } else {
+            $selected = (array)$this->uri->getSegment(4);
+        }
+        $this->eventModel->deleteEvent($selected);
+
+        //$this->slugModel->whereIn('route_id', $selected)->delete();
+
+        $this->session->setFlashdata('message', 'Event deleted Successfully.');
+        return redirect()->to(admin_url('event'));
+
     }
 }
 ?>

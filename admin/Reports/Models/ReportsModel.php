@@ -404,7 +404,8 @@ FROM (SELECT * FROM soe_components_assign
 WHERE deleted_at IS NULL AND fund_agency_id=".$filter['fund_agency_id'].") sca
   LEFT JOIN soe_components sc
     ON sca.component_id = sc.id
-    LEFT JOIN (SELECT sb.agency_type_id,sb.component_id FROM soe_budgets sb LEFT JOIN soe_budgets_plan sbp ON sb.budget_plan_id=sbp.id where 1=1 ";
+    LEFT JOIN (SELECT sb.agency_type_id,sb.component_id FROM soe_budgets sb 
+    LEFT JOIN soe_budgets_plan sbp ON sb.budget_plan_id=sbp.id where 1=1 ";
     if(!empty($filter['fund_agency_id'])){
         $sql .= " AND sbp.fund_agency_id = ".$filter['fund_agency_id'];
     }
@@ -462,6 +463,7 @@ WHERE sb.deleted_at IS NULL";
             $sql .= " OR sb.agency_type_id is NULL or sb.agency_type_id = 0)";
         }
         $sql .= " GROUP BY sb.component_id) bud ON bud.component_id=comp.component_id";
+
         /* ******************transaction starts****************** */
         /* ******************month's expense****************** */
         $sql .= " LEFT JOIN (SELECT
@@ -686,7 +688,7 @@ WHERE sb.deleted_at IS NULL";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-//echo $sql;
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }
@@ -1402,6 +1404,20 @@ GROUP BY abst.heading_id";
     }
 
     //dashboard
+
+    public function getClosingBalanceTotal($filter = [])
+    {
+        $ob = (float)$this->getOpeningBalanceTotal($filter);
+
+        $filter['transaction_type'] = 'fund_receipt';
+        $fr = (float)$this->getTransactionTotal($filter);
+
+        $filter['transaction_type'] = 'expense';
+        $ex = (float)$this->getTransactionTotal($filter);
+
+        return $ob + $fr - $ex;
+    }
+
     public function getOpeningBalanceTotal($filter=[]) {
 
         $filter['transaction_type'] = 'fund_receipt';
@@ -1429,18 +1445,6 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         $sql .= $this->appendFilter($filter);
 
         return $this->db->query($sql)->getFirstRow()->total;
-    }
-
-    public function getClosingBalanceTotal($filter=[]) {
-        $ob = (float)$this->getOpeningBalanceTotal($filter);
-
-        $filter['transaction_type'] = 'fund_receipt';
-        $fr = (float)$this->getTransactionTotal($filter);
-
-        $filter['transaction_type'] = 'expense';
-        $ex = (float)$this->getTransactionTotal($filter);
-
-        return $ob+$fr-$ex;
     }
 
     protected function appendFilter($filter) {

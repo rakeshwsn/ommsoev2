@@ -1,5 +1,5 @@
 <?php
-namespace Admin\Proceeding\Config;
+namespace Admin\FPO\Config;
 if(!isset($routes))
 {
     $routes = \Config\Services::routes(true);

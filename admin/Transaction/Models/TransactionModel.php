@@ -175,6 +175,7 @@ WHERE t.deleted_at IS NULL";
     public function getBlockDistrictReport($filter=[]) {
         $sql = "SELECT
   res.component_id,
+  res.assign_id,
   number,
   description,
   agency_type,
@@ -202,7 +203,7 @@ WHERE t.deleted_at IS NULL";
 FROM (SELECT
     comp.*,
     bud.phy bud_phy,
-    bud.fin bud_fin,
+    bud.fin bud_fin, ug.name agency_type,
     COALESCE(expn_mon.phy, 0) exp_mon_phy,
     COALESCE(expn_mon.fin, 0) exp_mon_fin,
     COALESCE(fr_mon.phy, 0) fr_mon_phy,
@@ -216,37 +217,47 @@ FROM (SELECT
     COALESCE(fr_upto_cy.phy, 0) fr_upto_cy_phy,
     COALESCE(fr_upto_cy.fin, 0) fr_upto_cy_fin
   FROM (SELECT
-  sc.id component_id,
-  sc.number,
-  sc.description,
-  sc.parent,
-  sc.sort_order,
-  sc.row_type,
-  ug.name agency_type,
-  sc.category
-FROM (SELECT * FROM soe_components
-WHERE deleted_at IS NULL AND fund_agency_id=".$filter['fund_agency_id'].")sc
-  LEFT JOIN (SELECT * FROM soe_budgets
-  GROUP BY component_id) sb 
-    ON sb.component_id = sc.id
-  LEFT JOIN user_group ug
-    ON sb.agency_type_id = ug.id WHERE 1=1";
+      sca.id assign_id,
+      sc.id component_id,
+      sca.number,
+      sc.description,
+      sca.parent,
+      sca.sort_order,
+      sc.row_type,
+      sc.category,sb.agency_type_id
+      FROM (SELECT
+        *
+      FROM soe_components_assign
+      WHERE deleted_at IS NULL
+      AND fund_agency_id = " . $filter['fund_agency_id'] . ") sca
+      LEFT JOIN soe_components sc
+        ON sca.component_id = sc.id
+      LEFT JOIN (SELECT
+          sb.agency_type_id,
+          sb.component_id
+        FROM soe_budgets sb
+          LEFT JOIN soe_budgets_plan sbp
+            ON sb.budget_plan_id = sbp.id WHERE 
+            sbp.fund_agency_id = " . $filter['fund_agency_id'] . " GROUP BY sb.component_id) sb ON sb.component_id = sc.id 
+            WHERE 1 = 1";
+
         if (!empty($filter['component_agency_type_id'])) {
             if(is_array($filter['component_agency_type_id'])){
                 $sql .= " AND ( sb.agency_type_id IN (" . implode(',',$filter['component_agency_type_id']) . ")";
             } else {
                 $sql .= " AND ( sb.agency_type_id = " . $filter['component_agency_type_id'];
             }
-            $sql .= " OR sb.agency_type_id is NULL OR sc.row_type = 'heading')";
+            $sql .= " OR sb.agency_type_id is NULL)";
         }
         if(!empty($filter['category'])){
             if(is_array($filter['category'])){
-                $sql .= " AND sc.category IN (" . implode(',',$filter['category']) . ")";
+                $sql .= " AND sc.category IN ('" . implode('\',\'', $filter['category']) . "')";
             } else {
                 $sql .= " AND sc.category = '".$filter['category']."'";
             }
         }
-        $sql .= " ORDER BY sc.sort_order) comp LEFT JOIN
+        $sql .= " ) comp LEFT JOIN user_group ug ON comp.agency_type_id=ug.id
+         LEFT JOIN
     (SELECT
   sbb.block_id,
   sbb.budget_id,
@@ -478,7 +489,7 @@ $sql .= " GROUP BY sb.component_id) bud ON bud.component_id=comp.component_id
         }
       $sql .= " GROUP BY tc.component_id) fr_upto_cy
       ON comp.component_id = fr_upto_cy.component_id) res ORDER BY sort_order";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -876,7 +887,7 @@ AND scb.block_id = $block_id AND scb.month < $month";
 
             return $this->db->query($sql)->getFirstRow();
 
-        } else if($this->user->agency_type_id == $this->settings->district_user){
+        } else if ($agency_type == $this->settings->district_user) {
             //check if pending closing balances from blocks
             $sql = "SELECT
   scb.block_id,
@@ -890,7 +901,7 @@ AND scb.district_id = $district_id
 AND scb.month < $month
 GROUP BY scb.block_id";
 
-            $data['block_cbs'] = $this->db->query($sql)->result();
+            $data['block_cbs'] = $this->db->query($sql)->getResult();
 
             //check if pending cb at ATMA
             $sql = "SELECT
@@ -918,7 +929,7 @@ AND scb.year = $year
 AND scb.district_id = $district_id AND scb.status != 1
 AND scb.month <= $month GROUP BY scb.block_id";
 
-            $data['pending_cbs'] = $this->db->query($sql)->result();
+            $data['pending_cbs'] = $this->db->query($sql)->getResult();
 
             return $data;
 

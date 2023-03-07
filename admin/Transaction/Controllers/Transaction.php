@@ -97,6 +97,38 @@ class Transaction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\index', $data);
     }
 
+    private function filterOptions(&$data)
+    {
+
+        $block_model = new BlockModel();
+
+        $data['blocks'] = [];
+        if ($this->user->agency_type_id != $this->settings->block_user) {
+            $filter = [
+                'district_id' => $this->user->district_id,
+                'fund_agency_id' => $this->user->fund_agency_id
+            ];
+
+            $data['blocks'] = $block_model->where($filter)->asArray()->findAll();
+        }
+
+        $data['districts'] = [];
+//        if($this->user->agency_type_id!=$this->settings->district_user
+//            && $this->user->agency_type_id!=$this->settings->block_user) {
+//            $data['districts'] = (new DistrictModel)->asArray()->findAll();
+//        }
+
+        $data['agency_types'] = [];
+        foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
+            if ($this->user->agency_type_id == $user_group) {
+                $data['agency_types'] = (new UserGroupModel)->whereIn('id',
+                    $user_can_access_grp)->orderBy('name')->asArray()->findAll();
+            }
+        }
+        $data['agency_type_id'] = $this->user->agency_type_id;
+
+    }
+
     public function search() {
         if(!$this->request->isAJAX()){
             return $this->response->setStatusCode(404);
@@ -409,7 +441,7 @@ class Transaction extends AdminController {
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
-        $components = $this->buildTree($block_components,'parent','component_id');
+        $components = $this->buildTree($block_components, 'parent', 'assign_id');
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
@@ -478,6 +510,202 @@ class Transaction extends AdminController {
 
     }
 
+    protected function fillExcel(&$activesheet, $data)
+    {
+
+        $year = $data['year'];
+        $month = $data['month'];
+        $month_year = $data['month_year'];
+
+        $bM = new BlockModel();
+        $block = $bM->find($data['block_id']);
+
+        $dM = new DistrictModel();
+        $district = $dM->find($data['district_id']);
+
+        if ($data['txn_type'] == 'expense') {
+            $txn_type_text = 'Expenditure';
+        } else {
+            $txn_type_text = 'Fund Receipt';
+        }
+
+        $activesheet->setCellValue($this->cells['heading'], $txn_type_text);
+        $activesheet->setCellValue($this->cells['transaction_type'], $data['txn_type']);
+        $activesheet->setCellValue($this->cells['month'], $month);
+        $activesheet->setCellValue($this->cells['year'], $year);
+        $activesheet->setCellValue($this->cells['fund_agency_id'], $data['fund_agency_id']);
+        $activesheet->setCellValue($this->cells['agency_type_id'], $data['agency_type_id']);
+        if ($block) {
+            $activesheet->setCellValue($this->cells['level'], 'Block');
+            $activesheet->setCellValue($this->cells['block'], $block->name);
+        } else if ($district) {
+            $activesheet->setCellValue($this->cells['level'], 'District');
+            $activesheet->setCellValue($this->cells['block'], $district->name);
+        }
+        $activesheet->setCellValue($this->cells['monthyear'], $month_year);
+        $activesheet->setCellValue($this->cells['agency'], $this->user->firstname);
+        $activesheet->setCellValue($this->cells['prev_cell'], $txn_type_text . ' up to prev month');
+        $activesheet->setCellValue($this->cells['during_cell'], $txn_type_text . ' during the month');
+        $activesheet->setCellValue($this->cells['cum_cell'], 'Cumulative ' . $txn_type_text . ' till month');
+
+        $txnModel = new TransactionModel();
+
+        $filter = [
+            'month' => $month,
+            'year' => $year,
+            'user_id' => $this->user->user_id,
+            'user_group' => $this->user->agency_type_id
+        ];
+
+        //added by niranjan
+        $agency_type_id = $filter['agency_type_id'] = $data['agency_type_id'];
+
+        if ($agency_type_id == $this->settings->block_user || $txn->agency_type_id == $this->settings->cbo_user) {
+            $filter['component_agency_type_id'] = [5, 6, 7]; //fa/cbo --to be added to settings
+            $filter['category'] = 'program';
+        }
+        if ($agency_type_id == $this->settings->district_user) {
+            $filter['component_agency_type_id'] = [5, 6, 7]; //fa/cbo --to be added to settings
+        }
+        if ($agency_type_id == $this->settings->ps_user) {
+            $filter['component_agency_type_id'] = 8; //ps --to be added to settings
+        }
+        if ($agency_type_id == $this->settings->rs_user) {
+            $filter['component_agency_type_id'] = 9; //rs --to be added to settings
+        }
+
+        if ($block) {
+            $filter['block_id'] = $block->id;
+        } else {
+            $filter['block_id'] = null;
+        }
+
+        if ($district) {
+            $filter['district_id'] = $district->id;
+        } else {
+            $filter['district_id'] = null;
+        }
+        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+
+        $block_components = $txnModel->getBlockDistrictReport($filter);
+
+        $components = $this->buildTree($block_components, 'parent', 'component_id');
+        //printr($components);
+        //exit;
+        $row = 6;
+
+        $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_upto_phy = $this->tot_upto_fin = 0;
+
+        $this->i_cells = [];
+        $this->j_cells = [];
+        $this->k_cells = [];
+        $this->l_cells = [];
+
+        $this->fillComponents($components, $row, $activesheet);
+
+        // total
+        $i_cells = implode(',', $this->i_cells);
+        $j_cells = implode(',', $this->j_cells);
+        $k_cells = implode(',', $this->k_cells);
+        $l_cells = implode(',', $this->l_cells);
+
+        $activesheet->setCellValue("C$row", 'Grand Total for all components ');
+        $activesheet->setCellValue("E$row", $this->tot_ob_phy);
+        $activesheet->setCellValue("F$row", $this->tot_ob_fin);
+        $activesheet->setCellValue("G$row", $this->tot_upto_phy);
+        $activesheet->setCellValue("H$row", $this->tot_upto_fin);
+        $activesheet->setCellValue("I$row", "=SUM($i_cells)");
+        $activesheet->setCellValue("J$row", "=SUM($j_cells)");
+        $activesheet->setCellValue("K$row", "=SUM($k_cells)");
+        $activesheet->setCellValue("L$row", "=SUM($l_cells)");
+        $activesheet->getStyle("B$row:L$row")
+            ->applyFromArray(ExcelStyles::heading2())
+            ->applyFromArray(ExcelStyles::fill_yellow());
+
+    }
+
+    protected function fillComponents($components, &$row, &$activesheet)
+    {
+
+        $this->ob_phy = $this->ob_fin = $this->upto_phy = $this->upto_fin = 0;
+
+        //row start
+        $row_start = $row;
+        foreach ($components as $component) {
+
+            if ($component['row_type'] == 'heading') {
+                $activesheet->setCellValue("B$row", $component['number']);
+                $activesheet->setCellValue("C$row", $component['description']);
+
+                $activesheet->getStyle("B$row:C$row")
+                    ->applyFromArray(ExcelStyles::heading2());
+            } else {
+                $activesheet->setCellValue("A$row", $component['component_id']);
+                $activesheet->setCellValue("B$row", $component['number']);
+                $activesheet->setCellValue("C$row", $component['description']);
+                $activesheet->setCellValue("D$row", $component['agency_type']);
+                $activesheet->setCellValue("E$row", $component['ob_phy']);
+                $activesheet->setCellValue("F$row", $component['ob_fin']);
+                $activesheet->setCellValue("G$row", $component['exp_upto_phy']);
+                $activesheet->setCellValue("H$row", $component['exp_upto_fin']);
+                $activesheet->setCellValue("I$row", '');
+                $activesheet->setCellValue("J$row", '');
+                $activesheet->setCellValue("K$row", "=G$row+I$row");
+                $activesheet->setCellValue("L$row", "=H$row+J$row");
+
+                //sub total
+                $this->ob_phy += $component['ob_phy'];
+                $this->ob_fin += $component['ob_fin'];
+                if ($this->request->getGet('txn_type') == 'expense') {
+                    $this->upto_phy += $component['exp_upto_phy'];
+                    $this->upto_fin += $component['exp_upto_fin'];
+                } else {
+                    $this->upto_phy += $component['fr_upto_phy'];
+                    $this->upto_fin += $component['fr_upto_fin'];
+                }
+                //total
+                $this->tot_ob_phy += $component['ob_phy'];
+                $this->tot_ob_fin += $component['ob_fin'];
+
+                if ($this->request->getGet('txn_type') == 'expense') {
+                    $this->tot_upto_phy += $component['exp_upto_phy'];
+                    $this->tot_upto_fin += $component['exp_upto_fin'];
+                } else {
+                    $this->tot_upto_phy += $component['fr_upto_phy'];
+                    $this->tot_upto_fin += $component['fr_upto_fin'];
+                }
+
+                $this->i_cells[] = 'I' . $row;
+                $this->j_cells[] = 'J' . $row;
+                $this->k_cells[] = 'K' . $row;
+                $this->l_cells[] = 'L' . $row;
+            }
+
+            $row++;
+            if (!empty($component['children'])) {
+                $this->fillComponents($component['children'], $row, $activesheet);
+
+                $activesheet->setCellValue("B$row", 'Sub Total');
+                $activesheet->setCellValue("E$row", $this->ob_phy);
+                $activesheet->setCellValue("F$row", $this->ob_fin);
+                $activesheet->setCellValue("G$row", $this->upto_phy);
+                $activesheet->setCellValue("H$row", $this->upto_fin);
+                $last_row = $row - 1;
+                $activesheet->setCellValue("I$row", "=SUM(I$row_start:I$last_row)");
+                $activesheet->setCellValue("J$row", "=SUM(J$row_start:J$last_row)");
+                $activesheet->setCellValue("K$row", "=G$row+I$row");
+                $activesheet->setCellValue("L$row", "=H$row+J$row");
+
+                $activesheet->getStyle("B$row:L$row")
+                    ->applyFromArray(ExcelStyles::heading2())
+                    ->applyFromArray(ExcelStyles::fill_yellow());
+
+                $row++;
+                $row_start = $row;
+            }
+        }
+    }
+
     public function add() {
 
         $txnModel = new TransactionModel();
@@ -534,6 +762,9 @@ class Transaction extends AdminController {
             'year' => $year,
             'month' => $month,
         ];
+        if ($this->user->agency_type_id == $this->settings->district_user) {
+            $filter['district_id'] = $this->user->district_id;
+        }
         $pending_transactions = $txnModel->pendingUploads($filter);
 
         if(isset($pending_transactions->total)) {
@@ -627,6 +858,7 @@ class Transaction extends AdminController {
         }
         if($agency_type_id==$this->settings->district_user){
             $filter['component_agency_type_id'] = [5,6,7,0];
+            $filter['category'] = ['program', 'pmu'];
         }
         if($agency_type_id == $this->settings->block_user || $agency_type_id == $this->settings->cbo_user){
             $filter['component_agency_type_id'] = [5,6,7,0]; //fa/cbo --to be added to settings
@@ -648,7 +880,7 @@ class Transaction extends AdminController {
             $component['exp_cum_fin'] = $component['exp_upto_fin'];
         }
 
-        $components = $this->buildTree($block_components,'parent','component_id');
+        $components = $this->buildTree($block_components, 'parent', 'assign_id');
 
         $data['components'] = $this->getTable($components,$txn_type,'edit');
 
@@ -727,231 +959,6 @@ class Transaction extends AdminController {
         }
 
         return $this->response->setJSON($data);
-
-    }
-
-    protected function fillExcel(&$activesheet,$data){
-
-        $year = $data['year'];
-        $month = $data['month'];
-        $month_year = $data['month_year'];   
-
-        $bM = new BlockModel();
-        $block = $bM->find($data['block_id']);
-
-        $dM = new DistrictModel();
-        $district = $dM->find($data['district_id']);
-
-        if($data['txn_type']=='expense'){
-            $txn_type_text = 'Expenditure';
-        } else {
-            $txn_type_text = 'Fund Receipt';
-        }
-
-        $activesheet->setCellValue($this->cells['heading'], $txn_type_text);
-        $activesheet->setCellValue($this->cells['transaction_type'], $data['txn_type']);
-        $activesheet->setCellValue($this->cells['month'], $month);
-        $activesheet->setCellValue($this->cells['year'], $year);
-        $activesheet->setCellValue($this->cells['fund_agency_id'], $data['fund_agency_id']);
-        $activesheet->setCellValue($this->cells['agency_type_id'], $data['agency_type_id']);
-        if($block) {
-            $activesheet->setCellValue($this->cells['level'], 'Block');
-            $activesheet->setCellValue($this->cells['block'], $block->name);
-        } else if($district) {
-            $activesheet->setCellValue($this->cells['level'], 'District');
-            $activesheet->setCellValue($this->cells['block'], $district->name);
-        }
-        $activesheet->setCellValue($this->cells['monthyear'], $month_year);
-        $activesheet->setCellValue($this->cells['agency'], $this->user->firstname);
-        $activesheet->setCellValue($this->cells['prev_cell'], $txn_type_text.' up to prev month');
-        $activesheet->setCellValue($this->cells['during_cell'], $txn_type_text.' during the month');
-        $activesheet->setCellValue($this->cells['cum_cell'], 'Cumulative '.$txn_type_text.' till month');
-
-        $txnModel = new TransactionModel();
-
-        $filter = [
-            'month' => $month,
-            'year' => $year,
-            'user_id' => $this->user->user_id,
-			'user_group' => $this->user->agency_type_id
-        ];
-		
-		//added by niranjan
-		$agency_type_id = $filter['agency_type_id']=$data['agency_type_id'];
-            
-        if($agency_type_id == $this->settings->block_user || $txn->agency_type_id == $this->settings->cbo_user){
-            $filter['component_agency_type_id'] = [5,6,7]; //fa/cbo --to be added to settings
-            $filter['category'] = 'program';
-        }
-        if($agency_type_id == $this->settings->district_user){
-            $filter['component_agency_type_id'] = [5,6,7]; //fa/cbo --to be added to settings
-        }
-        if($agency_type_id == $this->settings->ps_user){
-            $filter['component_agency_type_id'] = 8; //ps --to be added to settings
-        }
-        if($agency_type_id == $this->settings->rs_user){
-            $filter['component_agency_type_id'] = 9; //rs --to be added to settings
-        } 
-
-        if($block){
-            $filter['block_id'] = $block->id;
-        } else {
-            $filter['block_id'] = null;
-        }
-
-        if($district){
-            $filter['district_id'] = $district->id;
-        } else {
-            $filter['district_id'] = null;
-        }
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
-        
-		$block_components = $txnModel->getBlockDistrictReport($filter);
-		
-        $components = $this->buildTree($block_components,'parent','component_id');
-		//printr($components);
-		//exit;
-        $row = 6;
-
-        $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_upto_phy = $this->tot_upto_fin = 0;
-
-        $this->i_cells = [];
-        $this->j_cells = [];
-        $this->k_cells = [];
-        $this->l_cells = [];
-
-        $this->fillComponents($components,$row,$activesheet);
-
-        // total
-        $i_cells = implode(',',$this->i_cells);
-        $j_cells = implode(',',$this->j_cells);
-        $k_cells = implode(',',$this->k_cells);
-        $l_cells = implode(',',$this->l_cells);
-
-        $activesheet->setCellValue("C$row", 'Grand Total for all components ');
-        $activesheet->setCellValue("E$row", $this->tot_ob_phy);
-        $activesheet->setCellValue("F$row", $this->tot_ob_fin);
-        $activesheet->setCellValue("G$row", $this->tot_upto_phy);
-        $activesheet->setCellValue("H$row", $this->tot_upto_fin);
-        $activesheet->setCellValue("I$row", "=SUM($i_cells)");
-        $activesheet->setCellValue("J$row", "=SUM($j_cells)");
-        $activesheet->setCellValue("K$row", "=SUM($k_cells)");
-        $activesheet->setCellValue("L$row", "=SUM($l_cells)");
-        $activesheet->getStyle("B$row:L$row")
-            ->applyFromArray(ExcelStyles::heading2())
-            ->applyFromArray(ExcelStyles::fill_yellow());
-
-    }
-
-    protected function fillComponents($components,&$row,&$activesheet){
-
-        $this->ob_phy = $this->ob_fin = $this->upto_phy = $this->upto_fin = 0;
-
-        //row start
-        $row_start = $row;
-        foreach ($components as $component) {
-
-            if($component['row_type']=='heading'){
-                $activesheet->setCellValue("B$row", $component['number']);
-                $activesheet->setCellValue("C$row", $component['description']);
-
-                $activesheet->getStyle("B$row:C$row")
-                    ->applyFromArray(ExcelStyles::heading2());
-            } else {
-                $activesheet->setCellValue("A$row", $component['component_id']);
-                $activesheet->setCellValue("B$row", $component['number']);
-                $activesheet->setCellValue("C$row", $component['description']);
-                $activesheet->setCellValue("D$row", $component['agency_type']);
-                $activesheet->setCellValue("E$row", $component['ob_phy']);
-                $activesheet->setCellValue("F$row", $component['ob_fin']);
-                $activesheet->setCellValue("G$row", $component['exp_upto_phy']);
-                $activesheet->setCellValue("H$row", $component['exp_upto_fin']);
-                $activesheet->setCellValue("I$row", '');
-                $activesheet->setCellValue("J$row", '');
-                $activesheet->setCellValue("K$row", "=G$row+I$row");
-                $activesheet->setCellValue("L$row", "=H$row+J$row");
-
-                //sub total
-                $this->ob_phy += $component['ob_phy'];
-                $this->ob_fin += $component['ob_fin'];
-                if($this->request->getGet('txn_type')=='expense') {
-                    $this->upto_phy += $component['exp_upto_phy'];
-                    $this->upto_fin += $component['exp_upto_fin'];
-                } else {
-                    $this->upto_phy += $component['fr_upto_phy'];
-                    $this->upto_fin += $component['fr_upto_fin'];
-                }
-                //total
-                $this->tot_ob_phy += $component['ob_phy'];
-                $this->tot_ob_fin += $component['ob_fin'];
-
-                if($this->request->getGet('txn_type')=='expense') {
-                    $this->tot_upto_phy += $component['exp_upto_phy'];
-                    $this->tot_upto_fin += $component['exp_upto_fin'];
-                } else {
-                    $this->tot_upto_phy += $component['fr_upto_phy'];
-                    $this->tot_upto_fin += $component['fr_upto_fin'];
-                }
-
-                $this->i_cells[] = 'I'.$row;
-                $this->j_cells[] = 'J'.$row;
-                $this->k_cells[] = 'K'.$row;
-                $this->l_cells[] = 'L'.$row;
-            }
-
-            $row++;
-            if (!empty($component['children'])){
-                $this->fillComponents($component['children'],$row,$activesheet);
-
-                $activesheet->setCellValue("B$row", 'Sub Total');
-                $activesheet->setCellValue("E$row", $this->ob_phy);
-                $activesheet->setCellValue("F$row", $this->ob_fin);
-                $activesheet->setCellValue("G$row", $this->upto_phy);
-                $activesheet->setCellValue("H$row", $this->upto_fin);
-                $last_row = $row-1;
-                $activesheet->setCellValue("I$row", "=SUM(I$row_start:I$last_row)");
-                $activesheet->setCellValue("J$row", "=SUM(J$row_start:J$last_row)");
-                $activesheet->setCellValue("K$row", "=G$row+I$row");
-                $activesheet->setCellValue("L$row", "=H$row+J$row");
-
-                $activesheet->getStyle("B$row:L$row")
-                    ->applyFromArray(ExcelStyles::heading2())
-                    ->applyFromArray(ExcelStyles::fill_yellow());
-
-                $row++;
-                $row_start = $row;
-            }
-        }
-    }
-
-    private function filterOptions(&$data) {
-
-        $block_model = new BlockModel();
-
-        $data['blocks'] = [];
-        if($this->user->agency_type_id!=$this->settings->block_user) {
-            $filter = [
-                'district_id' => $this->user->district_id,
-                'fund_agency_id' => $this->user->fund_agency_id
-            ];
-
-            $data['blocks'] = $block_model->where($filter)->asArray()->findAll();
-        }
-
-        $data['districts'] = [];
-//        if($this->user->agency_type_id!=$this->settings->district_user
-//            && $this->user->agency_type_id!=$this->settings->block_user) {
-//            $data['districts'] = (new DistrictModel)->asArray()->findAll();
-//        }
-
-        $data['agency_types'] = [];
-        foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
-            if($this->user->agency_type_id==$user_group){
-                $data['agency_types'] = (new UserGroupModel)->whereIn('id',
-                    $user_can_access_grp)->orderBy('name')->asArray()->findAll();
-            }
-        }
-        $data['agency_type_id'] = $this->user->agency_type_id;
 
     }
 

@@ -13,5 +13,4 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->match(['get','post'],'event/edit/(:segment)', 'Event\Controllers\Event::edit/$1');
     $routes->get('event/delete/(:segment)',   'Event\Controllers\Event::delete/$1');
     $routes->post('event/delete','Event\Controllers\Event::delete');
-
 });

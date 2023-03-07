@@ -18,14 +18,6 @@ trait TreeTrait {
 
     }
 
-    public function getTreeArray(){
-        $compModel = new ComponentModel();
-
-        $comps = $compModel->getAll();
-
-        return $this->buildTree($comps);
-    }
-
     public function buildTree(array $flatList, $parent_col = 'parent',$id_col='id')
     {
         if(!$flatList){
@@ -73,6 +65,15 @@ trait TreeTrait {
         }
         $nav .= '</ul>';
         return $nav;
+    }
+
+    public function getTreeArray()
+    {
+        $compModel = new ComponentModel();
+
+        $comps = $compModel->getAll();
+
+        return $this->buildTree($comps);
     }
 
     protected function getTable($array,$txn_type,$action) {
@@ -124,9 +125,8 @@ trait TreeTrait {
                     <td>' . $item['ob_phy'] . ' </td>
                     <td>' . $item['ob_fin'] . ' </td>';
                 if($txn_type=='expense') {
-                    $html .= '
-                    <td class="upto_phy">' . $item['exp_upto_phy'] . ' </td>
-                    <td class="upto_fin">' . $item['exp_upto_fin'] . ' </td>';
+                    $html .= '<td class="upto_phy">' . $item['exp_upto_phy'] . ' </td>
+                              <td class="upto_fin">' . $item['exp_upto_fin'] . ' </td>';
                     if($action=='edit'){
                         $html .= '<td class="mon_phy"><input class="w-50p" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['exp_mon_phy'] . '"> </td>
                                   <td class="mon_fin"><input type="text" name="'.$item['component_id'].'[fin]" value="' . $item['exp_mon_fin'] . '"> </td>';
@@ -134,14 +134,11 @@ trait TreeTrait {
                         $html .= '<td class="mon_phy">' . $item['exp_mon_phy'] . ' </td>
                                   <td class="mon_fin">' . $item['exp_mon_fin'] . ' </td>';
                     }
-                    $html .= '
-                    <td class="cum_phy">' . $item['exp_cum_phy'] . ' </td>
-                    <td class="cum_fin">' . $item['exp_cum_fin'] . ' </td>
-                    ';
+                    $html .= '<td class="cum_phy">' . $item['exp_cum_phy'] . ' </td>
+                              <td class="cum_fin">' . $item['exp_cum_fin'] . ' </td>';
                 } else {
-                    $html .= '
-                    <td class="upto_phy">' . $item['fr_upto_phy'] . ' </td>
-                    <td class="upto_fin">' . $item['fr_upto_fin'] . ' </td>';
+                    $html .= '<td class="upto_phy">' . $item['fr_upto_phy'] . ' </td>
+                              <td class="upto_fin">' . $item['fr_upto_fin'] . ' </td>';
                     if($action=='edit'){
                         $html .= '<td class="mon_phy"><input class="w-50p" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['fr_mon_phy'] . '"> </td>
                                   <td class="mon_fin"><input type="text" name="'.$item['component_id'].'[fin]" value="' . $item['fr_mon_fin'] . '"> </td>';
@@ -150,8 +147,7 @@ trait TreeTrait {
                                   <td class="mon_fin">' . $item['fr_mon_fin'] . ' </td>';
                     }
                     $html .= '<td class="cum_phy">' . $item['fr_cum_phy'] . ' </td>
-                    <td class="cum_fin">' . $item['fr_cum_fin'] . ' </td>
-                    ';
+                              <td class="cum_fin">' . $item['fr_cum_fin'] . ' </td>';
                 }
                 $html .= '</tr>';
 

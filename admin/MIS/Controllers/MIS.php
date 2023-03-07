@@ -1,6 +1,7 @@
 <?php
 namespace Admin\MIS\Controllers;
-use Admin\Component\Models\ComponentModel;
+
+use Admin\Components\Models\ComponentsModel;
 use Admin\MIS\Models\MISComponentModel;
 use Admin\MIS\Models\MISDetailModel;
 use Admin\MIS\Models\MISFileModel;
@@ -36,7 +37,6 @@ class MIS extends AdminController
     public function add() {
         $misModel = new MISModel();
         $misDetailModel = new MISDetailModel();
-        $misFileModel = new MISFileModel();
 
         $block_id = $this->user->block_id;
         if($this->request->getGet('block_id')) {
@@ -108,112 +108,10 @@ class MIS extends AdminController
 
     }
 
-    public function edit() {
-//        $misModel = new MISModel();
-        $misDetailModel = new MISDetailModel();
-        $misFileModel = new MISFileModel();
-
-        if($this->request->getMethod(1)=='POST'){
-
-            $id = $this->uri->getSegment(4);
-
-            $misDetailModel->where(['submission_id'=>$id])->delete();
-
-            $achievements = [];
-
-            foreach ($this->request->getPost('achievement') as $indicator_id => $value) {
-                $achievements[] = [
-                    'submission_id' => $id,
-                    'output_indicator_id' => $indicator_id,
-                    'achievement' => isset($value['number'])?$value['number']:'',
-                    'file' => isset($value['file'])?$value['file']:''
-                ];
-            }
-            $misDetailModel->insertBatch($achievements);
-
-            $this->session->setFlashdata('message','MIS Updated Successfully');
-            return redirect()->to(Url::mis);
-        }
-
-
-
-        return $this->getForm();
-
-    }
-
-    public function search() {
-        if(!$this->request->isAJAX()){
-            return $this->response->setStatusCode(404);
-        }
-
-        $misModel = new MISModel();
-        $requestData = $_REQUEST;
-        $totalData = $misModel->getTotal(['user_id'=>$this->user->user_id]);
-        $totalFiltered = $totalData;
-
-        $filter_search = $requestData['search']['value'];
-
-        $order_columns = array(
-            'block','month','year','date_added'
-        );
-        $filter_data = array(
-            'user_id' => $this->user->user_id,
-            'filter_search' => $filter_search,
-            'order' => $requestData['order'][0]['dir'],
-            'sort' => $order_columns[$requestData['order'][0]['column']],
-            'start' => $requestData['start'],
-            'limit' => $requestData['length']
-        );
-//        $totalFiltered = 0;
-        $totalFiltered = $misModel->getTotal($filter_data);
-
-        $filteredData = $misModel->getAll($filter_data);
-
-        $datatable=array();
-
-        foreach($filteredData as $result) {
-
-            $action  = '<div class="btn-group">';
-            $action .= '<a class="btn btn-sm btn-primary" href="' . Url::misEdit.'/'.$result->id . '"><i class="fa fa-pencil"></i></a>';
-            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::misDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
-            $action .= '</div>';
-            $status = '';
-
-            if($result->status==0){
-                $status = '<label class="badge badge-warning">'.$this->statuses[$result->status].'</label>';
-            }
-            if($result->status==1){
-                $status = '<label class="badge badge-success">'.$this->statuses[$result->status].'</label>';
-            }
-            if($result->status==2){
-                $status = '<label class="badge badge-danger">'.$this->statuses[$result->status].'</label>';
-            }
-
-            $datatable[]=array(
-                $result->month,
-                $result->year,
-                ymdToDmy($result->created_at),
-                $status,
-                $action
-            );
-
-        }
-        //printr($datatable);
-        $json_data = array(
-            "draw"            => isset($requestData['draw']) ? intval( $requestData['draw'] ):1,
-            "recordsTotal"    => intval( $totalData ),
-            "recordsFiltered" => intval( $totalFiltered ),
-            "data"            => $datatable
-        );
-        ob_end_clean();
-        return $this->response->setJSON($json_data);
-
-    }
-
     protected function getForm(){
         $data = [];
         $misModel = new MISModel();
-        $compModel = new ComponentModel();
+        $compModel = new ComponentsModel();
         $misDetailModel = new MISDetailModel();
 
         $this->template->add_package(['uploader','jquery_loading'],true);
@@ -283,16 +181,18 @@ class MIS extends AdminController
             'block_id' => $block_id,
             'month' => $month,
             'year' => $year,
-            'user_group' => $agency_type_id
+            'user_group' => $agency_type_id == 5 ? [5, 6] : [],
+            'component_category' => 'program'
         ];
 
         if($district_id){
             $filter['district_id'] = $district_id;
+            $filter['user_group'] = $agency_type_id;
         }
 
         $components = $compModel->getComponents($filter);
 
-        $components = $this->buildTree($components,'parent','component_id');
+        $components = $this->buildTree($components, 'parent', 'assign_id');
 
         $data['components'] = $this->getTable($components,$misdetails,$action);
 
@@ -333,6 +233,7 @@ class MIS extends AdminController
                 $inds = $misComponent_model->where([
                     'component_id'=>$item['component_id']
                 ])->findAll();
+
                 if($inds) {
                     $html .= '<tr data-parent="' . $item['parent'] . '">
                     <td rowspan="' . (count($inds) + 1) . '">' . $item['number'] . ' </td>
@@ -384,6 +285,109 @@ class MIS extends AdminController
 
     }
 
+    public function edit()
+    {
+//        $misModel = new MISModel();
+        $misDetailModel = new MISDetailModel();
+        $misFileModel = new MISFileModel();
+
+        if ($this->request->getMethod(1) == 'POST') {
+
+            $id = $this->uri->getSegment(4);
+
+            $misDetailModel->where(['submission_id' => $id])->delete();
+
+            $achievements = [];
+
+            foreach ($this->request->getPost('achievement') as $indicator_id => $value) {
+                $achievements[] = [
+                    'submission_id' => $id,
+                    'output_indicator_id' => $indicator_id,
+                    'achievement' => isset($value['number']) ? $value['number'] : '',
+                    'file' => isset($value['file']) ? $value['file'] : ''
+                ];
+            }
+            $misDetailModel->insertBatch($achievements);
+
+            $this->session->setFlashdata('message', 'MIS Updated Successfully');
+            return redirect()->to(Url::mis);
+        }
+
+
+        return $this->getForm();
+
+    }
+
+    public function search()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(404);
+        }
+
+        $misModel = new MISModel();
+        $requestData = $_REQUEST;
+        $totalData = $misModel->getTotal(['user_id' => $this->user->user_id]);
+        $totalFiltered = $totalData;
+
+        $filter_search = $requestData['search']['value'];
+
+        $order_columns = array(
+            'block', 'month', 'year', 'date_added'
+        );
+        $filter_data = array(
+            'user_id' => $this->user->user_id,
+            'filter_search' => $filter_search,
+            'order' => $requestData['order'][0]['dir'],
+            'sort' => $order_columns[$requestData['order'][0]['column']],
+            'start' => $requestData['start'],
+            'limit' => $requestData['length']
+        );
+//        $totalFiltered = 0;
+        $totalFiltered = $misModel->getTotal($filter_data);
+
+        $filteredData = $misModel->getAll($filter_data);
+
+        $datatable = array();
+
+        foreach ($filteredData as $result) {
+
+            $action = '<div class="btn-group">';
+            $action .= '<a class="btn btn-sm btn-primary" href="' . Url::misEdit . '/' . $result->id . '"><i class="fa fa-pencil"></i></a>';
+            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::misDelete . '/' . $result->id . '"><i class="fa fa-trash"></i></a>';
+            $action .= '</div>';
+            $status = '';
+
+            if ($result->status == 0) {
+                $status = '<label class="badge badge-warning">' . $this->statuses[$result->status] . '</label>';
+            }
+            if ($result->status == 1) {
+                $status = '<label class="badge badge-success">' . $this->statuses[$result->status] . '</label>';
+            }
+            if ($result->status == 2) {
+                $status = '<label class="badge badge-danger">' . $this->statuses[$result->status] . '</label>';
+            }
+
+            $datatable[] = array(
+                $result->month,
+                $result->year,
+                ymdToDmy($result->created_at),
+                $status,
+                $action
+            );
+
+        }
+        //printr($datatable);
+        $json_data = array(
+            "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $datatable
+        );
+        ob_end_clean();
+        return $this->response->setJSON($json_data);
+
+    }
+
     public function upload() {
         $input = $this->validate([
             'file' => [
@@ -431,5 +435,20 @@ class MIS extends AdminController
 
         return $this->response->setJSON($data);
 
+    }
+
+    public function delete($id)
+    {
+
+        $misModel = new MISModel();
+        $misDetailModel = new MISDetailModel();
+
+        $misModel->delete($id);
+
+        $misDetailModel->where(['submission_id' => $id])->delete();
+
+        $this->session->setFlashdata('message', 'MIS Deleted Successfully');
+
+        return redirect()->to(Url::mis);
     }
 }
