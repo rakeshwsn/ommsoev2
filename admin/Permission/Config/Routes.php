@@ -3,7 +3,7 @@ if(!isset($routes))
 { 
     $routes = \Config\Services::routes(true);
 }
-$routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
+$routes->group(env('app.adminROUTE'), ['namespace' => 'Admin', 'filter' => 'login'], function ($routes)
 {
     $routes->add('permission', 'Permission\Controllers\Permission::index');
     $routes->post('permission/search','Permission\Controllers\Permission::search');
@@ -13,3 +13,4 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->post('permission/delete','Permission\Controllers\Permission::delete');
 
 });
+    
