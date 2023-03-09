@@ -1926,4 +1926,83 @@ WHERE res.total = 0";
         return $this->db->query($sql)->getResultArray();
     }
 
+    public function getPendingClosingBalance($filter = [])
+    {
+        $sql = "SELECT
+  res.block_id,
+  res.district_id,
+  sd.name district,
+  res.block,
+  res.phase,
+  res.total,
+  res.agency_type_id
+FROM (SELECT
+    bl.block_id,
+    bl.district_id,
+    bl.block,
+    bl.phase,
+    COALESCE(bl_txn.total, 0) total,
+    bl_txn.agency_type_id
+  FROM (SELECT
+      id block_id,
+      sb.district_id,
+      sb.name block,
+      sb.phase
+    FROM soe_blocks sb) bl
+    LEFT JOIN (SELECT
+        COUNT(id) total,
+        st.block_id,
+        st.district_id,
+        st.agency_type_id
+      FROM soe_closing_balances st
+      WHERE st.deleted_at IS NULL
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.block_id,
+               st.agency_type_id) bl_txn
+      ON bl_txn.block_id = bl.block_id
+  UNION ALL
+  SELECT
+    0 block_id,
+    sd.id district_id,
+    CONCAT('ATMA ', sd.name) block,
+    0 phase,
+    COALESCE(dist_txn.total, 0) total,
+    dist_txn.agency_type_id
+  FROM soe_districts sd
+    LEFT JOIN (SELECT
+        st.district_id,
+        COUNT(st.id) total,
+        st.agency_type_id
+      FROM soe_closing_balances st
+      WHERE st.deleted_at IS NULL
+      AND st.agency_type_id = 7
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.district_id,
+               st.agency_type_id) dist_txn
+      ON dist_txn.district_id = sd.id) res
+  LEFT JOIN soe_districts sd
+    ON res.district_id = sd.id
+WHERE res.total = 0";
+        if (!empty($filter['phase'])) {
+            if (is_array($filter['phase'])) {
+                $sql .= " AND res.phase IN (" . implode(',', $filter['phase']) . ")";
+            } else {
+                $sql .= " AND res.phase = " . $filter['phase'];
+            }
+        }
+
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND res.block_id=" . $filter['block_id'];
+        }
+
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND district_id=" . $filter['district_id'];
+        }
+        $sql .= " ORDER BY district, res.block";
+
+        return $this->db->query($sql)->getResultArray();
+    }
+
 }

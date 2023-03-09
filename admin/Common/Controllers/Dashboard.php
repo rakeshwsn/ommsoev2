@@ -16,42 +16,43 @@ use Config\Url;
 
 class Dashboard extends AdminController
 {
-    use TreeTrait,ReportTrait {
+    use TreeTrait, ReportTrait {
         ReportTrait::generateTable insteadof TreeTrait;
         ReportTrait::getTable insteadof TreeTrait;
     }
 
-	public function index() {
-	    $data = [];
+    public function index()
+    {
+        $data = [];
 
-	    if(!$this->request->isAJAX()){
+        if (!$this->request->isAJAX()) {
             $data['fr_check'] = $this->fund_receipt_check();
         } else {
-	        return $this->fund_receipt_check();
+            return $this->fund_receipt_check();
         }
 
-        $data['fr_url'] = site_url(Url::transactionAdd) . '?month='.getCurrentMonthId().'&year='.getCurrentYearId().'&txn_type=fund_receipt&agency_type_id='.$this->user->agency_type_id;
+        $data['fr_url'] = site_url(Url::transactionAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
 
-	    $data['year'] = date('F').' '.getYear(getCurrentYearId());
+        $data['year'] = date('F') . ' ' . getYear(getCurrentYearId());
 
-        if($this->user->agency_type_id==$this->settings->block_user){
+        if ($this->user->agency_type_id == $this->settings->block_user) {
             return $this->fa_dashboard($data);
         }
 
-        if($this->user->agency_type_id==$this->settings->district_user){
+        if ($this->user->agency_type_id == $this->settings->district_user) {
             return $this->atma_dashboard($data);
         }
 
-        if($this->user->agency_type_id==$this->settings->ps_user){
+        if ($this->user->agency_type_id == $this->settings->ps_user) {
             return $this->ps_dashboard($data);
         }
 
-        if($this->user->agency_type_id==$this->settings->spmu_user){
+        if ($this->user->agency_type_id == $this->settings->spmu_user) {
             return $this->spmu_dashboard($data);
         }
 
-        return $this->template->view('Admin\Common\Views\dashboard',$data);
-	}
+        return $this->template->view('Admin\Common\Views\dashboard', $data);
+    }
 
     protected function fund_receipt_check()
     {
@@ -91,7 +92,8 @@ class Dashboard extends AdminController
         return !$fr;
     }
 
-	protected function fa_dashboard(&$data){
+    protected function fa_dashboard(&$data)
+    {
         $reportModel = new ReportsModel();
 
         $filter = [
@@ -112,37 +114,38 @@ class Dashboard extends AdminController
         $filter['year'] = getCurrentYearId();
 
         $data['cb'] = $reportModel->getClosingBalanceTotal($filter);
-/*
-        $reportModel = new ReportsModel();
-        $data['components'] = [];
-        $filter = [
-            'user_id' => $this->user->user_id,
-            'block_id' => $this->user->block_id,
-            'month_id' => getMonthIdByMonth(date('m')),
-            'year_id' => getCurrentYearId(),
-            'agency_type_id' => [5]
-        ];
-        $filter['block_users'] = [5,6];
-        $filter['block_user'] = false;
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $filter['block_user'] = true;
-        }
-        $filter['fund_agency_id'] =  $this->user->fund_agency_id;
+        /*
+                $reportModel = new ReportsModel();
+                $data['components'] = [];
+                $filter = [
+                    'user_id' => $this->user->user_id,
+                    'block_id' => $this->user->block_id,
+                    'month_id' => getMonthIdByMonth(date('m')),
+                    'year_id' => getCurrentYearId(),
+                    'agency_type_id' => [5]
+                ];
+                $filter['block_users'] = [5,6];
+                $filter['block_user'] = false;
+                if($this->user->agency_type_id==$this->settings->block_user){
+                    $filter['block_user'] = true;
+                }
+                $filter['fund_agency_id'] =  $this->user->fund_agency_id;
 
-        $components = $reportModel->getMpr($filter);
-        $components = $this->buildTree($components,'parent','component_id');
+                $components = $reportModel->getMpr($filter);
+                $components = $this->buildTree($components,'parent','component_id');
 
-        $data['components'] = $this->getTable($components,'view');
-*/
+                $data['components'] = $this->getTable($components,'view');
+        */
         $data['components'] = [];
-        return $this->template->view('Admin\Common\Views\fa_dashboard',$data);
+        return $this->template->view('Admin\Common\Views\fa_dashboard', $data);
 
     }
 
-	protected function atma_dashboard(&$data){
-		
-	    $month = $this->request->getGet('month');
-	    $year = $this->request->getGet('year');
+    protected function atma_dashboard(&$data)
+    {
+
+        $month = $this->request->getGet('month');
+        $year = $this->request->getGet('year');
         $reportModel = new ReportsModel();
 
         $filter = [
@@ -157,7 +160,7 @@ class Dashboard extends AdminController
         $filter['user_id'] = null;
         $filter['district_id'] = $this->user->district_id;
         $filter['transaction_type'] = 'expense';
-        $filter['agency_type_id'] = [5,6,7];
+        $filter['agency_type_id'] = [5, 6, 7];
         $data['ex'] = $reportModel->getTransactionTotal($filter);
 
         $filter['month'] = getMonthIdByMonth(date('m'));
@@ -167,90 +170,63 @@ class Dashboard extends AdminController
         //$data['cb'] = $reportModel->getClosingBalanceTotal($filter);
 
         $data['components'] = [];
-		
-		
-		 $filter['transaction_type'] = 'fund_receipt';
-		 $filter['district_id'] = $this->user->district_id;
-		  $filter['fund_agency_id'] = $this->user->fund_agency_id;
-		    $data['abstracts']=[];
-        $data['fund_abstract'] = $fund_abstract =  $reportModel->getTransactionAbstractDistrict($filter);
-          //fund abstract loop for bar chart
-        foreach($fund_abstract as $key=>$fund_abstracts){
 
-           $data['fund']['label'][] =  $fund_abstracts->block;
-              
-           //$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
 
-       $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total,'') ;
-        //    $data['fund']['data'][$key]['itemStyle']['color'] = '#26c6da' ;
+        $filter['transaction_type'] = 'fund_receipt';
+        $filter['district_id'] = $this->user->district_id;
+        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        $data['abstracts'] = [];
+        $data['fund_abstract'] = $fund_abstract = $reportModel->getTransactionAbstractDistrict($filter);
+        //fund abstract loop for bar chart
+        foreach ($fund_abstract as $key => $fund_abstracts) {
 
-           $data['abstracts'][$fund_abstracts->block]=[
-            'block'=>$fund_abstracts->block,
-            'ftotal'=>in_lakh($fund_abstracts->total,''),
-           
-           ];
+            $data['fund']['label'][] = $fund_abstracts->block;
+
+            //$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
+
+            $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total, '');
+            //    $data['fund']['data'][$key]['itemStyle']['color'] = '#26c6da' ;
+
+            $data['abstracts'][$fund_abstracts->block] = [
+                'block' => $fund_abstracts->block,
+                'ftotal' => in_lakh($fund_abstracts->total, ''),
+
+            ];
         }
 
-       // printr($data['fund_abstract']); exit;
-      //   printr($data['fund']); exit;
-       
- 
-         $filter['transaction_type'] = 'expense';
+        $filter['transaction_type'] = 'expense';
         $filter['district_id'] = $this->user->district_id;
-		 $filter['fund_agency_id'] = $this->user->fund_agency_id;
-         $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstractDistrict($filter);
-		 // echo "<pre>";
-		 // print_r($data['expense_abstract']); 
-		 // exit;
+        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstractDistrict($filter);
+
         // expense abstract loop for bar chart
-        foreach($expense_abstract as $key=>$expense_abstracts){
+        foreach ($expense_abstract as $key => $expense_abstracts) {
 
-           $data['abstract']['label'][] =  $expense_abstracts->block;
-              
-         //  $data['abstract']['data'][] = in_lakh($expense_abstracts->total);
+            $data['abstract']['label'][] = $expense_abstracts->block;
 
-        $data['abstract']['data'][$key]['value'] = in_lakh($expense_abstracts->total);
-         $data['abstracts'][$expense_abstracts->block]['etotal']=in_lakh($expense_abstracts->total,'');
-         
+            $data['abstract']['data'][$key]['value'] = in_lakh($expense_abstracts->total);
+            $data['abstracts'][$expense_abstracts->block]['etotal'] = in_lakh($expense_abstracts->total, '');
 
-           $etotal=$expense_abstracts->total;
-           $ftotal=$data['abstracts'][$expense_abstracts->block]['ftotal'];
+
+            $etotal = $expense_abstracts->total;
+            $ftotal = $data['abstracts'][$expense_abstracts->block]['ftotal'];
 
             if ((int)$ftotal) {
                 $uc = ($etotal / $ftotal) * 100;
             } else {
                 $uc = 0;
             }
-           $data['abstracts'][$expense_abstracts->block]['uc']=in_lakh($uc);
+            $data['abstracts'][$expense_abstracts->block]['uc'] = in_lakh($uc);
         }
-		   usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
-		//  printr($data['abstract']); exit;
-        /*
-        $filter = [
-            'user_id' => $this->user->user_id,
-            'district_id' => $this->user->district_id,
-            'month_id' => getMonthIdByMonth(date('m')),
-            'year_id' => getCurrentYearId(),
-            'agency_type_id' => [5,6,7]
-        ];
-        $filter['block_users'] = [5,6];
-        $filter['block_user'] = false;
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $filter['block_user'] = true;
-        }
-        $reportModel = new ReportsModel();
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
 
-        $components = $reportModel->getMpr($filter);
-        $components = $this->buildTree($components,'parent','component_id');
-
-        $data['components'] = $this->getTable($components,'view');
-*/
         $data['upload_status'] = $this->upload_status([
-            'district_id'=>$this->user->district_id
+            'district_id' => $this->user->district_id
         ]);
 
-        return $this->template->view('Admin\Common\Views\atma_dashboard',$data);
+        $this->pendingUploads($data);
+
+        return $this->template->view('Admin\Common\Views\atma_dashboard', $data);
 
     }
 
@@ -260,6 +236,25 @@ class Dashboard extends AdminController
         $data = $this->getUploadStatus($filter);
 
         return view('Admin\Reports\Views\upload_status', $data);
+    }
+
+    private function pendingUploads(&$data)
+    {
+        $reportsModel = new ReportsModel();
+        $data['pendingstatus'] = 0;
+
+        $filter['year_id'] = getCurrentYearId();
+        $filter['month_id'] = getCurrentMonthId();
+        $filter['phase'] = [0, 1, 2];
+
+        if ($this->user->district_id) {
+            $filter['district_id'] = $this->user->district_id;
+        }
+
+        $data['pendingstatus'] += count($reportsModel->getPendingExpenses($filter));
+        $data['pendingstatus'] += count($reportsModel->getPendingClosingBalance($filter));
+
+        $data['pendingstatus_url'] = admin_url('pendingstatus');
     }
 
     protected function ps_dashboard(&$data)
@@ -306,14 +301,14 @@ class Dashboard extends AdminController
 
     }
 
-	protected function spmu_dashboard(&$data){
-       // echo "hh"; exit;
+    protected function spmu_dashboard(&$data)
+    {
         $reportModel = new ReportsModel();
 
         $filter = [
 //            'user_id' => $this->user->user_id,
 //            'district_id' => $this->user->district_id,
-            'agency_type_id' => [7,8,9],
+            'agency_type_id' => [7, 8, 9],
             'fund_agency_id' => 1,
             'year_upto' => getCurrentYearId(),
         ];
@@ -322,231 +317,207 @@ class Dashboard extends AdminController
         $data['fr'] = $reportModel->getTransactionTotal($filter);
 
         $filter['transaction_type'] = 'expense';
-        $filter['agency_type_id'] = [5,6,7,8,9];
+        $filter['agency_type_id'] = [5, 6, 7, 8, 9];
         $data['ex'] = $reportModel->getTransactionTotal($filter);
-
-        //$filter['month'] = getMonthIdByMonth(date('m'));
-        //$filter['year'] = getCurrentYearId();
-
-//        $data['cb'] = $reportModel->getClosingBalanceTotal($filter);
 
         $data['cb'] = $data['fr'] - $data['ex'];
 
 
-
-
         $filter['transaction_type'] = 'fund_receipt';
 
-        $data['abstracts']=[];
-        $data['fund_abstract'] = $fund_abstract =  $reportModel->getTransactionAbstract($filter);
-        //echo "<pre>";
-        //print_r($data['fund_abstract']); exit;
-          //fund abstract loop for bar chart
+        $data['abstracts'] = [];
+        $data['fund_abstract'] = $fund_abstract = $reportModel->getTransactionAbstract($filter);
 
-        foreach($fund_abstract as $key=>$fund_abstracts){
+        //fund abstract loop for bar chart
 
-           $data['fund']['label'][] =  $fund_abstracts->district;
+        foreach ($fund_abstract as $key => $fund_abstracts) {
 
-           $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total,'') ;
-        //    $data['fund']['data'][$key]['itemStyle']['color'] = '#26c6da' ;
+            $data['fund']['label'][] = $fund_abstracts->district;
 
-           $data['abstracts'][$fund_abstracts->district]=[
-            'district'=>$fund_abstracts->district,
-            'ftotal'=>in_lakh($fund_abstracts->total,''),
+            $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total, '');
+            //    $data['fund']['data'][$key]['itemStyle']['color'] = '#26c6da' ;
 
-           ];
+            $data['abstracts'][$fund_abstracts->district] = [
+                'district' => $fund_abstracts->district,
+                'ftotal' => in_lakh($fund_abstracts->total, ''),
+
+            ];
 
         }
 
-        //printr($data['abstracts']); exit;
-     // printr($data['fund']); exit;
-
-
         $filter['transaction_type'] = 'expense';
-         $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstract($filter);
+        $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstract($filter);
 
 
         // expense abstract loop for bar chart
-        foreach($expense_abstract as $key=>$expense_abstracts){
+        foreach ($expense_abstract as $key => $expense_abstracts) {
 
-           $data['abstract']['label'][] =  $expense_abstracts->district;
+            $data['abstract']['label'][] = $expense_abstracts->district;
 
             $data['abstract']['data'][$key]['value'] = in_lakh($expense_abstracts->total);
-        //    $data['abstract']['data'][$key]['itemStyle']['color'] = '#555';
-        //    $data['abstracts']['data'][$key]['itemStyle']['color'] = 'green' ;
-           $data['abstracts'][$expense_abstracts->district]['etotal']=in_lakh($expense_abstracts->total,'');
+
+            $data['abstracts'][$expense_abstracts->district]['etotal'] = in_lakh($expense_abstracts->total, '');
 
 
             $etotal = $expense_abstracts->total;
-           $ftotal=$data['abstracts'][$expense_abstracts->district]['ftotal'];
+            $ftotal = $data['abstracts'][$expense_abstracts->district]['ftotal'];
 
             $uc = ($etotal / $ftotal) * 100;
-           $data['abstracts'][$expense_abstracts->district]['uc']=in_lakh($uc);
+            $data['abstracts'][$expense_abstracts->district]['uc'] = in_lakh($uc);
 
 
         }
 
         usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
 
-
-        // echo "<pre>";
-        // print_r( $data['abstract']['data']);
-        // exit;
-
          $filter['transaction_type'] = 'closing_balance';
          $data['closing_abstract'] = $closing_abstract = $reportModel->getTransactionAbstract($filter);
          // closing abstract loop for bar chart
-         foreach($closing_abstract as $closing_abstracts){
+         foreach ($closing_abstract as $closing_abstracts) {
 
-            $data['closing']['label'][] =  $closing_abstracts->district;
+             $data['closing']['label'][] = $closing_abstracts->district;
 
              $data['closing']['data'][] = in_lakh($closing_abstracts->cb);
-        }
-         //printr($data['closing']); exit;
+         }
 
-         //printr($data['closing_abstract']);exit;
-        //$data['districts'] = (new DistrictModel())->asArray()->findAll();
-//        $data['district_id'] = '0';
-//        if($this->request->getGet('district_id')){
-//            $data['district_id'] = $this->request->getGet('district_id');
-//        }
-//        $data['upload_status'] = $this->upload_status($data);
+        $this->pendingUploads($data);
 
-        return $this->template->view('Admin\Common\Views\spmu_dashboard',$data);
+        return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
 
     }
 
-    public function spmu_dashboard_chart(){
+    public function spmu_dashboard_chart()
+    {
 
-		$reportModel = new ReportsModel();
-		if($_GET['data'] == 'all'){
+        $reportModel = new ReportsModel();
+        if ($_GET['data'] == 'all') {
 
-			$filter['transaction_type'] = 'fund_receipt';
+            $filter['transaction_type'] = 'fund_receipt';
 
-			$data['abstracts']=[];
-			$fund_abstract =  $reportModel->getTransactionAbstract($filter);
+            $data['abstracts'] = [];
+            $fund_abstract = $reportModel->getTransactionAbstract($filter);
 
-			foreach($fund_abstract as $key=>$fund_abstracts){
+            foreach ($fund_abstract as $key => $fund_abstracts) {
 
-				$data['fund']['label'][] =  $fund_abstracts->district;
+                $data['fund']['label'][] = $fund_abstracts->district;
 
-				$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
+                $data['fund']['data'][] = in_lakh($fund_abstracts->total, '');
 
-				$data['abstracts'][$fund_abstracts->district]=[
-					'district'=>$fund_abstracts->district,
-					'ftotal'=>in_lakh($fund_abstracts->total,''),
-				];
+                $data['abstracts'][$fund_abstracts->district] = [
+                    'district' => $fund_abstracts->district,
+                    'ftotal' => in_lakh($fund_abstracts->total, ''),
+                ];
 
             }
 
-			$filter['transaction_type'] = 'expense';
-			$expense_abstract = $reportModel->getTransactionAbstract($filter);
+            $filter['transaction_type'] = 'expense';
+            $expense_abstract = $reportModel->getTransactionAbstract($filter);
 
             foreach ($expense_abstract as $key => $expense_abstracts) {
 
-			$data['abstract']['label'][] =  $expense_abstracts->district;
+                $data['abstract']['label'][] = $expense_abstracts->district;
 
-			$data['abstract']['data'][] = in_lakh($expense_abstracts->total);
+                $data['abstract']['data'][] = in_lakh($expense_abstracts->total);
 
 
-			$etotal=$expense_abstracts->total;
-			$ftotal=$data['abstracts'][$expense_abstracts->district]['ftotal'];
+                $etotal = $expense_abstracts->total;
+                $ftotal = $data['abstracts'][$expense_abstracts->district]['ftotal'];
 
-			$uc=($etotal / $ftotal) * 100;
-			$data['abstracts'][$expense_abstracts->district]['uc']=in_lakh($uc);
+                $uc = ($etotal / $ftotal) * 100;
+                $data['abstracts'][$expense_abstracts->district]['uc'] = in_lakh($uc);
 
-			}
-			usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
+            }
+            usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
 
 		}
 
         if ($_GET['data'] == 'agency') {
 
-			$filter['transaction_type'] = 'fund_receipt';
+            $filter['transaction_type'] = 'fund_receipt';
 
-			$fund_abstract =  $reportModel->getTransactionAbstractAgency($filter);
-			foreach($fund_abstract as $key=>$fund_abstracts){
+            $fund_abstract = $reportModel->getTransactionAbstractAgency($filter);
+            foreach ($fund_abstract as $key => $fund_abstracts) {
 
-				$data['fund']['label'][] =  $fund_abstracts->agency;
+                $data['fund']['label'][] = $fund_abstracts->agency;
 
-				$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
+                $data['fund']['data'][] = in_lakh($fund_abstracts->total, '');
             }
 
-			$filter['transaction_type'] = 'expense';
-			$expense_abstract = $reportModel->getTransactionAbstractAgency($filter);
-			// expense abstract loop for bar chart
-			foreach($expense_abstract as $key=>$expense_abstracts){
+            $filter['transaction_type'] = 'expense';
+            $expense_abstract = $reportModel->getTransactionAbstractAgency($filter);
+            // expense abstract loop for bar chart
+            foreach ($expense_abstract as $key => $expense_abstracts) {
 
-				$data['abstract']['label'][] =  $expense_abstracts->agency;
+                $data['abstract']['label'][] = $expense_abstracts->agency;
 
-				$data['abstract']['data'][] = in_lakh($expense_abstracts->total,'');
-
-			}
-		}
-		if($_GET['data'] == 'percentage'){
-
-			$filter['transaction_type'] = 'fund_receipt';
-			$data['abstracts']=[];
-			$fund_abstract =  $reportModel->getTransactionAbstract($filter);
-			$fabs=[];
-			foreach($fund_abstract as $key=>$fund_abstracts){
-				$data['abstracts']['district'][]=$fund_abstracts->district;
-				$fabs[$fund_abstracts->district]=in_lakh($fund_abstracts->total,'');
-            }
-
-			$filter['transaction_type'] = 'expense';
-			$expense_abstract = $reportModel->getTransactionAbstract($filter);
-			// expense abstract loop for bar chart
-			foreach($expense_abstract as $key=>$expense_abstracts){
-
-				$etotal=$expense_abstracts->total;
-				$ftotal=$fabs[$expense_abstracts->district];
-				$uc=($etotal / $ftotal) * 100;
-				$data['abstracts']['uc'][]=in_lakh($uc);
-			}
-		}
-		if($_GET['data'] == 'district'){
-
-			$filter['transaction_type'] = 'fund_receipt';
-
-			$data['abstracts']=[];
-			$fund_abstract =  $reportModel->getTransactionAbstract($filter);
-
-			foreach($fund_abstract as $key=>$fund_abstracts){
-
-				$data['fund']['label'][] =  $fund_abstracts->district;
-
-				$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
-
-				$data['abstracts'][$fund_abstracts->district]=[
-					'district'=>$fund_abstracts->district,
-					'ftotal'=>in_lakh($fund_abstracts->total,''),
-				];
+                $data['abstract']['data'][] = in_lakh($expense_abstracts->total, '');
 
             }
+        }
+        if ($_GET['data'] == 'percentage') {
 
-			$filter['transaction_type'] = 'expense';
-			$expense_abstract = $reportModel->getTransactionAbstract($filter);
+            $filter['transaction_type'] = 'fund_receipt';
+            $data['abstracts'] = [];
+            $fund_abstract = $reportModel->getTransactionAbstract($filter);
+            $fabs = [];
+            foreach ($fund_abstract as $key => $fund_abstracts) {
+                $data['abstracts']['district'][] = $fund_abstracts->district;
+                $fabs[$fund_abstracts->district] = in_lakh($fund_abstracts->total, '');
+            }
+
+            $filter['transaction_type'] = 'expense';
+            $expense_abstract = $reportModel->getTransactionAbstract($filter);
+            // expense abstract loop for bar chart
+            foreach ($expense_abstract as $key => $expense_abstracts) {
+
+                $etotal = $expense_abstracts->total;
+                $ftotal = $fabs[$expense_abstracts->district];
+                $uc = ($etotal / $ftotal) * 100;
+                $data['abstracts']['uc'][] = in_lakh($uc);
+            }
+        }
+        if ($_GET['data'] == 'district') {
+
+            $filter['transaction_type'] = 'fund_receipt';
+
+            $data['abstracts'] = [];
+            $fund_abstract = $reportModel->getTransactionAbstract($filter);
+
+            foreach ($fund_abstract as $key => $fund_abstracts) {
+
+                $data['fund']['label'][] = $fund_abstracts->district;
+
+                $data['fund']['data'][] = in_lakh($fund_abstracts->total, '');
+
+                $data['abstracts'][$fund_abstracts->district] = [
+                    'district' => $fund_abstracts->district,
+                    'ftotal' => in_lakh($fund_abstracts->total, ''),
+                ];
+
+            }
+
+            $filter['transaction_type'] = 'expense';
+            $expense_abstract = $reportModel->getTransactionAbstract($filter);
 
             foreach ($expense_abstract as $key => $expense_abstracts) {
 
-			$data['abstract']['label'][] =  $expense_abstracts->district;
+                $data['abstract']['label'][] = $expense_abstracts->district;
 
-			$data['abstract']['data'][] = in_lakh($expense_abstracts->total);
+                $data['abstract']['data'][] = in_lakh($expense_abstracts->total);
 
 
-			$etotal=$expense_abstracts->total;
-			$ftotal=$data['abstracts'][$expense_abstracts->district]['ftotal'];
+                $etotal = $expense_abstracts->total;
+                $ftotal = $data['abstracts'][$expense_abstracts->district]['ftotal'];
 
-			$uc=($etotal / $ftotal) * 100;
-			$data['abstracts'][$expense_abstracts->district]['uc']=in_lakh($uc);
+                $uc = ($etotal / $ftotal) * 100;
+                $data['abstracts'][$expense_abstracts->district]['uc'] = in_lakh($uc);
 
-			}
-			usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
+            }
+            usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
 		}
 
-		echo json_encode($data);
+        echo json_encode($data);
 
-	}
+    }
 
 }

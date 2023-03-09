@@ -7,7 +7,7 @@
             <form>
                 <div class="row">
                     <div class="col-md-2">
-                        <select class="form-control" id="year" name="year">
+                        <select class="form-control" id="year" name="year_id">
                             <option value="">Choose Year</option>
                             <?php foreach (getAllYears() as $_year) { ?>
                                 <option value="<?= $_year['id'] ?>" <?php if ($_year['id'] == $year_id) {
@@ -17,12 +17,22 @@
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-control" id="month" name="month">
+                        <select class="form-control" id="month" name="month_id">
                             <option value="">Choose Month</option>
                             <?php foreach (getAllMonths() as $_month) { ?>
                                 <option value="<?= $_month['id'] ?>" <?php if ($_month['id'] == $month_id) {
                                     echo 'selected';
                                 } ?>><?= $_month['name'] ?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control" id="modulecode" name="modulecode">
+                            <option value="">Choose Module</option>
+                            <?php foreach ($modules as $module) { ?>
+                                <option value="<?= $module['modulecode'] ?>" <?php if ($module['modulecode'] == $modulecode) {
+                                    echo 'selected';
+                                } ?>><?= $module['module'] ?></option>
                             <?php } ?>
                         </select>
                     </div>

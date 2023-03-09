@@ -29,7 +29,7 @@ class Reports extends AdminController
         return $this->template->view('Admin\Reports\Views\upload_status',$data);
     }
 
-    public function pendingStatus($modulecode = 'expense')
+    public function pendingStatus()
     {
         $reportsModel = new ReportsModel();
 
@@ -42,28 +42,39 @@ class Reports extends AdminController
             $filter['month_id'] = $this->request->getGet('month_id');
         }
         $filter['district_id'] = null;
-        if ($this->request->getGet('district_id')) {
-            $filter['district_id'] = $this->request->getGet('district_id');
-        }
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
         }
+        if ($this->request->getGet('district_id')) {
+            $filter['district_id'] = $this->request->getGet('district_id');
+        }
+        $filter['modulecode'] = 'expense';
+        if ($this->request->getGet('modulecode')) {
+            $filter['modulecode'] = $this->request->getGet('modulecode');
+        }
         $filter['phase'] = [0, 1, 2];
-        $filter['module'] = 'expense';
+        $modulecode = $filter['modulecode'];
 
         if ($modulecode == 'expense') {
             $data['blocks'] = $reportsModel->getPendingExpenses($filter);
+        } else if ($modulecode == 'closing_balance') {
+            $data['blocks'] = $reportsModel->getPendingClosingBalance($filter);
         }
 
-        $data['module'] = $filter['module'];
         $data['modules'] = [
             ['module' => 'Expense', 'modulecode' => 'expense'],
-            ['module' => 'Fund Receipt', 'modulecode' => 'fund_receipt'],
+            ['module' => 'Closing Balance', 'modulecode' => 'closing_balance'],
         ];
+        $data['modulecode'] = $modulecode;
 
         $data['year_id'] = $filter['year_id'];
         $data['month_id'] = $filter['month_id'];
-        $data['districts'] = (new DistrictModel())->asArray()->findAll();
+        if ($this->user->district_id) {
+            $data['districts'] = (new DistrictModel())->asArray()
+                ->where('id', $this->user->district_id)->find();
+        } else {
+            $data['districts'] = (new DistrictModel())->asArray()->findAll();
+        }
         $data['district_id'] = $filter['district_id'];
 
         return $this->template->view('Admin\Reports\Views\pending_status', $data);
