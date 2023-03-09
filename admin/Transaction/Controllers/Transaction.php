@@ -35,8 +35,6 @@ class Transaction extends AdminController {
         'cum_cell' => 'K4',
     ];
 
-    //test commit --2
-
     public function index() {
 
         $this->template->add_package(['datatable','uploader','jquery_loading'],true);
@@ -60,7 +58,6 @@ class Transaction extends AdminController {
 
         $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
 
-//        $data['upload_enabled'] = (bool)$upload;
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
 
@@ -113,12 +110,6 @@ class Transaction extends AdminController {
 
             $data['blocks'] = $block_model->where($filter)->asArray()->findAll();
         }
-
-        $data['districts'] = [];
-//        if($this->user->agency_type_id!=$this->settings->district_user
-//            && $this->user->agency_type_id!=$this->settings->block_user) {
-//            $data['districts'] = (new DistrictModel)->asArray()->findAll();
-//        }
 
         $data['agency_types'] = [];
         foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
@@ -767,31 +758,41 @@ class Transaction extends AdminController {
         if ($this->user->agency_type_id == $this->settings->district_user) {
             $filter['district_id'] = $this->user->district_id;
         }
-        $pending_transactions = $txnModel->pendingUploads($filter);
 
-        if(isset($pending_transactions->total)) {
-            if ($pending_transactions->total < ($month - 1)) {
-                $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending uploads in the previous months!!');
-                return redirect()->to(Url::transaction);
-            }
+        //skip validation for ps
+        if ($this->user->agency_type_id == $this->settings->ps_user
+            || $this->user->agency_type_id == $this->settings->rs_user
+        ) {
+
         } else {
-            if($pending_transactions['block_cbs']){
-                foreach ($pending_transactions['block_cbs'] as $block_cb) {
-                    if($block_cb->total != ($month-1)){
-                        $this->session->setFlashdata('message', 'Cannot add transaction. Block level uploads are pending in the previous months!!');
-                        return redirect()->to(Url::transaction);
+            $pending_transactions = $txnModel->pendingUploads($filter);
+
+            if (isset($pending_transactions->total)) {
+                if ($pending_transactions->total < ($month - 1)) {
+                    $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending closing balance of the previous months!!');
+                    return redirect()->to(Url::transaction);
+                }
+            } else {
+                if ($pending_transactions['block_cbs']) {
+                    foreach ($pending_transactions['block_cbs'] as $block_cb) {
+                        if ($block_cb->total != ($month - 1)) {
+                            $this->session->setFlashdata('message', 'Cannot add transaction. Block level uploads are pending in the previous months!!');
+                            return redirect()->to(Url::transaction);
+                        }
                     }
                 }
-            }
-            if($pending_transactions['district_cbs'] < ($month - 1)){
-                $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending uploads in the previous months!!');
-                return redirect()->to(Url::transaction);
-            }
-            if($pending_transactions['pending_cbs']){
-                $this->session->setFlashdata('message', 'Cannot add transaction. Blocks status are pending');
-                return redirect()->to(Url::transaction);
+                if ($pending_transactions['district_cbs'] < ($month - 1)) {
+                    $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending uploads in the previous months!!');
+                    return redirect()->to(Url::transaction);
+                }
+                if ($pending_transactions['pending_cbs']) {
+                    $this->session->setFlashdata('message', 'Cannot add transaction. Blocks status are pending');
+                    return redirect()->to(Url::transaction);
+                }
             }
         }
+
+
 
         if($this->request->getMethod(1)=='POST'){
 

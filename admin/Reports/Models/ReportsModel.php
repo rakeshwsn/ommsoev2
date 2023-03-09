@@ -1812,8 +1812,6 @@ FROM (SELECT
         }
     }
 	
-	
-	
     public function getTransactionAbstractAgency($filter=[]){
         if($filter['transaction_type'] == 'expense'){
             $sql = "SELECT * FROM vw_txn_agency_type_exp";
@@ -1823,7 +1821,6 @@ FROM (SELECT
             return $this->db->query($sql)->getResult();
         }
     }
-
 
     public function getTransactionAbstractDistrict($filter=[]){
 
@@ -1843,18 +1840,90 @@ FROM (SELECT
 	
 	}
 
-    public function getPendingStatus($filter=[]) {
-        $sql = "SELECT * FROM vw_pending_uploads WHERE 1=1";
+    public function getPendingExpenses($filter = [])
+    {
+        $sql = "SELECT
+  res.block_id,
+  res.district_id,
+  sd.name district,
+  res.block,
+  res.phase,
+  res.total,
+  res.transaction_type,
+  res.agency_type_id
+FROM (SELECT
+    bl.block_id,
+    bl.district_id,
+    bl.block,
+    bl.phase,
+    COALESCE(bl_txn.total, 0) total,
+    bl_txn.transaction_type,
+    bl_txn.agency_type_id
+  FROM (SELECT
+      id block_id,
+      sb.district_id,
+      sb.name block,
+      sb.phase
+    FROM soe_blocks sb) bl
+    LEFT JOIN (SELECT
+        COUNT(id) total,
+        st.block_id,
+        st.district_id,
+        st.transaction_type,
+        st.agency_type_id
+      FROM soe_transactions st
+      WHERE st.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.block_id,
+               st.agency_type_id) bl_txn
+      ON bl_txn.block_id = bl.block_id
+  UNION ALL
+  SELECT
+    0 block_id,
+    sd.id district_id,
+    CONCAT('ATMA ', sd.name) block,
+    0 phase,
+    COALESCE(dist_txn.total, 0) total,
+    dist_txn.transaction_type,
+    dist_txn.agency_type_id
+  FROM soe_districts sd
+    LEFT JOIN (SELECT
+        st.district_id,
+        COUNT(st.id) total,
+        st.transaction_type,
+        st.agency_type_id
+      FROM soe_transactions st
+      WHERE st.deleted_at IS NULL
+      AND st.agency_type_id = 7
+      AND st.transaction_type = 'expense'
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.district_id,
+               st.agency_type_id) dist_txn
+      ON dist_txn.district_id = sd.id) res
+  LEFT JOIN soe_districts sd
+    ON res.district_id = sd.id
+WHERE res.total = 0";
+        if (!empty($filter['phase'])) {
+            if (is_array($filter['phase'])) {
+                $sql .= " AND res.phase IN (" . implode(',', $filter['phase']) . ")";
+            } else {
+                $sql .= " AND res.phase = " . $filter['phase'];
+            }
+        }
 
-        if(!empty($filter['block_id'])){
-            $sql .= " AND block_id=".$filter['block_id'];
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND res.block_id=" . $filter['block_id'];
         }
 
         if(!empty($filter['district_id'])){
             $sql .= " AND district_id=".$filter['district_id'];
         }
-
-        return $this->db->query($sql)->getResult();
+        $sql .= " ORDER BY district, res.block";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResultArray();
     }
 
 }
