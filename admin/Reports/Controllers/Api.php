@@ -64,9 +64,7 @@ class Api extends ResourceController
 
         $components = $reportModel->getMpr($filter);
 
-        $components = $this->buildTree($components, 'parent', 'component_id');
-
-//        $components = $this->getTable($components,'array');
+        $components = $this->buildTree($components, 'parent', 'scomponent_id');
 
         $data['components'] = $components;
 

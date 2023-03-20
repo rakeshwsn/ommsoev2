@@ -1,55 +1,58 @@
 
 <!-- Main content -->
-<section class="content">
-    <h2 class="content-heading">MIS</h2>
-    <?php if($upload_enabled) { ?>
-        <div class="block" id="upload-controls">
-            <div class="block-content block-content-full">
-                <div class="row">
-                    <div class="col-md-2">
-                        <select class="form-control" id="year" name="year" required>
-                            <option value="">Choose Year</option>
-                            <?php foreach ($years as $year) { ?>
-                                <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <select class="form-control" id="month" name="month" required>
-                            <option value="">Choose Month</option>
-                            <?php foreach ($months as $month) { ?>
-                                <option value="<?=$month['id']?>" <?php if($month['id']==$month_id){echo 'selected';} ?>><?=$month['name']?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
+
+<h2 class="content-heading">MIS</h2>
+<?php if ($upload_enabled) { ?>
+    <div class="block" id="upload-controls">
+        <div class="block-content block-content-full">
+            <div class="row">
+                <div class="col-md-2">
+                    <select class="form-control" id="year" name="year" required>
+                        <option value="">Choose Year</option>
+                        <?php foreach ($years as $year) { ?>
+                            <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
+                                echo 'selected';
+                            } ?>><?= $year['name'] ?></option>
+                        <?php } ?>
+                    </select>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-md-2">
-                        <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add New</button>
-                    </div>
+                <div class="col-md-2">
+                    <select class="form-control" id="month" name="month" required>
+                        <option value="">Choose Month</option>
+                        <?php foreach ($months as $month) { ?>
+                            <option value="<?= $month['id'] ?>" <?php if ($month['id'] == $month_id) {
+                                echo 'selected';
+                            } ?>><?= $month['name'] ?></option>
+                        <?php } ?>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-2">
+                    <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add New
+                    </button>
                 </div>
             </div>
         </div>
-    <?php } ?>
-
-    <div class="block">
-
-        <div class="block-content block-content-full">
-            <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
-                <thead>
-                <tr>
-                    <th>Month</th>
-                    <th>Year</th>
-                    <th>Date Added</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-            </table>
-        </div>
     </div>
+<?php } ?>
 
-</section>
+<div class="block">
+
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
+            <thead>
+            <tr>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Date Added</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
 <!-- content -->
 <?php js_start(); ?>
 <script>

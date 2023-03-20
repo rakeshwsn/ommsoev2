@@ -3,6 +3,7 @@ namespace Admin\Transaction\Controllers;
 
 use Admin\Common\Models\CommonModel;
 use Admin\Component\Models\ComponentModel;
+use Admin\Components\Models\ComponentsModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\MIS\Controllers\MIS;
@@ -216,9 +217,14 @@ class Approve extends AdminController {
         $user = (new UserModel())->find($txn->user_id);
         $filter['fund_agency_id'] = $user->fund_agency_id;
 
+        if ($txn->agency_type_id == $this->settings->block_user || $txn->agency_type_id == $this->settings->cbo_user) {
+            $filter['component_agency_type_id'] = [5, 6, 7, 0]; //fa/cbo --to be added to settings
+            $filter['category'] = 'program';
+        }
+
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
-        $components = $this->buildTree($block_components,'parent','component_id');
+        $components = $this->buildTree($block_components, 'parent', 'assign_id');
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
@@ -228,6 +234,69 @@ class Approve extends AdminController {
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
+    }
+
+    private function getUrlParam()
+    {
+        $year = $this->request->getGet('year');
+        $month = $this->request->getGet('month');
+        $agency_type_id = $this->request->getGet('agency_type_id');
+        $txn_type = $this->request->getGet('txn_type');
+        $fund_agency_id = $this->request->getGet('fund_agency_id');
+        $block_id = $this->request->getGet('block_id');
+        return '?year=' . $year
+            . '&month=' . $month
+            . '&year=' . $year
+            . '&agency_type_id=' . $agency_type_id
+            . '&txn_type=' . $txn_type
+            . '&fund_agency_id=' . $fund_agency_id
+            . '&block_id=' . $block_id;
+
+    }
+
+    public function getForm()
+    {
+        $txn_type = $this->request->getGet('txn_type');
+        $txn_id = $this->request->getGet('txn_id');
+
+        $data['statuses'] = [
+            [
+                'id' => 0,
+                'name' => 'Not Approved',
+            ],
+            [
+                'id' => 1,
+                'name' => 'Approved',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Rejected',
+            ],
+        ];
+        $title = 'Approve';
+        if ($txn_type == 'expense' || $txn_type == 'fund_receipt') {
+            $txn = (new TransactionModel())->find($txn_id);
+            $title .= $txn->transaction_type == 'expense' ? ' Expense' : ' Fund receipt';
+        }
+        if ($txn_type == 'other_receipt') {
+            $txn = (new MisctransactionModel())->find($txn_id);
+            $title .= ' Other Receipt';
+        }
+        if ($txn_type == 'closing_balance') {
+            $txn = (new ClosingbalanceModel())->find($txn_id);
+            $title .= ' Closing Balance';
+        }
+        if ($txn_type == 'mis') {
+            $txn = (new MISModel())->find($txn_id);
+            $title .= ' MIS';
+        }
+
+        $data['status_id'] = $txn->status;
+        $data['remarks'] = $txn->remarks;
+
+        $data['title'] = $title;
+
+        return $data;
     }
 
     public function otherReceipt() {
@@ -383,7 +452,7 @@ class Approve extends AdminController {
         helper('form');
         $data = [];
         $misModel = new MISModel();
-        $compModel = new ComponentModel();
+        $compModel = new ComponentsModel();
         $misDetailModel = new MISDetailModel();
         $this->template->add_package(['uploader','jquery_loading'],true);
 
@@ -424,6 +493,8 @@ class Approve extends AdminController {
             'year' => $year,
             'user_group' => $agency_type_id
         ];
+        $filter['component_agency_type_id'] = [5, 6, 7, 0];
+        $filter['component_category'] = ['program'];
 
         if($district_id){
             $filter['district_id'] = $district_id;
@@ -431,7 +502,7 @@ class Approve extends AdminController {
 
         $components = $compModel->getComponents($filter);
 
-        $components = $this->buildTree($components,'parent','component_id');
+        $components = $this->buildTree($components, 'parent', 'assign_id');
 
         $misController = new MIS();
 
@@ -458,66 +529,5 @@ class Approve extends AdminController {
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
         return $this->template->view('Admin\Transaction\Views\approve_mis', $data);
-    }
-
-    public function getForm() {
-        $txn_type = $this->request->getGet('txn_type');
-        $txn_id = $this->request->getGet('txn_id');
-
-        $data['statuses'] = [
-            [
-                'id' => 0,
-                'name' => 'Not Approved',
-            ],
-            [
-                'id' => 1,
-                'name' => 'Approved',
-            ],
-            [
-                'id' => 2,
-                'name' => 'Rejected',
-            ],
-        ];
-        $title = 'Approve';
-        if($txn_type=='expense' || $txn_type=='fund_receipt') {
-            $txn = (new TransactionModel())->find($txn_id);
-            $title .= $txn->transaction_type=='expense' ? ' Expense':' Fund receipt';
-        }
-        if($txn_type=='other_receipt') {
-            $txn = (new MisctransactionModel())->find($txn_id);
-            $title .= ' Other Receipt';
-        }
-        if($txn_type=='closing_balance') {
-            $txn = (new ClosingbalanceModel())->find($txn_id);
-            $title .= ' Closing Balance';
-        }
-        if($txn_type=='mis') {
-            $txn = (new MISModel())->find($txn_id);
-            $title .= ' MIS';
-        }
-
-        $data['status_id'] = $txn->status;
-        $data['remarks'] = $txn->remarks;
-
-        $data['title'] = $title;
-
-        return $data;
-    }
-
-    private function getUrlParam() {
-        $year=$this->request->getGet('year');
-        $month=$this->request->getGet('month');
-        $agency_type_id=$this->request->getGet('agency_type_id');
-        $txn_type=$this->request->getGet('txn_type');
-        $fund_agency_id=$this->request->getGet('fund_agency_id');
-        $block_id=$this->request->getGet('block_id');
-        return '?year='.$year
-            . '&month='.$month
-            . '&year='.$year
-            . '&agency_type_id='.$agency_type_id
-            . '&txn_type='.$txn_type
-            . '&fund_agency_id='.$fund_agency_id
-            . '&block_id='.$block_id;
-
     }
 }

@@ -404,7 +404,8 @@ FROM (SELECT * FROM soe_components_assign
 WHERE deleted_at IS NULL AND fund_agency_id=".$filter['fund_agency_id'].") sca
   LEFT JOIN soe_components sc
     ON sca.component_id = sc.id
-    LEFT JOIN (SELECT sb.agency_type_id,sb.component_id FROM soe_budgets sb LEFT JOIN soe_budgets_plan sbp ON sb.budget_plan_id=sbp.id where 1=1 ";
+    LEFT JOIN (SELECT sb.agency_type_id,sb.component_id FROM soe_budgets sb 
+    LEFT JOIN soe_budgets_plan sbp ON sb.budget_plan_id=sbp.id where 1=1 ";
     if(!empty($filter['fund_agency_id'])){
         $sql .= " AND sbp.fund_agency_id = ".$filter['fund_agency_id'];
     }
@@ -462,6 +463,7 @@ WHERE sb.deleted_at IS NULL";
             $sql .= " OR sb.agency_type_id is NULL or sb.agency_type_id = 0)";
         }
         $sql .= " GROUP BY sb.component_id) bud ON bud.component_id=comp.component_id";
+
         /* ******************transaction starts****************** */
         /* ******************month's expense****************** */
         $sql .= " LEFT JOIN (SELECT
@@ -686,7 +688,7 @@ WHERE sb.deleted_at IS NULL";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-//echo $sql;
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }
@@ -1402,6 +1404,20 @@ GROUP BY abst.heading_id";
     }
 
     //dashboard
+
+    public function getClosingBalanceTotal($filter = [])
+    {
+        $ob = (float)$this->getOpeningBalanceTotal($filter);
+
+        $filter['transaction_type'] = 'fund_receipt';
+        $fr = (float)$this->getTransactionTotal($filter);
+
+        $filter['transaction_type'] = 'expense';
+        $ex = (float)$this->getTransactionTotal($filter);
+
+        return $ob + $fr - $ex;
+    }
+
     public function getOpeningBalanceTotal($filter=[]) {
 
         $filter['transaction_type'] = 'fund_receipt';
@@ -1429,18 +1445,6 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         $sql .= $this->appendFilter($filter);
 
         return $this->db->query($sql)->getFirstRow()->total;
-    }
-
-    public function getClosingBalanceTotal($filter=[]) {
-        $ob = (float)$this->getOpeningBalanceTotal($filter);
-
-        $filter['transaction_type'] = 'fund_receipt';
-        $fr = (float)$this->getTransactionTotal($filter);
-
-        $filter['transaction_type'] = 'expense';
-        $ex = (float)$this->getTransactionTotal($filter);
-
-        return $ob+$fr-$ex;
     }
 
     protected function appendFilter($filter) {
@@ -1808,8 +1812,6 @@ FROM (SELECT
         }
     }
 	
-	
-	
     public function getTransactionAbstractAgency($filter=[]){
         if($filter['transaction_type'] == 'expense'){
             $sql = "SELECT * FROM vw_txn_agency_type_exp";
@@ -1819,7 +1821,6 @@ FROM (SELECT
             return $this->db->query($sql)->getResult();
         }
     }
-
 
     public function getTransactionAbstractDistrict($filter=[]){
 
@@ -1839,18 +1840,169 @@ FROM (SELECT
 	
 	}
 
-    public function getPendingStatus($filter=[]) {
-        $sql = "SELECT * FROM vw_pending_uploads WHERE 1=1";
+    public function getPendingExpenses($filter = [])
+    {
+        $sql = "SELECT
+  res.block_id,
+  res.district_id,
+  sd.name district,
+  res.block,
+  res.phase,
+  res.total,
+  res.transaction_type,
+  res.agency_type_id
+FROM (SELECT
+    bl.block_id,
+    bl.district_id,
+    bl.block,
+    bl.phase,
+    COALESCE(bl_txn.total, 0) total,
+    bl_txn.transaction_type,
+    bl_txn.agency_type_id
+  FROM (SELECT
+      id block_id,
+      sb.district_id,
+      sb.name block,
+      sb.phase
+    FROM soe_blocks sb) bl
+    LEFT JOIN (SELECT
+        COUNT(id) total,
+        st.block_id,
+        st.district_id,
+        st.transaction_type,
+        st.agency_type_id
+      FROM soe_transactions st
+      WHERE st.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.block_id,
+               st.agency_type_id) bl_txn
+      ON bl_txn.block_id = bl.block_id
+  UNION ALL
+  SELECT
+    0 block_id,
+    sd.id district_id,
+    CONCAT('ATMA ', sd.name) block,
+    0 phase,
+    COALESCE(dist_txn.total, 0) total,
+    dist_txn.transaction_type,
+    dist_txn.agency_type_id
+  FROM soe_districts sd
+    LEFT JOIN (SELECT
+        st.district_id,
+        COUNT(st.id) total,
+        st.transaction_type,
+        st.agency_type_id
+      FROM soe_transactions st
+      WHERE st.deleted_at IS NULL
+      AND st.agency_type_id = 7
+      AND st.transaction_type = 'expense'
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.district_id,
+               st.agency_type_id) dist_txn
+      ON dist_txn.district_id = sd.id) res
+  LEFT JOIN soe_districts sd
+    ON res.district_id = sd.id
+WHERE res.total = 0";
+        if (!empty($filter['phase'])) {
+            if (is_array($filter['phase'])) {
+                $sql .= " AND res.phase IN (" . implode(',', $filter['phase']) . ")";
+            } else {
+                $sql .= " AND res.phase = " . $filter['phase'];
+            }
+        }
 
-        if(!empty($filter['block_id'])){
-            $sql .= " AND block_id=".$filter['block_id'];
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND res.block_id=" . $filter['block_id'];
         }
 
         if(!empty($filter['district_id'])){
             $sql .= " AND district_id=".$filter['district_id'];
         }
+        $sql .= " ORDER BY district, res.block";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResultArray();
+    }
 
-        return $this->db->query($sql)->getResult();
+    public function getPendingClosingBalance($filter = [])
+    {
+        $sql = "SELECT
+  res.block_id,
+  res.district_id,
+  sd.name district,
+  res.block,
+  res.phase,
+  res.total,
+  res.agency_type_id
+FROM (SELECT
+    bl.block_id,
+    bl.district_id,
+    bl.block,
+    bl.phase,
+    COALESCE(bl_txn.total, 0) total,
+    bl_txn.agency_type_id
+  FROM (SELECT
+      id block_id,
+      sb.district_id,
+      sb.name block,
+      sb.phase
+    FROM soe_blocks sb) bl
+    LEFT JOIN (SELECT
+        COUNT(id) total,
+        st.block_id,
+        st.district_id,
+        st.agency_type_id
+      FROM soe_closing_balances st
+      WHERE st.deleted_at IS NULL
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.block_id,
+               st.agency_type_id) bl_txn
+      ON bl_txn.block_id = bl.block_id
+  UNION ALL
+  SELECT
+    0 block_id,
+    sd.id district_id,
+    CONCAT('ATMA ', sd.name) block,
+    0 phase,
+    COALESCE(dist_txn.total, 0) total,
+    dist_txn.agency_type_id
+  FROM soe_districts sd
+    LEFT JOIN (SELECT
+        st.district_id,
+        COUNT(st.id) total,
+        st.agency_type_id
+      FROM soe_closing_balances st
+      WHERE st.deleted_at IS NULL
+      AND st.agency_type_id = 7
+      AND st.year = " . $filter['year_id'] . "
+      AND st.month = " . $filter['month_id'] . "
+      GROUP BY st.district_id,
+               st.agency_type_id) dist_txn
+      ON dist_txn.district_id = sd.id) res
+  LEFT JOIN soe_districts sd
+    ON res.district_id = sd.id
+WHERE res.total = 0";
+        if (!empty($filter['phase'])) {
+            if (is_array($filter['phase'])) {
+                $sql .= " AND res.phase IN (" . implode(',', $filter['phase']) . ")";
+            } else {
+                $sql .= " AND res.phase = " . $filter['phase'];
+            }
+        }
+
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND res.block_id=" . $filter['block_id'];
+        }
+
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND district_id=" . $filter['district_id'];
+        }
+        $sql .= " ORDER BY district, res.block";
+
+        return $this->db->query($sql)->getResultArray();
     }
 
 }

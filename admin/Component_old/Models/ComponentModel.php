@@ -66,7 +66,52 @@ ORDER BY c.sort_order";
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getComponents($filter=[])
+    public function getComponents($filter=[]) {
+        $filter['fund_agency_id'] = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+
+        $sql = "SELECT
+      sca.id assign_id,
+      sc.id component_id,
+      sca.number,
+      sc.description,
+      sca.parent,
+      sca.sort_order,
+      sc.row_type,
+      sc.category
+    FROM (SELECT
+        *
+      FROM soe_components_assign
+      WHERE deleted_at IS NULL
+      AND fund_agency_id = 1) sca
+      LEFT JOIN soe_components sc
+        ON sca.component_id = sc.id
+      LEFT JOIN (SELECT
+          sb.agency_type_id,
+          sb.component_id
+        FROM soe_budgets sb
+          LEFT JOIN soe_budgets_plan sbp
+            ON sb.budget_plan_id = sbp.id
+        WHERE sbp.fund_agency_id = ".(int)$filter['fund_agency_id']."
+        GROUP BY sb.component_id) sb
+        ON sb.component_id = sc.id
+    WHERE 1 = 1";
+        if(!empty($filter['user_group'])){
+            $user_group = (array)$filter['user_group'];
+            $sql .= "
+    AND (sb.agency_type_id IN (".implode(',',$user_group).")
+    OR sb.agency_type_id IS NULL
+    OR sb.agency_type_id = 0)";
+        }
+        if (!empty($filter['component_category'])) {
+            $sql .= " AND sc.category='".$filter['component_category']."'";
+        }
+
+        $sql .= " ORDER by sort_order";
+//        echo $sql;exit;
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getComponents_bak($filter=[])
     {
         $sql = "SELECT
   c.id component_id,
