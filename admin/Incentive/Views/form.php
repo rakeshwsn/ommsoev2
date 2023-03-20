@@ -78,7 +78,7 @@ $validation = \Config\Services::validation();
                                 <button id="" class="btn btn-outline btn-primary"><i class="fa fa-upload"></i> Upload</button>
                             </td>
                             <td>
-                               <a href="<?php echo theme_url('assets/farmerin.xlsx'); ?>" download target="__blank"  class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</a>
+                               <a href="<?php echo theme_url('assets/Farmer_Incentive.csv'); ?>" download target="__blank"  class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</a>
                             </td>
                         </tr>
                     </table>
