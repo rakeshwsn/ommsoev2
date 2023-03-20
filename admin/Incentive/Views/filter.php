@@ -1,7 +1,7 @@
-<form>
+<form id="formfilter">
     <div class="block">
         <div class="block-header block-header-default">
-            <h3 class="block-title">Filter</h3>
+            <h3 class="block-title">Data Filter</h3>
         </div>
     </div>
     <div class="block">
@@ -10,42 +10,33 @@
                 <div class="col-md-12">
                     <table class="table table-bordered">
                         <tr>
-                            <?php if($show_district): ?>
-                            <th>District</th>
-                            <?php endif; ?>
                             <th>Year</th>
-                            <th>Month</th>
                             <th>Season</th>
-                            <th>&nbsp;</th>
+                            <th>Filter</th>
+                           
                         </tr>
                         <tr>
-                            <?php if($show_district): ?>
                             <td>
                                 <select class="form-control" id="year" name="year" required>
-                                    <?php foreach ($districts as $district) { ?>
-                                        <option value="<?=$district['id']?>" <?php if($district['id']==$district_id){echo 'selected';} ?>><?=$district['name']?></option>
-                                    <?php } ?>
+                                <option value="">select</option>
+                                <option value="1">2017-18</option>
+                                <option value="2">2018-19</option>
+                                <option value="3">2020-21</option>
+                                <option value="4">2021-22</option>
                                 </select>
                             </td>
-                            <?php endif; ?>
-                            <td>
-                                <select class="form-control" id="year" name="year" required>
-                                    <?php foreach ($years as $year) { ?>
-                                        <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
-                                    <?php } ?>
-                                </select>
-                            </td>
-                            <td>
+                            <!-- <td>
                                 <select class="form-control" id="month" name="month">
                                     <?php foreach ($months as $month) { ?>
                                         <option value="<?=$month['id']?>" <?php if($month['id']==$month_id){echo 'selected';} ?>><?=$month['name']?></option>
                                     <?php } ?>
                                 </select>
-                            </td>
+                            </td> -->
                             <td>
                                 <select class="form-control" id="season" name="season">
-                                    <?php foreach ($seasons as $_season) { ?>
-                                        <option value="<?=$_season?>" <?php if($_season==$season){echo 'selected';} ?>><?=$_season?></option>
+                                    <option value="">select</option>
+                                    <?php foreach ($seasons as $key=>$_season) { ?>
+                                        <option value="<?=$key?>"><?=$_season?></option>
                                     <?php } ?>
                                 </select>
                             </td>

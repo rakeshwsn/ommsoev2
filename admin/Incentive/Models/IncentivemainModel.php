@@ -4,10 +4,10 @@ namespace Admin\Incentive\Models;
 
 use CodeIgniter\Model;
 
-class IncentiveModel extends Model
+class IncentivemainModel extends Model
 {
     protected $DBGroup              = 'default';
-    protected $table                = 'detailed_incentive_data';
+    protected $table                = 'incetive_main_details';
     protected $primaryKey           = 'id';
     protected $useAutoIncrement     = true;
     protected $insertID             = 0;
@@ -50,24 +50,15 @@ class IncentiveModel extends Model
     public function getAll($data){
         // echo "<pre>";
         // print_r($data); exit;
-        $builder=$this->db->table($this->table);
+        $builder=$this->db->table("{$this->table} im");
+        $builder->select("im.*,sd.name as district_name,sb.name as block_name");
+        $builder->join("soe_districts sd","im.district_id=sd.id","left");
+        $builder->join("soe_blocks sb","im.block_id=sb.id","left");
         $this->filter($builder,$data);
 
-        $builder->select("*");
+        
 
-        if (isset($data['sort']) && $data['sort']) {
-            $sort = $data['sort'];
-        } else {
-            $sort = "name";
-        }
-
-        if (isset($data['order']) && ($data['order'] == 'desc')) {
-            $order = "desc";
-        } else {
-            $order = "asc";
-        }
-        $builder->orderBy($sort, $order);
-
+        
         if (isset($data['start']) || isset($data['limit'])) {
             if ($data['start'] < 0) {
                 $data['start'] = 0;
@@ -134,29 +125,28 @@ class IncentiveModel extends Model
 		// 		year LIKE '%{$data['filter_search']}%'"
         //     );
         // }
-        if (!empty($data['mainincetiveid'])) {
-            $builder->where("incetive_id", $data['mainincetiveid']);
+        if (!empty($data['filter_district'])) {
+            $builder->where("
+            im.district_id LIKE '%{$data['filter_district']}%'"
+            );
         }
-        // if (!empty($data['filter_year'])) {
-        //     $builder->where("
-		// 		year LIKE '%{$data['filter_year']}%'"
-        //     );
-        // }
-        // if (!empty($data['filter_season'])) {
-        //     $builder->where("
-		// 		season LIKE '%{$data['filter_season']}%'"
-        //     );
-        // }
+        if (!empty($data['filter_block'])) {
+            $builder->where("
+            im.block_id LIKE '%{$data['filter_block']}%'"
+            );
+        }
+
+        if (!empty($data['filter_year'])) {
+            $builder->where("
+				im.year LIKE '%{$data['filter_year']}%'"
+            );
+        }
+        if (!empty($data['filter_season'])) {
+            $builder->where("
+				im.season LIKE '%{$data['filter_season']}%'"
+            );
+        }
+       
     }
-
-
-    public function deleteincentive($selected = [])
-	{
-		$builder = $this->db->table('incetive_main_details');
-		$builder->whereIn("id", $selected)->delete();
-
-		$builder = $this->db->table('detailed_incentive_data');
-		$builder->whereIn("incetive_id", $selected)->delete();
-	}
 
 }
