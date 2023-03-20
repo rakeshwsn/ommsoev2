@@ -123,11 +123,13 @@ class Incentive extends AdminController{
 		foreach($filteredData as $result) {
 
 			if($result->year == 1){
-				$year = '2022-23';
+				$year = '2017-18';
 			} else if($result->year == 2){
-				$year = '2023-24';
+				$year = '2018-19';
 			} else if($result->year == 3){
-				$year = '2024-25';
+				$year = '2020-21';
+			} else if($result->year == 3){
+				$year = '2021-22';
 			}
 
 
