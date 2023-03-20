@@ -6,6 +6,8 @@ use Admin\Incentive\Models\IncentiveModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use App\Controllers\AdminController;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class Incentive extends AdminController{
 	private $error = array();
@@ -210,14 +212,20 @@ class Incentive extends AdminController{
 						'season' =>$check['season'],
 					);
 					$result_main= $this->incentiveModel->addInceitive_main($main_incetive_data);
+					//print_r($_FILES); exit;
 					$fileName = $_FILES["file"]["tmp_name"];
-				 
+					$reader = IOFactory::createReader('Xlsx');
+					$spreadsheet = $reader->load($fileName);
+					$activesheet = $spreadsheet->getSheet(0);
+
+					$row_data = $activesheet->toArray();
+				
+					// echo "<pre>";
+					// print_r($main); exit;
 					if ($_FILES["file"]["size"] > 0) {
-				 
-					 $file = fopen($fileName, "r");
-					 $row=1;
-					 while (($column = fgetcsv($file, 10000, ";")) !== FALSE) {
-					   if($row>=2){
+				
+					 foreach ($row_data  as $key=>$column) {
+					   if($key>=5){
 				 
 						 $datacsv[]= array(
 						'incetive_id' =>$result_main,
@@ -240,7 +248,7 @@ class Incentive extends AdminController{
 				 
 						 );
 					   }
-					   $row++;
+					   
 					 }
 					
 					$res= $this->incentiveModel->addInceitive($datacsv);
