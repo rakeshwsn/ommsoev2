@@ -24,9 +24,12 @@
                             <td>
                             <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $district_id),"id='district_id' class='form-control select2'"); ?>
                             </td>
+
+
                             <td>
                             <?php echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name',array("0"=>"Select Block")), set_value('block_id', ''),"id='block_id' class='form-control select2'"); ?>
                             </td>
+                          
                             <td>
                                 <select class="form-control" id="year" name="year" required>
                                 <option value="">select</option>
@@ -37,6 +40,13 @@
                                 
                                 </select>
                             </td>
+                            <!-- <td>
+                                <select class="form-control" id="month" name="month">
+                                    <?php foreach ($months as $month) { ?>
+                                        <option value="<?=$month['id']?>" <?php if($month['id']==$month_id){echo 'selected';} ?>><?=$month['name']?></option>
+                                    <?php } ?>
+                                </select>
+                            </td> -->
                             <td>
                                 <select class="form-control" id="season" name="season">
                                     <option value="">select</option>
@@ -60,14 +70,14 @@
 	<div class="block-header block-header-default">
 		<h3 class="block-title"><?php echo $heading_title; ?></h3>
 		<div class="block-options">
-			<a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
-			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
-			
+			<!-- <a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+			 -->
 		</div>
 	</div>
 	<div class="block-content block-content-full">
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/datatable/be_tables_datatables.min.js which was auto compiled from _es6/datatable/be_tables_datatables.js -->
-		<form action="" method="post" enctype="multipart/form-data" id="form-datatable">
+		<form action="" method="post" enctype="multipart/form-data" id="form-datatable" style="overflow-x: scroll;">
 			<table id="datatable_list" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 				<thead>
 					<tr>
@@ -76,7 +86,21 @@
 						<th>Block</th>
 						<th>Year</th>
 						<th>Season</th>
-						<th class="text-right no-sort">Actions</th>
+						<th>GP</th>
+						<th>Village</th>
+						<th>Farmer</th>
+						<th>Spouse Name</th>
+						<th>Gender</th>
+						<th>CASTE</th>
+						<th>Mobile</th>
+						<th>AADHAAR</th>
+						<th>Year of Support</th>
+						<th>Area in Hectare</th>
+						<th>Bank Name</th>
+						<th>Account Number</th>
+						<th>IFSC Code</th>
+						<th>Amount</th>
+						<!-- <th class="text-right no-sort">Actions</th> -->
 					</tr>
 				</thead>
 			</table>
@@ -128,6 +152,16 @@
 <script type="text/javascript">
 	$(function() {
 		$('#datatable_list').DataTable({
+
+            dom: 'Bfrtip',
+            "buttons": [
+            {
+               "extend": 'excel',
+               "text": '<button data-toggle="tooltip" title="" class="btn btn-primary js-tooltip-enabled" data-original-title="Add Incentive Data">Excel Download</button>',
+               "titleAttr": 'Excel',                               
+               "action": newexportaction
+            }
+        ],
 			"processing": true,
 			"serverSide": true,
 			"columnDefs": [
@@ -171,6 +205,49 @@
 </script>
 
 
+<script>
 
+function newexportaction(e, dt, button, config) {
+    var self = this;
+    var oldStart = dt.settings()[0]._iDisplayStart;
+    dt.one('preXhr', function (e, s, data) {
+        // Just this once, load all data from the server...
+        data.start = 0;
+        data.length = 2147483647;
+        dt.one('preDraw', function (e, settings) {
+            // Call the original action function
+            if (button[0].className.indexOf('buttons-copy') >= 0) {
+                $.fn.dataTable.ext.buttons.copyHtml5.action.call(self, e, dt, button, config);
+            } else if (button[0].className.indexOf('buttons-excel') >= 0) {
+                $.fn.dataTable.ext.buttons.excelHtml5.available(dt, config) ?
+                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(self, e, dt, button, config) :
+                    $.fn.dataTable.ext.buttons.excelFlash.action.call(self, e, dt, button, config);
+            } else if (button[0].className.indexOf('buttons-csv') >= 0) {
+                $.fn.dataTable.ext.buttons.csvHtml5.available(dt, config) ?
+                    $.fn.dataTable.ext.buttons.csvHtml5.action.call(self, e, dt, button, config) :
+                    $.fn.dataTable.ext.buttons.csvFlash.action.call(self, e, dt, button, config);
+            } else if (button[0].className.indexOf('buttons-pdf') >= 0) {
+                $.fn.dataTable.ext.buttons.pdfHtml5.available(dt, config) ?
+                    $.fn.dataTable.ext.buttons.pdfHtml5.action.call(self, e, dt, button, config) :
+                    $.fn.dataTable.ext.buttons.pdfFlash.action.call(self, e, dt, button, config);
+            } else if (button[0].className.indexOf('buttons-print') >= 0) {
+                $.fn.dataTable.ext.buttons.print.action(e, dt, button, config);
+            }
+            dt.one('preXhr', function (e, s, data) {
+                // DataTables thinks the first item displayed is index 0, but we're not drawing that.
+                // Set the property to what it was before exporting.
+                settings._iDisplayStart = oldStart;
+                data.start = oldStart;
+            });
+            // Reload the grid with the original page. Otherwise, API functions like table.cell(this) don't work properly.
+            setTimeout(dt.ajax.reload, 0);
+            // Prevent rendering of the full data to the DOM
+            return false;
+        });
+    });
+    // Requery the server with the new one-time export settings
+    dt.ajax.reload();
+};
+</script>
 
 <?php js_end(); ?>

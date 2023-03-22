@@ -24,8 +24,8 @@ class Incentive extends AdminController{
 	}
 
 
-	protected function getListMain() {
-		
+	public function incentivesearch(){
+		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			'text' => lang('Incentive.heading_title'),
@@ -33,7 +33,7 @@ class Incentive extends AdminController{
 		);
 		$this->template->add_package(array('datatable','select2'),true);
 		$data['addform'] = admin_url('incentive/addform');
-		$data['delete'] = admin_url('incentive/delete');
+		$data['searchview'] = admin_url('incentive/incentivesearch');
 
 		$data['heading_title'] = lang('Incentive.heading_title');
 		
@@ -42,6 +42,119 @@ class Incentive extends AdminController{
 		$data['text_confirm'] = lang('Incentive.text_confirm');
 		
 		$data['button_add'] = lang('Incentive.button_add');
+		$data['button_view'] = lang('Incentive.button_view');
+		$data['button_edit'] = lang('Incentive.button_edit');
+		$data['button_delete'] = lang('Incentive.button_delete');
+		$data['datatable_url'] = admin_url('incentive/searchall');
+		if(isset($this->error['warning'])){
+			$data['error'] 	= $this->error['warning'];
+		}
+		$this->filterOptionsMain($data);
+
+		return $this->template->view('Admin\Incentive\Views\incentiveallview', $data); 
+	}
+
+
+	public function searchall() {
+		$requestData= $_REQUEST;
+		$totalData = $this->incentiveModel->getTotal();
+		$totalFiltered = $totalData;
+		$filter_data = array(
+				'filter_district'=>$requestData['searchBydistrictId'],
+				'filter_block'=>$requestData['searchByblockId'],
+				'filter_year'=>$requestData['searchByYear'],
+				'filter_season'=>$requestData['searchBySeason'],
+				'filter_search' => $requestData['search']['value'],
+				'order'  		 => $requestData['order'][0]['dir'],
+				'sort' 			 => $requestData['order'][0]['column'],
+				'start' 			 => $requestData['start'],
+				'limit' 			 => $requestData['length']
+			);
+		
+		//$totalFiltered = $this->incentiveModel->getTotal($filter_data);
+		$filteredData = $this->incentivemainModel->getAllsearch($filter_data);
+	
+		//printr($filteredData);
+		$datatable=array();
+		foreach($filteredData as $result) {
+
+			if($result->year == 1){
+				$year = '2017-18';
+			} else if($result->year == 2){
+				$year = '2018-19';
+			} else if($result->year == 3){
+				$year = '2020-21';
+			} else if($result->year == 4){
+				$year = '2021-22';
+			}
+
+			if($result->season == 1){
+				$season = 'kharif';
+			} else if($result->season == 2){
+				$season = 'Rabi';
+			}
+			
+			// $action  = '<div class="btn-group btn-group-sm pull-right">';
+            // $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('incentive/view/'.$result->id).'"><i class="fa fa-eye"></i></a>';
+			// $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('incentivemain/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+			// $action .= '</div>';
+			
+			$datatable[]=array(
+				'<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
+				$result->district_name,
+				$result->block_name,
+                $year,
+                $season,
+				$result->gp,
+				$result->village,
+				$result->name,
+				$result->spouse_name,
+				$result->gender,
+				$result->caste,
+				$result->phone_no,
+				$result->aadhar_no,
+				$result->year_support,
+				$result->area_hectare,
+				$result->bank_name,
+				$result->account_no,
+				$result->ifsc,
+				$result->amount,
+				
+			);
+			
+	
+		} 
+		$json_data = array(
+			"draw"            => isset($requestData['draw']) ? intval( $requestData['draw'] ):1,
+			"recordsTotal"    => intval( $totalData ),
+			"recordsFiltered" => intval( $totalFiltered ),
+			"data"            => $datatable
+		);
+		
+		return $this->response->setContentType('application/json')
+								->setJSON($json_data);
+		
+	}
+
+
+	protected function getListMain() {
+		$data['breadcrumbs'] = array();
+		$data['breadcrumbs'][] = array(
+			'text' => lang('Incentive.heading_title'),
+			'href' => admin_url('incentive')
+		);
+		$this->template->add_package(array('datatable','select2'),true);
+		$data['addform'] = admin_url('incentive/addform');
+		$data['searchview'] = admin_url('incentive/incentivesearch');
+
+		$data['heading_title'] = lang('Incentive.heading_title');
+		
+		$data['text_list'] = lang('Incentive.text_list');
+		$data['text_no_results'] = lang('Incentive.text_no_results');
+		$data['text_confirm'] = lang('Incentive.text_confirm');
+		
+		$data['button_add'] = lang('Incentive.button_add');
+		$data['button_view'] = lang('Incentive.button_view');
 		$data['button_edit'] = lang('Incentive.button_edit');
 		$data['button_delete'] = lang('Incentive.button_delete');
 		$data['datatable_url'] = admin_url('incentive/searchmain');
@@ -130,7 +243,7 @@ class Incentive extends AdminController{
 				$year = '2018-19';
 			} else if($result->year == 3){
 				$year = '2020-21';
-			} else if($result->year == 3){
+			} else if($result->year == 4){
 				$year = '2021-22';
 			}
 
@@ -142,7 +255,7 @@ class Incentive extends AdminController{
 			}
 			
 			$action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('incentive/view/'.$result->id).'"><i class="fa fa-eye"></i></a>';
+            $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('incentive/view/'.$result->id).'">District/Block View Data</a>';
 			$action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('incentivemain/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
 			$action .= '</div>';
 			
@@ -170,6 +283,7 @@ class Incentive extends AdminController{
 	}
 
 	public function addform(){
+		$user_upload =  $this->session->get('user')->id ;
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['text_form'] = $this->uri->getSegment(4) ? "Incentive Edit" : "Incentive Add";
 		$data['cancel'] = admin_url('incentive');
@@ -183,7 +297,7 @@ class Incentive extends AdminController{
             $blockModel = new BlockModel();
             $data['blocks'] = $blockModel->where(['district_id'=>$data['district_id']])->findAll();
         }
-
+		
 		$data['seasons'] = [
             'kharif','rabi'
         ];
@@ -243,10 +357,8 @@ class Incentive extends AdminController{
 						   'account_no' => $column[11], 
 						   'ifsc' => $column[12],
 						   'amount' => $column[13],
-						   'uploaded_by' => 1
-				 
-				 
-						 );
+						   'uploaded_by' => $user_upload
+				 		 );
 					   }
 					   
 					 }
@@ -265,13 +377,11 @@ class Incentive extends AdminController{
 	}
 
 	public function view(){
-	
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		return $this->getList();  
 	}
 	
 	public function add(){
-		
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		if ($this->request->getMethod(1) === 'POST'){
 
@@ -282,9 +392,7 @@ class Incentive extends AdminController{
 	}
 	
 	public function edit(){
-		
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
-		
 		if ($this->request->getMethod(1) === 'POST'){	
 			$id=$this->uri->getSegment(4);
 			// echo "<pre>";
@@ -338,7 +446,6 @@ class Incentive extends AdminController{
 		if(isset($this->error['warning'])){
 			$data['error'] 	= $this->error['warning'];
 		}
-
 		$this->filterOptions($data);
 
 		return $this->template->view('Admin\Incentive\Views\index', $data);
@@ -349,19 +456,13 @@ class Incentive extends AdminController{
 		$totalData = $this->incentiveModel->getTotal();
 		$totalFiltered = $totalData;
 		$filter_data = array(
-				// 'filter_district'=>$requestData['searchBydistrictId'],
-				// 'filter_block'=>$requestData['searchByblockId'],
 				'mainincetiveid'=>$requestData['mainincetiveid'],
-				// 'filter_year'=>$requestData['searchByYear'],
-				// 'filter_season'=>$requestData['searchBySeason'],
 				'filter_search' => $requestData['search']['value'],
 				'order'  		 => $requestData['order'][0]['dir'],
 				'sort' 			 => $requestData['order'][0]['column'],
 				'start' 			 => $requestData['start'],
 				'limit' 			 => $requestData['length']
 			);
-			//printr($filter_data); exit;
-	//	$totalFiltered = $this->incentiveModel->getTotal($filter_data);
 		$filteredData = $this->incentiveModel->getAll($filter_data);
 	
 		

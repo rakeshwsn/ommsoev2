@@ -16,5 +16,7 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->match(['get','post'],'incentive/edit/(:segment)', 'Incentive\Controllers\Incentive::edit/$1');
     $routes->get('incentivemain/delete/(:segment)',   'Incentive\Controllers\Incentive::delete/$1');
     $routes->post('incentive/delete','Incentive\Controllers\Incentive::delete');
+    $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
+    $routes->post('incentive/searchall','Incentive\Controllers\Incentive::searchall');
 
 });

@@ -72,7 +72,39 @@ class IncentivemainModel extends Model
         //$builder->where($this->deletedField, null);
 
         $res = $builder->get()->getResult();
-     // echo $this->db->getLastQuery();
+    //   echo $this->db->getLastQuery();
+    //   exit;
+        return $res;
+    }
+
+
+    public function getAllsearch($data){
+        // echo "<pre>";
+        // print_r($data); exit;
+        $builder=$this->db->table("{$this->table} im");
+        $builder->select("im.*,sd.name as district_name,sb.name as block_name,di.*");
+        $builder->join("soe_districts sd","im.district_id=sd.id","left");
+        $builder->join("soe_blocks sb","im.block_id=sb.id","left");
+        $builder->join("detailed_incentive_data  di","di.incetive_id=im.id","left");
+        $this->filter($builder,$data);
+
+        
+
+        
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 10;
+            }
+            $builder->limit((int)$data['limit'],(int)$data['start']);
+        }
+        //$builder->where($this->deletedField, null);
+
+        $res = $builder->get()->getResult();
+      
         return $res;
     }
 
