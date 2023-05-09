@@ -158,24 +158,20 @@ class IncentivemainModel extends Model
         //     );
         // }
         if (!empty($data['filter_district'])) {
-            $builder->where("
-            im.district_id LIKE '%{$data['filter_district']}%'"
+            $builder->where("im.district_id = '{$data['filter_district']}'"
             );
         }
         if (!empty($data['filter_block'])) {
-            $builder->where("
-            im.block_id LIKE '%{$data['filter_block']}%'"
+            $builder->where("im.block_id = '{$data['filter_block']}'"
             );
         }
 
         if (!empty($data['filter_year'])) {
-            $builder->where("
-				im.year LIKE '%{$data['filter_year']}%'"
+            $builder->where("im.year = '{$data['filter_year']}'"
             );
         }
         if (!empty($data['filter_season'])) {
-            $builder->where("
-				im.season LIKE '%{$data['filter_season']}%'"
+            $builder->where("im.season = '{$data['filter_season']}'"
             );
         }
        

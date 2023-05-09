@@ -68,11 +68,16 @@
                         <td><?=$user['firstname']?></td>
                         <td><?=$user['module']?></td>
                         <td>
+                            <?php $remove = range(2,5); $dd_statuses = array_diff_key($statuses, array_flip($remove)); ?>
+                            <?php if(in_array($user['status'],[0,1])): ?>
                             <select class="form-control status" data-upload_id="<?=$user['upload_id']?>" data-module="<?=$user['modulecode']?>">
-                                <?php foreach ($statuses as $key => $status): ?>
+                                <?php foreach ($dd_statuses as $key => $status): ?>
                                     <option value="<?=$key?>"<?php if($key==$user['status']){ echo 'selected';} ?>><?=$status?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <?php else: ?>
+                                <div class="badge badge-secondary"><?=$statuses[$user['status']]?></div>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

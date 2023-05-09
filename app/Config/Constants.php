@@ -538,6 +538,15 @@ $packages = array(
             'plugins/loader/jquery.loading.min.js',
             'plugins/loader/loadingoverlay.min.js'
         ]
+    ],
+    'typehead' => [
+        'javascript' => [
+//            'themes/default/assets/vendor_components/x-editable/dist/inputs-ext/typeaheadjs/lib/typeahead.js',
+            'plugins/bs3-typeahead/bootstrap3-typeahead.min.js',
+        ],
+        'stylesheet' => [
+//            'themes/default/assets/vendor_components/x-editable/dist/inputs-ext/typeaheadjs/lib/typeahead.js-bootstrap.css',
+        ]
     ]
 
 );

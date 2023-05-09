@@ -6,13 +6,15 @@ use Admin\Budgets\Models\BudgetPlanModel;
 use Admin\Common\Models\CommonModel;
 use Admin\Common\Models\YearModel;
 use Admin\Localisation\Models\BlockModel;
+use Admin\Localisation\Models\DistrictModel;
 use App\Controllers\AdminController;
 use App\Traits\TreeTrait;
 
 class Budgets extends AdminController {
     use TreeTrait;
     private $error = array();
-
+    private $budgetModel;
+    private $budgetPlanModel;
     function __construct(){
         $this->budgetPlanModel=new BudgetPlanModel();
         $this->budgetModel=new BudgetModel();
@@ -84,7 +86,8 @@ class Budgets extends AdminController {
                 '<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
                 $result->fund_agency,
                 $years[$ykey]['name'],
-                $result->total_block,
+                $result->district,
+                $result->block,
                 $action
             );
 
@@ -171,7 +174,7 @@ class Budgets extends AdminController {
         //printr($data['fund_agencies']);
         $data['block_phases']=(new BlockModel())->getTotalPhaseByAgency(1);
         $data['years']=(new YearModel())->findAll();
-
+        $data['districts']=(new DistrictModel())->findAll();
 
         echo $this->template->view('Admin\Budgets\Views\budgetPlanForm',$data);
     }
@@ -214,45 +217,67 @@ class Budgets extends AdminController {
 
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $budgetplan_info = $this->budgetPlanModel->getBudgetPlan($this->uri->getSegment(4));
-            $agencyphase=(new BlockModel())->getTotalPhaseByAgency($budgetplan_info->fund_agency_id);
+           // $agencyphase=(new BlockModel())->getTotalPhaseByAgency($budgetplan_info->fund_agency_id);
             
             $data['text_form'] = "Budget Details for ";
 
         }
         $agency_types=(new CommonModel())->getAgencyTypes();
 
-
+       
         if($budgetplan_info){
-            $pmubudgetplan=[
+            if($budgetplan_info->block_id){
+                $phase=1;
+                $category=['program'];
+            }else if($budgetplan_info->district_id){
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }else{
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }
+                
+            /*$pmubudgetplan=[
                 'phase_no'=>0,
                 'name'=>'PMU/Add/Procurement Component',
                 'category'=>['pmu', 'addl', 'procurement']
             ];
             array_push($agencyphase,$pmubudgetplan);
             //printr($agencyphase);
-            //exit;
-            $data['agencyphase']=$agencyphase;
-            foreach($agencyphase as $key=>$budgetplan){
-                $filter=[
-                    'budget_plan_id'=>$budgetplan_info->id,
-                    'fund_agency_id'=>$budgetplan_info->fund_agency_id,
-                    'phase'=>$budgetplan['phase_no'],
-                    'year'=>$budgetplan_info->year,
-                    'category'=>isset($budgetplan['category'])?$budgetplan['category']:['program']
-                ];
-
-                $components = $this->budgetModel->getBudgetDetails($filter);
-                //$components=[];
-
-                if($components) {
-                    $components = $this->buildTree($components);
-                    $data['components'][$key]['phase'] = $budgetplan['phase_no'];
-                    $data['components'][$key]['year'] = $budgetplan_info->year;
-                    $data['components'][$key]['fund_agency_id'] = $budgetplan_info->fund_agency_id;
-                    //$data['components'][$key]['budgets']=$components;
-                    $data['components'][$key]['budgets'] = $this->getTable($components,$agency_types,$key);
-                }
+            //exit;*/
+            $agency_type_id = 0;
+            if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
+                $agency_type_id = 8;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
+                $agency_type_id = 7;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
+                $agency_type_id = 5;
             }
+            $filter=[
+                'budget_plan_id'=>$budgetplan_info->id,
+                'fund_agency_id'=>$budgetplan_info->fund_agency_id,
+                'year'=>$budgetplan_info->year,
+                'district_id'=>$budgetplan_info->district_id,
+                'block_id'=>$budgetplan_info->block_id,
+                'phase'=>$phase,
+                'category'=>$category,
+                'agency_type_id' => $agency_type_id
+             ];
+
+            $components = $this->budgetModel->getBudgetDetails($filter);
+            //$components=[];
+            
+            if($components) {
+                $components = $this->buildTree($components);
+                $data['components'][0]['year'] = $budgetplan_info->year;
+                $data['components'][0]['phase'] = 0;
+                $data['components'][0]['fund_agency_id'] = $budgetplan_info->fund_agency_id;
+                $data['components'][0]['district_id'] = $budgetplan_info->district_id;
+                $data['components'][0]['block_id'] = $budgetplan_info->block_id;
+                //$data['components'][$key]['budgets']=$components;
+                $data['components'][0]['budgets'] = $this->getTable($components,$agency_types,0);
+            }
+            
 
             return $this->template->view('Admin\Budgets\Views\budgetForm', $data);
 
@@ -289,6 +314,14 @@ class Budgets extends AdminController {
                 'phase'=>$budgetplan_info->phase,
                 'year'=>$budgetplan_info->year
             ];
+            $agency_type_id = 0;
+            if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
+                $filter['agency_type_id'] = 8;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
+                $filter['agency_type_id'] = 7;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
+                $filter['agency_type_id'] = 5;
+            }
             $components = $this->budgetModel->getBudgetDetails($filter);
 
             $data['components'] = '';

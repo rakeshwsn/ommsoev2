@@ -14,7 +14,8 @@
                     <th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
                     <th>Fund Agency</th>
                     <th>Year</th>
-                    <th>Total Block</th>
+                    <th>District</th>
+                    <th>Block</th>
                     <th class="text-right no-sort">Actions</th>
                 </tr>
                 </thead>

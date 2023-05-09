@@ -55,7 +55,7 @@ class Approve extends AdminController {
             $data['district_id'] = $this->request->getGet('district_id');
         }
 
-        $data['fund_agency_id'] = '';
+        $data['fund_agency_id'] = $this->user->fund_agency_id;
         if($this->request->getGet('fund_agency_id')) {
             $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
         }
@@ -69,7 +69,8 @@ class Approve extends AdminController {
 
         $data['blocks'] = [];
         if($this->user->agency_type_id!=$this->settings->block_user) {
-            $data['blocks'] = $block_model->where(['district_id' => $this->user->district_id])->asArray()->findAll();
+            $data['blocks'] = $block_model->where(['district_id' => $this->user->district_id])
+                ->where(['fund_agency_id' => $data['fund_agency_id']])->asArray()->findAll();
         }
 
         $data['districts'] = [];
@@ -218,13 +219,13 @@ class Approve extends AdminController {
         $filter['fund_agency_id'] = $user->fund_agency_id;
 
         if ($txn->agency_type_id == $this->settings->block_user || $txn->agency_type_id == $this->settings->cbo_user) {
-            $filter['component_agency_type_id'] = [5, 6, 7, 0]; //fa/cbo --to be added to settings
+            $filter['component_agency_type_id'] = 5; //fa/cbo --to be added to settings
             $filter['category'] = 'program';
         }
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
-        $components = $this->buildTree($block_components, 'parent', 'assign_id');
+        $components = $this->buildTree($block_components, 'parent', 'scomponent_id');
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
@@ -380,6 +381,7 @@ class Approve extends AdminController {
         $month = $this->request->getGet('month');
         $block_id = $this->request->getGet('block_id');
         $agency_type_id = $this->request->getGet('agency_type_id');
+        $id = $this->request->getGet('txn_id');
 
         $filter = [
             'block_id' => $block_id,
@@ -388,6 +390,10 @@ class Approve extends AdminController {
         ];
 
         $filter['month'] = $month;
+
+        if($id){
+            $filter = ['id' => $id];
+        }
 
         $cb = $cbModel->where($filter)->first();
 
@@ -408,7 +414,11 @@ class Approve extends AdminController {
             return redirect()->to(Url::approve.$url_params);
         }
 
-        $filter['user_id'] = $cb->user_id;
+        $filter = ['user_id' => $cb->user_id];
+        $filter['year'] = $cb->year;
+        $filter['month'] = $cb->month;
+        $filter['agency_type_id'] = $cb->agency_type_id;
+        $filter['block_id'] = $cb->block_id;
         $filter['fund_agency_id'] = (new BlockModel())->find($cb->block_id)->fund_agency_id;
 
         $ledger =  $cbModel->getLedgerReport($filter,'array');
@@ -483,6 +493,7 @@ class Approve extends AdminController {
         $block_id = $txn->block_id;
         $district_id = $txn->district_id;
         $agency_type_id = $txn->agency_type_id;
+        $fund_agency_id = $txn->fund_agency_id;
         $month = $txn->month;
         $year = $txn->year;
         $misdetails = $misDetailModel->asArray()->where('submission_id', $txn_id)->findAll();
@@ -491,10 +502,11 @@ class Approve extends AdminController {
             'block_id' => $block_id,
             'month' => $month,
             'year' => $year,
-            'user_group' => $agency_type_id
+            'user_group' => $agency_type_id,
         ];
-        $filter['component_agency_type_id'] = [5, 6, 7, 0];
+//        $filter['component_agency_type_id'] = [5, 6, 7, 0];
         $filter['component_category'] = ['program'];
+        $filter['fund_agency_id'] = $fund_agency_id;
 
         if($district_id){
             $filter['district_id'] = $district_id;
@@ -530,4 +542,5 @@ class Approve extends AdminController {
 
         return $this->template->view('Admin\Transaction\Views\approve_mis', $data);
     }
+
 }

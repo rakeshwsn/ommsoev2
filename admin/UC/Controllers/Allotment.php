@@ -80,15 +80,6 @@ class Allotment extends AdminController{
         }
         $allotmentModel = new UCAllotmentModel();
 
-        $year = getCurrentYearId();
-        if($this->request->getGet('year')){
-            $year = $this->request->getGet('year');
-        }
-
-        $json_data = [
-            'status' => false,
-        ];
-
         if($this->request->getMethod(1)=='POST'){
             $allotmentModel
                 ->insert([
@@ -240,8 +231,12 @@ class Allotment extends AdminController{
         }
 
         $data['years'] = getAllYears();
-        $data['recipients'] = $allotmentModel->getAllRecipients();
-
+        $filter = [];
+        //if dmf district, filter dmf
+        if($this->user->fund_agency_id!=1) {
+            $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        }
+        $data['recipients'] = $allotmentModel->getAllRecipients($filter);
         return view('\Admin\UC\Views\allotment_form', $data);
     }
 

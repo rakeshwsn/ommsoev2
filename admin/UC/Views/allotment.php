@@ -179,19 +179,16 @@
                 type:'POST',
                 dataType:'JSON',
                 before:function () {
-//                $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                 },
                 success:function (json) {
                     location.reload();
                 },
                 error:function () {
-//                $('#main-container').loading('stop');
                     $("#main-container").LoadingOverlay("hide");
                 },
                 complete:function () {
                     $("#main-container").LoadingOverlay("hide");
-//                $('#main-container').loading('stop');
                 }
             })
         });

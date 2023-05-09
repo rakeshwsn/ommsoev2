@@ -43,7 +43,9 @@ class ComponentsAssignModel extends Model
         $builder->select("sca.id,sca.component_id,sca.number,sc.description,sca.parent,sca.sort_order,sca.fund_agency_id,sc.row_type");
         $builder->join("soe_components sc","sca.component_id=sc.id","left");
         $builder->where("sca.fund_agency_id",$fund_agency_id);
+        $builder->where("sca.deleted_at is null", null);
         $builder->orderBy('sort_order','ASC');
+//        echo $builder->getCompiledSelect();
         return $builder->get()->getResultArray();
     }
     public function getMaxSortorder($id){

@@ -67,43 +67,51 @@ ORDER BY c.sort_order";
     }
 
     public function getComponents($filter=[]) {
-        $filter['fund_agency_id'] = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
-
         $sql = "SELECT
-      sca.id assign_id,
-      sc.id component_id,
-      sca.number,
-      sc.description,
-      sca.parent,
-      sca.sort_order,
-      sc.row_type,
-      sc.category
-    FROM (SELECT
-        *
-      FROM soe_components_assign
-      WHERE deleted_at IS NULL
-      AND fund_agency_id = 1) sca
-      LEFT JOIN soe_components sc
-        ON sca.component_id = sc.id
-      LEFT JOIN (SELECT
-          sb.agency_type_id,
-          sb.component_id
-        FROM soe_budgets sb
-          LEFT JOIN soe_budgets_plan sbp
-            ON sb.budget_plan_id = sbp.id
-        WHERE sbp.fund_agency_id = ".(int)$filter['fund_agency_id']."
-        GROUP BY sb.component_id) sb
-        ON sb.component_id = sc.id
-    WHERE 1 = 1";
-        if(!empty($filter['user_group'])){
+  bl_comp.assign_id,
+  bl_comp.component_id,
+  bl_comp.number,
+  bl_comp.sort_order,
+  bl_comp.parent,
+  bl_comp.fund_agency_id,
+  bl_comp.description,
+  bl_comp.row_type,
+  bl_comp.category,
+  bl_comp.block_id,
+  bl_comp.district_id,
+  bl_comp.phase,
+  bud.agency_type_id
+FROM (SELECT
+    ac.*,
+    bl.id block_id,
+    bl.district_id,
+    bl.phase
+  FROM vw_agency_components ac
+    LEFT JOIN soe_blocks bl
+      ON bl.fund_agency_id = ac.fund_agency_id) bl_comp
+  LEFT JOIN (SELECT
+      bud.agency_type_id,
+      pl.fund_agency_id,
+      bud.component_id
+    FROM soe_budgets bud
+      LEFT JOIN soe_budgets_plan pl
+        ON bud.budget_plan_id = pl.id
+    GROUP BY bud.component_id) bud
+    ON bl_comp.component_id = bud.component_id
+WHERE 1=1";
+        if(!empty($filter['block_id'])){
+            $sql .= " AND block_id = ".$filter['block_id'];
+        }
+
+        if(!empty($filter['district_id'])){
+            $sql .= " AND district_id = ".$filter['district_id'];
+        }
+        if (!empty($filter['user_group'])) {
             $user_group = (array)$filter['user_group'];
-            $sql .= "
-    AND (sb.agency_type_id IN (".implode(',',$user_group).")
-    OR sb.agency_type_id IS NULL
-    OR sb.agency_type_id = 0)";
+            $sql .= " AND (agency_type_id IN (".implode(',',$user_group).") OR bud.agency_type_id IS NULL)";
         }
         if (!empty($filter['component_category'])) {
-            $sql .= " AND sc.category='".$filter['component_category']."'";
+            $sql .= " AND bl_comp.category='".$filter['component_category']."'";
         }
 
         $sql .= " ORDER by sort_order";

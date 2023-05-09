@@ -6,6 +6,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Reports\Models\ReportsModel;
 use App\Controllers\AdminController;
 use App\Traits\ReportTrait;
+use Config\Url;
 
 class Reports extends AdminController
 {
@@ -37,7 +38,7 @@ class Reports extends AdminController
         if ($this->request->getGet('year_id')) {
             $filter['year_id'] = $this->request->getGet('year_id');
         }
-        $filter['month_id'] = getCurrentMonthId();
+        $filter['month_id'] = 0;
         if ($this->request->getGet('month_id')) {
             $filter['month_id'] = $this->request->getGet('month_id');
         }
@@ -45,27 +46,54 @@ class Reports extends AdminController
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
         }
+        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        if ($this->request->getGet('fund_agency_id')) {
+            $filter['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+        }
         if ($this->request->getGet('district_id')) {
             $filter['district_id'] = $this->request->getGet('district_id');
         }
-        $filter['modulecode'] = 'expense';
-        if ($this->request->getGet('modulecode')) {
-            $filter['modulecode'] = $this->request->getGet('modulecode');
-        }
+
         $filter['phase'] = [0, 1, 2];
-        $modulecode = $filter['modulecode'];
 
-        if ($modulecode == 'expense') {
-            $data['blocks'] = $reportsModel->getPendingExpenses($filter);
-        } else if ($modulecode == 'closing_balance') {
-            $data['blocks'] = $reportsModel->getPendingClosingBalance($filter);
+        $data['blocks'] = $reportsModel->getPendingStatuses($filter);
+
+        foreach ($data['blocks'] as &$block) {
+            if($block['transaction_type']=='expense' || $block['transaction_type']=='fund_receipt'){
+                $block['action'] = site_url(Url::approveClosingBalance);
+
+            }
+            if($block['status']==0){
+                $block['status']= '<label class="badge badge-warning">'.$this->statuses[$block['status']].'</label>';
+            }
+            if($block['status']==1){
+                $block['status']= '<label class="badge badge-success">'.$this->statuses[$block['status']].'</label>';
+            }
+            if($block['status']==2){
+                $block['status']= '<label class="badge badge-danger">'.$this->statuses[$block['status']].'</label>';
+            }
+            if($block['status']==3){
+                $block['status']= '<label class="badge badge-info">'.$this->statuses[$block['status']].'</label>';
+            }
+
+            $block['action'] = '';
+            $url_params = '?txn_type='.$block['transaction_type']
+                .'&txn_id='.$block['transaction_id'];
+            if($block['transaction_type'] =='fund_receipt' || $block['transaction_type'] =='expense'){
+                $block['action'] = site_url(Url::approveTransaction.$url_params);
+            }
+            if($block['transaction_type'] =='other_receipt'){
+                $block['action'] = site_url(Url::approveOtherReceipt.$url_params);
+            }
+            if($block['transaction_type'] =='closing_balance'){
+                $block['action'] = site_url(Url::approveClosingBalance.$url_params);
+            }
+            if($block['transaction_type'] =='mis'){
+                $block['action'] = site_url(Url::approveMIS.$url_params);
+            }
         }
 
-        $data['modules'] = [
-            ['module' => 'Expense', 'modulecode' => 'expense'],
-            ['module' => 'Closing Balance', 'modulecode' => 'closing_balance'],
-        ];
-        $data['modulecode'] = $modulecode;
+        $data['statuses'] = $this->statuses;
 
         $data['year_id'] = $filter['year_id'];
         $data['month_id'] = $filter['month_id'];

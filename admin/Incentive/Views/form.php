@@ -1,6 +1,12 @@
 <?php
 $validation = \Config\Services::validation();
+$user  = service('user');
 ?>
+<style>
+    #select2-container {
+        width: 0px !important;
+    }
+</style>
 <?php echo form_open_multipart('', 'id="form-user"'); ?>
 <div class="content-heading pt-0">
     <!-- <div class="dropdown float-right">
@@ -21,16 +27,27 @@ $validation = \Config\Services::validation();
 	<div class="col-xl-12">
 
    
-    <div class="block">
+    <!-- <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Data Upload</h3>
         </div>
-    </div>
+    </div> -->
     <div class="block">
+   
+		<div class="block-options mt-10 ml-20 float-left">
+        <h3 class="block-title">Before Uploading Data Please Download the file and set Your data into downloadble File then upload it.</h3> 
+		</div>
+		<div class="block-options mt-10 float-left">
+        <a href="<?php echo theme_url('assets/farmerin.xlsx'); ?>" download target="__blank"  class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</a>  
+		</div>
+
+        <div class="block-options">
+   
+     
+		</div>
         <div class="block-content block-content-full">
             <div class="row">
-                <h5 style="text-align: center;">Before Uploading Data Please Download the file and set Your data into downloadble File then upload it.</h5>
-                <div class="col-md-12">
+        
                     <table class="table table-bordered">
                         <tr>
                        
@@ -40,13 +57,18 @@ $validation = \Config\Services::validation();
                             <th>Season</th>
                             <th>File</th>
                             <th>Upload</th>
-                            <th>Download</th>
                          
                         </tr>
                         <tr>
-                           
+                        <?php 
+                        if($user->district_id){
+                           $main = "disabled";
+                        } else{
+                            $main = "";
+                        }
+                        ?>
                         <td>
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', ''),"id='district_id' class='form-control js-select2'"); ?>
+                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control js-select2' $main" ) ; ?>
                         </td>
 
                         <td>
@@ -76,9 +98,6 @@ $validation = \Config\Services::validation();
                             </td>
                             <td>
                                 <button id="" class="btn btn-outline btn-primary"><i class="fa fa-upload"></i> Upload</button>
-                            </td>
-                            <td>
-                               <a href="<?php echo theme_url('assets/farmerin.xlsx'); ?>" download target="__blank"  class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</a>
                             </td>
                         </tr>
                     </table>
@@ -116,15 +135,15 @@ $validation = \Config\Services::validation();
                         html += '<option value="0" selected="selected">Select Block</option>';
                     }
 
-                    $('select[name=\'block_id\']').html(html);
-                    $('select[name=\'block_id\']').select2();
+                        $('select[name=\'block_id\']').html(html);
+                        $('select[name=\'block_id\']').select2();
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
                     alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                 }
             });
         });
-
+        $('select[name=\'district_id\']').trigger('change');
         Codebase.helpers([ 'select2']);
     });
     //--></script>

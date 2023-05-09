@@ -54,6 +54,7 @@ class MIS extends AdminController
         if($this->request->getGet('agency_type_id')) {
             $agency_type_id = $this->request->getGet('agency_type_id');
         }
+        $fund_agency_id = $this->user->fund_agency_id;
 
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
@@ -66,6 +67,7 @@ class MIS extends AdminController
             'month' => $month,
             'year' => $year,
             'user_id' => $this->user->user_id,
+            'fund_agency_id'=>$fund_agency_id,
         ])->first();
 
         if($txn){
@@ -79,6 +81,7 @@ class MIS extends AdminController
                 'block_id'=>$block_id,
                 'district_id'=>$district_id,
                 'agency_type_id'=>$agency_type_id,
+                'fund_agency_id'=>$fund_agency_id,
                 'month' => $month,
                 'year' => $year,
                 'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
@@ -101,8 +104,6 @@ class MIS extends AdminController
             $this->session->setFlashdata('message','New MIS added');
             return redirect()->to(Url::mis);
         }
-
-
 
         return $this->getForm();
 
@@ -150,6 +151,7 @@ class MIS extends AdminController
             $block_id = $txn->block_id;
             $district_id = $txn->district_id;
             $agency_type_id = $txn->agency_type_id;
+            $fund_agency_id = $txn->fund_agency_id;
             $month = $txn->month;
             $year = $txn->year;
             $data['status'] = $this->statuses[$txn->status];
@@ -172,6 +174,10 @@ class MIS extends AdminController
             if($this->request->getGet('agency_type_id')) {
                 $agency_type_id = $this->request->getGet('agency_type_id');
             }
+            $fund_agency_id = $this->user->fund_agency_id;
+            if($this->request->getGet('fund_agency_id')) {
+                $fund_agency_id = $this->request->getGet('fund_agency_id');
+            }
 
             $month = $this->request->getGet('month');
             $year = $this->request->getGet('year');
@@ -181,9 +187,10 @@ class MIS extends AdminController
             'block_id' => $block_id,
             'month' => $month,
             'year' => $year,
-            'user_group' => $agency_type_id == 5 ? [5, 6] : [],
+            'user_group' => $agency_type_id == 5 ? [5, 6] : $agency_type_id,
             'component_category' => 'program'
         ];
+        $filter['fund_agency_id'] = $fund_agency_id;
 
         if($district_id){
             $filter['district_id'] = $district_id;
@@ -332,7 +339,7 @@ class MIS extends AdminController
         $filter_search = $requestData['search']['value'];
 
         $order_columns = array(
-            'block', 'month', 'year', 'date_added'
+            'id','month', 'year', 'created_at'
         );
         $filter_data = array(
             'user_id' => $this->user->user_id,
@@ -368,6 +375,7 @@ class MIS extends AdminController
             }
 
             $datatable[] = array(
+                $result->id,
                 $result->month,
                 $result->year,
                 ymdToDmy($result->created_at),

@@ -9,6 +9,7 @@ use Config\Url;
 class Submit extends AdminController{
 	
 	public function index(){
+        $this->template->add_package(['jquery_loading','datepicker'],true);
         $data = [];
 
         $ucModel = new UCSubmitModel();
@@ -40,6 +41,13 @@ class Submit extends AdminController{
             $data['total_allotment'] += $allotment->allotment;
             $data['total_uc_submitted'] += $allotment->uc_submit;
             $data['total_uc_balance'] += $allotment->balance;
+        }
+
+        $data['dmf'] = false;
+        //if dmf district, can add allotment by self
+        if($this->user->fund_agency_id!=1){
+            $data['dmf'] = true;
+            $data['add_url'] = site_url(Url::allotmentAdd);
         }
 
         return $this->template->view('Admin\UC\Views\submit', $data);

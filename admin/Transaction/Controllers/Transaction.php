@@ -96,20 +96,18 @@ class Transaction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\index', $data);
     }
 
-    private function filterOptions(&$data)
-    {
-
-        $block_model = new BlockModel();
+    private function filterOptions(&$data) {
 
         $data['blocks'] = [];
-        if ($this->user->agency_type_id != $this->settings->block_user) {
+        /*if ($this->user->agency_type_id != $this->settings->block_user) {
+            $block_model = new BlockModel();
             $filter = [
                 'district_id' => $this->user->district_id,
                 'fund_agency_id' => $this->user->fund_agency_id
             ];
 
             $data['blocks'] = $block_model->where($filter)->asArray()->findAll();
-        }
+        }*/
 
         $data['agency_types'] = [];
         foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
@@ -119,6 +117,8 @@ class Transaction extends AdminController {
             }
         }
         $data['agency_type_id'] = $this->user->agency_type_id;
+
+        $data['districts'] = [];
 
     }
 
@@ -135,7 +135,7 @@ class Transaction extends AdminController {
         $filter_search = $requestData['search']['value'];
 
         $order_columns = array(
-            't.month','t.year','t.date_added','t.txn_type','t.agency_type_id'
+            't.id','t.month','t.year','t.date_added','t.txn_type','t.agency_type_id'
         );
         $filter_data = array(
             'user_id' => $this->user->user_id,
@@ -176,6 +176,7 @@ class Transaction extends AdminController {
             }
 
             $datatable[]=array(
+                $result->id,
                 $result->month,
                 $result->year,
                 ymdToDmy($result->date_added),
@@ -418,12 +419,18 @@ class Transaction extends AdminController {
         $user = (new UserModel())->find($txn->user_id);
         $filter['fund_agency_id'] = $user->fund_agency_id;
 
-        if($txn->agency_type_id == $this->settings->block_user || $txn->agency_type_id == $this->settings->cbo_user){
-            $filter['component_agency_type_id'] = [5,6,7,0]; //fa/cbo --to be added to settings
+        if($txn->agency_type_id == $this->settings->block_user
+            || $txn->agency_type_id == $this->settings->cbo_user){
+            $filter['component_agency_type_id'] = 5; //fa/cbo --to be added to settings
             $filter['category'] = 'program';
         }
         if($txn->agency_type_id == $this->settings->district_user){
-            $filter['component_agency_type_id'] = [5,6,7,0]; //fa/cbo --to be added to settings
+            $filter['component_agency_type_id'] = 7; //fa/cbo --to be added to settings
+            //for dmf angul/keunjhar
+            if(in_array($this->user->district_id,[7,15])){
+                $filter['component_agency_type_id'] = 7;
+                $filter['category'] = ['program', 'pmu','addl'];
+            }
         }
         if($txn->agency_type_id == $this->settings->ps_user){
             $filter['component_agency_type_id'] = 8; //ps --to be added to settings
@@ -434,7 +441,7 @@ class Transaction extends AdminController {
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
-        $components = $this->buildTree($block_components, 'parent', 'assign_id');
+        $components = $this->buildTree($block_components, 'parent', 'scomponent_id');
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
@@ -716,9 +723,15 @@ class Transaction extends AdminController {
         if($this->user->agency_type_id == $this->settings->district_user){
             $district_id = $this->user->district_id;
         }
+
         $agency_type_id = $this->user->agency_type_id;
-        if($this->request->getGet('agency_type_id')) {
-            $agency_type_id = $this->request->getGet('agency_type_id');
+
+        //block and district can enter for cbo
+        if ($this->user->agency_type_id == $this->settings->block_user
+            || $this->user->agency_type_id == $this->settings->district_user) {
+            if($this->request->getGet('agency_type_id')) {
+                $agency_type_id = $this->request->getGet('agency_type_id');
+            }
         }
 
         $txn_type = $this->request->getGet('txn_type');
@@ -754,15 +767,18 @@ class Transaction extends AdminController {
             'block_id' => $block_id,
             'year' => $year,
             'month' => $month,
+            'fund_agency_id' => $this->user->fund_agency_id,
         ];
         if ($this->user->agency_type_id == $this->settings->district_user) {
             $filter['district_id'] = $this->user->district_id;
         }
 
         //skip validation for ps
-        if ($this->user->agency_type_id == $this->settings->ps_user
-            || $this->user->agency_type_id == $this->settings->rs_user
-        ) {
+        if (in_array($this->user->agency_type_id,
+            [$this->settings->ps_user,
+                $this->settings->rs_user,
+                $this->settings->block_user,11,7])) {
+            //pass
 
         } else {
             $pending_transactions = $txnModel->pendingUploads($filter);
@@ -856,15 +872,20 @@ class Transaction extends AdminController {
         if($district_id){
             $filter['district_id'] = $district_id;
         }
-        if(in_array($agency_type_id,[$this->settings->ps_user,$this->settings->rs_user])) {
+        if(in_array($agency_type_id,[$this->settings->ps_user,$this->settings->rs_user,11])) {
             $filter['component_agency_type_id'] = $agency_type_id;
         }
         if($agency_type_id==$this->settings->district_user){
-            $filter['component_agency_type_id'] = [5,6,7,0];
+            $filter['component_agency_type_id'] = 7;
             $filter['category'] = ['program', 'pmu'];
+            //for dmf angul/keunjhar
+            if(in_array($this->user->district_id,[7,15])){
+                $filter['component_agency_type_id'] = 7;
+                $filter['category'] = ['program', 'pmu','addl'];
+            }
         }
         if($agency_type_id == $this->settings->block_user || $agency_type_id == $this->settings->cbo_user){
-            $filter['component_agency_type_id'] = [5,6,7,0]; //fa/cbo --to be added to settings
+            $filter['component_agency_type_id'] = 5; //fa/cbo --to be added to settings
             $filter['category'] = 'program';
         }
 
@@ -883,17 +904,15 @@ class Transaction extends AdminController {
             $component['exp_cum_fin'] = $component['exp_upto_fin'];
         }
 
-        $components = $this->buildTree($block_components, 'parent', 'assign_id');
+        $components = $this->buildTree($block_components, 'parent', 'scomponent_id');
 
         $data['components'] = $this->getTable($components,$txn_type,'edit');
 
-//        $data['fund_agencies'] = [];
-//        if($agency_type_id!=$this->settings->block_user){
-//            if($district_id)
-//                $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['district_id'=>$district_id]);
-//            else
-//                $data['fund_agencies'] = (new BlockModel())->getFundAgencies();
-//        }
+        return $this->template->view('Admin\Transaction\Views\edit', $data);
+    }
+
+    public function getForm() {
+
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }

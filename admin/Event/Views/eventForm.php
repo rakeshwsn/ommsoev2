@@ -40,14 +40,14 @@ $validation = \Config\Services::validation();
          <div class="form-group row <?= $validation->hasError('event_date_from') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Date Of Event From</label>
           <div class="col-sm-10">
-              <?= form_input(array('class' => 'form-control', 'name' => 'event_date_from', 'type' => 'date', 'id' => 'event_date_from', 'onchange' => 'getDays()', 'placeholder' => 'Date Of Event From', 'value' => set_value('event_date_from', $event_date_from))); ?>
+            <?= form_input(array('class' => 'form-control', 'name' => 'event_date_from', 'type' => 'date', 'id' => 'event_date_from', 'placeholder' => 'Date Of Event From', 'value' => set_value('event_date_from', $event_date_from))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('event_date_from'); ?></div>
           </div>
         </div>
          <div class="form-group row <?= $validation->hasError('event_date_to') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Date Of Event To</label>
           <div class="col-sm-10">
-              <?= form_input(array('class' => 'form-control', 'name' => 'event_date_to', 'type' => 'date', 'onchange' => 'getDays()', 'id' => 'event_date_to', 'placeholder' => 'Date Of Event To', 'value' => set_value('event_date_to', $event_date_to))); ?>
+            <?= form_input(array('class' => 'form-control', 'name' => 'event_date_to', 'type' => 'date', 'id' => 'event_date_to', 'placeholder' => 'Date Of Event To', 'value' => set_value('event_date_to', $event_date_to))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('event_date_to'); ?></div>
           </div>
         </div>
@@ -63,7 +63,7 @@ $validation = \Config\Services::validation();
           <label class="col-sm-2 control-label" for="input-name">No Of Event Days</label>
           <div class="col-sm-10">
 
-              <?= form_input(array('class' => 'form-control', 'name' => 'event_days', 'type' => 'number', 'id' => 'event_days', 'onchange' => 'getVisitors()', 'placeholder' => 'Event Days In Number', 'value' => set_value('event_days', $event_days))); ?>
+            <?= form_input(array('class' => 'form-control', 'name' => 'event_days', 'type' => 'number', 'id' => 'event_days', 'placeholder' => 'Event Days In Number', 'value' => set_value('event_days', $event_days))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('event_days'); ?></div>
           </div>
         </div>
@@ -71,7 +71,7 @@ $validation = \Config\Services::validation();
           <label class="col-sm-2 control-label" for="input-name">No Of Visitor</label>
           <div class="col-sm-10">
 
-              <?= form_input(array('class' => 'form-control', 'name' => 'no_visitor', 'type' => 'number', 'id' => 'no_visitor', 'onchange' => 'getVisitors()', 'placeholder' => 'People Visiting per day to event', 'value' => set_value('no_visitor', $no_visitor))); ?>
+            <?= form_input(array('class' => 'form-control', 'name' => 'no_visitor', 'type' => 'number', 'id' => 'no_visitor', 'placeholder' => 'People Visiting per day to event', 'value' => set_value('no_visitor', $no_visitor))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('no_visitor'); ?></div>
           </div>
         </div>
@@ -117,21 +117,11 @@ $validation = \Config\Services::validation();
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('involved'); ?></div>
           </div>
         </div>
-          <div class="form-group row">
-              <label class="col-lg-2 col-form-label" for="example-hf-email">Event Report</label>
-              <div class="col-lg-10 <?= $validation->hasError('report') ? 'is-invalid' : '' ?>">
-                  <div class="input-group">
-                      <?= form_input(array('class' => 'form-control', 'name' => 'report', 'id' => 'report', 'placeholder' => 'report', 'value' => set_value('report', $report), 'readonly' => true)); ?>
-                      <div class="input-group-append">
-                          <button class="btn btn-outline-secondary" onclick="file_upload('report')" type="button">File
-                              Choose
-                          </button>
-                      </div>
-                  </div>
-                  <span style="margin-top:30px;"><a href="<?= base_url('uploads/' . $report); ?>"
-                                                    target="_blank"><?= $report ?></a></span>
-
-              </div>
+        <div class="form-group row <?= $validation->hasError('report') ? 'is-invalid' : '' ?>">
+            <label class="col-sm-2 control-label" for="input-name">Event Report</label>
+            <div class="col-sm-10">
+                <input type="file" name="report" id="report" value="<?= set_value('report', $report); ?>">
+            </div>
         </div>
         <div class="form-group row">
           <label class="col-sm-2 control-label" for="input-status">Status</label>
@@ -195,192 +185,130 @@ $validation = \Config\Services::validation();
 </div>
 <?php js_start(); ?>
 <script type="text/javascript">
-    function getDays() {
+  var thin_config = {
+    toolbar: [{
+      name: 'basicstyles',
+      items: ['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink', 'Source']
+    }],
+    entities: true,
+    entities_latin: false,
+    allowedContent: true,
+    enterMode: CKEDITOR.ENTER_BR,
+    resize_maxWidth: '400px',
+    width: '550px',
+    height: '120px'
+  };
 
-        var start_date = new Date(document.getElementById('event_date_from').value);
-        var end_date = new Date(document.getElementById('event_date_to').value);
-        //Here we will use getTime() function to get the time difference
-        var time_difference = end_date.getTime() - start_date.getTime();
-        //Here we will divide the above time difference by the no of miliseconds in a day
-        var days_difference = time_difference / (1000 * 3600 * 24);
-        //alert(days);
-        document.getElementById('event_days').value = days_difference;
+  $(document).ready(function() {
+    initDnD = function() {
+
+      // Sort images (table sort)
+      $('#event_images').tableDnD({
+        onDrop: function(table, row) {
+          order = $('#event_images').tableDnDSerialize()
+          $.post("<?= admin_url('banner/images_order') ?>", order, function() {
+
+          });
+        },
+        //dragHandle: ".drag_handle"
+      });
     }
-</script>
-    <script type="text/javascript"><!--
-        jQuery(function () {
-            Codebase.helpers(['flatpickr']);
-        });
-        function file_upload(field) {
-            CKFinder.modal({
-                chooseFiles: true,
-                width: 800,
-                height: 600,
-                onInit: function (finder) {
-                    console.log(finder);
-                    finder.on('files:choose', function (evt) {
-                        var file = evt.data.files.first();
-                        url = file.getUrl();
+    initDnD();
 
-                        var lastSlash = url.lastIndexOf("uploads/");
-                        var fileName = url.substring(lastSlash + 8);
-                        $('#' + field).attr('value', decodeURI(fileName));
+    $('textarea.description').ckeditor(thin_config);
+  });
 
-                    });
+  function image_upload1(field, thumb) {
+    window.KCFinder = {
+      callBack: function(url) {
 
-                    finder.on('file:choose:resizedImage', function (evt) {
-                        var output = document.getElementById(field);
-                        output.value = evt.data.resizedUrl;
-                        console.log(evt.data.resizedUrl);
-                    });
-                }
-            });
+        window.KCFinder = null;
+        var lastSlash = url.lastIndexOf("uploads/");
 
-        }
-        ;
-        //--></script>
-    <script type="text/javascript">
-        function getVisitors() {
+        var fileName = url.substring(lastSlash + 8);
+        url = url.replace("images", ".thumbs/images");
+        $('#' + thumb).attr('src', url);
+        $('#' + field).attr('value', fileName);
+        $.colorbox.close();
+      }
+    };
+    $.colorbox({
+      href: BASE_URL + "/plugins/kcfinder/browse.php?type=images",
+      width: "850px",
+      height: "550px",
+      iframe: true,
+      title: "Image Manager"
+    });
+  };
 
-            var days = $('#event_days').val();
-            ;
-            var visitor = $('#no_visitor').val();
-            ;
+  function image_upload(field, thumb) {
+    CKFinder.modal({
+      chooseFiles: true,
+      width: 800,
+      height: 600,
+      onInit: function(finder) {
+        console.log(finder);
+        finder.on('files:choose', function(evt) {
+          var file = evt.data.files.first();
+          url = file.getUrl();
 
-            var total_visitor = days * visitor;
+          var lastSlash = url.lastIndexOf("uploads/");
+          var fileName = url.substring(lastSlash + 8);
+          //url=url.replace("images", ".thumbs/images"); 
+          $('#' + thumb).attr('src', decodeURI(url));
+          $('#' + field).attr('value', decodeURI(fileName));
 
-
-            $('#total_visitor').val(total_visitor);
-            //Here we will divide the above time difference by the no of miliseconds in a day
-
-            //alert(days);
-            // document.getElementById('total_visitor').value = total_visitor;
-        }
-    </script>
-    <script type="text/javascript">
-        var thin_config = {
-            toolbar: [{
-                name: 'basicstyles',
-                items: ['Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink', 'Source']
-            }],
-            entities: true,
-            entities_latin: false,
-            allowedContent: true,
-            enterMode: CKEDITOR.ENTER_BR,
-            resize_maxWidth: '400px',
-            width: '550px',
-            height: '120px'
-        };
-
-        $(document).ready(function () {
-            initDnD = function () {
-
-                // Sort images (table sort)
-                $('#event_images').tableDnD({
-                    onDrop: function (table, row) {
-                        order = $('#event_images').tableDnDSerialize()
-                        $.post("<?= admin_url('banner/images_order') ?>", order, function () {
-
-                        });
-                    },
-                    //dragHandle: ".drag_handle"
-                });
-            }
-            initDnD();
-
-            $('textarea.description').ckeditor(thin_config);
         });
 
-        function image_upload1(field, thumb) {
-            window.KCFinder = {
-                callBack: function (url) {
-
-                    window.KCFinder = null;
-                    var lastSlash = url.lastIndexOf("uploads/");
-
-                    var fileName = url.substring(lastSlash + 8);
-                    url = url.replace("images", ".thumbs/images");
-                    $('#' + thumb).attr('src', url);
-                    $('#' + field).attr('value', fileName);
-                    $.colorbox.close();
-                }
-            };
-            $.colorbox({
-                href: BASE_URL + "/plugins/kcfinder/browse.php?type=images",
-                width: "850px",
-                height: "550px",
-                iframe: true,
-                title: "Image Manager"
-            });
-        }
-        ;
-
-        function image_upload(field, thumb) {
-            CKFinder.modal({
-                chooseFiles: true,
-                width: 800,
-                height: 600,
-                onInit: function (finder) {
-                    console.log(finder);
-                    finder.on('files:choose', function (evt) {
-                        var file = evt.data.files.first();
-                        url = file.getUrl();
-
-                        var lastSlash = url.lastIndexOf("uploads/");
-                        var fileName = url.substring(lastSlash + 8);
-                        //url=url.replace("images", ".thumbs/images");
-                        $('#' + thumb).attr('src', decodeURI(url));
-                        $('#' + field).attr('value', decodeURI(fileName));
-
-                    });
 
 
-                    finder.on('file:choose:resizedImage', function (evt) {
-                        var output = document.getElementById(field);
-                        output.value = evt.data.resizedUrl;
-                        console.log(evt.data.resizedUrl);
-                    });
-                }
-            });
 
-        }
-        ;
+        finder.on('file:choose:resizedImage', function(evt) {
+          var output = document.getElementById(field);
+          output.value = evt.data.resizedUrl;
+          console.log(evt.data.resizedUrl);
+        });
+      }
+    });
 
-
-        function image_uploadd(field, thumb) {
-            CKFinder.modal({
-                chooseFiles: true,
-                width: 800,
-                height: 600,
-                onInit: function (finder) {
-                    console.log(finder);
-                    finder.on('files:choose', function (evt) {
-                        var file = evt.data.files.first();
-                        url = file.getUrl();
-
-                        var lastSlash = url.lastIndexOf("uploads/");
-                        var fileName = url.substring(lastSlash + 8);
-                        //url=url.replace("images", ".thumbs/images");
-                        $('#' + thumb).attr('src', decodeURI(url));
-                        $('#' + field).attr('value', decodeURI(fileName));
-
-                    });
+  };
 
 
-                    finder.on('file:choose:resizedImage', function (evt) {
-                        var output = document.getElementById(field);
-                        output.value = evt.data.resizedUrl;
-                        console.log(evt.data.resizedUrl);
-                    });
-                }
-            });
+  function image_uploadd(field, thumb) {
+    CKFinder.modal({
+      chooseFiles: true,
+      width: 800,
+      height: 600,
+      onInit: function(finder) {
+        console.log(finder);
+        finder.on('files:choose', function(evt) {
+          var file = evt.data.files.first();
+          url = file.getUrl();
 
-        }
-        ;
+          var lastSlash = url.lastIndexOf("uploads/");
+          var fileName = url.substring(lastSlash + 8);
+          //url=url.replace("images", ".thumbs/images"); 
+          $('#' + thumb).attr('src', decodeURI(url));
+          $('#' + field).attr('value', decodeURI(fileName));
+
+        });
+
+
+
+
+        finder.on('file:choose:resizedImage', function(evt) {
+          var output = document.getElementById(field);
+          output.value = evt.data.resizedUrl;
+          console.log(evt.data.resizedUrl);
+        });
+      }
+    });
+
+  };
 </script>
 <script type="text/javascript">
-
-    var image_row = <?= $image_row; ?>;
+  <!--
+  var image_row = <?= $image_row; ?>;
 
   function addImage() {
 
@@ -425,6 +353,6 @@ $validation = \Config\Services::validation();
 
   }
   //
-
+  -->
 </script>
 <?php js_end(); ?>

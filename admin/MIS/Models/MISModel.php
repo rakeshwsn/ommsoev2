@@ -69,7 +69,7 @@ WHERE 1=1";
         if (isset($filter['sort']) && $filter['sort']) {
             $sort = $filter['sort'];
         } else {
-            $sort = "ms.year,ms.month";
+            $sort = "ms.year DESC,ms.month DESC";
         }
 
         if (isset($filter['order']) && ($filter['order'] == 'asc')) {
@@ -90,7 +90,7 @@ WHERE 1=1";
         }
 
         $sql .= " LIMIT ".$filter['start'].', '.$filter['limit'];
-        
+
         return $this->db->query($sql)->getResult();
     }
 

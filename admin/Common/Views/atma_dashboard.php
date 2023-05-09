@@ -178,8 +178,9 @@
     <?php endif; ?>
 </div>
 
-<!-- Pop Out Modal -->
-<div class="modal fade" id="modal-popout" tabindex="-1" role="dialog" aria-labelledby="modal-popout" aria-hidden="true">
+
+<!-- FR Modal -->
+<div class="modal fade" id="modal-fr" tabindex="-1" role="dialog" aria-labelledby="modal-fr" aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -203,8 +204,34 @@
         </div>
     </div>
 </div>
-<!-- END Pop Out Modal -->
+<!-- END FR Modal -->
 
+<!-- Other receipt Modal -->
+<div class="modal fade" id="modal-or" tabindex="-1" role="dialog" aria-labelledby="modal-or" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title">Other Receipt</h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content">
+                    <div>
+                        <p>Do you have any other receipt this month?
+                            <button type="button" data-value="yes" class="btn btn-alt-success btn-or" >Yes</button>
+                            <button type="button" data-value="no" class="btn btn-alt-danger btn-or" >No</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END Other receipt Modal -->
 
 
 <!-- model for fund receipt -->
@@ -449,9 +476,10 @@ window.addEventListener('resize', myChart.resize);
 </script>
 
 <script type="text/javascript">
-    <?php if($fr_check): ?>
     $(function () {
-        $('#modal-popout').modal('show');
+
+        <?php if($fr_check): ?>
+        $('#modal-fr').modal('show');
 
         $('.btn-fr').click(function () {
             choice = $(this).data('value');
@@ -460,19 +488,44 @@ window.addEventListener('resize', myChart.resize);
                 type:'GET',
                 dataType:'JSON',
                 success:function (json) {
-                    $('#modal-popout').modal('hide');
+                    $('#modal-fr').modal('hide');
                     if(choice=='yes') {
                         location.href = "<?=$fr_url?>";
                     }
                 },
                 error:function () {
-                    alert('Request not successful');
-                    $('#modal-popout').modal('hide');
+                    alert('Request not succussful');
+                    $('#modal-fr').modal('hide');
                 }
             });
         });
+        <?php endif; ?>
+
+        <?php if($or_check): ?>
+
+        $('#modal-or').modal('show');
+
+        $('.btn-or').click(function () {
+            choice = $(this).data('value');
+            $.ajax({
+                data:{choice:choice,check_type:'or'},
+                type:'GET',
+                dataType:'JSON',
+                success:function (json) {
+                    $('#modal-or').modal('hide');
+                    if(choice=='yes') {
+                        location.href = "<?=$or_url?>";
+                    }
+                },
+                error:function () {
+                    alert('Request not succussful');
+                    $('#modal-or').modal('hide');
+                }
+            });
+        });
+        <?php endif; ?>
+
     });
-    <?php endif; ?>
 </script>
 <?php js_end(); ?>
 

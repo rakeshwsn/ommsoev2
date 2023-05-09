@@ -43,6 +43,7 @@ class AllowUpload extends AdminController{
 	    if($month && ($district_id || $agency_type_id)){
             $userModel = new UserModel();
 	        $filter = [
+	            'year' => $year,
 	            'month' => $month,
 	            'district_id' => $district_id,
 	            'agency_type_id' => $agency_type_id,

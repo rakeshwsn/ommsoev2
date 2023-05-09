@@ -183,13 +183,13 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->add('mis','MIS\Controllers\MIS::index');
     $routes->add('mis/add','MIS\Controllers\MIS::add');
     $routes->add('mis/edit/(:num)','MIS\Controllers\MIS::edit/$1');
+    $routes->get('mis/delete/(:num)','MIS\Controllers\MIS::delete/$1');
 	$routes->add('mis/upload','MIS\Controllers\MIS::upload');
 	$routes->post('mis/search','MIS\Controllers\MIS::search');
 	
 	$routes->add('fpo','FPO\Controllers\FPO::index');
     $routes->add('mis/add','MIS\Controllers\MIS::add');
     $routes->add('mis/edit/(:num)','MIS\Controllers\MIS::edit/$1');
-    $routes->get('mis/delete/(:num)', 'MIS\Controllers\MIS::delete/$1');
 	$routes->add('mis/upload','MIS\Controllers\MIS::upload');
 	$routes->post('mis/search','MIS\Controllers\MIS::search');
 

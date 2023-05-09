@@ -26,16 +26,6 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <select class="form-control" id="modulecode" name="modulecode">
-                            <option value="">Choose Module</option>
-                            <?php foreach ($modules as $module) { ?>
-                                <option value="<?= $module['modulecode'] ?>" <?php if ($module['modulecode'] == $modulecode) {
-                                    echo 'selected';
-                                } ?>><?= $module['module'] ?></option>
-                            <?php } ?>
-                        </select>
-                    </div>
                     <?php if (isset($districts)): ?>
                         <div class="col-md-2">
                             <select class="form-control" id="district_id" name="district_id">
@@ -63,6 +53,12 @@
                     <th>Sl No.</th>
                     <th>District</th>
                     <th>Block</th>
+                    <th>Agency</th>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Transaction</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -71,6 +67,12 @@
                         <td><?= ++$i ?></td>
                         <td><?= $block['district'] ?></td>
                         <td><?= $block['block'] ?></td>
+                        <td><?= $block['agency'] ?></td>
+                        <td><?= $block['month'] ?></td>
+                        <td><?= $block['year'] ?></td>
+                        <td><?= $block['transaction_type'] ?></td>
+                        <td><?= $block['status'] ?></td>
+                        <td><a href="<?=$block['action']?>" class="btn btn-primary btn-sm">View</a></td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (!$blocks): ?>

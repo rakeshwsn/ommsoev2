@@ -132,16 +132,16 @@ FROM (SELECT
     sc.row_type,
     sc.category
   FROM (SELECT
-      *
-    FROM soe_components_assign
-    WHERE fund_agency_id = ".$filter['fund_agency_id'].") sca
-    LEFT JOIN soe_components sc
-      ON sca.component_id = sc.id where 1=1 ";
-    if(isset($filter['category'])){
-        $sql.=" and sc.category IN ( '".implode("','",$filter['category'])."')";
-    }
-    $sql.=") t1
-
+      c.*,
+      a.fund_agency_id
+    FROM soe_components_agency a
+      LEFT JOIN soe_components c
+        ON component_id = c.ID
+    WHERE a.agency_type_id = ".$filter['agency_type_id']."
+    AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
+    LEFT JOIN soe_components_assign sca
+      ON sca.component_id = sc.ID
+      AND sca.fund_agency_id = sc.fund_agency_id) t1
   LEFT JOIN (SELECT
   bc.component_id,
   bc.agency_type_id,
@@ -152,12 +152,12 @@ FROM (SELECT
 FROM soe_budgets bc
   LEFT JOIN soe_budgets_plan sbp
     ON bc.budget_plan_id = sbp.id
-WHERE bc.phase = ".$filter['phase']."
+WHERE bc.budget_plan_id = ".$filter['budget_plan_id']."
 AND sbp.year = ".$filter['year']."
 AND sbp.fund_agency_id = ".$filter['fund_agency_id'].") t2
     ON t1.component_id = t2.component_id
 ";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 

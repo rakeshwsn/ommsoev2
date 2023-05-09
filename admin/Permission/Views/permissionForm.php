@@ -16,6 +16,7 @@ $validation = \Config\Services::validation();
                 <div class="form-group row">
                     <label class="col-lg-2 col-form-label" for="example-hf-email">Name</label>
                     <div class="col-lg-10 <?=$validation->hasError('name')?'is-invalid':''?>">
+                        <input type="hidden" name="id" id="id" value="<?=$id?>"/>
                         <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name))); ?>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('name'); ?></div>
                     </div>

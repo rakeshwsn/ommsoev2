@@ -19,44 +19,6 @@ class Usergroup extends AdminController {
         return $this->getList();
     }
 
-    protected function getList()
-    {
-
-        $data['breadcrumbs'] = array();
-        $data['breadcrumbs'][] = array(
-            'text' => lang('Usergroup.heading_title'),
-            'href' => admin_url('usergroup')
-        );
-
-        $this->template->add_package(array('datatable'), true);
-
-        $data['add'] = admin_url('usergroup/add');
-        $data['delete'] = admin_url('usergroup/delete');
-        $data['datatable_url'] = admin_url('usergroup/search');
-
-        $data['heading_title'] = lang('Usergroup.heading_title');
-
-        $data['text_list'] = lang('Usergroup.text_list');
-        $data['text_no_results'] = lang('Usergroup.text_no_results');
-        $data['text_confirm'] = lang('Usergroup.text_confirm');
-
-        $data['button_add'] = lang('Usergroup.button_add');
-        $data['button_edit'] = lang('Usergroup.button_edit');
-        $data['button_delete'] = lang('Usergroup.button_delete');
-
-        if (isset($this->error['warning'])) {
-            $data['error'] = $this->error['warning'];
-        }
-
-        if ($this->request->getPost('selected')) {
-            $data['selected'] = (array)$this->request->getPost('selected');
-        } else {
-            $data['selected'] = array();
-        }
-
-        return $this->template->view('Admin\Users\Views\userGroup', $data);
-    }
-
     public function add(){
 
         $this->template->set_meta_title(lang('Usergroup.heading_title'));
@@ -70,64 +32,6 @@ class Usergroup extends AdminController {
             return redirect()->to(base_url('admin/usergroup'));
         }
         $this->getForm();
-    }
-
-    protected function validateForm()
-    {
-        //printr($_POST);
-        $validation = \Config\Services::validation();
-        $id = $this->uri->getSegment(4);
-        $regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
-        $regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
-        $regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor
-
-        $rules = $this->usergroupModel->validationRules;
-
-        if ($this->validate($rules)) {
-            return true;
-        } else {
-            //printr($validation->getErrors());
-            $this->error['warning'] = "Warning: Please check the form carefully for errors!";
-            return false;
-        }
-        return !$this->error;
-    }
-
-    protected function getForm()
-    {
-
-        $this->template->add_package(array('select2'), true);
-
-        $data['breadcrumbs'] = array();
-        $data['breadcrumbs'][] = array(
-            'text' => lang('Usergroup.heading_title'),
-            'href' => admin_url('usergroup')
-        );
-
-
-        $data['heading_title'] = lang('Usergroup.heading_title');
-        $data['text_form'] = $this->uri->getSegment(4) ? "Usergroup Edit" : "Usergroup Add";
-        $data['cancel'] = admin_url('usergroup');
-
-        if (isset($this->error['warning'])) {
-            $data['error'] = $this->error['warning'];
-        }
-
-        if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-            $usergroup_info = $this->usergroupModel->find($this->uri->getSegment(4));
-        }
-        //printr($data['permissions']);
-        foreach ($this->usergroupModel->getFieldNames('user_group') as $field) {
-            if ($this->request->getPost($field)) {
-                $data[$field] = $this->request->getPost($field);
-            } else if (isset($usergroup_info->{$field}) && $usergroup_info->{$field}) {
-                $data[$field] = html_entity_decode($usergroup_info->{$field}, ENT_QUOTES, 'UTF-8');
-            } else {
-                $data[$field] = '';
-            }
-        }
-
-        echo $this->template->view('Admin\Users\Views\userGroupForm', $data);
     }
 
     public function edit(){
@@ -155,6 +59,43 @@ class Usergroup extends AdminController {
         $this->usergroupModel->delete($selected);
         $this->session->setFlashdata('message', 'Usergroup deleted Successfully.');
         return redirect()->to(base_url('admin/usergroup'));
+    }
+
+    protected function getList() {
+
+        $data['breadcrumbs'] = array();
+        $data['breadcrumbs'][] = array(
+            'text' => lang('Usergroup.heading_title'),
+            'href' => admin_url('usergroup')
+        );
+
+        $this->template->add_package(array('datatable'),true);
+
+        $data['add'] = admin_url('usergroup/add');
+        $data['delete'] = admin_url('usergroup/delete');
+        $data['datatable_url'] = admin_url('usergroup/search');
+
+        $data['heading_title'] = lang('Usergroup.heading_title');
+
+        $data['text_list'] = lang('Usergroup.text_list');
+        $data['text_no_results'] = lang('Usergroup.text_no_results');
+        $data['text_confirm'] = lang('Usergroup.text_confirm');
+
+        $data['button_add'] = lang('Usergroup.button_add');
+        $data['button_edit'] = lang('Usergroup.button_edit');
+        $data['button_delete'] = lang('Usergroup.button_delete');
+
+        if(isset($this->error['warning'])){
+            $data['error'] 	= $this->error['warning'];
+        }
+
+        if ($this->request->getPost('selected')) {
+            $data['selected'] = (array)$this->request->getPost('selected');
+        } else {
+            $data['selected'] = array();
+        }
+
+        return $this->template->view('Admin\Users\Views\userGroup', $data);
     }
 
     public function search() {
@@ -205,6 +146,42 @@ class Usergroup extends AdminController {
 
     }
 
+    protected function getForm(){
+
+        $this->template->add_package(array('select2'),true);
+
+        $data['breadcrumbs'] = array();
+        $data['breadcrumbs'][] = array(
+            'text' => lang('Usergroup.heading_title'),
+            'href' => admin_url('usergroup')
+        );
+
+
+        $data['heading_title'] 	= lang('Usergroup.heading_title');
+        $data['text_form'] = $this->uri->getSegment(4) ? "Usergroup Edit" : "Usergroup Add";
+        $data['cancel'] = admin_url('usergroup');
+
+        if(isset($this->error['warning'])){
+            $data['error'] 	= $this->error['warning'];
+        }
+
+        if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
+            $usergroup_info = $this->usergroupModel->find($this->uri->getSegment(4));
+        }
+        //printr($data['permissions']);
+        foreach($this->usergroupModel->getFieldNames('user_group') as $field) {
+            if($this->request->getPost($field)) {
+                $data[$field] = $this->request->getPost($field);
+            } else if(isset($usergroup_info->{$field}) && $usergroup_info->{$field}) {
+                $data[$field] = html_entity_decode($usergroup_info->{$field},ENT_QUOTES, 'UTF-8');
+            } else {
+                $data[$field] = '';
+            }
+        }
+
+        echo $this->template->view('Admin\Users\Views\userGroupForm',$data);
+    }
+
     public function permission(){
         $id = $this->uri->getSegment(4);
         $data['user_group_id']=$id;
@@ -222,12 +199,9 @@ class Usergroup extends AdminController {
             $data['cancel'] = admin_url('usergroup');
             $data['id']=$id;
             $data['gpermissions'] = (array)$this->permissionModel->get_modules_with_permission($id);
-            //printr($data);exit;
-            if (empty($data['gpermissions'])) {
-                $data['gpermissions'] = NULL;
+            if(empty($data['permissions'])) {
+                $data['permissions'] = NULL;
             }
-            //printr($data['gpermissions']);
-            //exit;
             echo $this->template->view('Admin\Users\Views\userGroupPermissionForm',$data);
         }else {
 
@@ -351,6 +325,27 @@ class Usergroup extends AdminController {
         }
 
         return $resthis_method;
+    }
+
+    protected function validateForm() {
+        //printr($_POST);
+        $validation =  \Config\Services::validation();
+        $id=$this->uri->getSegment(4);
+        $regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
+        $regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
+        $regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor
+
+        $rules = $this->usergroupModel->validationRules;
+
+        if ($this->validate($rules)){
+            return true;
+        }
+        else{
+            //printr($validation->getErrors());
+            $this->error['warning']="Warning: Please check the form carefully for errors!";
+            return false;
+        }
+        return !$this->error;
     }
 
 }

@@ -98,7 +98,10 @@ class Mpr extends AdminController
             'year_id' => $data['year_id'],
             'user_id' => $this->user->id,
         ];
-
+        $filter['component_agency_type_id'] = $this->user->agency_type_id;
+        if($this->user->agency_type_id==11){ //spmu
+            $filter['component_agency_type_id'] = NULL;
+        }
         if($data['agency_type_id']){
             $filter['agency_type_id'] = $data['agency_type_id'];
         }
@@ -106,22 +109,30 @@ class Mpr extends AdminController
             $filter['district_id'] = $data['district_id'];
             $filter['agency_type_id'] = [5,6,7]; //fa/cbo/atma --to be added to settings
 
-            //in case of keunjhar (district id 7) all agency_type
-            if($data['district_id']==7){
+            //in case of dmf angul/keunjhar (district id 7) all agency_type
+            if($data['district_id']==7 || $data['district_id']==15){
                 $filter['agency_type_id'] = [5,6,7,8,9];
                 $filter['district_id'] = null;
             }
+            $filter['component_agency_type_id'] = 7;
         }
         if($data['block_id']){
             $filter['block_id'] = $data['block_id'];
             $filter['block_user_id'] = $data['block_user_id'];
             $filter['agency_type_id'] = [5,6,7]; //fa/cbo --to be added to settings
             $filter['category'] = 'program'; //only program components when block is selected
+            $filter['component_agency_type_id'] = 5;
         }
 
         if($data['fund_agency_id']){
             $filter['fund_agency_id'] = $data['fund_agency_id'];
             $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
+
+            //if fund_ag == dmf cati = 7
+            if($data['fund_agency_id']!=1)
+                $filter['component_agency_type_id'] = 7;
+                if($data['block_id'])
+                    $filter['component_agency_type_id'] = 5;
         }
 
         $filter['block_users'] = [5,6];
@@ -522,16 +533,16 @@ class Mpr extends AdminController
         }
         if($this->user->agency_type_id==$this->settings->ps_user){
 
-            $data['districts'] = (new DistrictModel())->asArray()->findAll();
-            $data['blocks'] = $this->block_model->where(['district_id' => $this->request->getGet('district_id')])->asArray()->findAll();
-            foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
-                if(8==$user_group){
-                    $data['agency_types'] = (new UserGroupModel())->whereIn('id',
-                        $user_can_access_grp)->orderBy('name')->asArray()->findAll();
-                }
-            }
+//            $data['districts'] = (new DistrictModel())->asArray()->findAll();
+//            $data['blocks'] = $this->block_model->where(['district_id' => $this->request->getGet('district_id')])->asArray()->findAll();
+//            foreach ($this->settings->user_can_access as $user_group => $user_can_access_grp) {
+//                if(8==$user_group){
+//                    $data['agency_types'] = (new UserGroupModel())->whereIn('id',
+//                        $user_can_access_grp)->orderBy('name')->asArray()->findAll();
+//                }
+//            }
 
-            $data['filter_panel'] = view('Admin\Reports\Views\state_filter_panel',$data);
+            $data['filter_panel'] = view('Admin\Reports\Views\ps_filter_panel',$data);
         }
         if($this->user->agency_type_id==11){
 

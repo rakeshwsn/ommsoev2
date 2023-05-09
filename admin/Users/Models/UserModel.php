@@ -260,6 +260,9 @@ FROM soe_allow_uploads sau
         if(!empty($filter['month'])){
             $sql .= " AND sau.month = ".$filter['month'];
         }
+        if(!empty($filter['year'])){
+            $sql .= " AND sau.year = ".$filter['year'];
+        }
 
         return $this->db->query($sql)->getResult();
 	}
@@ -354,7 +357,6 @@ AND scb.district_id = $district_id) sts
     AND sts.district_id = umym.district_id
     AND sts.block_id = umym.block_id
     AND sts.agency_type_id = umym.user_group_id";
-
 
         return $this->db->query($sql)->getResult();
     }

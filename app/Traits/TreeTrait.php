@@ -18,6 +18,14 @@ trait TreeTrait {
 
     }
 
+    public function getTreeArray(){
+        $compModel = new ComponentModel();
+
+        $comps = $compModel->getAll();
+
+        return $this->buildTree($comps);
+    }
+
     public function buildTree(array $flatList, $parent_col = 'parent',$id_col='id')
     {
         if(!$flatList){
@@ -65,15 +73,6 @@ trait TreeTrait {
         }
         $nav .= '</ul>';
         return $nav;
-    }
-
-    public function getTreeArray()
-    {
-        $compModel = new ComponentModel();
-
-        $comps = $compModel->getAll();
-
-        return $this->buildTree($comps);
     }
 
     protected function getTable($array,$txn_type,$action) {

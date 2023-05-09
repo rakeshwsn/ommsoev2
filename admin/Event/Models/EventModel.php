@@ -45,8 +45,8 @@ class EventModel extends Model
             'rules' => 'trim|required'
         ),
         'place' => array(
-            'label' => 'Place Of Event',
-            'rules' => 'trim|required|min_length[3]|max_length[100]'
+            'label' => 'Place Of Event', 
+            'rules' => 'trim|required|min_length[3]|max_length[20]'
         ),
 
         'event_days' => array(
@@ -62,16 +62,16 @@ class EventModel extends Model
             'rules' => 'trim|required'
         ),
         'stakeholder' => array(
-            'label' => 'Other Stakeholder involved (Collaborations)',
-            'rules' => 'trim|min_length[3]|max_length[50]'
+            'label' => 'Other Stakeholder involved (Collaborations)', 
+            'rules' => 'trim|required|min_length[3]|max_length[50]'
         ),
         'guest' => array(
             'label' => 'Special Guest To Event(Name and Designation)', 
             'rules' => 'trim|required|min_length[3]|max_length[50]'
         ),
         'feedback' => array(
-            'label' => 'Any Feedback',
-            'rules' => 'trim|min_length[3]|max_length[100]'
+            'label' => 'Any Feedback', 
+            'rules' => 'trim|required|min_length[3]|max_length[100]'
         ),
 
         'involved' => array(
@@ -147,17 +147,6 @@ class EventModel extends Model
 		return $res;
 	
 	}
-
-    private function filter($builder, $data)
-    {
-
-
-        if (!empty($data['filter_search'])) {
-            $builder->where("
-				b.title LIKE '%{$data['filter_search']}%'"
-            );
-        }
-    }
 	
 	public function getTotalEvents($data = array()) {
 		$builder=$this->db->table("{$this->table} b");
@@ -175,7 +164,7 @@ class EventModel extends Model
 	
 	public function editEvent($id, $data) {
 		$builder=$this->db->table("{$this->table}");
-
+		
 		$eventdata=array(
 			"name"=>$data['name'],
 			"objective"=>$data['objective'],
@@ -190,18 +179,17 @@ class EventModel extends Model
             "guest"=>$data['guest'],
             "feedback"=>$data['feedback'],
             "involved"=>$data['involved'],
-            "report" => $data['report'],
 			"status"=>$data['status'],
 			//"report"=>
 		);
-
+	
 		$builder->where("id",$id);
 		$builder->update($eventdata);
-
+		
 		$builder=$this->db->table("events_gallery");
 		$builder->where("event_id",$id);
 		$builder->delete();
-
+		
       if (isset($data['event_image'])) {
 			$sort_order=1;
 			foreach ($data['event_image'] as $event_image) {
@@ -216,14 +204,13 @@ class EventModel extends Model
 				$builder->insert($event_image_data);
 				$sort_order++;
 			}
-      }
-
+		}	
+       
       return "success";
 	}
-
-    public function addEvent($data)
-    {
-
+	
+	public function addEvent($data,$originalname) {
+		
 		$eventdata=array(
 			"name"=>$data['name'],
 			"objective"=>$data['objective'],
@@ -238,7 +225,7 @@ class EventModel extends Model
             "guest"=>$data['guest'],
             "feedback"=>$data['feedback'],
             "involved"=>$data['involved'],
-            "report" => $data['report'],
+            "report"=>$originalname,
 			"status"=>$data['status']
 		);
 		$this->db->table('events')->insert($eventdata);
@@ -260,27 +247,37 @@ class EventModel extends Model
 			}
 		}
 	}
+	
 
 	public function getEventImages($id) {
 		$builder = $this->db->table('events_gallery')
 					->orderBy("sort_order", "asc")
 					->Where(['event_id' => $id])
 					->get();
-
-        $event_image_data = $builder->getResultArray();
+					
+		$event_image_data = $builder->getResultArray();
 		return $event_image_data;
 	}
 
-    public function getEventImagess($id)
-    {
+	public function getEventImagess($id) {
 		$builder = $this->db->table('events_gallery')
 					->orderBy("sort_order", "asc")
 					->Where(['event_id' => $id])
 					->get();
-
-        $event_image_data = $builder->getRowArray();
+					
+		$event_image_data = $builder->getRowArray();
 		return $event_image_data;
 	}
+	
+	private function filter($builder,$data){
+		
+		
+		if (!empty($data['filter_search'])) {
+			$builder->where("
+				b.title LIKE '%{$data['filter_search']}%'"
+			);
+		}
+    }
 	
 	public function deleteEvent($selected=[]){
 		$builder = $this->db->table('events');

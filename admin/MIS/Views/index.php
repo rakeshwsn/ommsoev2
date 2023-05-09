@@ -43,6 +43,7 @@
         <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
             <thead>
             <tr>
+                <th>ID</th>
                 <th>Month</th>
                 <th>Year</th>
                 <th>Date Added</th>
@@ -66,9 +67,10 @@
             "responsive": false,
             "filter":false,
             "columnDefs": [
-                { targets: [], orderable: false },
-                { targets: [], visible: false },
+                { targets: [3,4], orderable: false },
+                { targets: [0], visible: false },
             ],
+            'order':[0,'desc'],
             "ajax":{
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 url :"<?=$datatable_url?>", // json datasource

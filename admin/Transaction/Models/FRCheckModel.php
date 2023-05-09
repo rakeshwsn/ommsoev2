@@ -35,10 +35,12 @@ class FRCheckModel extends Model
 	protected $afterInsert          = [];
 	protected $beforeUpdate         = [];
 	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
+	protected $beforeFind           = ['checkType'];
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 
-
+    public function checkType(){
+        $this->where('check_type','fr');
+    }
 }

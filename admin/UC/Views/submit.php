@@ -1,5 +1,15 @@
 
 <div class="content">
+    <?php if($dmf): ?>
+    <div class="row invisible" data-toggle="appear">
+        <!-- Row #1 -->
+        <div class="col-12 text-right mb-3">
+            <button id="add-new" class="btn btn-success">Add Allocation</button>
+        </div>
+        <!-- END Row #1 -->
+    </div>
+    <?php endif; ?>
+
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
         <div class="col-6 col-xl-4">
@@ -91,3 +101,107 @@
         </div>
     </div>
 </div>
+
+<!-- Add new Modal -->
+<div class="modal fade" id="modal-add-new" tabindex="-1" role="dialog" aria-labelledby="modal-popout" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="modal-title"></h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content" id="modal-content">
+                    Hello
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="btn-add" class="btn btn-alt-success">
+                    <i class="fa fa-check"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<?php if($dmf): ?>
+    <?php js_start(); ?>
+    <script>
+        $(function () {
+            //add new
+            $('#add-new').click(function (e) {
+                e.preventDefault();
+                fai = $('#fund_agency_id').val() || '';
+                $.ajax({
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    data: {year:$('#year_id').val(),fund_agency_id:fai},
+                    url :"<?=$add_url?>", // json datasource
+                    type: "get",  // method  , by default get
+                    dataType:'json',
+                    beforeSend:function () {
+                        //                    $('#main-container').loading();
+                        $("#main-container").LoadingOverlay('show');
+                        $('#res-message').text('');
+                    },
+                    success:function (json) {
+                        if(json.status==false){
+                            $('#res-message').text(json.message);
+                        } else {
+                            $('#modal-title').html(json.title);
+                            $('#modal-content').html(json.html);
+                            $("#modal-add-new").modal({
+                                backdrop: 'static',
+                            });
+                        }
+                    },
+                    error: function(){  // error handling
+                        $("#main-container").LoadingOverlay("hide");
+                    },
+                    complete:function () {
+                        //                    $('#main-container').loading('stop');
+                        $("#main-container").LoadingOverlay("hide");
+                    }
+                });
+            });
+
+            $(document).on('click','#btn-add',function () {
+                formdata = $(this).closest('.modal-content').find('form').serialize();
+                year = $('#year').val()||'';
+                $.ajax({
+                    headers: {'X-Requested-With': 'XMLHttpRequest'},
+                    url:'<?=$add_url?>',
+                    data:formdata,
+                    type:'POST',
+                    dataType:'JSON',
+                    before:function () {
+                        $("#main-container").LoadingOverlay('show');
+                    },
+                    success:function (json) {
+                        location.reload();
+                    },
+                    error:function () {
+                        $("#main-container").LoadingOverlay("hide");
+                    },
+                    complete:function () {
+                        $("#main-container").LoadingOverlay("hide");
+                    }
+                })
+            });
+
+            $(document).on('focus',".js-datepicker", function() {
+                $(this).datepicker({
+                    autoclose:true,
+                    orientation: 'bottom',
+                    todayHighlight:true
+                });
+            });
+        });
+    </script>
+    <?php js_end(); ?>
+<?php endif; ?>

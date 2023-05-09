@@ -343,6 +343,7 @@ FROM (SELECT
         $year = isset($filter['year']) ? $filter['year']:0;
         $month = isset($filter['month']) ? $filter['month']:0;
         $agency_type = isset($filter['agency_type']) ? $filter['agency_type']:0;
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
 
         if($this->settings->block_user == $agency_type){
             //check if pending transactions
@@ -352,7 +353,7 @@ FROM soe_transactions st
 WHERE st.deleted_at IS NULL
 AND st.agency_type_id = 5
 AND st.transaction_type = 'expense'
-AND st.block_id=$block_id
+AND st.block_id=$block_id AND fund_agency_id = $fund_agency_id
 AND st.year=$year
 AND st.month < $month";
 
@@ -369,7 +370,7 @@ AND scb.transaction_type = 'expense'
 AND scb.month > 0
 AND scb.agency_type_id = 5
 AND scb.year = $year
-AND scb.district_id = $district_id
+AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND scb.month < $month
 GROUP BY scb.block_id";
 
@@ -382,7 +383,7 @@ FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
 AND scb.transaction_type = 'expense'
 AND scb.month > 0
-AND scb.agency_type_id = 7
+AND scb.agency_type_id = 7 AND fund_agency_id = $fund_agency_id
 AND scb.year = $year
 AND scb.district_id = $district_id
 AND scb.month < $month";
@@ -398,9 +399,9 @@ FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
 AND scb.transaction_type = 'expense'
 AND scb.month > 0
-AND scb.agency_type_id = 5
+AND scb.agency_type_id = 5 AND fund_agency_id = $fund_agency_id
 AND scb.year = $year
-AND scb.district_id = $district_id AND scb.status != 1
+AND scb.district_id = $district_id AND scb.status != 1 
 AND scb.month <= $month GROUP BY scb.block_id";
 
             $data['pending_cbs'] = $this->db->query($sql)->getResult();

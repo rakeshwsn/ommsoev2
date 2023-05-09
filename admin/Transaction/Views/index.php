@@ -20,21 +20,21 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <?php if($agency_types): ?>
-                    <div class="col-md-2">
-                        <select class="form-control" id="agency_type_id" name="agency_type_id" required>
-                            <?php foreach ($agency_types as $agency_type) : ?>
-                            <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <?php endif; ?>
                     <div class="col-md-2">
                         <select class="form-control" id="txn_type" name="txn_type" required>
                             <option value="expense">Expense</option>
                             <option value="fund_receipt">Fund Receipt</option>
                         </select>
                     </div>
+                    <?php if($agency_types): ?>
+                        <div class="col-md-2">
+                            <select class="form-control" id="agency_type_id" name="agency_type_id" required>
+                                <?php foreach ($agency_types as $agency_type) : ?>
+                                    <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php endif; ?>
                     <?php if($districts): ?>
                     <div class="col-md-2">
                         <select class="form-control" id="district_id" name="district_id">
@@ -101,6 +101,7 @@
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
                 <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Month</th>
                     <th>Year</th>
                     <th>Date Added</th>
@@ -149,8 +150,9 @@
             "filter":false,
             "columnDefs": [
                 { targets: [5,6,7,8], orderable: false },
-                { targets: [], visible: false },
+                { targets: [0], visible: false },
             ],
+            order: [[1, 'desc'], [2, 'desc']],
             "ajax":{
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 url :"<?=$datatable_url?>", // json datasource
@@ -294,6 +296,7 @@
                 }
             });
         });
+        $('#month').trigger('change');
     });
 
 </script>

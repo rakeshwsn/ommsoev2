@@ -22,17 +22,6 @@
                     <label>Fund Agency</label>
                     <?php echo form_dropdown('fund_agency_id', option_array_value($fund_agencies, 'fund_agency_id', 'fund_agency'), set_value('fund_agency_id', $fund_agency_id),"id='fund_agency_id' class='form-control js-select2'"); ?>
                 </div>
-                <?php  if($agency_types): ?>
-                    <div class="col-md-2">
-                        <label>Agency Type</label>
-                        <select class="form-control" id="agency_type_id" name="agency_type_id">
-                            <option value="">All</option>
-                            <?php foreach ($agency_types as $agency_type) : ?>
-                                <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                <?php endif;  ?>
 
                 <?php if($districts): ?>
                     <div class="col-md-2">

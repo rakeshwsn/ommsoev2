@@ -185,7 +185,8 @@
     var cb = parseFloat(<?=$summary['bal']?>);
 
     function toggleSubmit() {
-        $('#btn-submit').attr('disabled',cb!=total);
+        _total = $('#total').val();
+        $('#btn-submit').attr('disabled',cb!=_total);
     }
 
     $(function () {
@@ -212,7 +213,8 @@
     }
 
     //check files
-
+    //exclude atma user
+    <?php if($agency_type_id==5 || $agency_type_id==6){ ?>
     $('#btn-submit').click(function(e){
         $('.fileerror').remove();
         $('.filepath').each(function(){
@@ -223,5 +225,7 @@
             }
         });
     });
+    <?php } ?>
+
 </script>
 <?php js_end(); ?>

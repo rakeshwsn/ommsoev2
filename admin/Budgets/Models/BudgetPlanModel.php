@@ -79,11 +79,11 @@ class BudgetPlanModel extends Model
     public function getAll($data = array()){
         $builder=$this->db->table("{$this->table} sbp");
         $builder->join("soe_fund_agency sfa","sbp.fund_agency_id=sfa.id","left");
-        $builder->join("soe_blocks sb","sb.fund_agency_id=sfa.id","left");
-
+        $builder->join("soe_blocks sb","sb.id=sbp.block_id","left");
+        $builder->join("soe_districts sd","sd.id=sbp.district_id","left");
         $this->filter($builder,$data);
 
-        $builder->select("sbp.*,sfa.name as fund_agency,count(sb.id) total_block");
+        $builder->select("sbp.*,sfa.name as fund_agency,sd.name as district,sb.name as block");
 
         if (isset($data['sort']) && $data['sort']) {
             $sort = $data['sort'];
@@ -108,8 +108,9 @@ class BudgetPlanModel extends Model
             }
             $builder->limit((int)$data['limit'],(int)$data['start']);
         }
-        $builder->groupBy("sbp.fund_agency_id");
+       // $builder->groupBy("sbp.fund_agency_id");
         $res = $builder->get()->getResult();
+       // echo $this->db->getLastQuery();
         return $res;
 
     }

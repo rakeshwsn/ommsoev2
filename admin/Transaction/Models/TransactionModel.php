@@ -108,7 +108,7 @@ AND tc.deleted_at IS NULL";
         if (isset($filter['sort']) && $filter['sort']) {
             $sort = $filter['sort'];
         } else {
-            $sort = "t.year,t.month";
+            $sort = "t.year DESC,t.month";
         }
 
         if (isset($filter['order']) && ($filter['order'] == 'asc')) {
@@ -175,6 +175,300 @@ WHERE t.deleted_at IS NULL";
     public function getBlockDistrictReport($filter=[]) {
         $sql = "SELECT
   res.component_id,
+  res.scomponent_id,
+  number,
+  description,
+  agency_type,
+  parent,
+  sort_order,
+  row_type,
+  (res.fr_upto_phy - res.exp_upto_phy) ob_phy,
+  (res.fr_upto_fin - res.exp_upto_fin) ob_fin,
+  res.bud_phy,
+  res.bud_fin,
+  res.fr_upto_cy_phy fr_upto_phy,
+  res.fr_upto_cy_fin fr_upto_fin,
+  res.fr_mon_phy,
+  res.fr_mon_fin,
+  (res.fr_upto_cy_phy + res.fr_mon_phy) fr_cum_phy,
+  (res.fr_upto_cy_fin + res.fr_mon_fin) fr_cum_fin,
+  res.exp_upto_cy_phy exp_upto_phy,
+  res.exp_upto_cy_fin exp_upto_fin,
+  res.exp_mon_phy,
+  res.exp_mon_fin,
+  (res.exp_upto_cy_phy + res.exp_mon_phy) exp_cum_phy,
+  (res.exp_upto_cy_fin + res.exp_mon_fin) exp_cum_fin,
+  (res.fr_upto_phy - res.exp_upto_phy + res.fr_mon_phy - res.exp_mon_phy) cb_phy,
+  (res.fr_upto_fin - res.exp_upto_fin + res.fr_mon_fin - res.exp_mon_fin) cb_fin
+FROM (SELECT
+    comp.*,
+    bud.phy bud_phy,
+    bud.fin bud_fin, ug.name agency_type,
+    COALESCE(expn_mon.phy, 0) exp_mon_phy,
+    COALESCE(expn_mon.fin, 0) exp_mon_fin,
+    COALESCE(fr_mon.phy, 0) fr_mon_phy,
+    COALESCE(fr_mon.fin, 0) fr_mon_fin,
+    COALESCE(exp_upto.phy, 0) exp_upto_phy,
+    COALESCE(exp_upto.fin, 0) exp_upto_fin,
+    COALESCE(fr_upto.phy, 0) fr_upto_phy,
+    COALESCE(fr_upto.fin, 0) fr_upto_fin,
+    COALESCE(exp_upto_cy.phy, 0) exp_upto_cy_phy,
+    COALESCE(exp_upto_cy.fin, 0) exp_upto_cy_fin,
+    COALESCE(fr_upto_cy.phy, 0) fr_upto_cy_phy,
+    COALESCE(fr_upto_cy.fin, 0) fr_upto_cy_fin
+  FROM (SELECT
+      sca.id scomponent_id,
+      sc.id component_id,
+      sca.number,
+      sc.description,
+      sca.parent,
+      sca.sort_order,
+      sc.row_type,
+      sc.category,
+      agency_type_id
+  FROM (SELECT
+      c.*,
+      sca.fund_agency_id,agency_type_id
+    FROM soe_components_agency sca
+      LEFT JOIN soe_components c
+        ON component_id = c.id
+    WHERE 1=1";
+        if(!empty($filter['component_agency_type_id'])){
+            $sql .= " AND sca.agency_type_id = ".$filter['component_agency_type_id'];
+        } else {
+            $sql .= " AND sca.agency_type_id IS NULL ";
+        }
+        $sql .= " AND sca.fund_agency_id = ".$filter['fund_agency_id'].") sc
+    LEFT JOIN soe_components_assign sca
+      ON sca.component_id = sc.id
+      AND sca.fund_agency_id = sc.fund_agency_id) comp
+    LEFT JOIN user_group ug
+      ON comp.agency_type_id = ug.id
+    LEFT JOIN (SELECT
+  component_id,
+  agency_type_id,
+  units,
+  unit_cost,
+  SUM(physical) phy,
+  SUM(financial) fin,
+  block_category
+FROM soe_budgets_plan bp
+  LEFT JOIN soe_budgets b
+    ON b.budget_plan_id = bp.ID
+WHERE fund_agency_id =  ".$filter['fund_agency_id']."
+AND bp.year =  ".$filter['year'];
+if(!empty($filter['block_id'])){
+    $sql .= " AND block_id =  ".$filter['block_id'];
+}
+if(!empty($filter['district_id'])){
+    $sql .= " AND district_id =  ".$filter['district_id'];
+}
+$sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+      //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['month'])){
+            $sql .= " AND t.month = ".$filter['month'];
+        }
+        if(!empty($filter['year'])){
+            $sql .= " AND t.year = ".$filter['year'];
+        }
+        $sql .= " GROUP BY tc.component_id) expn_mon
+      ON comp.component_id = expn_mon.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+      //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['month'])){
+            $sql .= " AND t.month = ".$filter['month'];
+        }
+        if(!empty($filter['year'])){
+            $sql .= " AND t.year = ".$filter['year'];
+        }
+        $sql .= " GROUP BY tc.component_id) fr_mon
+      ON comp.component_id = fr_mon.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+
+        //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['month']) && !empty($filter['year'])){
+            $last_year = ($filter['year'] - 1);
+            $last_month = ($filter['month'] - 1);
+            $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
+      OR (t.year = ".$filter['year']."
+      AND t.month BETWEEN 0 AND $last_month))";
+        }
+       $sql .= " GROUP BY tc.component_id) exp_upto
+      ON comp.component_id = exp_upto.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+      //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['month']) && !empty($filter['year'])){
+            $last_year = ($filter['year'] - 1);
+            $last_month = ($filter['month']);
+            $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
+      OR (t.year = ".$filter['year']."
+      AND t.month BETWEEN 0 AND $last_month))";
+        }
+      $sql .= " GROUP BY tc.component_id) fr_upto
+      ON comp.component_id = fr_upto.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+
+        //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['year'])){
+            $sql .= " AND t.year = ".$filter['year'];
+        }
+        if(!empty($filter['month']) && !empty($filter['year'])){
+            $last_month = ($filter['month'] - 1);
+            $sql .= " AND t.month BETWEEN 0 AND $last_month";
+        }
+       $sql .= " GROUP BY tc.component_id) exp_upto_cy
+      ON comp.component_id = exp_upto_cy.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        LEFT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+      //not required
+        //$sql .= " AND t.status = 1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND t.user_id = ".$filter['user_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id = ".$filter['agency_type_id'];
+        }
+        if(!empty($filter['year'])){
+            $sql .= " AND t.year = ".$filter['year'];
+        }
+        if(!empty($filter['month']) && !empty($filter['year'])){
+            $last_month = ($filter['month'] - 1);
+            $sql .= " AND t.month BETWEEN 0 AND $last_month";
+        }
+      $sql .= " GROUP BY tc.component_id) fr_upto_cy
+      ON comp.component_id = fr_upto_cy.component_id) res ORDER BY sort_order";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getBlockDistrictReport_bk($filter=[]) {
+        $sql = "SELECT
+  res.component_id,
   res.assign_id,
   number,
   description,
@@ -238,7 +532,8 @@ FROM (SELECT
         FROM soe_budgets sb
           LEFT JOIN soe_budgets_plan sbp
             ON sb.budget_plan_id = sbp.id WHERE 
-            sbp.fund_agency_id = " . $filter['fund_agency_id'] . " GROUP BY sb.component_id) sb ON sb.component_id = sc.id 
+            sbp.fund_agency_id = " . $filter['fund_agency_id'] . " GROUP BY sb.component_id) sb 
+            ON sb.component_id = sc.id 
             WHERE 1 = 1";
 
         if (!empty($filter['component_agency_type_id'])) {
@@ -249,6 +544,7 @@ FROM (SELECT
             }
             $sql .= " OR sb.agency_type_id is NULL)";
         }
+
         if(!empty($filter['category'])){
             if(is_array($filter['category'])){
                 $sql .= " AND sc.category IN ('" . implode('\',\'', $filter['category']) . "')";
@@ -754,7 +1050,7 @@ AND t.transaction_type = 'expense'";
   sts.agency_type_id,
   ug.name agency_type,
   sts.user_id,
-  sts.fund_agency_id
+  bmym.fund_agency_id
 FROM (SELECT
     *
   FROM vw_block_modules
@@ -856,7 +1152,7 @@ AND ms.month > 0)
             $sql .= " AND transaction_type = '".$filter['transaction_type'].'\'';
         }
         if(!empty($filter['fund_agency_id'])){
-            $sql .= " AND (sts.fund_agency_id =".$filter['fund_agency_id'].' OR fund_agency_id IS NULL)';
+            $sql .= " AND (bmym.fund_agency_id =".$filter['fund_agency_id'].' OR fund_agency_id IS NULL)';
         }
         if(!empty($filter['agency_type_id'])){
             $sql .= " AND agency_type_id =".$filter['agency_type_id'];
@@ -874,6 +1170,7 @@ $sql .= " ORDER BY district_id,block_id,bmym.month_id, sts.transaction_type";
         $year = isset($filter['year']) ? $filter['year']:0;
         $month = isset($filter['month']) ? $filter['month']:0;
         $agency_type = isset($filter['agency_type']) ? $filter['agency_type']:0;
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
 
         if($this->settings->block_user == $agency_type){
             //check if pending closing balances
@@ -926,7 +1223,7 @@ WHERE scb.deleted_at IS NULL
 AND scb.month > 0
 AND scb.agency_type_id = 5
 AND scb.year = $year
-AND scb.district_id = $district_id AND scb.status != 1
+AND scb.district_id = $district_id AND scb.status != 1 AND scb.fund_agency_id = $fund_agency_id
 AND scb.month <= $month GROUP BY scb.block_id";
 
             $data['pending_cbs'] = $this->db->query($sql)->getResult();

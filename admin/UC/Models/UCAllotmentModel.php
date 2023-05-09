@@ -26,8 +26,12 @@ class UCAllotmentModel extends Model
 	protected $updatedField         = '';
 	protected $deletedField         = 'deleted_at';
 
-    public function getAllRecipients() {
-        $sql = "SELECT * FROM soe_uc_recipients";
+    public function getAllRecipients($filter=[]) {
+        $sql = "SELECT * FROM soe_uc_recipients ur WHERE 1=1";
+
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND ur.fund_agency_id = ".$filter['fund_agency_id'];
+        }
 
         return $this->db->query($sql)->getResultArray();
     }

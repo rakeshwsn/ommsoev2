@@ -1,11 +1,25 @@
+<?php
+$user  = service('user');
+//printr($user->getId());
+?>
 <div class="block">
 <form id="formfilter">
     <div class="block">
         <div class="block-header block-header-default">
-            <h3 class="block-title">Data Filter</h3>
+            <!-- <h3 class="block-title">Data Filter</h3> -->
         </div>
+        <div class="block-header block-header-default">
+		<h3 class="block-title"><?php echo $heading_title; ?></h3>
+		<div class="block-options">
+			<a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
+            <?php if(!$user->district_id){?>
+			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
+            <?php }?>
+		</div>
+	</div>
     </div>
     <div class="block">
+   
         <div class="block-content block-content-full">
             <div class="row">
                 <div class="col-md-12">
@@ -20,9 +34,15 @@
                            
                         </tr>
                         <tr>
-                           
+                        <?php 
+                        if($user->district_id){
+                           $main = "disabled";
+                        } else{
+                            $main = "";
+                        }
+                        ?>
                             <td>
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $district_id),"id='district_id' class='form-control select2'"); ?>
+                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control select2' $main"); ?>
                             </td>
                             <td>
                             <?php echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name',array("0"=>"Select Block")), set_value('block_id', ''),"id='block_id' class='form-control select2'"); ?>
@@ -57,14 +77,6 @@
 </form>
 </div>
 <div class="block">
-	<div class="block-header block-header-default">
-		<h3 class="block-title"><?php echo $heading_title; ?></h3>
-		<div class="block-options">
-			<a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
-			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
-			
-		</div>
-	</div>
 	<div class="block-content block-content-full">
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/datatable/be_tables_datatables.min.js which was auto compiled from _es6/datatable/be_tables_datatables.js -->
 		<form action="" method="post" enctype="multipart/form-data" id="form-datatable">
@@ -121,7 +133,7 @@
                 }
             });
         });
-
+        $('select[name=\'district_id\']').trigger('change');
         Codebase.helpers([ 'select2']);
     });
     //--></script>

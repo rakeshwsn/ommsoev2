@@ -8,6 +8,8 @@ use Admin\Reports\Models\ReportsModel;
 use Admin\Transaction\Controllers\OpeningBalance;
 use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Transaction\Models\FRCheckModel;
+use Admin\Transaction\Models\MisctransactionModel;
+use Admin\Transaction\Models\ORCheckModel;
 use App\Controllers\AdminController;
 use App\Traits\ReportTrait;
 use App\Traits\TreeTrait;
@@ -27,11 +29,13 @@ class Dashboard extends AdminController
 
         if (!$this->request->isAJAX()) {
             $data['fr_check'] = $this->fund_receipt_check();
+            $data['or_check'] = $this->other_receipt_check();
         } else {
             return $this->fund_receipt_check();
         }
-
+//        dd($data);
         $data['fr_url'] = site_url(Url::transactionAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
+        $data['or_url'] = site_url(Url::otherReceiptAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
 
         $data['year'] = date('F') . ' ' . getYear(getCurrentYearId());
 
@@ -61,12 +65,60 @@ class Dashboard extends AdminController
 
         if ($this->request->isAJAX()) {
             $choice = $this->request->getGet('choice');
+            $check_type = $this->request->getGet('check_type');
 
             $data = [
                 'month' => getCurrentMonthId(),
                 'year' => getCurrentYearId(),
                 'district_id' => $this->user->district_id,
-                'block_id' => $this->user->block_id
+                'block_id' => $this->user->block_id,
+                'fund_agency_id' => $this->user->fund_agency_id,
+                'check_type' => 'fr'
+            ];
+            if ($choice == 'yes') {
+                $data['status'] = 1;
+            } else {
+                $data['status'] = 0;
+            }
+            if ($check_type == 'or') {
+                $data['check_type'] = 'or';
+            } else {
+                $data['check_type'] = 'fr';
+            }
+
+            $frcModel->insert($data);
+
+            return $this->response->setJSON(['success' => true]);
+
+        }
+
+        $where = [
+            'block_id' => $this->user->block_id,
+            'district_id' => $this->user->district_id,
+            'month' => getCurrentMonthId(),
+            'year' => getCurrentYearId(),
+        ];
+
+        $fr = $frcModel->where($where)->first();
+//echo $frcModel->db->getLastQuery();exit;
+        return !$fr;
+    }
+
+    protected function other_receipt_check()
+    {
+
+        $frcModel = new ORCheckModel();
+
+        if ($this->request->isAJAX()) {
+            $choice = $this->request->getGet('choice');
+
+            $data = [
+                'month' => getCurrentMonthId(),
+                'year' => getCurrentYearId(),
+                'district_id' => $this->user->district_id,
+                'block_id' => $this->user->block_id,
+                'fund_agency_id' => $this->user->fund_agency_id,
+                'check_type' => 'or'
             ];
             if ($choice == 'yes') {
                 $data['status'] = 1;
@@ -151,10 +203,13 @@ class Dashboard extends AdminController
         $filter = [
             'user_id' => $this->user->user_id,
             'district_id' => $this->user->district_id,
+            'fund_agency_id' => $this->user->fund_agency_id,
             'year_upto' => getCurrentYearId(),
         ];
 
         $filter['transaction_type'] = 'fund_receipt';
+        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+
         $data['fr'] = $reportModel->getTransactionTotal($filter);
 
         $filter['user_id'] = null;
@@ -174,23 +229,22 @@ class Dashboard extends AdminController
 
         $filter['transaction_type'] = 'fund_receipt';
         $filter['district_id'] = $this->user->district_id;
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+
         $data['abstracts'] = [];
         $data['fund_abstract'] = $fund_abstract = $reportModel->getTransactionAbstractDistrict($filter);
+
         //fund abstract loop for bar chart
+        $data['fund']['label'] = [];
+        $data['fund']['data'] = [];
         foreach ($fund_abstract as $key => $fund_abstracts) {
 
-            $data['fund']['label'][] = $fund_abstracts->block;
-
-            //$data['fund']['data'][] = in_lakh($fund_abstracts->total,'') ;
+            $data['fund']['label'][] = $fund_abstracts->agency;
 
             $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total, '');
-            //    $data['fund']['data'][$key]['itemStyle']['color'] = '#26c6da' ;
 
-            $data['abstracts'][$fund_abstracts->block] = [
-                'block' => $fund_abstracts->block,
+            $data['abstracts'][$fund_abstracts->agency] = [
+                'block' => $fund_abstracts->agency,
                 'ftotal' => in_lakh($fund_abstracts->total, ''),
-
             ];
         }
 
@@ -200,23 +254,25 @@ class Dashboard extends AdminController
         $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstractDistrict($filter);
 
         // expense abstract loop for bar chart
+        $data['abstract']['label'] = [];
+        $data['abstract']['data'] = [];
         foreach ($expense_abstract as $key => $expense_abstracts) {
 
-            $data['abstract']['label'][] = $expense_abstracts->block;
+            $data['abstract']['label'][] = $expense_abstracts->agency;
 
             $data['abstract']['data'][$key]['value'] = in_lakh($expense_abstracts->total);
-            $data['abstracts'][$expense_abstracts->block]['etotal'] = in_lakh($expense_abstracts->total, '');
+            $data['abstracts'][$expense_abstracts->agency]['etotal'] = in_lakh($expense_abstracts->total, '');
 
 
             $etotal = $expense_abstracts->total;
-            $ftotal = $data['abstracts'][$expense_abstracts->block]['ftotal'];
+            $ftotal = $data['abstracts'][$expense_abstracts->agency]['ftotal'];
 
             if ((int)$ftotal) {
                 $uc = ($etotal / $ftotal) * 100;
             } else {
                 $uc = 0;
             }
-            $data['abstracts'][$expense_abstracts->block]['uc'] = in_lakh($uc);
+            $data['abstracts'][$expense_abstracts->agency]['uc'] = in_lakh($uc);
         }
         usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
 
@@ -250,9 +306,11 @@ class Dashboard extends AdminController
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
         }
+        if ($this->user->fund_agency_id) {
+            $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        }
 
-        $data['pendingstatus'] += count($reportsModel->getPendingExpenses($filter));
-        $data['pendingstatus'] += count($reportsModel->getPendingClosingBalance($filter));
+        $data['pendingstatus'] += count($reportsModel->getPendingStatuses($filter));
 
         $data['pendingstatus_url'] = admin_url('pendingstatus');
     }
@@ -300,6 +358,7 @@ class Dashboard extends AdminController
         return $this->template->view('Admin\Common\Views\ps_dashboard', $data);
 
     }
+
 
     protected function spmu_dashboard(&$data)
     {
@@ -361,8 +420,10 @@ class Dashboard extends AdminController
 
             $etotal = $expense_abstracts->total;
             $ftotal = $data['abstracts'][$expense_abstracts->district]['ftotal'];
-
-            $uc = ($etotal / $ftotal) * 100;
+            $uc = 0;
+            if((int)$ftotal>0){
+                $uc = ($etotal / $ftotal) * 100;
+            }
             $data['abstracts'][$expense_abstracts->district]['uc'] = in_lakh($uc);
 
 
@@ -380,14 +441,16 @@ class Dashboard extends AdminController
              $data['closing']['data'][] = in_lakh($closing_abstracts->cb);
          }
 
-        $this->pendingUploads($data);
-
         return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
 
     }
 
-    public function spmu_dashboard_chart()
-    {
+    protected function spmu_dashboard_blank(&$data){
+
+        return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
+    }
+
+    public function spmu_dashboard_chart(){
 
         $reportModel = new ReportsModel();
         if ($_GET['data'] == 'all') {
@@ -518,6 +581,41 @@ class Dashboard extends AdminController
 
         echo json_encode($data);
 
+    }
+
+    public function getSpmuChart() {
+        $reportModel = new ReportsModel();
+        $chart_type = $this->request->getGet('chart_type');
+        $data = [];
+
+        $filter = [
+            'fund_agency_id' => 1, //state plan
+            'year' => 1
+        ];
+        $result = $reportModel->getAgencywiseAbstract($filter);
+
+        if($chart_type=='all'){
+            foreach ($result as &$item) {
+                $item['fund_receipt'] = round(($item['fund_receipt']/100000),2);
+                $item['expense'] = round(($item['expense']/100000),2);
+            }
+        }
+        if($chart_type=='percentage'){
+            foreach ($result as &$item) {
+                $item['percentage'] = round((($item['expense']/$item['fund_receipt']) * 100),2);
+            }
+        }
+
+        if($result){
+            $data['status'] = true;
+            $data['data'] = $result;
+        } else {
+            $data['status'] = false;
+            $data['data'] = [];
+        }
+
+        return $this->response->setContentType('application/json')
+            ->setJSON($data);
     }
 
 }

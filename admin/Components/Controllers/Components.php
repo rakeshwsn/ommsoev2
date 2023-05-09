@@ -189,7 +189,8 @@ class Components extends AdminController {
             'addl'=>'Additional Component',
             'pmu'=>'PMU Component',
             'procurement'=>'Procurement Component',
-            'program'=>'Program Component'
+            'program'=>'Program Component',
+            'iyom'=>'IYOM'
         ];
         echo $this->template->view('Admin\Components\Views\componentForm',$data);
     }

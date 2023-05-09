@@ -23,10 +23,8 @@ class ClosingBalance extends AdminController {
 
 	public function index() {
 
-        if($this->user->agency_type_id==$this->settings->ps_user){
-            return $this->agency();
-        }
-        if($this->user->agency_type_id==$this->settings->rs_user){
+        if($this->user->agency_type_id==$this->settings->ps_user
+            || $this->user->agency_type_id==$this->settings->rs_user){
             return $this->agency();
         }
 
@@ -48,7 +46,8 @@ class ClosingBalance extends AdminController {
             'fund_agency_id' => $fund_agency_id,
             'user_id' => $this->user->user_id,
         ];
-        if($this->user->agency_type_id==$this->settings->block_user || $this->user->agency_type_id==$this->settings->cbo_user) {
+        if($this->user->agency_type_id==$this->settings->block_user
+            || $this->user->agency_type_id==$this->settings->cbo_user) {
             $filter['block_id'] = $this->user->block_id;
         }
         if($this->user->agency_type_id==$this->settings->district_user) {
@@ -222,6 +221,7 @@ class ClosingBalance extends AdminController {
             'district_id' => $this->user->district_id,
             'year' => $year,
             'month' => $month,
+            'fund_agency_id' => $this->user->fund_agency_id,
         ];
 
         $pending_transactions = $this->cbModel->pendingUploads($filter);
@@ -367,6 +367,8 @@ class ClosingBalance extends AdminController {
 
         $data['years'] = getAllYears();
         $data['months'] = getAllMonths();
+
+        $data['can_edit'] = true;
 
         return $this->template->view('Admin\Transaction\Views\closingbalance_district', $data);
     }

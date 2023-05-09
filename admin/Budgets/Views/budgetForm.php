@@ -7,16 +7,9 @@
             </div>
 
             <div class="block-content">
-                <ul class="nav nav-tabs nav-tabs-block" data-toggle="tabs"   role="tablist">
-                    <?php foreach($agencyphase as $key=> $agencyp){?>
-                    <li class="nav-item">
-                        <a class="nav-link <?=$key==0?'active':''?>" href="#budget-<?=$key?>"><?=$agencyp['name']?></a>
-                    </li>
-                    <?}?>
-                </ul>
-                <div class="tab-content">
+                
+               
                     <?php foreach($components as $key=> $component){?>
-                    <div class="tab-pane <?=$key==0?'active':''?>" id="budget-<?=$key?>" role="tabpanel">
                         <table class="table table-striped" id="block-components">
                             <thead>
                             <tr>
@@ -37,11 +30,8 @@
                             <?=$component['budgets']?>
                             </tbody>
                         </table>
-                    </div>
+                   
                     <?}?>
-
-                </div>
-
 
                 <div class="text-right my-3">
                     <button type="submit" class="btn btn-primary" id="btn-save-menu">Save</button>
