@@ -381,7 +381,6 @@ class Dashboard extends AdminController
 
         $data['cb'] = $data['fr'] - $data['ex'];
 
-
         $filter['transaction_type'] = 'fund_receipt';
 
         $data['abstracts'] = [];
