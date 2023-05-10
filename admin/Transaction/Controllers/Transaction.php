@@ -78,13 +78,6 @@ class Transaction extends AdminController {
             $data['mis_uploaded'] = true;
         }
 
-        //bypass for ps and rs
-        if($this->user->agency_type_id==$this->settings->ps_user
-            || $this->user->agency_type_id==$this->settings->rs_user){
-            $data['mis_uploaded'] = true;
-            $data['upload_enabled'] = true;
-        }
-
         $data['datatable_url'] = Url::transactionDatatable;
         $data['check_mis_url'] = Url::misIsUploaded;
         $data['upload_url'] = Url::transactionUpload;

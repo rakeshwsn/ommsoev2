@@ -2,8 +2,6 @@
 
 namespace Admin\Transaction\Controllers;
 
-
-
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
 use Admin\Localisation\Models\BlockModel;
@@ -40,8 +38,8 @@ class OtherReceipt extends AdminController
             $data['agency_types'] = (new UserGroupModel())->getBlockUsers();
         }
 
-        $data['fund_agencies'] = [];
-        /*if($this->user->agency_type_id!=$this->settings->block_user){
+        /*$data['fund_agencies'] = [];
+        if($this->user->agency_type_id!=$this->settings->block_user){
             if($this->user->district_id)
                 $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['district_id'=>$this->user->district_id]);
             else
@@ -172,10 +170,11 @@ class OtherReceipt extends AdminController
                 'status' => true,
             ];
             $this->session->setFlashData('message','Other receipt added.');
+
         } else if($this->request->getMethod(1)!='POST') {
             $error = false;
 
-            //validate
+            //validate if exists
             $txn = $this->txnModel
                 ->where($condition)
                 ->find();
@@ -187,6 +186,29 @@ class OtherReceipt extends AdminController
                 ];
                 $error = true;
             }
+
+            // validate if dates are allowed.
+            $upload_model = new AllowuploadModel();
+
+            $ufilter = [
+                'user_id' => $this->user->user_id
+            ];
+
+            $upload = $upload_model->getByDate($ufilter);
+
+            $months = [];
+            foreach ($upload as $item) {
+                $months[] = $item['month'];
+            }
+
+            if (!in_array(getCurrentMonthId(),$months)) {
+                $json_data = [
+                    'status' => false,
+                    'message' => 'Cannot add other receipt. Upload for the month is closed.',
+                ];
+                $error = true;
+            }
+
             if(!$error) {
                 $json_data = [
                     'status' => true,

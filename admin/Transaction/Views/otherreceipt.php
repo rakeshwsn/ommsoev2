@@ -1,5 +1,6 @@
 <!-- Main content -->
 <section class="content">
+    <div id="message"></div>
     <div class="block" id="upload-controls">
             <div class="block-content block-content-full">
                 <div class="row">
@@ -37,11 +38,9 @@
                             </select>
                         </div>
                     <?php endif; ?>
+
                     <div class="col-2">
                         <button class="btn btn-primary" id="add-new"><i class="si-plus"></i> New</button>
-                    </div>
-                    <div class="col-7">
-                        <span id="res-message"></span>
                     </div>
                 </div>
             </div>
@@ -183,7 +182,14 @@
                 },
                 success:function (json) {
                     if(json.status==false){
-                        $('#res-message').text(json.message);
+                        html = '<div class="alert alert-danger alert-dismissable" role="alert">'+
+                            '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+                            '<span aria-hidden="true">×</span>'+
+                        '</button>'+
+                        '<h3 class="alert-heading font-size-h4 font-w400">Alert</h3>'+
+                            '<p class="mb-0">'+json.message+'</p>'+
+                        '</div>';
+                        $('#message').html(html);
                     } else {
                         $('#modal-title').html(json.title);
                         $('#modal-content').html(json.html);
@@ -223,12 +229,10 @@
                 location.reload();
             },
             error:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
             },
             complete:function () {
                 $("#main-container").LoadingOverlay("hide");
-//                $('#main-container').loading('stop');
             }
         })
     });
