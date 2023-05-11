@@ -38,14 +38,6 @@ class OtherReceipt extends AdminController
             $data['agency_types'] = (new UserGroupModel())->getBlockUsers();
         }
 
-        /*$data['fund_agencies'] = [];
-        if($this->user->agency_type_id!=$this->settings->block_user){
-            if($this->user->district_id)
-                $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['district_id'=>$this->user->district_id]);
-            else
-                $data['fund_agencies'] = (new BlockModel())->getFundAgencies();
-        }*/
-
         return $this->template->view('Admin\Transaction\Views\otherreceipt', $data);
     }
 

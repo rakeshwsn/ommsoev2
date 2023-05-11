@@ -29,15 +29,6 @@
                         </select>
                     </div>
                     <?php endif; ?>
-                    <?php if($fund_agencies): ?>
-                        <div class="col-md-2">
-                            <select class="form-control" id="fund_agency_id" name="fund_agency_id">
-                                <?php foreach ($fund_agencies as $agency): ?>
-                                    <option value="<?=$agency['fund_agency_id']?>"><?=$agency['fund_agency']?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    <?php endif; ?>
 
                     <div class="col-2">
                         <button class="btn btn-primary" id="add-new"><i class="si-plus"></i> New</button>
