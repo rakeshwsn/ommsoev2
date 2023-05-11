@@ -128,6 +128,7 @@ class Usergroup extends AdminController {
             $datatable[]=array(
                 '<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
                 $result->name,
+                $result->agency?'Yes':'No',
                 $result->status?'Enable':'Disable',
                 $action
             );
@@ -172,7 +173,7 @@ class Usergroup extends AdminController {
         foreach($this->usergroupModel->getFieldNames('user_group') as $field) {
             if($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
-            } else if(isset($usergroup_info->{$field}) && $usergroup_info->{$field}) {
+            } else if(isset($usergroup_info->{$field}) ) {
                 $data[$field] = html_entity_decode($usergroup_info->{$field},ENT_QUOTES, 'UTF-8');
             } else {
                 $data[$field] = '';
