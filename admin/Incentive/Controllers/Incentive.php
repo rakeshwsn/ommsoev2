@@ -309,7 +309,7 @@ class Incentive extends AdminController{
         ];
 		$data['msgclass'] = '';
 		if ($this->request->getMethod(1) === 'POST'){
-			// print_r($_POST);exit;
+			 //print_r($_POST);exit;
 			$check['district_id'] = $_POST['district_id'];
 			$check['block_id'] = $_POST['block_id'];
 			$check['year'] = $_POST['year'];
@@ -372,13 +372,14 @@ class Incentive extends AdminController{
 					$res= $this->incentiveModel->addInceitive($datacsv);
 					$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
 					$data['msgclass'] = 'bg-success';
-					return redirect()->to(base_url('admin/incentive/addform'));
+					return redirect()->to(base_url('admin/incentive'));
 				   }
 				 }
 			}
 
 
 		}
+		
 		return $this->template->view('Admin\Incentive\Views\form', $data);  
 	}
 
