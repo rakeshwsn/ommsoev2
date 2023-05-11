@@ -8,6 +8,12 @@ $user  = service('user');
         <div class="block-header block-header-default">
             <!-- <h3 class="block-title">Data Filter</h3> -->
         </div>
+        <?php if (isset($_SESSION['errorupload'])) : ?>
+    <div class="alert alert-warning alert-dismissible fade show <?php echo $msgclass ?>" role="alert">
+        <?php echo $_SESSION['errorupload']; ?>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    </div>
+<?php endif; ?>
         <div class="block-header block-header-default">
 		<h3 class="block-title"><?php echo $heading_title; ?></h3>
 		<div class="block-options">

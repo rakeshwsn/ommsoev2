@@ -68,11 +68,12 @@ $user  = service('user');
                         }
                         ?>
                         <td>
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control js-select2' $main" ) ; ?>
+                            <input type="hidden" name="district_id" value="<?php echo $user->district_id?>"/>
+                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array(""=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control js-select2' $main required='required'" ) ; ?>
                         </td>
 
                         <td>
-                            <?php echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name',array("0"=>"Select Block")), set_value('block_id', ''),"id='block_id' class='form-control select2'"); ?>
+                            <?php echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name',array(""=>"Select Block")), set_value('block_id', ''),"id='block_id' class='form-control select2' required='required'"); ?>
                         </td>
                           
                             <td>
@@ -94,7 +95,7 @@ $user  = service('user');
                             </select>
                             </td>
                             <td>
-                               <input type="file" class="from-control" name="file"/>
+                               <input type="file" class="from-control" name="file" required='required'/>
                             </td>
                             <td>
                                 <button id="" class="btn btn-outline btn-primary"><i class="fa fa-upload"></i> Upload</button>
@@ -124,7 +125,7 @@ $user  = service('user');
                 },
                 success: function(json) {
 
-                    html = '<option value="0">Select Block</option>';
+                    html = '<option value="">Select Block</option>';
 
                     if (json['block'] != '') {
                         for (i = 0; i < json.length; i++) {
