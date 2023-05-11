@@ -30,6 +30,12 @@ $validation = \Config\Services::validation();
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label class="col-sm-2 control-label" for="input-status">Agency</label>
+                        <div class="col-md-10">
+                            <?php  echo form_dropdown('agency', array('1'=>'Yes','0'=>'No'), set_value('agency',$agency),array('class'=>'form-control','id' => 'input-agency')); ?>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-sm-2 control-label" for="input-status">Status</label>
                         <div class="col-md-10">
                             <?php  echo form_dropdown('status', array('1'=>'Enable','0'=>'Disable'), set_value('status',$status),array('class'=>'form-control','id' => 'input-status')); ?>
