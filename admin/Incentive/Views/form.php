@@ -70,7 +70,7 @@ $user  = service('user');
                         ?>
                         <td>
                             <input type="hidden" name="district_id" value="<?php echo $user->district_id?>"/>
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array(""=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control js-select2' $main required='required'" ) ; ?>
+                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control js-select2' $main required='required'" ) ; ?>
                         </td>
 
                         <td>
