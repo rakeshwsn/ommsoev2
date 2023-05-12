@@ -55,7 +55,8 @@ $user  = service('user');
                             <th>Block</th>
                             <th>Year</th>
                             <th>Season</th>
-                            <th>File</th>
+                            <th>Data Upload File</th>
+                            <th>Pdf Upload File</th>
                             <th>Upload</th>
                          
                         </tr>
@@ -96,6 +97,9 @@ $user  = service('user');
                             </td>
                             <td>
                                <input type="file" class="from-control" name="file" required='required'/>
+                            </td>
+                            <td>
+                               <input type="file" class="from-control" name="pdf" required='required'/>
                             </td>
                             <td>
                                 <button id="" class="btn btn-outline btn-primary"><i class="fa fa-upload"></i> Upload</button>

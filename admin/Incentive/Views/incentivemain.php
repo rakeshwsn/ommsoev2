@@ -88,6 +88,7 @@ $user  = service('user');
 						<th>Block</th>
 						<th>Year</th>
 						<th>Season</th>
+						<th>Pdf View</th>
 						<th class="text-right no-sort">Actions</th>
 					</tr>
 				</thead>
