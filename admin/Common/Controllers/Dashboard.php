@@ -33,11 +33,14 @@ class Dashboard extends AdminController
         } else {
             return $this->fund_receipt_check();
         }
-//        dd($data);
+
         $data['fr_url'] = site_url(Url::transactionAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
         $data['or_url'] = site_url(Url::otherReceiptAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
 
         $data['year'] = date('F') . ' ' . getYear(getCurrentYearId());
+
+        $data['years'] = getAllYears();
+        $data['year_id'] = getCurrentYearId();
 
         if ($this->user->agency_type_id == $this->settings->block_user) {
             return $this->fa_dashboard($data);
@@ -56,6 +59,41 @@ class Dashboard extends AdminController
         }
 
         return $this->template->view('Admin\Common\Views\dashboard', $data);
+    }
+
+    public function chart() {
+        $reportModel = new ReportsModel();
+        $data = [];
+        $chart_type = $this->request->getGet('chart_type');
+        if($chart_type=='district'){
+            $year = $this->request->getGet('year');
+            $abstractDists = $reportModel->getTransactionAbstractDistrict(['year'=>$year]);
+
+            $xaxis = [];
+            foreach ($abstractDists as $dist) {
+                $xaxis[] = $dist->district;
+            }
+            $series_ex = $series_fr = [];
+            foreach ($abstractDists as $dist) {
+                $series_ex[] = in_lakh($dist->ex_total,'');
+                $series_fr[] = in_lakh($dist->fr_total,'');
+            }
+            $data['xaxis'] = $xaxis;
+            $data['series'] = [
+                ['name' => 'Expense','data' => $series_ex],
+                ['name' => 'Fund Receipt','data' => $series_fr]
+            ];
+            $data['year'] = getYear($year);
+        }
+
+        if($chart_type=='agency'){
+
+        }
+
+        //add the header here
+        header('Content-Type: application/json');
+        echo json_encode( $data,JSON_NUMERIC_CHECK );
+
     }
 
     protected function fund_receipt_check()
@@ -224,58 +262,6 @@ class Dashboard extends AdminController
         $data['cb'] = $data['fr'] - $data['ex'];
         //$data['cb'] = $reportModel->getClosingBalanceTotal($filter);
 
-        $data['components'] = [];
-
-
-        $filter['transaction_type'] = 'fund_receipt';
-        $filter['district_id'] = $this->user->district_id;
-
-        $data['abstracts'] = [];
-        $data['fund_abstract'] = $fund_abstract = $reportModel->getTransactionAbstractDistrict($filter);
-
-        //fund abstract loop for bar chart
-        $data['fund']['label'] = [];
-        $data['fund']['data'] = [];
-        foreach ($fund_abstract as $key => $fund_abstracts) {
-
-            $data['fund']['label'][] = $fund_abstracts->agency;
-
-            $data['fund']['data'][$key]['value'] = in_lakh($fund_abstracts->total, '');
-
-            $data['abstracts'][$fund_abstracts->agency] = [
-                'block' => $fund_abstracts->agency,
-                'ftotal' => in_lakh($fund_abstracts->total, ''),
-            ];
-        }
-
-        $filter['transaction_type'] = 'expense';
-        $filter['district_id'] = $this->user->district_id;
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
-        $data['expense_abstract'] = $expense_abstract = $reportModel->getTransactionAbstractDistrict($filter);
-
-        // expense abstract loop for bar chart
-        $data['abstract']['label'] = [];
-        $data['abstract']['data'] = [];
-        foreach ($expense_abstract as $key => $expense_abstracts) {
-
-            $data['abstract']['label'][] = $expense_abstracts->agency;
-
-            $data['abstract']['data'][$key]['value'] = in_lakh($expense_abstracts->total);
-            $data['abstracts'][$expense_abstracts->agency]['etotal'] = in_lakh($expense_abstracts->total, '');
-
-
-            $etotal = $expense_abstracts->total;
-            $ftotal = $data['abstracts'][$expense_abstracts->agency]['ftotal'];
-
-            if ((int)$ftotal) {
-                $uc = ($etotal / $ftotal) * 100;
-            } else {
-                $uc = 0;
-            }
-            $data['abstracts'][$expense_abstracts->agency]['uc'] = in_lakh($uc);
-        }
-        usort($data['abstracts'], fn($a, $b) => $b['uc'] <=> $a['uc']);
-
         $data['upload_status'] = $this->upload_status([
             'district_id' => $this->user->district_id
         ]);
@@ -359,8 +345,36 @@ class Dashboard extends AdminController
 
     }
 
-
     protected function spmu_dashboard(&$data)
+    {
+        $reportModel = new ReportsModel();
+
+        $filter = [
+            'agency_type_id' => [7, 8, 9],
+            'fund_agency_id' => 1,
+            'year_upto' => getCurrentYearId(),
+        ];
+
+        $filter['transaction_type'] = 'fund_receipt';
+        $data['fr'] = $reportModel->getTransactionTotal($filter);
+
+        $filter['transaction_type'] = 'expense';
+        $filter['agency_type_id'] = [5, 6, 7, 8, 9];
+        $data['ex'] = $reportModel->getTransactionTotal($filter);
+
+        $data['cb'] = $data['fr'] - $data['ex'];
+
+        $data['fr'] = in_lakh($data['fr'],'');
+        $data['ex'] = in_lakh($data['ex'],'');
+        $data['cb'] = in_lakh($data['cb'],'');
+
+        $data['chart_url'] = admin_url('dashboard/chart');
+
+        return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
+
+    }
+
+    protected function spmu_dashboard_old(&$data)
     {
         $reportModel = new ReportsModel();
 
@@ -380,6 +394,7 @@ class Dashboard extends AdminController
         $data['ex'] = $reportModel->getTransactionTotal($filter);
 
         $data['cb'] = $data['fr'] - $data['ex'];
+
 
         $filter['transaction_type'] = 'fund_receipt';
 
@@ -440,13 +455,8 @@ class Dashboard extends AdminController
              $data['closing']['data'][] = in_lakh($closing_abstracts->cb);
          }
 
-        return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
+        return $this->template->view('Admin\Common\Views\spmu_dashboard_old', $data);
 
-    }
-
-    protected function spmu_dashboard_blank(&$data){
-
-        return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
     }
 
     public function spmu_dashboard_chart(){
