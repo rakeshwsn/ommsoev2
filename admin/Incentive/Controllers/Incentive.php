@@ -289,6 +289,7 @@ class Incentive extends AdminController{
 
 
 	public function addform(){
+		$this->template->add_package(array('select2'),true);
 		$user_upload =  $this->session->get('user')->id ;
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['text_form'] = $this->uri->getSegment(4) ? "INCENTIVE EDIT" : "INCENTIVE ADD";
