@@ -1762,7 +1762,7 @@ GROUP BY abst.heading_id";
         $sql = "SELECT
   SUM(stc.financial) total
 FROM soe_transactions st
-  RIGHT JOIN soe_transaction_components stc
+  JOIN soe_transaction_components stc
     ON st.id = stc.transaction_id
 WHERE st.deleted_at IS NULL
 AND stc.deleted_at IS NULL AND st.status = 1";
@@ -1770,6 +1770,148 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         $sql .= $this->appendFilter($filter);
 
         return $this->db->query($sql)->getFirstRow()->total;
+    }
+
+    public function getAbstractTotal($filter=[]) {
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+        $cy = isset($filter['year']) ? $filter['year']:getCurrentYearId();
+        $ly = ($cy-1);
+        $sql = "SELECT
+  agency_type_id,
+  district_id,
+  (fr_ly_total - xp_ly_total) ob_total,
+  res.fr_total,
+  res.xp_total,
+  (fr_ly_total - xp_ly_total + fr_total - xp_total) cb_total
+FROM (SELECT
+    agency.agency_type_id,
+    agency.district_id,
+    COALESCE(fr_ly.total, 0) fr_ly_total,
+    COALESCE(xp_ly.total, 0) xp_ly_total,
+    COALESCE(fr_cy.total, 0) fr_total,
+    COALESCE(xp_cy.total, 0) xp_total
+  FROM (SELECT
+      u.user_group_id agency_type_id,
+      u.district_id,
+      u.fund_agency_id
+    FROM user u
+    WHERE u.user_group_id IN (7, 8, 9, 11)) agency
+    LEFT JOIN (SELECT
+        st.agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.agency_type_id NOT IN (5, 6)
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.agency_type_id,
+               st.district_id,
+               st.fund_agency_id) fr_ly
+      ON agency.agency_type_id = fr_ly.agency_type_id
+      AND agency.district_id = fr_ly.district_id
+      AND agency.fund_agency_id = fr_ly.fund_agency_id
+    LEFT JOIN (SELECT
+        7 agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.district_id > 0
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.district_id,
+               st.fund_agency_id
+      UNION ALL
+      SELECT
+        st.agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.district_id = 0
+      AND st.fund_agency_id = 1
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.agency_type_id,
+               st.fund_agency_id) xp_ly
+      ON agency.district_id = xp_ly.district_id
+      AND agency.agency_type_id = xp_ly.agency_type_id
+      AND agency.fund_agency_id = xp_ly.fund_agency_id
+    LEFT JOIN (SELECT
+        st.agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.agency_type_id NOT IN (5, 6)
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.agency_type_id,
+               st.district_id,
+               st.fund_agency_id) fr_cy
+      ON fr_cy.district_id = agency.district_id
+      AND fr_cy.agency_type_id = agency.agency_type_id
+      AND agency.fund_agency_id = fr_cy.fund_agency_id
+    LEFT JOIN (SELECT
+        7 agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.district_id > 0
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.district_id,
+               st.fund_agency_id
+      UNION ALL
+      SELECT
+        st.agency_type_id,
+        st.district_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.district_id = 0
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.agency_type_id,
+               st.fund_agency_id) xp_cy
+      ON xp_cy.district_id = agency.district_id
+      AND xp_cy.agency_type_id = agency.agency_type_id
+      AND agency.fund_agency_id = xp_cy.fund_agency_id
+  WHERE agency.fund_agency_id = $fund_agency_id) res";
+
+        return $this->db->query($sql)->getResult();
     }
 
     protected function appendFilter($filter) {
@@ -2131,17 +2273,48 @@ FROM (SELECT
         return $this->db->query($sql)->getResult();
     }
 	
-	public function getTransactionAbstract($filter=[]){
-        if($filter['transaction_type'] == 'expense'){
-            $sql = "SELECT * FROM vw_txn_abstract_expense";
-            return $this->db->query($sql)->getResult();
-        }else if($filter['transaction_type'] == 'fund_receipt'){
-            $sql = "SELECT * FROM vw_txn_abstract_fund_receipt";
-            return $this->db->query($sql)->getResult();
-        }else if($filter['transaction_type'] == 'closing_balance'){
-            $sql = "SELECT * FROM vw_txn_abstract_cb";
-            return $this->db->query($sql)->getResult();
-        }
+	public function getTransactionAbstractDistrict($filter=[]){
+        $sql = "SELECT
+  sd.district_id,
+  sd.district,
+  fr.total fr_total,
+  xp.total ex_total
+FROM (SELECT
+    sd.id district_id,
+    sd.name district,
+    u.fund_agency_id
+  FROM soe_districts sd
+    LEFT JOIN user u
+      ON u.district_id = sd.id
+      AND u.user_group_id = 7) sd
+  LEFT JOIN (SELECT
+      district_id,
+      transaction_type,
+      xp.fund_agency_id,
+      year,
+      SUM(total) total
+    FROM vw_district_abstract_txn xp
+    WHERE xp.transaction_type = 'fund_receipt'
+    AND xp.block_id = 0
+    GROUP BY district_id,
+             xp.fund_agency_id,xp.year) fr
+    ON fr.district_id = sd.district_id
+    AND sd.fund_agency_id = fr.fund_agency_id
+  LEFT JOIN (SELECT
+      district_id,
+      transaction_type,
+      xp.fund_agency_id,
+      year,
+      SUM(total) total
+    FROM vw_district_abstract_txn xp
+    WHERE xp.transaction_type = 'expense'
+    GROUP BY district_id,
+             xp.fund_agency_id,xp.year) xp
+    ON fr.district_id = xp.district_id AND  fr.year = xp.year
+    AND sd.fund_agency_id = xp.fund_agency_id
+WHERE sd.fund_agency_id = 1 AND fr.year = ".$filter['year'];
+
+        return $this->db->query($sql)->getResult();
     }
 	
     public function getTransactionAbstractAgency($filter=[]){
@@ -2154,7 +2327,7 @@ FROM (SELECT
         }
     }
 
-    public function getTransactionAbstractDistrict($filter=[]){
+    public function getTransactionAbstractBlock($filter=[]){
         $sql = "SELECT * FROM vw_district_abstract_txn WHERE 
 district_id=".(int)$filter['district_id']
             ." AND (fund_agency_id=".(int)$filter['fund_agency_id'].")"

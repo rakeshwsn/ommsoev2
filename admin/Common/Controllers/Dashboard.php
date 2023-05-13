@@ -42,6 +42,15 @@ class Dashboard extends AdminController
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
 
+        if($this->request->getGet('year')){
+            $data['year_id'] = $this->request->getGet('year');
+        }
+
+        $data['fund_agency_id'] = 1;
+        if($this->request->getGet('fund_agency_id')){
+            $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+        }
+
         if ($this->user->agency_type_id == $this->settings->block_user) {
             return $this->fa_dashboard($data);
         }
@@ -350,23 +359,23 @@ class Dashboard extends AdminController
         $reportModel = new ReportsModel();
 
         $filter = [
-            'agency_type_id' => [7, 8, 9],
-            'fund_agency_id' => 1,
-            'year_upto' => getCurrentYearId(),
+            'year' => $data['year_id'],
+            'fund_agency_id' => $data['fund_agency_id'],
         ];
+        $abstract = $reportModel->getAbstractTotal($filter);
 
-        $filter['transaction_type'] = 'fund_receipt';
-        $data['fr'] = $reportModel->getTransactionTotal($filter);
+        $ob = $fr = $ex = $cb = 0;
+        foreach ($abstract as $item) {
+            $ob += $item->ob_total;
+            $fr += $item->fr_total;
+            $ex += $item->xp_total;
+            $cb += $item->cb_total;
+        }
 
-        $filter['transaction_type'] = 'expense';
-        $filter['agency_type_id'] = [5, 6, 7, 8, 9];
-        $data['ex'] = $reportModel->getTransactionTotal($filter);
-
-        $data['cb'] = $data['fr'] - $data['ex'];
-
-        $data['fr'] = in_lakh($data['fr'],'');
-        $data['ex'] = in_lakh($data['ex'],'');
-        $data['cb'] = in_lakh($data['cb'],'');
+        $data['ob'] = in_lakh($ob,'');
+        $data['fr'] = in_lakh($fr,'');
+        $data['ex'] = in_lakh($ex,'');
+        $data['cb'] = in_lakh($cb,'');
 
         $data['chart_url'] = admin_url('dashboard/chart');
 
