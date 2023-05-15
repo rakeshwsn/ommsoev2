@@ -15,7 +15,6 @@
                             <tr>
                                 <th width="5%">Number</th>
                                 <th width="40%">Component</th>
-                                <th width="10%">To be Released to</th>
                                 <th width="10%">Units</th>
                                 <th width="15%">Rate</th>
                                 <th width="5%">Physical</th>
@@ -23,9 +22,9 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <input type="hidden" name="phase[<?=$key?>][fund_agency_id]" value="<?=$component['fund_agency_id']?>">
-                            <input type="hidden" name="phase[<?=$key?>][phase]" value="<?=$component['phase']?>">
-                            <input type="hidden" name="phase[<?=$key?>][year]" value="<?=$component['year']?>">
+                            <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
+                            <input type="hidden" name="phase" value="<?=$component['phase']?>">
+                            <input type="hidden" name="year" value="<?=$component['year']?>">
 
                             <?=$component['budgets']?>
                             </tbody>
@@ -75,6 +74,53 @@
 
 
         });
+
+        $('.mon_phy').keyup(function (e) {
+            var ctx = $(this);
+            parent = $(ctx).closest('tr');
+            parent_id = $(ctx).closest('tr').data('parent');
+            
+            //grand total
+            gt_mon_phy = 0;
+            $('.mon_phy').each(function () {
+                mon_phy = parseInt($(this).find('input').val()) || 0;
+                gt_mon_phy += mon_phy;
+            });
+            $('#gt_mon_phy').text(gt_mon_phy.toFixed(2));
+            //console.log(gt_mon_phy);
+            //sub total
+            sub_mon_phy = 0;
+            $('tr[data-parent="'+parent_id+'"]').each(function () {
+                mon_phy = parseInt($(this).find('.mon_phy').find('input').val()) || 0;
+                sub_mon_phy += mon_phy;
+            });
+            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_mon_phy').text(sub_mon_phy.toFixed(2));
+    
+        });
+
+        $('.mon_fin').keyup(function (e) {
+            var ctx = $(this);
+            parent = $(ctx).closest('tr');
+            parent_id = $(ctx).closest('tr').data('parent');
+
+            //grand total
+            gt_mon_fin = 0;
+            $('.mon_fin').each(function () {
+                mon_fin = parseFloat($(this).find('input').val()) || 0;
+                gt_mon_fin += mon_fin;
+
+            });
+            $('#gt_mon_fin').text(gt_mon_fin.toFixed(2));
+        
+            //sub total
+            sub_mon_fin = 0;
+            $('tr[data-parent="'+parent_id+'"]').each(function () {
+                mon_fin = parseFloat($(this).find('.mon_fin').find('input').val()) || 0;
+                sub_mon_fin += mon_fin;
+            });
+            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_mon_fin').text(sub_mon_fin.toFixed(2));
+        });
+
         function calculation_financial(obj){
             var rate=$(obj).parents('tr').find('td input.rate').val();
             var physical=$(obj).parents('tr').find('td input.physical').val();

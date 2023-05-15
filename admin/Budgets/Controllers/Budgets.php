@@ -32,11 +32,13 @@ class Budgets extends AdminController {
             'href' => admin_url('budgets')
         );
 
-        $this->template->add_package(array('datatable'),true);
+        $this->template->add_package(array('datatable','select2'),true);
 
         $data['add'] = admin_url('budgets/add');
         $data['delete'] = admin_url('budgets/delete');
         $data['datatable_url'] = admin_url('budgets/search');
+
+        $data['bulkbudegt'] = admin_url('budgets/bulkbudget');
 
         $data['heading_title'] = 'Budgets Plan';
 
@@ -50,6 +52,22 @@ class Budgets extends AdminController {
             $data['selected'] = array();
         }
 
+        $data['districts']=(new DistrictModel())->getAll();
+        $data['years'] = getAllYears();
+        $data['fundagencies'] = (new BlockModel())->getFundAgencies();
+        
+        $data['user_id']=$this->user->getId();
+
+        
+        $data['active_district']=$this->user->district_id;
+        if($data['active_district']){
+            $data['district_id']=$data['active_district'];
+        }
+		$data['active_block']=$this->user->block_id;
+        if($data['active_block']){
+            $data['block_id']=$data['active_block'];
+        }
+
         return $this->template->view('Admin\Budgets\Views\budgetPlan', $data);
     }
 
@@ -60,6 +78,10 @@ class Budgets extends AdminController {
 
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
+            'filter_year'       => $requestData['year'],
+            'filter_district_id'   => $requestData['district_id'],
+            'filter_block_id'      => $requestData['block_id'],
+            'filter_fund_agency_id' => $requestData['fund_agency_id'],
             'order'  		 => $requestData['order'][0]['dir'],
             'sort' 			 => $requestData['order'][0]['column'],
             'start' 			 => $requestData['start'],
@@ -76,8 +98,7 @@ class Budgets extends AdminController {
             $ykey=array_search($result->year,array_column($years,'id'));
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/details/'.$result->id).'"><i class="fa fa-list"></i></a>';
-            $action .= 		'<a class="btn btn-sm btn-info" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-eye"></i></a>';
+            $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
             $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
             $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
@@ -179,6 +200,108 @@ class Budgets extends AdminController {
         echo $this->template->view('Admin\Budgets\Views\budgetPlanForm',$data);
     }
 
+    public function bulkBudget(){
+        $data=[];
+        $data['heading_title'] 	= "Bulk Budgets Details";
+        $this->template->add_package(array('select2'),true);
+        
+        if ($this->request->getMethod(1) === 'POST' ){
+          
+           foreach($this->request->getPost('block_id') as $blockid){
+                $plandata=[
+                    'year'=>$this->request->getPost('year'),
+                    'fund_agency_id'=>$this->request->getPost('fund_agency_id'),
+                    'district_id'=>$this->request->getPost('district_id'),
+                    'block_id'=>$blockid
+                ];
+                $budget_plan=$this->budgetPlanModel->getBudgetPlanByBlock($plandata);
+                if($budget_plan){
+                    $budget_plan_id=$budget_plan->id;
+                }else{
+                    $this->budgetPlanModel->insert($plandata);
+                    $budget_plan_id=$this->budgetPlanModel->getInsertID();
+                }
+
+                $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
+            }
+           
+          
+            $this->session->setFlashdata('message', 'Budget Updated Successfully.');
+
+            return redirect()->to(admin_url('budgets'));
+
+        }
+
+        $data['details']=0;
+        $data['components']=[];
+        $data['fund_agency_id']=$fund_agency_id=$this->request->getGet('fund_agency_id');
+        $data['year']=$year=$this->request->getGet('year');
+        $data['district_id']=$district_id=$this->request->getGet('district_id');
+        $data['block_id']=$block_id=$this->request->getGet('block_id');
+        $agency_types=(new CommonModel())->getAgencyTypes();
+        if ($this->request->getGet('fund_agency_id') && $this->validateBulkBudget()){
+        
+            $data['details']=1;
+            if($block_id){
+                $phase=1;
+                $category=['program'];
+            }else if($district_id){
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }else{
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }
+
+
+            $agency_type_id = 0;
+            if($district_id==0 && empty($block_id)){
+                $agency_type_id = 8;
+            } else if($district_id!=0 && empty($block_id)){
+                $agency_type_id = 7;
+            } else if($district_id!=0 && !empty($block_id)){
+                $agency_type_id = 5;
+            }
+            
+            $filter=[
+                'fund_agency_id'=>$fund_agency_id,
+                'year'=>$year,
+                'district_id'=>$district_id,
+                'block_id'=>$block_id,
+                'phase'=>$phase,
+                'category'=>$category,
+                'agency_type_id' => $agency_type_id
+             ];
+
+            $components = $this->budgetModel->getBulkBudgetDetails($filter);
+            
+            if($components) {
+                $components = $this->buildTree($components);
+                $data['components'][0]['year'] = $year;
+                $data['components'][0]['phase'] = 0;
+                $data['components'][0]['fund_agency_id'] = $fund_agency_id;
+                $data['components'][0]['district_id'] = $district_id;
+                $data['components'][0]['block_id'] = $block_id;
+                //$data['components'][$key]['budgets']=$components;
+                $data['components'][0]['budgets'] = $this->getBTable($components,0);
+            }
+
+        }
+
+        
+        if(isset($this->error['warning'])){
+            $data['error'] 	= $this->error['warning'];
+        }
+
+        $data['fund_agencies'] = (new BlockModel())->getFundAgencies();
+        $data['block_phases']=(new BlockModel())->getTotalPhaseByAgency(1);
+        $data['years']=(new YearModel())->findAll();
+        $data['districts']=(new DistrictModel())->findAll();
+
+        
+        return $this->template->view('Admin\Budgets\Views\bulkBudgetForm', $data);
+    }
+
     protected function validateForm() {
 
         $validation =  \Config\Services::validation();
@@ -196,18 +319,42 @@ class Budgets extends AdminController {
         }
         return !$this->error;
     }
-    public function details(){
+    
+    protected function validateBulkBudget(){
+        $rules=[
+            'district_id' => array(
+                'label' => 'District',
+                'rules' => 'trim|required|max_length[500]'
+            ),
+            'block_id' => array(
+                'label' => 'Block',
+                'rules' => 'required'
+            ),
+
+        ];
+
+        if ($this->validate($rules)){
+            return true;
+        }
+        else{
+            //printr($validation->getErrors());
+            $this->error['warning']="Warning: Please check the form carefully for errors!";
+            return false;
+        }
+
+        return !$this->error;
+    }
+    public function view(){
         $data=[];
         $data['heading_title'] 	= "Budgets Details";
 
         if ($this->request->getMethod(1) === 'POST'){
             $budget_plan_id=$this->uri->getSegment(4);
-            //printr($this->request->getPost());
-            //exit;
+            
             $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
             $this->session->setFlashdata('message', 'Budget Updated Successfully.');
 
-            return redirect()->to(admin_url('budgets/details/'.$budget_plan_id));
+            return redirect()->to(admin_url('budgets/view/'.$budget_plan_id));
 
         }
 
@@ -222,9 +369,7 @@ class Budgets extends AdminController {
             $data['text_form'] = "Budget Details for ";
 
         }
-        $agency_types=(new CommonModel())->getAgencyTypes();
-
-       
+        
         if($budgetplan_info){
             if($budgetplan_info->block_id){
                 $phase=1;
@@ -275,7 +420,7 @@ class Budgets extends AdminController {
                 $data['components'][0]['district_id'] = $budgetplan_info->district_id;
                 $data['components'][0]['block_id'] = $budgetplan_info->block_id;
                 //$data['components'][$key]['budgets']=$components;
-                $data['components'][0]['budgets'] = $this->getTable($components,$agency_types,0);
+                $data['components'][0]['budgets'] = $this->getBTable($components,0);
             }
             
 
@@ -286,7 +431,7 @@ class Budgets extends AdminController {
         }
     }
 
-    public function view(){
+    public function view_ols(){
         $data=[];
         $data['heading_title'] 	= "Budgets View";
 
@@ -338,7 +483,7 @@ class Budgets extends AdminController {
         }
     }
 
-    private function getTable($array,$agency_types,$key) {
+    private function getTable($array,$key) {
         $html = '';
 
         foreach ($array as $item) {
@@ -354,19 +499,7 @@ class Budgets extends AdminController {
                     <input type="hidden" class="form-control" name="phase['.$key.'][budget]['.$item['component_id'].'][category]" value="'.$item['category'].'">
                     <label for="cb' . $item['id'] . '">' . $item['number'] . '</label></td>
                     <td><label for="cb' . $item['component_id'] . '">' . $item['description'] . '</label></td>
-                    <td>
-                    <select class="form-control" name="phase['.$key.'][budget]['.$item['component_id'].'][agency_type_id]">';
-                    $html .= '<option value="0">Select Agency</option>';
-
-                    foreach($agency_types as $agency_type) {
-                            if ($agency_type->id == $item['agency_type_id']) {
-                                $html .= '<option value=' . $agency_type->id . ' selected="selected">' . $agency_type->name . '</option>';
-                            } else {
-                                $html .= '<option value=' . $agency_type->id . '>' . $agency_type->name . '</option>';
-                            }
-                        }
-                    $html .= '</select>
-                    </td>
+                    
                     <td><input type="text" class="form-control" name="phase['.$key.'][budget]['.$item['component_id'].'][units]" value="'.$item['units'].'"></td></td>
                     <td><input type="text" class="form-control rate" name="phase['.$key.'][budget]['.$item['component_id'].'][unit_cost]" value="'.$item['unit_cost'].'"></td>
                     <td><input type="text" class="form-control physical" name="phase['.$key.'][budget]['.$item['component_id'].'][physical]" value="'.$item['physical'].'"></td>
@@ -374,7 +507,7 @@ class Budgets extends AdminController {
                     ';
             }
             if (!empty($item['children'])){
-                $html .= $this->getTable($item['children'],$agency_types,$key);
+                $html .= $this->getTable($item['children'],$key);
             }
             $html .= '</tr>';
         }

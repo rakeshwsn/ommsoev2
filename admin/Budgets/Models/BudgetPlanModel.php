@@ -132,12 +132,44 @@ class BudgetPlanModel extends Model
 
     }
     private function filter($builder,$data){
+        $builder->join("soe_fund_agency fa","sbp.fund_agency_id=fa.id","left");
+        $builder->join('soe_districts d','d.id=sbp.district_id','left');
+        $builder->join('soe_blocks b','b.id=sbp.block_id','left');
+        
+        if(!empty($data['filter_district_id'])){
+            $builder->where("sbp.district_id  = '".$data['filter_district_id']."'");
+        }
 
+        if(!empty($data['filter_block_id'])){
+            $builder->where("sbp.block_id  = '".$data['filter_block_id']."'");
+        }
+		
+		if(!empty($data['filter_year'])){
+            $builder->where("sbp.year  = '".$data['filter_year']."'");
+        }
+		
+        if(!empty($data['filter_fund_agency_id'])){
+            $builder->where("sbp.fund_agency_id  = '".$data['filter_fund_agency_id']."'");
+        }
+        
         if (!empty($data['filter_search'])) {
             $builder->where("(
                 sfa.name LIKE '%{$data['filter_search']}%')"
             );
         }
+
+    }
+
+    public function getBudgetPlanByBlock($data){
+        $builder=$this->db->table("{$this->table} sbp");
+        $builder->where("sbp.year",$data['year']);
+        $builder->where("sbp.fund_agency_id",$data['fund_agency_id']);
+        $builder->where("sbp.district_id",$data['district_id']);
+        $builder->where("sbp.block_id",$data['block_id']);
+        $builder->where("sbp.deleted_at",null);
+        $res = $builder->get()->getRow();
+        return $res;
+
     }
 
 }
