@@ -21,4 +21,7 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->add('components/assign/add','Components\Controllers\Assign::add');
     $routes->post('components/assign/delete','Components\Controllers\Assign::delete');
 
+    $routes->add('components/agencyassign','Components\Controllers\AgencyAssign::index');
+
+
 });

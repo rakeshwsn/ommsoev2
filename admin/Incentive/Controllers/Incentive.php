@@ -99,6 +99,14 @@ class Incentive extends AdminController{
             $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('incentive/view/'.$result->id).'">District/Block View Data</a>';
 			$action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('incentivemain/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
 			$action .= '</div>';
+
+			if($result->pdf){
+			$pdfupload ='<a href="'.base_url() .'/uploads/farmerincentive/'.$result->pdf.'">';
+			$pdfupload .= '<i class="fa fa-file-pdf-o" style="font-size:48px;color:red"></i>';
+			$pdfupload .= '</a>';
+			} else {
+				$pdfupload ='<h5>Not Uploaded </h5>';
+			}
 			
 			$datatable[]=array(
 				'<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
@@ -106,6 +114,7 @@ class Incentive extends AdminController{
 				$result->block_name,
                 $year,
                 $season,
+				$pdfupload,
 				$action
 			);
 			
@@ -289,6 +298,7 @@ class Incentive extends AdminController{
 
 
 	public function addform(){
+		$this->template->add_package(array('select2'),true);
 		$user_upload =  $this->session->get('user')->id ;
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['text_form'] = $this->uri->getSegment(4) ? "INCENTIVE EDIT" : "INCENTIVE ADD";
@@ -309,7 +319,8 @@ class Incentive extends AdminController{
         ];
 		$data['msgclass'] = '';
 		if ($this->request->getMethod(1) === 'POST'){
-			// print_r($_POST);exit;
+			
+			//printr($file_pdf); exit;
 			$check['district_id'] = $_POST['district_id'];
 			$check['block_id'] = $_POST['block_id'];
 			$check['year'] = $_POST['year'];
@@ -324,12 +335,15 @@ class Incentive extends AdminController{
 			} else{
 
 				if(isset($_FILES["file"]["name"])){
-
+					$file_pdf = $this->request->getFile('pdf');
+					$file_pdf->move(DIR_UPLOAD . 'farmerincentive', $file_pdf->getName());
 					$main_incetive_data = array(
 						'district_id' =>$check['district_id'],
 						'block_id' =>$check['block_id'],
 						'year' =>$check['year'],
 						'season' =>$check['season'],
+						'pdf' => $file_pdf->getName(),
+						'created_by' => $user_upload
 					);
 					$result_main= $this->incentiveModel->addInceitive_main($main_incetive_data);
 					//print_r($_FILES); exit;
@@ -372,13 +386,14 @@ class Incentive extends AdminController{
 					$res= $this->incentiveModel->addInceitive($datacsv);
 					$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
 					$data['msgclass'] = 'bg-success';
-					return redirect()->to(base_url('admin/incentive/addform'));
+					return redirect()->to(base_url('admin/incentive'));
 				   }
 				 }
 			}
 
 
 		}
+		
 		return $this->template->view('Admin\Incentive\Views\form', $data);  
 	}
 
