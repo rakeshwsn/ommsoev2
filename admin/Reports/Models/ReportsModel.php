@@ -1778,7 +1778,7 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         $ly = ($cy-1);
         $sql = "SELECT
   agency_type_id,
-  district_id,
+  agency,
   (fr_ly_total - xp_ly_total) ob_total,
   res.fr_total,
   res.xp_total,
@@ -1786,6 +1786,7 @@ AND stc.deleted_at IS NULL AND st.status = 1";
 FROM (SELECT
     agency.agency_type_id,
     agency.district_id,
+    CASE WHEN agency.district_id>0 THEN d.name ELSE ug.name END as agency,
     COALESCE(fr_ly.total, 0) fr_ly_total,
     COALESCE(xp_ly.total, 0) xp_ly_total,
     COALESCE(fr_cy.total, 0) fr_total,
@@ -1795,7 +1796,8 @@ FROM (SELECT
       u.district_id,
       u.fund_agency_id
     FROM user u
-    WHERE u.user_group_id IN (7, 8, 9, 11)) agency
+    WHERE u.user_group_id IN (7, 8, 9, 11)) agency LEFT JOIN soe_districts d ON d.id=agency.district_id
+    LEFT JOIN user_group ug ON agency.agency_type_id=ug.id
     LEFT JOIN (SELECT
         st.agency_type_id,
         st.district_id,

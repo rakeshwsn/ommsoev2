@@ -40,47 +40,47 @@
     </div>
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="ob-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
-                        <i class="si si-login fa-2x text-earth-light"></i>
+                        <i class="fa fa-retweet fa-2x text-corporate"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$ob?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ob']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
                 </div>
             </a>
         </div>
         <!-- Row #2 -->
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="fr-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$fr?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['fr']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
         </div>
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="ex-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$ex?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ex']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
         </div>
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="cb-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span  data-toggle="countTo" data-speed="1000" data-to="<?=$cb?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['cb']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on date</small></div>
                 </div>
             </a>
@@ -120,6 +120,27 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Abstract Modal -->
+<div class="modal fade" id="modal-abstract" tabindex="-1" role="dialog" aria-labelledby="modal-popout" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="modal-title"></h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content" id="modal-content">
+                    <div class="text-centered p-3">Loading...</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -188,6 +209,7 @@
                         options.yAxis.title.text = 'Amount (in Lakhs)';
                         // Redraw the chart with the updated configuration
                         chart = new Highcharts.Chart('container',options);
+                        reloadAbstract(data);
                     },
                     error:function () {
 
@@ -207,8 +229,39 @@
         $('#year').on('change',function () {
             $('[name="chart_type"]').trigger('change');
         });
-    });
 
+        $('.abstract').click(function () {
+            year = $('#year').val();
+
+            $.ajax({
+                url:'<?=$abstract_url?>',
+                data:{year:year},
+                type:'GET',
+                dataType:'JSON',
+                beforeSend:function () {
+                    $('#modal-content').html('Loading...');
+                },
+                success:function (data) {
+                    $('#modal-content').html(data.html);
+                },
+                error:function () {
+
+                },
+                complete:function () {
+                    $("#modal-abstract").modal({
+                        backdrop: 'static',
+                    });
+                }
+            });
+        });
+    });
+    function reloadAbstract(data) {
+        $('#ob').text(data.abstract.ob);
+        $('#fr').text(data.abstract.fr);
+        $('#ex').text(data.abstract.ex);
+        $('#cb').text(data.abstract.cb);
+        //coreAppearCountTo();
+    }
 </script>
 
 
