@@ -144,7 +144,6 @@
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-    //                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                     $('#res-message').text('');
                 },
