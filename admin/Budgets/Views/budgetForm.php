@@ -3,7 +3,7 @@
         <?php echo form_open(); ?>
         <div class="block">
             <div class="block-header block-header-default">
-                <h3 class="block-title">Budget Details</h3>
+                <h3 class="block-title"><?=$text_form?></h3>
             </div>
 
             <div class="block-content">
