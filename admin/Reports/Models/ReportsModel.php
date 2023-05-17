@@ -765,7 +765,7 @@ FROM (SELECT
         $sql .= " AND sca.fund_agency_id = ".$filter['fund_agency_id'].") sc
     LEFT JOIN soe_components_assign sca
       ON sca.component_id = sc.id
-      AND sca.fund_agency_id = sc.fund_agency_id) comp
+      AND sca.fund_agency_id = sc.fund_agency_id GROUP BY component_id,sca.number) comp
     LEFT JOIN user_group ug
       ON comp.agency_type_id = ug.id
     LEFT JOIN (SELECT
@@ -1013,7 +1013,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-echo $sql;exit;
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }
