@@ -259,7 +259,7 @@ class Dashboard extends AdminController
         ];
 
         $fr = $frcModel->where($where)->first();
-//echo $frcModel->db->getLastQuery();exit;
+
         return !$fr;
     }
 
@@ -354,7 +354,6 @@ class Dashboard extends AdminController
 
     protected function atma_dashboard(&$data)
     {
-
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
         $this->reportModel = new ReportsModel();
@@ -456,11 +455,6 @@ class Dashboard extends AdminController
         if ($this->user->agency_type_id == $this->settings->block_user) {
             $filter['block_user'] = true;
         }
-//        $this->reportModel = new ReportsModel();
-//        $components = $this->reportModel->getMpr($filter);
-//        $components = $this->buildTree($components,'parent','component_id');
-
-//        $data['components'] = $this->getTable($components,'view');
 
         return $this->template->view('Admin\Common\Views\ps_dashboard', $data);
 

@@ -43,20 +43,25 @@ class Transaction extends AdminController {
         $data['years'] = getAllYears();
         $data['download_url'] = Url::transactionDownloadTemplate;
 
-        $upload_model = new AllowuploadModel();
+        //control validation from env file
+        $data['upload_enabled'] = false;
+        if(env('soe.uploadDateValidation')){
 
-        $ufilter = [
-            'user_id' => $this->user->user_id
-        ];
+            $upload_model = new AllowuploadModel();
 
-        $upload = $upload_model->getByDate($ufilter);
+            $ufilter = [
+                'user_id' => $this->user->user_id
+            ];
 
-        $months = [];
-        foreach ($upload as $item) {
-            $months[] = $item['month'];
+            $upload = $upload_model->getByDate($ufilter);
+
+            $months = [];
+            foreach ($upload as $item) {
+                $months[] = $item['month'];
+            }
+
+            $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
         }
-
-        $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
 
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
@@ -769,8 +774,7 @@ class Transaction extends AdminController {
         //skip validation for ps
         if (in_array($this->user->agency_type_id,
             [$this->settings->ps_user,
-                $this->settings->rs_user,
-                $this->settings->block_user,11,7])) {
+                $this->settings->rs_user,11])) {
             //pass
 
         } else {
@@ -924,14 +928,17 @@ class Transaction extends AdminController {
 
     public function misIsUploaded() {
 
-        $upload_model = new AllowuploadModel();
+        $upload_allowed = true;
+        if(env('soe.uploadDateValidation')) {
+            $upload_model = new AllowuploadModel();
 
-        $upload = $upload_model->uploadAllowed([
-            'month' => $this->request->getGet('month'),
-            'year' => $this->request->getGet('year'),
-            'user_id' => $this->user->user_id,
-            'agency_type_id' => $this->user->agency_type_id
-        ]);
+            $upload_allowed = $upload_model->uploadAllowed([
+                'month' => $this->request->getGet('month'),
+                'year' => $this->request->getGet('year'),
+                'user_id' => $this->user->user_id,
+                'agency_type_id' => $this->user->agency_type_id
+            ]);
+        }
 
         $misModel = new MISModel();
         $txn = $misModel->where([
@@ -943,7 +950,7 @@ class Transaction extends AdminController {
             'user_id' => $this->user->user_id,
         ])->first();
 
-        if(!$upload) {
+        if(!$upload_allowed) {
             $data['html'] = '<div class="col-12" id="alert-msg">
                         <div class="alert alert-danger" role="alert">
                             <p class="mb-0">The SoE/Fund Receipt upload is closed for the month.</p>

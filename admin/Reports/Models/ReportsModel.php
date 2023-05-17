@@ -1013,7 +1013,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-
+echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }
