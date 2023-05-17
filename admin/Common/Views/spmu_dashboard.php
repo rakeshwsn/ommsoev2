@@ -1,29 +1,9 @@
 <style>
-    .red {
-        background-color: rgb(255, 0, 0);
-        color: black;
+    #chart-container {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
     }
-    .orange {
-        background-color: rgb(250, 192, 144);
-        color: black;
-    }
-    .yellow {
-        background-color: rgb(255, 255, 0);
-        color: black;
-    }
-    .green {
-        background-color: #77933C;
-        color: black;
-    }
-    .table thead th {
-        
-        text-transform: none !important;
-}
-#chart-container {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-}
     .form-check-input {
         display: none;
     }
@@ -95,15 +75,6 @@
                             <input class="form-check-input" type="radio" value="district"
                                    name="chart_type" id="district" autocomplete="off" checked> Districtwise
                         </label>
-                        <!--<label class="btn btn-secondary form-check-label">
-                            <input class="form-check-input" type="radio"
-                                   name="chart_type" id="agency" value="agency"
-                                   autocomplete="off"> Agency
-                        </label>-->
-                        <!--<label class="btn btn-secondary form-check-label">
-                            <input class="form-check-input" type="radio" value="percentage"
-                                   name="chart_type" id="percentage" autocomplete="off"> Percentage
-                        </label>-->
                     </div>
                 </div>
                 <!-- END Navigation -->

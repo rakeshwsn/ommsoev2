@@ -89,6 +89,7 @@ $user  = service('user');
 						<th>Year</th>
 						<th>Season</th>
 						<th>Pdf View</th>
+						<th>Verify</th>
 						<th class="text-right no-sort">Actions</th>
 					</tr>
 				</thead>
@@ -184,6 +185,59 @@ $user  = service('user');
 </script>
 
 
+<script>
+    $(document).ready(function(){
+        $('body').on('click','.verifyCheck', function() {
+            var that=$(this);
+                var checkboxValue = $(this).val();
+                var confirmed = confirm("Are you sure you want to proceed?");
+                            if (confirmed) {
+                        // Send data to AJAX request
+                        $.ajax({
+                            url: '<?php echo admin_url("incentive/ajaxverify"); ?>',
+                            method: 'POST',
+                            data: { checkboxValue: checkboxValue },
+                            success: function(response) {
+                                // Handle success response
+                                if(response == 1){
+                                    alert("Please Verify All Data First");
+                                    $(that).prop("checked",false);
+                                } else{
+                                    aftererrorFix(checkboxValue);
+                                    
+                                }
+                               
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle error response
+                                console.log(error);
+                            }
+                        });
+                    } else{
+                        $(this).prop("checked",false);
+                    }
+           
+        });
 
+    })
+
+
+    function aftererrorFix(checkboxValue){
+            $.ajax({
+                url: '<?php echo admin_url("incentive/ajaxverifyupdate"); ?>',
+                method: 'POST',
+                data: { checkboxValue: checkboxValue },
+                success: function(response) {
+                    // Handle success response
+                    if(response){
+                       return response;
+                    } else{
+                        console.log('noerror');
+                    }
+                               
+                    },
+            })
+    }
+</script>
 
 <?php js_end(); ?>

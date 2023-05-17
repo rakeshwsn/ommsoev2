@@ -71,10 +71,10 @@ class Incentive extends AdminController{
 				'limit' 		    =>	$requestData['length']
 			);
 		
-		//$totalFiltered = $this->incentiveModel->getTotal($filter_data);
+		$totalFiltered = $this->incentiveModel->getTotal($filter_data);
 		$filteredData = $this->incentivemainModel->getAll($filter_data);
 	
-		//printr($filteredData);
+		// printr($filteredData); exit;
 		$datatable=array();
 		foreach($filteredData as $result) {
 
@@ -107,6 +107,8 @@ class Incentive extends AdminController{
 			} else {
 				$pdfupload ='<h5>Not Uploaded </h5>';
 			}
+
+			$verified = '<input type="checkbox" class="verifyCheck" value="'.$result->id.'" name="verify"'. ($result->verify == 1 ? ' checked' : '') . '/>';
 			
 			$datatable[]=array(
 				'<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
@@ -115,6 +117,7 @@ class Incentive extends AdminController{
                 $year,
                 $season,
 				$pdfupload,
+				$verified,
 				$action
 			);
 			
@@ -327,13 +330,27 @@ class Incentive extends AdminController{
 			$check['season'] = $_POST['season'];
 
 			$checkedData = $this->incentiveModel->getcheckExsists($check);
-
+			
 			if($checkedData > 0){
 				$this->session->setFlashdata('errorupload', 'Data Already Exists');
 				$data['msgclass'] = 'bg-danger';
-			
-			} else{
+				return redirect()->to(base_url('admin/incentive/addform'));
+			} 
 
+			// $checkk['filter_district'] = $_POST['district_id'];
+			// $checkk['filter_block'] = $_POST['block_id'];
+			// $checkk['filter_year'] = $_POST['year'];
+			// $checkk['filter_season'] = $_POST['season'];
+
+			// $checkedDatablock = $this->validateForm($checkk);
+			// if($checkedDatablock){
+			// 	$this->session->setFlashdata('errorupload', 'First Verify the Previous Block Data');
+			// 	$data['msgclass'] = 'bg-danger';
+			// 	return redirect()->to(base_url('admin/incentive/addform'));
+			
+			// } 
+
+			
 				if(isset($_FILES["file"]["name"])){
 					$file_pdf = $this->request->getFile('pdf');
 					$file_pdf->move(DIR_UPLOAD . 'farmerincentive', $file_pdf->getName());
@@ -389,7 +406,7 @@ class Incentive extends AdminController{
 					return redirect()->to(base_url('admin/incentive'));
 				   }
 				 }
-			}
+			 
 
 
 		}
@@ -576,27 +593,74 @@ class Incentive extends AdminController{
             $data['blocks'] = $blockModel->where(['district_id'=>$data['district_id']])->findAll();
         }
 		echo $this->template->view('Admin\Incentive\Views\incentiveform',$data);
+	}   
+
+	public function ajaxverify(){
+			//printr($_POST['checkboxValue']); exit;
+			$filter_data = array(
+				'mainincetiveid'=>$_POST['checkboxValue'],
+				
+			);
+		$filteredData = $this->incentiveModel->getAll($filter_data);
+		$error = 0;
+		foreach($filteredData as $result) {
+			if($this->checkError($result) == 'true'){
+				$error = 1 ;
+				break;
+				}  
+			} 
+	 	echo $error;	
 	}
+
+	public function ajaxverifyupdate(){
+		$id = $_POST['checkboxValue'];
+		// $this->incentiveModel->update($id,$id);
+		$row = $this->incentivemainModel->find($id);
+		$row->verify = 1;
+		$updateverify = true;
+		if($this->incentivemainModel->save($row)){
+			echo $updateverify;
+		}
+
+		
+
+}
 	
-	protected function validateForm() {
-		//printr($_POST);
-		$validation =  \Config\Services::validation();
-		$id=$this->uri->getSegment(4);
-		$regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
-		$regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
-		$regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor 
+	// protected function validateForm($filter_data) {
+	// 	//printr($filter_data); exit;
+	// 	$filteredData = $this->incentivemainModel->getAllCheckblockwise($filter_data);
+	
+	// 	if($filteredData){
+	// 		$filtered_Data = $this->incentiveModel->getAll($filteredData->id);
+		
+		
+			
+	// 		foreach($filtered_Data as $result) {
+	// 			if($this->checkError($result) == 'true'){
+	// 				return true;
+	// 			} 
+	// 		} 
+	// 	}else{
+	// 		return false;
+	// 	}
 
-		$rules = $this->incentiveModel->validationRules;
+	// }
 
-		if ($this->validate($rules)){
-			return true;
-    	}
-		else{
-			//printr($validation->getErrors());
-			$this->error['warning']="Warning: Please check the form carefully for errors!";
-			return false;
-    	}
-		return !$this->error;
+	protected function checkError($result){
+		$error = 'false';
+			//validation rules
+			if(!preg_match('/^[0-9]{10}+$/', $result->phone_no) || empty($result->phone_no)){
+                $error  = 'true';
+			} else if(!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)){
+				$error  = 'true';
+			}else if($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)){
+				$area_hectare  = 'true';
+			}else if(!preg_match('/^[0-9]{9,18}$/', $result->account_no) || empty($result->account_no)){
+				$error  = 'true';
+			}else if(!preg_match('/^[A-Z]{4}0[A-Z0-9]{6}$/', $result->ifsc) || empty($result->ifsc)){
+				 $error  = 'true';
+			}
+			return $error;
 	}
 
 	protected function filterOptions(&$data){
