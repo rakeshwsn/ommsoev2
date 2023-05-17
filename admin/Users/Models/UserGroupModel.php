@@ -120,4 +120,15 @@ class UserGroupModel extends Model
         return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
             ->asArray()->find();
     }
+
+    /* Get agency types (created by Niranjan)*/
+    public function getAgencyTypes($filter=[]){
+        $builder=$this->db->table($this->table);
+        $builder->where('agency', 1);
+        if(isset($filter['agency_type_id'])){
+            $builder->where("(parent_id = '".$filter['agency_type_id']."' or id = '".$filter['agency_type_id']."')");
+        }
+        $res = $builder->get()->getResult();
+        return $res;
+    }
 }

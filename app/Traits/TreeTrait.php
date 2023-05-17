@@ -297,4 +297,146 @@ trait TreeTrait {
 
     }
 
+    //Budget Details(added by Niranjan)
+    protected function getBTable($array,$action="view") {
+        $this->grand_phy = $this->grand_fin  = 0;
+        $html = $this->generateBTable($array,$action);
+
+        //grand total
+        $html .= '<tr class="subtotal bg-yellow">
+                    <td>&nbsp;</td>
+                    <td colspan="3">Grand Total</td>
+                    <td id="gt_mon_phy">'.$this->grand_phy.'</td>
+                    <td id="gt_mon_fin">'.$this->grand_fin.'</td>
+                    </tr>
+                ';
+
+        return $html;
+
+    }
+
+    protected function generateBTable($array,$action) {
+        $html = '';
+        $this->total_phy = $this->total_fin = 0;
+       
+        foreach ($array as $item) {
+            //$$sub=&$$sub;
+            //exclude heading without children
+            if ($item['row_type']=='heading' && !isset($item['children'])){
+                continue;
+            }
+
+            if($item['row_type']=='heading') {
+                $html .= '<tr class="heading" data-id="'.$item['id'].'">
+                    <th>' . $item['number'] . '</th>
+                    <th>' . $item['description'] . '</th>
+                    <th colspan="6"></th>
+                    </tr>
+                ';
+            } else {
+                if($action=="edit"){
+                    $html .= '<tr data-parent="'.$item['parent'].'">
+                    <td>
+                    <input type="hidden" class="form-control" name="budget['.$item['component_id'].'][component_id]" value="'.$item['component_id'].'">
+                    <input type="hidden" class="form-control" name="budget['.$item['component_id'].'][category]" value="'.$item['category'].'">
+                    <label for="cb' . $item['id'] . '">' . $item['number'] . '</label></td>
+                    <td><label for="cb' . $item['component_id'] . '">' . $item['description'] . '</label></td>
+                    <td><input type="text" class="form-control" name="budget['.$item['component_id'].'][units]" value="'.$item['units'].'"></td></td>
+                    
+                    <td><input type="text" class="form-control rate" name="budget['.$item['component_id'].'][unit_cost]" value="'.$item['unit_cost'].'"></td>
+                    <td class="mon_phy"><input type="text" class="form-control physical" name="budget['.$item['component_id'].'][physical]" value="'.$item['physical'].'"></td>
+                    <td class="mon_fin"><input type="text" class="form-control financial" name="budget['.$item['component_id'].'][financial]" value="'.$item['financial'].'"></td>
+                    ';
+                }else{
+                $html .= '<tr data-id="'.$item['id'].'">
+                    <td>' . $item['number'] . ' </td>
+                    <td>' . $item['description'] . ' </td>
+                    <td>' . $item['units'] . ' </td>
+                    <td>' . $item['unit_cost'] . ' </td>
+                    <td>' . $item['physical'] . ' </td>
+                    <td>' . in_lakh($item['financial']) . ' </td>
+                    ';
+                $html .= '</tr>';
+                }
+
+                $component = $item;
+                //sub total
+                $this->total_phy += (int)$component['physical'];
+                $this->total_fin += (float)$component['financial'];
+                
+
+                //total
+                $this->grand_phy += (int)$component['physical'];
+                $this->grand_fin += (float)$component['financial'];
+
+            }
+
+
+            if (!empty($item['children'])) {
+                $html .= $this->generateBTable($item['children'], $action);
+
+                $html .= '<tr class="subtotal" data-parent="' . $item['id'] . '" data-ref="'.$item['id'].'">
+                <td>&nbsp</td>
+                <td colspan="3">Sub Total</td>
+                <td class="sub_mon_phy">' . $this->total_phy . '</td>
+                <td class="sub_mon_fin">' . $this->total_fin . '</td>
+                </tr>
+            ';
+
+            }
+            
+        }
+
+        return $html;
+
+    }
+
+    //Component Agency (added by Niranjan)
+    private function getATable($array,$agency_types) {
+       
+        $html = '';
+
+        foreach ($array as $item) {
+            if($item['row_type']=='heading') {
+                $html .= '<tr data-id="'.$item['id'].'">
+                    <th>' . $item['number'] . '</th>
+                    <th>' . $item['description'] . '</th>
+                ';
+               
+                foreach($agency_types as $agency){
+                    $html .= '<th>';
+                    $html .= '<label class="css-control css-control-primary css-checkbox">';
+                    $html .= form_checkbox(array('class'=>'css-control-input agency-'.$agency->id,'data-agency'=>$agency->id,'name' => 'component['.$item['component_id'].'][agency_id][]', 'id'=>'row_'.$item['id'].'_'.$agency->id, 'value' => $agency->id,'checked' => (in_array($agency->id, $item['agencies']) ? true : false) ));   
+                    $html .= '<span class="css-control-indicator"></span>';
+                    $html .= '</label>';
+                    $html .= '</th>';
+                }
+           
+            } else {
+               
+                $html .= '<tr data-parent="'.$item['parent'].'">
+                    <td>' . $item['number'] . '</td>
+                    <td>' . $item['description'] . '</td>
+                    ';
+                foreach($agency_types as $agency){
+                    $html .= '<td>';
+                    $html .= '<label class="css-control css-control-primary css-checkbox">';
+                    $html .= form_checkbox(array('class'=>'css-control-input agency-'.$agency->id,'data-agency'=>$agency->id,'name' => 'component['.$item['component_id'].'][agency_id][]', 'id'=>'row_'.$item['id'].'_'.$agency->id, 'value' => $agency->id,'checked' => (in_array($agency->id, $item['agencies']) ? true : false) ));   
+                    $html .= '<span class="css-control-indicator"></span>';
+                    $html .= '</label>';
+                    $html .= '</td>';
+                }
+            }
+            if (!empty($item['children'])){
+                $html .= $this->getATable($item['children'],$agency_types);
+            }
+            $html .= '</tr>';
+        }
+
+        return $html;
+
+    }
+
+    
+
 }

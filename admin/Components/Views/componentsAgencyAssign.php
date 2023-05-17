@@ -2,6 +2,16 @@
 $validation = \Config\Services::validation();
 ?>
 
+<div class="block">
+    <ul class="nav nav-tabs nav-tabs-block js-tabs-enabled" data-toggle="tabs" role="tablist">
+        <?php foreach((array)$fund_agencies as $key => $value) : ?>
+            <li id="group-<?php echo $value['fund_agency_id']; ?>" class="nav-item">
+                <a class="nav-link <?=($value['fund_agency_id']==$fund_agency_id)?'active':''?>" href="<?php echo admin_url("components/agencyassign/{$value['fund_agency_id']}"); ?>"> <?php echo $value['fund_agency']; ?> </a>
+            </li>
+        <?php endforeach; ?>
+
+    </ul>
+</div>
     <div class="row">
         <div class="col-12">
             <div class="block">
@@ -26,55 +36,7 @@ $validation = \Config\Services::validation();
                             </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($components as $component){?>
-                                    <?php if($component['row_type']=='heading'){?>
-                                    <tr data-id="<?=$component['id']?>">
-                                        
-                                        <td><b><?=$component['number']?></b></td>
-                                        <td><b><?=$component['description']?></b></td>
-                                        <?php foreach($agency_types as $agency){?>
-                                        <td>
-                                            <label class="css-control css-control-primary css-checkbox">
-                                                <?php echo form_checkbox(array('class'=>'css-control-input agency-'.$agency->id,'data-agency'=>$agency->id,'name' => 'component['.$component['component_id'].'][agency_id][]', 'id'=>'row_'.$component['id'].'_'.$agency->id, 'value' => $agency->id,'onclick'=>'event.preventDefault();','checked' => (in_array($agency->id, $component['agencies']) ? true : false) )); ?>  
-                                                <span class="css-control-indicator"></span>
-                                            </label>
-                                        </td>
-                                        <?}?>
-                                    </tr>
-                                    <?}else{?>
-                                        <tr data-id="<?=$component['id']?>">
-                                        
-                                        <td><?=$component['number']?></td>
-                                        <td><?=$component['description']?></td>
-                                        <?php foreach($agency_types as $agency){?>
-                                        <td>
-                                            <label class="css-control css-control-primary css-checkbox">
-                                                <?php echo form_checkbox(array('class'=>'css-control-input agency-'.$agency->id,'data-agency'=>$agency->id,'name' => 'component['.$component['component_id'].'][agency_id][]', 'id'=>'row_'.$component['id'].'_'.$agency->id, 'value' => $agency->id,'checked' => (in_array($agency->id, $component['agencies']) ? true : false) )); ?>  
-                                                <span class="css-control-indicator"></span>
-                                            </label>
-                                        </td>
-                                        <?}?>
-                                    </tr>
-                                    <?}?>
-
-                                    <?php if ( ! empty($component['children'])){
-                                        foreach($component['children'] as $child){?>
-                                            <tr data-parent="<?=$component['id']?>">
-                                                
-                                                <td><?=$child['number']?></td>
-                                                <td><?=$child['description']?></td>
-                                                <?php foreach($agency_types as $agency){?>
-                                                <td>
-                                                    <label class="css-control css-control-primary css-checkbox">
-                                                        <?php echo form_checkbox(array('class'=>'css-control-input agency-'.$agency->id,'data-agency'=>$agency->id,'name' => 'component['.$child['component_id'].'][agency_id][]', 'id'=>'row_'.$component['id'].'_'.$agency->id, 'value' => $agency->id,'checked' => (in_array($agency->id, $child['agencies']) ? true : false) )); ?>
-                                                        <span class="css-control-indicator"></span>
-                                                    </label>
-                                                </td>
-                                                <?}?>
-                                            </tr>
-                                        <?}
-                                    }?>
-                                <?}?>
+                                <?=$components?>
                             </tbody>
                         </table>
                     <?php echo form_close(); ?>
