@@ -48,28 +48,27 @@ class BudgetModel extends Model
         $builder->where("budget_plan_id",$budget_plan_id);
         $builder->delete();
         $budget_data=[];
-        foreach ($data['phase'] as $phase) {
-            foreach($phase['budget'] as $budget) {
-                $budget_data[] = array(
-                    "budget_plan_id" => $budget_plan_id,
-                    "component_id" => $budget['component_id'],
-                    "agency_type_id" => (int)$budget['agency_type_id'],
-                    "units" => $budget['units'],
-                    "unit_cost" => (float)$budget['unit_cost'],
-                    "physical" => (float)$budget['physical'],
-                    "financial" => (float)$budget['financial'],
-                    "phase"=>$phase['phase'],
-                    "year"=>$phase['year'],
-                    "block_category"=>$budget['category']
-                );
-            }
-            //printr($budget_data);
-
-           // $builder->insertBatch($budget_data);
-            //$budget_id=$this->db->insertID();
-            //add block budget
-           // $this->updateBlockBudget($budget_id,$data['fund_agency_id'],$data['phase']);
+       
+        foreach($data['budget'] as $budget) {
+            $budget_data[] = array(
+                "budget_plan_id" => $budget_plan_id,
+                "component_id" => $budget['component_id'],
+                "units" => $budget['units'],
+                "unit_cost" => (float)$budget['unit_cost'],
+                "physical" => (float)$budget['physical'],
+                "financial" => (float)$budget['financial'],
+                "phase"=>$data['phase'],
+                "year"=>$data['year'],
+                "block_category"=>$budget['category']
+            );
         }
+        //printr($budget_data);
+
+        // $builder->insertBatch($budget_data);
+        //$budget_id=$this->db->insertID();
+        //add block budget
+        // $this->updateBlockBudget($budget_id,$data['fund_agency_id'],$data['phase']);
+    
         $builder->insertBatch($budget_data);
     }
 
@@ -106,58 +105,102 @@ WHERE c2.id IS NOT NULL AND c1.updated = 0";
         $builder->update($data);
     }
     public function getBudgetDetails($filter=[]){
+        
+        
         $sql="SELECT
-    t1.id,
-    t1.component_id,
-    t1.number,
-    t1.description,
-    t2.agency_type_id,
-    t2.units,
-    t2.unit_cost,
-    t2.physical,
-    t2.financial,
-    t1.sort_order,
-    t1.parent,
-    t1.fund_agency_id,
-    t1.row_type,
-    t1.category
-FROM (SELECT
-    sca.id,
-    sca.component_id,
-    sca.number,
-    sc.description,
-    sca.sort_order,
-    sca.parent,
-    sca.fund_agency_id,
-    sc.row_type,
-    sc.category
-  FROM (SELECT
-      c.*,
-      a.fund_agency_id
-    FROM soe_components_agency a
-      LEFT JOIN soe_components c
-        ON component_id = c.ID
-    WHERE a.agency_type_id = ".$filter['agency_type_id']."
-    AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
-    LEFT JOIN soe_components_assign sca
-      ON sca.component_id = sc.ID
-      AND sca.fund_agency_id = sc.fund_agency_id) t1
-  LEFT JOIN (SELECT
-  bc.component_id,
-  bc.agency_type_id,
-  bc.units,
-  bc.unit_cost,
-  bc.physical,
-  bc.financial
-FROM soe_budgets bc
-  LEFT JOIN soe_budgets_plan sbp
-    ON bc.budget_plan_id = sbp.id
-WHERE bc.budget_plan_id = ".$filter['budget_plan_id']."
-AND sbp.year = ".$filter['year']."
-AND sbp.fund_agency_id = ".$filter['fund_agency_id'].") t2
-    ON t1.component_id = t2.component_id
-";
-//echo $sql;exit;
+            t1.id,
+            t1.component_id,
+            t1.number,
+            t1.description,
+            t2.agency_type_id,
+            t2.units,
+            t2.unit_cost,
+            t2.physical,
+            t2.financial,
+            t1.sort_order,
+            t1.parent,
+            t1.fund_agency_id,
+            t1.row_type,
+            t1.category
+        FROM (SELECT
+            sca.id,
+            sca.component_id,
+            sca.number,
+            sc.description,
+            sca.sort_order,
+            sca.parent,
+            sca.fund_agency_id,
+            sc.row_type,
+            sc.category
+        FROM (SELECT
+            c.*,
+            a.fund_agency_id
+            FROM soe_components_agency a
+            LEFT JOIN soe_components c
+                ON component_id = c.ID
+            WHERE a.agency_type_id = ".$filter['agency_type_id']."
+            AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
+            LEFT JOIN soe_components_assign sca
+            ON sca.component_id = sc.ID
+            AND sca.fund_agency_id = sc.fund_agency_id) t1
+        LEFT JOIN (SELECT
+        bc.component_id,
+        bc.agency_type_id,
+        bc.units,
+        bc.unit_cost,
+        bc.physical,
+        bc.financial
+        FROM soe_budgets bc
+        LEFT JOIN soe_budgets_plan sbp
+            ON bc.budget_plan_id = sbp.id
+        WHERE bc.budget_plan_id = ".$filter['budget_plan_id']."
+        AND sbp.year = ".$filter['year']."
+        AND sbp.fund_agency_id = ".$filter['fund_agency_id'].") t2
+            ON t1.component_id = t2.component_id
+        ";
+
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getBulkBudgetDetails($filter=[]){
+        $sql="SELECT
+                t1.id,
+                t1.component_id,
+                t1.number,
+                t1.description,
+                t1.sort_order,
+                t1.parent,
+                t1.fund_agency_id,
+                0 units,
+                0 unit_cost,
+                0 physical,
+                0 financial,
+                t1.row_type,
+                t1.category
+        FROM (SELECT
+            sca.id,
+            sca.component_id,
+            sca.number,
+            sc.description,
+            sca.sort_order,
+            sca.parent,
+            sca.fund_agency_id,
+            sc.row_type,
+            sc.category
+        FROM (SELECT
+            c.*,
+            a.fund_agency_id
+            FROM soe_components_agency a
+            LEFT JOIN soe_components c
+                ON component_id = c.ID
+            WHERE a.agency_type_id = ".$filter['agency_type_id']."
+            AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
+            LEFT JOIN soe_components_assign sca
+            ON sca.component_id = sc.ID
+            AND sca.fund_agency_id = sc.fund_agency_id) t1
+        
+        ";
+       
         return $this->db->query($sql)->getResultArray();
     }
 

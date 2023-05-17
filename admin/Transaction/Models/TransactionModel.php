@@ -1172,19 +1172,30 @@ $sql .= " ORDER BY district_id,block_id,bmym.month_id, sts.transaction_type";
         $agency_type = isset($filter['agency_type']) ? $filter['agency_type']:0;
         $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
 
-        if($this->settings->block_user == $agency_type){
+        if($agency_type == $this->settings->block_user){
             //check if pending closing balances
             $sql = "SELECT
   COUNT(id) total
 FROM soe_closing_balances scb
 WHERE scb.deleted_at IS NULL
 AND scb.month > 0
-AND scb.agency_type_id = 5 AND year = $year
+AND scb.agency_type_id = 5 AND year = $year AND fund_agency_id = $fund_agency_id
 AND scb.block_id = $block_id AND scb.month < $month";
 
             return $this->db->query($sql)->getFirstRow();
 
         } else if ($agency_type == $this->settings->district_user) {
+            //check who have fr and or this month
+            $sql = "SELECT
+  *
+FROM soe_fund_receipt_check sfrc
+WHERE sfrc.district_id = $district_id AND fund_agency_id = $fund_agency_id
+AND sfrc.year = $year
+AND sfrc.month = $month AND sfrc.status=1";
+            $fr_check = $this->db->query($sql)->getResult();
+
+
+
             //check if pending closing balances from blocks
             $sql = "SELECT
   scb.block_id,
@@ -1193,6 +1204,7 @@ FROM soe_closing_balances scb
 WHERE scb.deleted_at IS NULL
 AND scb.month > 0
 AND scb.agency_type_id = 5
+AND scb.fund_agency_id = $fund_agency_id
 AND scb.year = $year
 AND scb.district_id = $district_id
 AND scb.month < $month

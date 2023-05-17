@@ -1,357 +1,237 @@
 <style>
-    .red {
-        background-color: rgb(255, 0, 0);
-        color: black;
+    #chart-container {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
     }
-    .orange {
-        background-color: rgb(250, 192, 144);
-        color: black;
+    .form-check-input {
+        display: none;
     }
-    .yellow {
-        background-color: rgb(255, 255, 0);
-        color: black;
-    }
-    .green {
-        background-color: #77933C;
-        color: black;
-    }
-    .table thead th {
-        
-        text-transform: none !important;
-}
-#chart-container {
-  position: relative;
-  height: 100vh;
-  overflow: hidden;
-}
-
 </style>
 <div class="content1">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <select name="year" id="year" class="form-control">
+                <?php foreach ($years as $year) { ?>
+                    <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
+                <?php } ?>
+            </select>
+        </div>
+    </div>
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
-        <div class="col-6 col-xl-4" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="ob-details">
+            <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
+                <div class="block-content block-content-full clearfix">
+                    <div class="float-right mt-15 d-none d-sm-block">
+                        <i class="fa fa-retweet fa-2x text-corporate"></i>
+                    </div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ob']?>">0</span> Lakh</div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
+                </div>
+            </a>
+        </div>
+        <!-- Row #2 -->
+        <div class="col-6 col-xl-3 abstract" id="fr-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$fr?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['fr']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
         </div>
-        <div class="col-6 col-xl-4" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="ex-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$ex?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ex']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
         </div>
-        <div class="col-6 col-xl-4" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3 abstract" id="cb-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span  data-toggle="countTo" data-speed="1000" data-to="<?=$cb?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['cb']?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on date</small></div>
                 </div>
             </a>
         </div>
-        <!-- rakesh nayak code updated -->
-     
-        <div class="col-md-12 col-sm-4">
-        <!-- Bars Chart -->
-        <div class="block">
-                <div class="block-header block-header-default">
-                    <h3 class="block-title">FUND RECEIPT/EXPENSE</h3>
-                    <div class="block-options">
-                    <select name="selectwisedata" id="selectwisedata" style="width: 150px;text-align: center;">
-                        <option value="all" selected='selected'>All</option>
-                        <option value="district">Districtwise</option>
-                        <option value="agency">Agencywise</option>
-                        <option value="percentage">Percentage</option>
-                    </select>
-					<button type="button" class="btn-block-option" data-toggle="block-option" data-action="state_toggle" data-action-mode="demo"></button>
+
+        <div class="col-12">
+            <div class="block">
+                <!-- Navigation -->
+                <div class="block-content block-content-full border-b clearfix">
+                    <div class="btn-group float-right" role="group" data-toggle="buttons">
+                        <label class="btn btn-secondary form-check-label active">
+                            <input class="form-check-input" type="radio" value="district"
+                                   name="chart_type" id="district" autocomplete="off" checked> Districtwise
+                        </label>
                     </div>
                 </div>
-                <div class="block-content block-content-full text-center">
-                    <!-- Bars Chart Container -->
-                    <div id="chart-container"></div>
+                <!-- END Navigation -->
+
+                <!-- Project -->
+                <div class="block-content block-content-full">
+                    <div class="row py-20">
+                        <div class="col-sm-12 invisible" data-toggle="appear">
+                            <div id="container" style="height: 450px; margin: 0 auto"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Project -->
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Abstract Modal -->
+<div class="modal fade" id="modal-abstract" tabindex="-1" role="dialog" aria-labelledby="modal-popout" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-popout modal-xl" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title" id="modal-title"></h3>
+                    <div class="block-options">
+                        <button type="button" class="btn-block-option" data-dismiss="modal" aria-label="Close">
+                            <i class="si si-close"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="block-content" id="modal-content">
+                    <div class="text-centered p-3">Loading...</div>
                 </div>
             </div>
-            <!-- END Bars Chart -->
-
         </div>
-
-        
-             
-
-
-
     </div>
-    <!--<div class="row invisible" data-toggle="appear">
-        <?/*=$upload_status*/?>
-    </div>-->
 </div>
-
-
-
-<!-- model for fund receipt -->
-
-<div class="modal fade" id="myModalone" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="padding: 0 !important;">
-  <div class="modal-dialog modal-xl" style="width: 100%; max-width: none;height: auto;margin: 0;">
-    <div class="modal-content" style="height: 100%;border: 0;border-radius: 0;">
-      <div class="modal-header" style="display: block !important;">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="font-size: 73px;">&times;</button>
-        <div style="display: flex;justify-content: center;">
-      <div class="">
-        <div class="col-md-12 col-sm-4">
-        <div class="block">
-        <div class="block-content block-content-full">
-        <table class="table table-bordered table-vcenter" id="table-mpr">
-                <thead>
-                <tr style="background: black;color: white;">
-                    <th>District/Agency</th>
-                    <th class="">Fund Receipt(in lakh)</th>
-                    <th class="">Expenditure(in lakh)</th>
-                    <th class="">% of Expenditure</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach($abstracts as $abstractn){  
-                    if($abstractn['uc'] >= 60) {
-                        $c="green";
-                    }else if($abstractn['uc'] < 60 && $abstractn['uc'] > 40) {
-                        $c="yellow";
-                    } else if($abstractn['uc'] < 40 && $abstractn['uc'] > 25){
-
-                        $c = "orange";
-                    } else if($abstractn['uc'] < 25){
-                        $c = "red";
-
-                    }
-                    
-                    ?>    
-                  <tr class="<?php echo $c; ?>">
-                    <td class="date-uploaded"><?php echo $abstractn['district']?></td>
-                    <td class="date-uploaded"><?php echo $abstractn['ftotal']?></td>
-                    <td class="uploaded"><?php echo $abstractn['etotal']?></td>
-                  
-                    <td class="uploaded"><?php echo $abstractn['uc']?></td>
-
-             
-                </tr>
-                <?php  }  ?>             
-             </tbody>
-            </table>
-            
-        </div>
-        </div>
-          </div>
-           </div>
-          </div>
-      </div>
-      
-    </div>
-  </div>
-</div>
-<!-- model for fund receipt -->
 
 
 <?php js_start(); ?>
-<script src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
 
 <script>
 
-	$(function(){
-		shownewchart('all');
-		$('#selectwisedata').on('change',function(){
-			if($(this).val()=='all'){
-				shownewchart('all');
-			}
-			if($(this).val()=='district'){
-				shownewchart('district');
-			}
-			if($(this).val()=='agency'){
-				shownewchart('agency');
-			}
-			if($(this).val()=='percentage'){
-				shownewchartvalue('percentage');
-			}
-		});
-	});
-    
-    var myChart = echarts.init(document.getElementById('chart-container'));
-    function shownewchart(selectdata){
-       // var selectdata=$("#selectwisedata option:selected").val();
-    $.ajax({
-            url: '<?php echo base_url() ?>/admin/spmu/chart',
-            data:{ 'data': selectdata},
-            method: 'GET',
-            type: 'json',
-            success: function(resp) {  
-                var ob = JSON.parse(resp);
-               // console.log(ob);
-				option = {
-				  tooltip: {
-					trigger: 'axis',
-					axisPointer: {
-					  type: 'shadow'
-					}
-				  },
-				  legend: {
-					data: ['Fund Receipt', 'Expense'],
-				   // backgroundColor: '#ccc',
-					selectedMode: true,
-				  },
-				  toolbox: {
-					show: true,
-					orient: 'vertical',
-					left: 'right',
-					top: 'center',
-					feature: {
-					  mark: { show: true },
-					//   dataView: { show: true, readOnly: false },
-					  magicType: { show: true, type: ['bar', 'stack'] },
-					//   restore: { show: true },
-					  saveAsImage: { show: true }
-					}
-				  },
-				  
-				  grid: {
-					height: "40%",
-					width: "85%"
-				  },
-				  xAxis: [
-					{
-					  type: 'category',
-					  axisTick: { show: false },
-					  axisLabel: { interval: 0, rotate: 45 },
-					  data: ob.fund.label
-					}
-				  ],
-				  yAxis: [
-					{
-					  type: 'value',
-					  boundaryGap: true,
-					// min: 100,
-					// scale: false,
-					// splitNumber: 10,
-				   
-					}
-				  ],
-				  series: [
-					{
-					  name: 'Fund Receipt',
-					  type: 'bar',
-					  stack: 'x',
-					  barGap: 0,
-					//   label: labelOption,
-					  emphasis: {
-						focus: 'series'
-					  },
-					  data: ob.fund.data
-					  
-					},
-					{
-					  name: 'Expense',
-					  type: 'bar',
-					  stack: 'x',
-					//   label: labelOption,
-					  emphasis: {
-						focus: 'series'
-					  },
-					  data: ob.abstract.data
-					}
-				  ]
-				};
+    var options = {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Fund Receipt vs Expense'
+        },
+        xAxis: {
+            categories: []
+        },
+        yAxis: {
+            title: {
+                text: 'Amount'
+            },
+            labels: {
+                format: '{value}'
+            }
+        },
+        tooltip: {
+            pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+        },
+        series: []
+    };
 
-				if (option && typeof option === 'object') {
-				  myChart.setOption(option);
-				}
-			}
-		});
-    }
+    // create the chart
+    var chart = Highcharts.chart('container', options);
 
-window.addEventListener('resize', myChart.resize);
-</script>
+    // add an event listener to detect when the user selects a new option
+    $(function () {
+        $('[name="chart_type"]').on('change',function () {
+            chart_type = $(this).val();
+            year = $('#year').val();
+            // update the chart options
+            if (chart_type === 'district') {
+                $.ajax({
+                    url:'<?=$chart_url?>',
+                    data:{year:year,chart_type:chart_type},
+                    type:'GET',
+                    dataType:'JSON',
+                    beforeSend:function () {
 
-<script>
-    function shownewchartvalue(data){
-        var myChart = echarts.init(document.getElementById('chart-container'));
-      //  console.log(data);
-        $.ajax({
-            url: '<?php echo base_url() ?>/admin/spmu/chart',
-            data:{ 'data': data},
-            method: 'GET',
-            type: 'json',
-      
-         success: function(resp) {   
-            var ob = JSON.parse(resp);
-            console.log(ob.abstracts)
-          
-            myChart.setOption({
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {
-                    type: 'shadow'
-                    }
-                },
-                legend: {
-                        data: ['Percentage'],
-                      //  backgroundColor: '#ccc',
                     },
-                    toolbox: {
-                        show: true,
-                        orient: 'vertical',
-                        left: 'right',
-                        top: 'center',
-                        feature: {
-                        mark: { show: true },
-                        //   dataView: { show: true, readOnly: false },
-                        magicType: { show: true, type: ['bar', 'stack'] },
-                        //   restore: { show: true },
-                        saveAsImage: { show: true }
+                    success:function (data) {
+                        if(data.xaxis){
+                            options.xAxis.categories = data.xaxis;
                         }
-                    },
-                    grid: {
-                        height: "40%",
-                        width: "85%"
-                    },
-                    xAxis: [
-                        {
-                        type: 'category',
-                        axisTick: { show: false },
-                        axisLabel: { interval: 0, rotate: 45 },
-                        data: ob.abstracts.district
+                        if(data.series){
+                            options.series = data.series;
                         }
-                    ],
-                    series: [
-                    {
-                    name: 'Percentage',
-                    type: 'bar',
-                    stack: 'x',
-                    //   label: labelOption,
-                    emphasis: {
-                        focus: 'series'
+                        if(data.year){
+                            options.title.text = 'Expense vs Fund Received: '+data.year;
+                        }
+                        options.yAxis.title.text = 'Amount (in Lakhs)';
+                        // Redraw the chart with the updated configuration
+                        chart = new Highcharts.Chart('container',options);
+                        reloadAbstract(data);
                     },
-                    data: ob.abstracts.uc
+                    error:function () {
+
                     }
-                ]
-                
-                   
-                   
-                },{
-					replaceMerge: ['series']
-				});
-            
+
+                });
+            }
+            if (chart_type === 'agency') {
+                $.ajax({
+
+                });
             }
         });
+
+        $('[name="chart_type"]').trigger('change');
+
+        $('#year').on('change',function () {
+            $('[name="chart_type"]').trigger('change');
+        });
+
+        $('.abstract').click(function () {
+            year = $('#year').val();
+
+            $.ajax({
+                url:'<?=$abstract_url?>',
+                data:{year:year},
+                type:'GET',
+                dataType:'JSON',
+                beforeSend:function () {
+                    $('#modal-content').html('Loading...');
+                },
+                success:function (data) {
+                    $('#modal-content').html(data.html);
+                },
+                error:function () {
+
+                },
+                complete:function () {
+                    $("#modal-abstract").modal({
+                        backdrop: 'static',
+                    });
+                }
+            });
+        });
+    });
+    function reloadAbstract(data) {
+        $('#ob').text(data.abstract.ob);
+        $('#fr').text(data.abstract.fr);
+        $('#ex').text(data.abstract.ex);
+        $('#cb').text(data.abstract.cb);
+        //coreAppearCountTo();
     }
 </script>
 

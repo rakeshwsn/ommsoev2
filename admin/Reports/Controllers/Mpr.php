@@ -149,7 +149,7 @@ class Mpr extends AdminController
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
 
         $data['components'] = $this->getTable($components, 'view');
-
+//dd($components);
         if($data['district_id']) {
             $data['district'] = (new DistrictModel())->find($data['district_id'])->name;
             $data['blocks'] = $this->block_model->where(

@@ -193,7 +193,8 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 	$routes->add('mis/upload','MIS\Controllers\MIS::upload');
 	$routes->post('mis/search','MIS\Controllers\MIS::search');
 
-	
+    $routes->get('dashboard/chart','Common\Controllers\Dashboard::chart');
+    $routes->get('dashboard/getabstractdetails','Common\Controllers\Dashboard::getabstractdetails');
 });
 $routes->group('/', ['namespace' => 'Admin'], function($routes){
     $routes->add('profile','Users\Controllers\Profile::index');
@@ -228,31 +229,6 @@ $routes->get('api','Api::index');
 //$routes->group('', ['namespace' => 'Front'], function($routes){
 //    $routes->get('/', 'App\Controllers\Home::index');
 //});
-
-
-/**
-     * --------------------------------------------------------------------
-     * HMVC Routing
-     * --------------------------------------------------------------------
-     */
-
-/*foreach(glob(ROOTPATH . 'admin/*', GLOB_ONLYDIR) as $item_dir)
-{
-	if (file_exists($item_dir . '/Config/Routes.php'))
-	{
-		
-		require_once($item_dir . '/Config/Routes.php');
-	}	
-}
-
-foreach(glob(ROOTPATH . 'front/*', GLOB_ONLYDIR) as $item_dir)
-{
-    if (file_exists($item_dir . '/Config/Routes.php'))
-    {
-
-        require_once($item_dir . '/Config/Routes.php');
-    }
-}*/
 
 
 /*
