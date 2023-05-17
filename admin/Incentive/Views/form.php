@@ -16,7 +16,7 @@ $user  = service('user');
     <?php echo $text_form; ?>
 </div>
 <?php if (isset($_SESSION['errorupload'])) : ?>
-    <div class="alert alert-warning alert-dismissible fade show <?php echo $msgclass ?>" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show <?php echo $msgclass ?>" role="alert" style="color: black;background-color: red;">
         <?php echo $_SESSION['errorupload']; ?>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     </div>

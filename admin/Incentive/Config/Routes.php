@@ -18,5 +18,7 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->post('incentive/delete','Incentive\Controllers\Incentive::delete');
     $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
     $routes->post('incentive/searchall','Incentive\Controllers\Incentive::searchall');
+    $routes->post('incentive/ajaxverify','Incentive\Controllers\Incentive::ajaxverify');
+    $routes->post('incentive/ajaxverifyupdate','Incentive\Controllers\Incentive::ajaxverifyupdate');
 
 });
