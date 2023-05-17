@@ -156,9 +156,9 @@ class IncentivemainModel extends Model
        
         
         $builder = $this->db->table("{$this->table} im");
-        $builder->select("im.id,im.block_id,im.district_id");
+        $builder->select("im.id,im.block_id,im.district_id,im.verify");
         $this->filter($builder, $data);
-        $res = $builder->get()->getRow();
+        $res = $builder->get()->getResultArray();
         //   echo $this->db->getLastQuery();
         //   exit;
         return $res;

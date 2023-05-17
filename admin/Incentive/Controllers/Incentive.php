@@ -108,8 +108,10 @@ class Incentive extends AdminController{
 				$pdfupload ='<h5>Not Uploaded </h5>';
 			}
 
-			$verified = '<input type="checkbox" class="verifyCheck" value="'.$result->id.'" name="verify"'. ($result->verify == 1 ? ' checked' : '') . '/>';
-			
+			//$verified = '<input type="checkbox" class="verifyCheck" value="'.$result->id.'" name="verify"'. ($result->verify == 1 ? ' checked' : '') . '/>';
+			$verified = '<label class="css-control css-control-primary css-switch">';
+			$verified .= '<input type="checkbox" class="css-control-input verifyCheck" value="'.$result->id.'" name="verify"'. ($result->verify == 1 ? ' checked' : '') . '/>';
+			$verified .= '<span class="css-control-indicator"></span> Verified</label>';
 			$datatable[]=array(
 				'<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
 				$result->district_name,
@@ -337,18 +339,18 @@ class Incentive extends AdminController{
 				return redirect()->to(base_url('admin/incentive/addform'));
 			} 
 
-			// $checkk['filter_district'] = $_POST['district_id'];
+			 $checkk['filter_district'] = $_POST['district_id'];
 			// $checkk['filter_block'] = $_POST['block_id'];
-			// $checkk['filter_year'] = $_POST['year'];
-			// $checkk['filter_season'] = $_POST['season'];
+			 $checkk['filter_year'] = $_POST['year'];
+			 $checkk['filter_season'] = $_POST['season'];
 
-			// $checkedDatablock = $this->validateForm($checkk);
-			// if($checkedDatablock){
-			// 	$this->session->setFlashdata('errorupload', 'First Verify the Previous Block Data');
-			// 	$data['msgclass'] = 'bg-danger';
-			// 	return redirect()->to(base_url('admin/incentive/addform'));
+			$checkedDatablock = $this->validateForm($checkk);
+			if($checkedDatablock){
+				$this->session->setFlashdata('errorupload', 'First Verify the Previous Block Data');
+				$data['msgclass'] = 'bg-danger';
+				return redirect()->to(base_url('admin/incentive/addform'));
 			
-			// } 
+			} 
 
 			
 				if(isset($_FILES["file"]["name"])){
@@ -596,20 +598,19 @@ class Incentive extends AdminController{
 	}   
 
 	public function ajaxverify(){
-			//printr($_POST['checkboxValue']); exit;
 			$filter_data = array(
 				'mainincetiveid'=>$_POST['checkboxValue'],
 				
 			);
-		$filteredData = $this->incentiveModel->getAll($filter_data);
-		$error = 0;
-		foreach($filteredData as $result) {
-			if($this->checkError($result) == 'true'){
-				$error = 1 ;
-				break;
-				}  
-			} 
-	 	echo $error;	
+			$filteredData = $this->incentiveModel->getAll($filter_data);
+			$error = 0;
+			foreach($filteredData as $result) {
+				if($this->checkError($result) == 'true'){
+					$error = 1 ;
+					break;
+					}  
+				} 
+			echo $error;	
 	}
 
 	public function ajaxverifyupdate(){
@@ -618,33 +619,28 @@ class Incentive extends AdminController{
 		$row = $this->incentivemainModel->find($id);
 		$row->verify = 1;
 		$updateverify = true;
-		if($this->incentivemainModel->save($row)){
-			echo $updateverify;
-		}
-
-		
-
+			if($this->incentivemainModel->save($row)){
+				echo $updateverify;
+			}	
 }
 	
-	// protected function validateForm($filter_data) {
-	// 	//printr($filter_data); exit;
-	// 	$filteredData = $this->incentivemainModel->getAllCheckblockwise($filter_data);
+	protected function validateForm($filter_data) {
+		//printr($filter_data); exit;
+		$filteredData = $this->incentivemainModel->getAllCheckblockwise($filter_data);
+		// 
 	
-	// 	if($filteredData){
-	// 		$filtered_Data = $this->incentiveModel->getAll($filteredData->id);
-		
+			// $filtered_Data = $this->incentiveModel->getAll($filteredData->id);
+			// printr($filtered_Data); exit;
 		
 			
-	// 		foreach($filtered_Data as $result) {
-	// 			if($this->checkError($result) == 'true'){
-	// 				return true;
-	// 			} 
-	// 		} 
-	// 	}else{
-	// 		return false;
-	// 	}
+			foreach($filteredData as $result) {
+				if($result['verify'] == 0){
+					return true;
+				} 
+			} 
+		
 
-	// }
+	}
 
 	protected function checkError($result){
 		$error = 'false';
