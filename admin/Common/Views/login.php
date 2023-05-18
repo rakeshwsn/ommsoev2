@@ -12,27 +12,24 @@
     }
 
     .myform-area {
-        overflow: hidden;
-        padding: 60px 0;
         background-image: url('<?php echo base_url() ?>/themes/default/assets/images/modal-bg.jpg');
-        position: relative;
-        padding-top: 100px;
-        padding-bottom: 100px;
-        background-position: center;
-        height: 100vh;
+        background-size: cover;
+  background-position: center;
+  width: 100%;
+  height: 100vh;
     }
 
     .myform-area .form-area {
         position: relative;
         background: rgba(152, 166, 72);
         width: 100%;
-        height: 550px;
+        /* height: 550px; */
         overflow: hidden;
         box-shadow: -1px 0px 7px 2px #e1e1e1;
     }
 
     .myform-area .form-area .form-content,
-    .myform-area .form-area .form-input {
+    .myform-area .form-area .form-inputt {
         position: relative;
         width: 50%;
         height: 100%;
@@ -104,37 +101,31 @@
         background: transparent;
     }
 
-    .myform-area .form-area .form-input {
+    .myform-area .form-area .form-inputt {
         background-color: white;
         position: relative;
         overflow: hidden;
         box-shadow: 0 0 40px 0 #e1e1e1;
     }
 
-    .myform-area .form-area .form-input {
+    .myform-area .form-area .form-inputt {
         width: 50%;
         background: #fff;
-        padding: 40px 30px;
+        padding: 5px 30px;
     }
 
-    .myform-area .form-area .form-input h2 {
+    .myform-area .form-area .form-inputt h2 {
         margin-bottom: 20px;
         color: #07315B;
     }
 
-    .myform-area .form-area .form-input input {
-        position: relative;
-        height: 60px;
-        padding: 20px 0;
-    }
-
-    .myform-area .form-area .form-input textarea {
+    .myform-area .form-area .form-inputt textarea {
         height: 120px;
         padding: 20px 0;
     }
 
-    .myform-area .form-area .form-input input,
-    .myform-area .form-area .form-input textarea {
+    .myform-area .form-area .form-inputt input,
+    .myform-area .form-area .form-inputt textarea {
         
         width: 100%;
         box-sizing: border-box;
@@ -142,54 +133,6 @@
         border: none;
         border-bottom: 2px solid #e1e1e1;
         color: #07315B;
-    }
-
-    .myform-area .form-area .form-input form .form-group {
-        position: relative;
-    }
-
-    .myform-area .form-area .form-input form .form-group label {
-        position: absolute;
-        
-        top: 20px;
-        left: 0;
-        pointer-events: none;
-        font-size: 14px;
-        color: #595959;
-        margin-bottom: 0;
-        transition: all .6s;
-    }
-
-    .myform-area .form-area .form-input input:focus~label,
-    .myform-area .form-area .form-input textarea:focus~label,
-    .myform-area .form-area .form-input input:valid~label,
-    .myform-area .form-area .form-input textarea:valid~label {
-        top: -5px;
-        opacity: 0;
-        left: 0;
-        color: rgba(103, 58, 183);
-        font-size: 12px;
-        color: #07315B;
-        font-weight: bold;
-    }
-
-    .myform-area .form-area .form-input input:focus,
-    .myform-area .form-area .form-input textarea:focus,
-    .myform-area .form-area .form-input input:valid,
-    .myform-area .form-area .form-input textarea:valid {
-        border-bottom: 2px solid rgba(103, 58, 183);
-    }
-
-    .myform-area .form-area .form-text {
-        margin-top: 30px;
-    }
-
-    .myform-area .form-area .form-text span a {
-        color: rgba(103, 58, 183);
-    }
-
-    .myform-area .form-area .myform-button {
-        margin-top: 30px;
     }
 
     .myform-area .form-area .myform-button .myform-btn {
@@ -209,10 +152,13 @@
     .myform-area .form-area .myform-button .myform-btn:hover {
         background: #07315B;
     }
+    .myform-area .form-area .form-inputt input, .myform-area .form-area .form-inputt textarea {
+        border-bottom: 2px solid #98a648;
+    }
 </style>
 <section class="myform-area">
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
             <div class="col-lg-8">
                 <div class="form-area login-form">
                     <div class="form-content">
@@ -227,19 +173,31 @@
                             <p class="text-center" style="color: white !important;*! font-family: font-family: &quot;Times New Roman&quot;, Times, serif; */font-family: &quot;algerian&quot;,;font-family: &quot;Algerian&quot;, Times, serif;font-size: 30px;padding-top: 40px;">SOE &amp; MIS PORTAL</p>
                         </div>
                     </div>
-                    <div class="d-flex" style="background: #fff;">
-                        <img src="<?php echo base_url() ?>/themes/default/assets/images/Gov. Logo(1).png" alt="" style="height: 50%;/*! height: 155px; */float: left;padding-left: 25px;padding-top: 10px;">
-                        <img src="<?php echo base_url() ?>/themes/default/assets/images/OMM New Logo(2).png" alt="" style="height: 50%;/*! height: 155px; */float: left;padding-top: 10px;">
+                    <div class="d-flex justify-content-center" style="background: #fff;">
+                        <img src="<?php echo base_url() ?>/themes/default/assets/images/Gov. Logo(1).png" alt="" style="height: 100px; width: auto; padding-top: 5px;padding-bottom: 5px;">
+                        <img src="<?php echo base_url() ?>/themes/default/assets/images/OMM New Logo(2).png" alt="" style="height: 100px; width: auto; padding-top: 5px;padding-bottom: 5px;">
                     </div>
 
-                    <div class="form-input">
+
+                    <div class="form-inputt">
                         <h2>Login</h2>
                         <?php echo form_open(env('app.adminRoute') . '/login', array('class' => 'js-validation-signin', 'id' => 'form-signin', 'role' => 'form')); ?>
-                        <div class="form-group">
-                            <input type="text" class="" placeholder="Username" id="login-username" name="username">
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <div class="form-material floating">
+                                    <input type="text" class="form-control" id="login-username" name="username">
+                                    <label for="login-username">Username</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group ">
-                            <input type="password" class="" id="password" name="password" placeholder="Password">
+
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <div class="form-material floating">
+                                    <input type="text" class="form-control" id="password" name="password">
+                                    <label for="password">Password</label>
+                                </div>
+                            </div>
                         </div>
                         <?php if ($login_error) { ?>
                             <div class="form-group">
@@ -248,7 +206,7 @@
                                 </div>
                             </div>
                         <?php } ?>
-                        <div class="form-group">
+                        <div class="form-group mt-30">
                             <?php if ($redirect) { ?>
                                 <input type="hidden" name="redirect" value="<?php echo $redirect; ?>" />
                             <?php } ?>
