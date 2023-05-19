@@ -62,11 +62,15 @@ class Transaction extends AdminController {
 
             $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
         }
-
+        
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
 
         $data['year_id'] = getCurrentYearId();
+
+        
+        $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies():[];
+        
 
         $data['mis_uploaded'] = false;
         $misModel = new MISModel();
@@ -82,7 +86,7 @@ class Transaction extends AdminController {
         if($mis_exist){
             $data['mis_uploaded'] = true;
         }
-
+       
         $data['datatable_url'] = Url::transactionDatatable;
         $data['check_mis_url'] = Url::misIsUploaded;
         $data['upload_url'] = Url::transactionUpload;
@@ -115,6 +119,7 @@ class Transaction extends AdminController {
             }
         }
         $data['agency_type_id'] = $this->user->agency_type_id;
+        $data['fund_agency_id'] = $this->user->fund_agency_id;
 
         $data['districts'] = [];
 
@@ -722,6 +727,11 @@ class Transaction extends AdminController {
             $district_id = $this->user->district_id;
         }
 
+        $fund_agency_id=$this->user->fund_agency_id;
+        if($this->request->getGet('fund_agency_id')) {
+            $fund_agency_id = $this->request->getGet('fund_agency_id');
+        }
+
         $agency_type_id = $this->user->agency_type_id;
 
         //block and district can enter for cbo
@@ -752,7 +762,7 @@ class Transaction extends AdminController {
             'year' => $year,
             'user_id' => $this->user->user_id,
             'transaction_type' => $txn_type,
-            'fund_agency_id' => $this->user->fund_agency_id
+            'fund_agency_id' => $fund_agency_id
         ])->first();
 
         if($txn){
@@ -765,7 +775,7 @@ class Transaction extends AdminController {
             'block_id' => $block_id,
             'year' => $year,
             'month' => $month,
-            'fund_agency_id' => $this->user->fund_agency_id,
+            'fund_agency_id' => $fund_agency_id,
         ];
         if ($this->user->agency_type_id == $this->settings->district_user) {
             $filter['district_id'] = $this->user->district_id;
@@ -820,7 +830,7 @@ class Transaction extends AdminController {
                 'date_added' => date('Y-m-d'),
                 'user_id' => $this->user->user_id,
                 'transaction_type' => $txn_type,
-                'fund_agency_id' => $this->user->fund_agency_id
+                'fund_agency_id' => $fund_agency_id
             ];
             $txn_id = $txnModel->insert($txn_data);
 
@@ -845,7 +855,7 @@ class Transaction extends AdminController {
         $data['block'] = $block_id ? (new BlockModel)->find($block_id)->name:'-';
         $data['district'] = $district_id ? (new DistrictModel)->find($district_id)->name:'-';
         $data['agency_type'] = $agency_type_id ? (new UserGroupModel)->find($agency_type_id)->name:'-';
-        $data['fund_agency'] = $this->user->fund_agency_id ? (new CommonModel())->getFundAgency($this->user->fund_agency_id)['name']:'-';
+        $data['fund_agency'] = $fund_agency_id ? (new CommonModel())->getFundAgency($fund_agency_id)['name']:'-';
         $data['month'] = getMonthById($month)['name'];
         $data['year'] = getYear($year);
         $data['date_added'] = date('Y/m/d');
@@ -886,7 +896,7 @@ class Transaction extends AdminController {
             $filter['category'] = 'program';
         }
 
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        $filter['fund_agency_id'] = $fund_agency_id;
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
