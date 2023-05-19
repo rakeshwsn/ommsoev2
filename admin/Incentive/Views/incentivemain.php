@@ -188,7 +188,7 @@ $user  = service('user');
 <script>
     $(document).ready(function(){
         $('body').on('click','.verifyCheck', function() {
-            var that=$(this);
+                var that=$(this);
                 var checkboxValue = $(this).val();
                 var confirmed = confirm("Are you sure you want to proceed?");
                             if (confirmed) {
@@ -206,7 +206,6 @@ $user  = service('user');
                                     aftererrorFix(checkboxValue);
                                     
                                 }
-                               
                             },
                             error: function(xhr, status, error) {
                                 // Handle error response
@@ -216,9 +215,7 @@ $user  = service('user');
                     } else{
                         $(this).prop("checked",false);
                     }
-           
         });
-
     })
 
 

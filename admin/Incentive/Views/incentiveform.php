@@ -92,9 +92,9 @@ $validation = \Config\Services::validation();
                         <div class="col-lg-10 <?=$validation->hasError('spouse_name')?'is-invalid':''?>">
                         <select class="form-control" id="" name="gender">
                                
-                               <option value="male" <?php if($gender == "male"){?> selected="selected" <?php }?>>Male</option>
-                               <option value="female" <?php if($gender == "female"){?> selected="selected" <?php }?>>Female</option>
-                               <option value="others" <?php if($gender == "others"){?> selected="selected" <?php }?>>Others</option>
+                               <option value="male" <?php if($gender == "male"){?> selected="selected" <?php }?>>MALE</option>
+                               <option value="female" <?php if($gender == "female"){?> selected="selected" <?php }?>>FEMALE</option>
+                               <option value="others" <?php if($gender == "others"){?> selected="selected" <?php }?>>OTHERS</option>
                         
                        </select>
                         </div>
