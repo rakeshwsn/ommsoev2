@@ -950,15 +950,18 @@ class Transaction extends AdminController {
             ]);
         }
 
-        $misModel = new MISModel();
-        $misExists = $misModel->where([
-            'block_id' => $this->user->block_id,
-            'district_id' => $this->user->district_id,
-            'agency_type_id' => $this->user->agency_type_id,
-            'month' => $this->request->getGet('month'),
-            'year' => $this->request->getGet('year'),
-            'user_id' => $this->user->user_id,
-        ])->first();
+        $misExists = true;
+        if(env('soe.misValidation')){
+            $misModel = new MISModel();
+            $misExists = $misModel->where([
+                'block_id' => $this->user->block_id,
+                'district_id' => $this->user->district_id,
+                'agency_type_id' => $this->user->agency_type_id,
+                'month' => $this->request->getGet('month'),
+                'year' => $this->request->getGet('year'),
+                'user_id' => $this->user->user_id,
+            ])->first();
+        }
 
         if(!$upload_allowed) {
             $data['html'] = '<div class="col-12" id="alert-msg">
@@ -975,22 +978,8 @@ class Transaction extends AdminController {
                         </div>';
         }
 
-        if(($upload_allowed && $misExists) || env('soe.uploadDateValidation')==false) {
-            $data['html'] = '<div class="col-md-3 upload-btn">
-                            <button id="btn-download" class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download Template</button>
-                        </div>
-                        <div class="col-md-4 upload-btn">
-                            <form class="dm-uploader" id="uploader">
-                                <div role="button" class="btn btn-outline btn-warning">
-                                    <i class="fa fa-folder-o fa-fw"></i> Upload Excel
-                                    <input type="file" title="Click to add Files">
-                                </div>
-                                <small class="ml-3 status text-muted">Select a file...</small>
-                            </form>
-                        </div>
-                        <div class="col-md-2 upload-btn">
-                            <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add New</button>
-                        </div>';
+        if(($upload_allowed && $misExists) || (env('soe.uploadDateValidation')==false && env('soe.misValidation')==false)) {
+            $data['html'] = view('Admin\Transaction\Views\upload_function');
         }
 
         return $this->response->setJSON($data);

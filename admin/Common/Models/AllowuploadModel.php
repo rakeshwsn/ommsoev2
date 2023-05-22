@@ -70,12 +70,16 @@ class AllowuploadModel extends Model
 
         $month = $this->db->query($sql)->getRowArray();
 
-        if((isset($month['extended_date']) && (strtotime('today') < strtotime($month['extended_date']))) && (strtotime('today') >= strtotime($month['from_date']))){
-            return $month;
-        }
+        if($month){
+            if((isset($month['extended_date']) && (strtotime('today') < strtotime($month['extended_date'])))
+                && (strtotime('today') >= strtotime($month['from_date']))){
+                return $month;
+            }
 
-        if((strtotime('today') >= strtotime($month['from_date'])) && (strtotime('today') <= strtotime($month['to_date']))){
-            return $month;
+            if((strtotime('today') >= strtotime($month['from_date']))
+                && (strtotime('today') <= strtotime($month['to_date']))){
+                return $month;
+            }
         }
 
         return [];

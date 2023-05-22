@@ -194,7 +194,7 @@
                         <div class="form-group row">
                             <div class="col-md-12">
                                 <div class="form-material floating">
-                                    <input type="text" class="form-control" id="password" name="password">
+                                    <input type="password" class="form-control" id="password" name="password">
                                     <label for="password">Password</label>
                                 </div>
                             </div>
