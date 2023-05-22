@@ -951,7 +951,8 @@ class Transaction extends AdminController {
         }
 
         $misExists = true;
-        if(env('soe.misValidation')){
+        //skip for ps user and if soe.misValidation is false
+        if(env('soe.misValidation') && $this->user->agency_type_id != $this->settings->ps_user){
             $misModel = new MISModel();
             $misExists = $misModel->where([
                 'block_id' => $this->user->block_id,
