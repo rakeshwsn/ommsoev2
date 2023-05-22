@@ -951,7 +951,7 @@ class Transaction extends AdminController {
         }
 
         $misModel = new MISModel();
-        $txn = $misModel->where([
+        $misExists = $misModel->where([
             'block_id' => $this->user->block_id,
             'district_id' => $this->user->district_id,
             'agency_type_id' => $this->user->agency_type_id,
@@ -966,13 +966,16 @@ class Transaction extends AdminController {
                             <p class="mb-0">The SoE/Fund Receipt upload is closed for the month.</p>
                         </div>
                         </div>';
-        } else if(!$txn){
+        }
+        if(!$misExists){
             $data['html'] = '<div class="col-12" id="alert-msg">
                         <div class="alert alert-danger" role="alert">
                             <p class="mb-0">Please upload MIS first to enable SoE/Fund Receipt upload. </p>
                         </div>
                         </div>';
-        } else {
+        }
+
+        if(($upload_allowed && $misExists) || env('soe.uploadDateValidation')==false) {
             $data['html'] = '<div class="col-md-3 upload-btn">
                             <button id="btn-download" class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download Template</button>
                         </div>
