@@ -91,7 +91,7 @@
                     <td>&nbsp;</td>
                     <td>Cash</td>
                     <td><?=$opening['cash']?></td>
-                    <td class="s-total"><?=$opening['total']?></td>
+                    <td> </td>
                     <td>&nbsp;</td>
                 </tr>
 
@@ -162,7 +162,7 @@
                     <td>&nbsp;</td>
                     <td>Cash</td>
                     <td><?=$closing['cash']?></td>
-                    <td><?=$closing['total']?></td>
+                    <td> </td>
                     <td>&nbsp;</td>
                 </tr>
                 <tr class="total">
