@@ -52,14 +52,6 @@ class AllowuploadModel extends Model
     public function uploadAllowed($filter=[]) {
         $sql = "SELECT * FROM vw_allow_uploads_block WHERE 1=1";
 
-        /*if(isset($filter['block_id']) && $filter['block_id']){
-            $sql .= " AND block_id='".$filter['block_id']."'";
-        }
-
-        if(isset($filter['district_id']) && $filter['district_id']){
-            $sql .= " AND district_id='".$filter['district_id']."'";
-        }*/
-
         if(isset($filter['agency_type_id']) && $filter['agency_type_id']){
             $sql .= " AND agency_type_id='".$filter['agency_type_id']."'";
         }
@@ -78,12 +70,16 @@ class AllowuploadModel extends Model
 
         $month = $this->db->query($sql)->getRowArray();
 
-        if((isset($month['extended_date']) && (strtotime('today') < strtotime($month['extended_date']))) && (strtotime('today') >= strtotime($month['from_date']))){
-            return $month;
-        }
+        if($month){
+            if((isset($month['extended_date']) && (strtotime('today') < strtotime($month['extended_date'])))
+                && (strtotime('today') >= strtotime($month['from_date']))){
+                return $month;
+            }
 
-        if((strtotime('today') >= strtotime($month['from_date'])) && (strtotime('today') <= strtotime($month['to_date']))){
-            return $month;
+            if((strtotime('today') >= strtotime($month['from_date']))
+                && (strtotime('today') <= strtotime($month['to_date']))){
+                return $month;
+            }
         }
 
         return [];

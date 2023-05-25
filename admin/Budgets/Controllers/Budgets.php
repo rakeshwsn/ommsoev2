@@ -129,13 +129,19 @@ class Budgets extends AdminController {
         $this->template->set_meta_title("Budgets Plan");
 
         if ($this->request->getMethod(1) === 'POST' ){
+            $budeget_plan=$this->budgetPlanModel->getBudgetPlanByBlock($this->request->getPost());
+            if($budeget_plan){
+                $budget_plan_id=$budeget_plan->id;
+                $this->session->setFlashdata('message', 'Budget Plan Already Exist.you can also fill up the budgets');
+               
+            }else{
+                $budget_plan_id=$this->budgetPlanModel->insert($this->request->getPost());
+                $this->session->setFlashdata('message', 'Budget Plan Saved Successfully.');
 
-            $id=$this->budgetPlanModel->insert($this->request->getPost());
-            $this->session->setFlashdata('message', 'Budget Plan Saved Successfully.');
+                return redirect()->to(admin_url('budgets'));
+            }
 
-            return redirect()->to(admin_url('budgets'));
-
-
+            return redirect()->to(admin_url('budgets/view/'.$budget_plan_id));
         }
         $this->getForm();
     }
@@ -365,8 +371,8 @@ class Budgets extends AdminController {
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $budgetplan_info = $this->budgetPlanModel->getBudgetPlan($this->uri->getSegment(4));
            // $agencyphase=(new BlockModel())->getTotalPhaseByAgency($budgetplan_info->fund_agency_id);
-            
-            $data['text_form'] = "Budget Details for ";
+           
+            $data['text_form'] = "Budget Details for ".$budgetplan_info->fund_agency."-".$budgetplan_info->yname."-".$budgetplan_info->district."-".$budgetplan_info->block;
 
         }
         

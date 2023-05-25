@@ -62,11 +62,15 @@ class Transaction extends AdminController {
 
             $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
         }
-
+        
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
 
         $data['year_id'] = getCurrentYearId();
+
+        
+        $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies():[];
+        
 
         $data['mis_uploaded'] = false;
         $misModel = new MISModel();
@@ -82,7 +86,7 @@ class Transaction extends AdminController {
         if($mis_exist){
             $data['mis_uploaded'] = true;
         }
-
+       
         $data['datatable_url'] = Url::transactionDatatable;
         $data['check_mis_url'] = Url::misIsUploaded;
         $data['upload_url'] = Url::transactionUpload;
@@ -115,6 +119,7 @@ class Transaction extends AdminController {
             }
         }
         $data['agency_type_id'] = $this->user->agency_type_id;
+        $data['fund_agency_id'] = $this->user->fund_agency_id;
 
         $data['districts'] = [];
 
@@ -722,6 +727,11 @@ class Transaction extends AdminController {
             $district_id = $this->user->district_id;
         }
 
+        $fund_agency_id=$this->user->fund_agency_id;
+        if($this->request->getGet('fund_agency_id')) {
+            $fund_agency_id = $this->request->getGet('fund_agency_id');
+        }
+
         $agency_type_id = $this->user->agency_type_id;
 
         //block and district can enter for cbo
@@ -752,7 +762,7 @@ class Transaction extends AdminController {
             'year' => $year,
             'user_id' => $this->user->user_id,
             'transaction_type' => $txn_type,
-            'fund_agency_id' => $this->user->fund_agency_id
+            'fund_agency_id' => $fund_agency_id
         ])->first();
 
         if($txn){
@@ -765,7 +775,7 @@ class Transaction extends AdminController {
             'block_id' => $block_id,
             'year' => $year,
             'month' => $month,
-            'fund_agency_id' => $this->user->fund_agency_id,
+            'fund_agency_id' => $fund_agency_id,
         ];
         if ($this->user->agency_type_id == $this->settings->district_user) {
             $filter['district_id'] = $this->user->district_id;
@@ -820,7 +830,7 @@ class Transaction extends AdminController {
                 'date_added' => date('Y-m-d'),
                 'user_id' => $this->user->user_id,
                 'transaction_type' => $txn_type,
-                'fund_agency_id' => $this->user->fund_agency_id
+                'fund_agency_id' => $fund_agency_id
             ];
             $txn_id = $txnModel->insert($txn_data);
 
@@ -845,7 +855,7 @@ class Transaction extends AdminController {
         $data['block'] = $block_id ? (new BlockModel)->find($block_id)->name:'-';
         $data['district'] = $district_id ? (new DistrictModel)->find($district_id)->name:'-';
         $data['agency_type'] = $agency_type_id ? (new UserGroupModel)->find($agency_type_id)->name:'-';
-        $data['fund_agency'] = $this->user->fund_agency_id ? (new CommonModel())->getFundAgency($this->user->fund_agency_id)['name']:'-';
+        $data['fund_agency'] = $fund_agency_id ? (new CommonModel())->getFundAgency($fund_agency_id)['name']:'-';
         $data['month'] = getMonthById($month)['name'];
         $data['year'] = getYear($year);
         $data['date_added'] = date('Y/m/d');
@@ -886,7 +896,7 @@ class Transaction extends AdminController {
             $filter['category'] = 'program';
         }
 
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        $filter['fund_agency_id'] = $fund_agency_id;
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
 
@@ -940,15 +950,19 @@ class Transaction extends AdminController {
             ]);
         }
 
-        $misModel = new MISModel();
-        $txn = $misModel->where([
-            'block_id' => $this->user->block_id,
-            'district_id' => $this->user->district_id,
-            'agency_type_id' => $this->user->agency_type_id,
-            'month' => $this->request->getGet('month'),
-            'year' => $this->request->getGet('year'),
-            'user_id' => $this->user->user_id,
-        ])->first();
+        $misExists = true;
+        //skip for ps user and if soe.misValidation is false
+        if(env('soe.misValidation') && $this->user->agency_type_id != $this->settings->ps_user){
+            $misModel = new MISModel();
+            $misExists = $misModel->where([
+                'block_id' => $this->user->block_id,
+                'district_id' => $this->user->district_id,
+                'agency_type_id' => $this->user->agency_type_id,
+                'month' => $this->request->getGet('month'),
+                'year' => $this->request->getGet('year'),
+                'user_id' => $this->user->user_id,
+            ])->first();
+        }
 
         if(!$upload_allowed) {
             $data['html'] = '<div class="col-12" id="alert-msg">
@@ -956,28 +970,17 @@ class Transaction extends AdminController {
                             <p class="mb-0">The SoE/Fund Receipt upload is closed for the month.</p>
                         </div>
                         </div>';
-        } else if(!$txn){
+        }
+        if(!$misExists){
             $data['html'] = '<div class="col-12" id="alert-msg">
                         <div class="alert alert-danger" role="alert">
                             <p class="mb-0">Please upload MIS first to enable SoE/Fund Receipt upload. </p>
                         </div>
                         </div>';
-        } else {
-            $data['html'] = '<div class="col-md-3 upload-btn">
-                            <button id="btn-download" class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download Template</button>
-                        </div>
-                        <div class="col-md-4 upload-btn">
-                            <form class="dm-uploader" id="uploader">
-                                <div role="button" class="btn btn-outline btn-warning">
-                                    <i class="fa fa-folder-o fa-fw"></i> Upload Excel
-                                    <input type="file" title="Click to add Files">
-                                </div>
-                                <small class="ml-3 status text-muted">Select a file...</small>
-                            </form>
-                        </div>
-                        <div class="col-md-2 upload-btn">
-                            <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add New</button>
-                        </div>';
+        }
+
+        if(($upload_allowed && $misExists) || (env('soe.uploadDateValidation')==false && env('soe.misValidation')==false)) {
+            $data['html'] = view('Admin\Transaction\Views\upload_function');
         }
 
         return $this->response->setJSON($data);

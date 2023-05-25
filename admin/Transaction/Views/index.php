@@ -35,6 +35,15 @@
                             </select>
                         </div>
                     <?php endif; ?>
+                    <?php if($fund_agencies): ?>
+                        <div class="col-md-2">
+                            <select class="form-control" id="fund_agency_id" name="fund_agency_id" required>
+                                <?php foreach ($fund_agencies as $fund_agency) : ?>
+                                    <option value="<?=$fund_agency['fund_agency_id']?>" <?php if($fund_agency['fund_agency_id']==$fund_agency_id){echo 'selected';} ?>><?=$fund_agency['fund_agency']?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php endif; ?>
                     <?php if($districts): ?>
                     <div class="col-md-2">
                         <select class="form-control" id="district_id" name="district_id">
@@ -200,9 +209,10 @@
         var block_id = $('#block_id').val() || '';
         var district_id = $('#district_id').val() || '';
         var agency_type_id = $('#agency_type_id').val() || '';
+        var fund_agency_id = $('#fund_agency_id').val() || '';
         location.href = url+'?month='+month+'&year='+_year+'&txn_type='
             +txn_type+'&block_id='+block_id+'&district_id='+district_id
-            +'&agency_type_id='+agency_type_id;
+            +'&agency_type_id='+agency_type_id + '&fund_agency_id='+fund_agency_id;
     }
 
     $('#uploader').dmUploader({

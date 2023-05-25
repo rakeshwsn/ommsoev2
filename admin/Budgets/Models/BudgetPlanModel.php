@@ -125,7 +125,10 @@ class BudgetPlanModel extends Model
     public function getBudgetPlan($budget_plan_id){
         $builder=$this->db->table("{$this->table} sbp");
         $builder->join("soe_fund_agency sfa","sbp.fund_agency_id=sfa.id","left");
-        $builder->select("sbp.*,sfa.name as fund_agency");
+        $builder->join("soe_districts d","sbp.district_id=d.id","left");
+        $builder->join("soe_blocks b","sbp.block_id=b.id","left");
+        $builder->join("soe_years y","sbp.year=y.id","left");
+        $builder->select("sbp.*,d.name as district,b.name as block,y.name as yname, sfa.name as fund_agency");
         $builder->where("sbp.id",$budget_plan_id);
         $res = $builder->get()->getRow();
         return $res;

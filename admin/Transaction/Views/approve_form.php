@@ -47,6 +47,15 @@
             $("#modal-edit").modal({
                 backdrop: 'static',
             });
-        })
+        });
+
+        $('#status').on('change',function () {
+            status = parseInt($(this).val());
+            if(status==2){
+                $('[name="remarks"]').attr('required', true);;
+            } else {
+                $('[name="remarks"]').removeAttr('required');
+            }
+        });
     })
 </script>

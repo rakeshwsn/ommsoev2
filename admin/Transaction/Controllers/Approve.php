@@ -261,10 +261,10 @@ class Approve extends AdminController {
         $txn_id = $this->request->getGet('txn_id');
 
         $data['statuses'] = [
-            [
-                'id' => 0,
-                'name' => 'Not Approved',
-            ],
+//            [
+//                'id' => 0,
+//                'name' => 'Not Approved',
+//            ],
             [
                 'id' => 1,
                 'name' => 'Approved',
