@@ -9,7 +9,7 @@
                     <div class="col-lg-3">
                         <div class="form-group mg-b-10-force">
                             <label class="form-control-label">Year</label>
-                            <?php echo form_dropdown('year', option_array_values($years, 'id', 'name',[''=>'Select Year']), set_value('year', ''),"id='year' class='form-control js-select2'"); ?> 
+                            <?php echo form_dropdown('year', option_array_values($years, 'id', 'name',[''=>'Select Year']), set_value('year', $year),"id='year' class='form-control js-select2'"); ?> 
                         </div>
                     </div>
                     
@@ -69,7 +69,7 @@
         <h3 class="block-title"><?php echo $heading_title; ?></h3>
         <div class="block-options">
             <a href="<?php echo $bulkbudegt; ?>" data-toggle="tooltip" title="" class="btn btn-primary">Bulk Budget</a>
-            <a href="<?php echo $add; ?>" data-toggle="tooltip" title="" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+            <!--<a href="<?php echo $add; ?>" data-toggle="tooltip" title="" class="btn btn-primary"><i class="fa fa-plus"></i></a>-->
             <button type="button" data-toggle="tooltip" title="" class="btn btn-danger" onclick="confirm('Are you sure to delete !') ? $('#form-budget').submit() : false;"><i class="fa fa-trash-o"></i></button>
         </div>
     </div>

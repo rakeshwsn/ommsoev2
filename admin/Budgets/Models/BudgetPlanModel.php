@@ -167,8 +167,12 @@ class BudgetPlanModel extends Model
         $builder=$this->db->table("{$this->table} sbp");
         $builder->where("sbp.year",$data['year']);
         $builder->where("sbp.fund_agency_id",$data['fund_agency_id']);
-        $builder->where("sbp.district_id",$data['district_id']);
-        $builder->where("sbp.block_id",$data['block_id']);
+        if($data['district_id']){
+            $builder->where("sbp.district_id",$data['district_id']);
+        }
+        if($data['block_id']){
+            $builder->where("sbp.block_id",$data['block_id']);
+        }
         $builder->where("sbp.deleted_at",null);
         $res = $builder->get()->getRow();
         return $res;
