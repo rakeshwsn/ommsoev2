@@ -120,8 +120,6 @@ class ClosingBalance extends AdminController {
         $filter['month'] = $month;
         $cb = $this->cbModel->where($filter)->first();
 
-        $data['can_edit'] = false;
-
         $upload_model = new AllowuploadModel();
 
         $ufilter = [
@@ -135,9 +133,13 @@ class ClosingBalance extends AdminController {
             $months[] = $item['month'];
         }
 
-        $data['can_edit'] = in_array($month,$months);
-        if(!$data['can_edit']){
-            $data['error'] = 'Closing balance upload date has ended';
+        //for test env
+        $data['can_edit'] = true;
+        if(env('soe.uploadDateValidation')){
+            $data['can_edit'] = in_array($month,$months);
+            if(!$data['can_edit']){
+                $data['error'] = 'Closing balance upload date has ended';
+            }
         }
 
         if($this->request->getMethod(1)=='POST'){
