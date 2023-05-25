@@ -160,10 +160,16 @@ WHERE scb.deleted_at IS NULL";
             $sql .= " AND scb.agency_type_id = ".$filter['agency_type_id'];
         }
         if(!empty($filter['month'])){
-            $sql .= " AND scb.month < ".$filter['month'];
+            if($filter['month']-1==0){
+                $month = $filter['month']-1;
+            }
+            $sql .= " AND scb.month = ".$month;
         }
         if(!empty($filter['year'])){
-            $sql .= " AND scb.year <= ".$filter['year'];
+            if($filter['year']-1==0){
+                $year = $filter['year']-1;
+            }
+            $sql .= " AND scb.year = ".$year;
         }
 
         return $this->db->query($sql)->getResult();

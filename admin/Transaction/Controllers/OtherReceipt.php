@@ -180,25 +180,28 @@ class OtherReceipt extends AdminController
             }
 
             // validate if dates are allowed.
-            $upload_model = new AllowuploadModel();
+            if(env('soe.uploadDateValidation')){
 
-            $ufilter = [
-                'user_id' => $this->user->user_id
-            ];
+                $upload_model = new AllowuploadModel();
 
-            $upload = $upload_model->getByDate($ufilter);
-
-            $months = [];
-            foreach ($upload as $item) {
-                $months[] = $item['month'];
-            }
-
-            if (!in_array(getCurrentMonthId(),$months)) {
-                $json_data = [
-                    'status' => false,
-                    'message' => 'Cannot add other receipt. Upload for the month is closed.',
+                $ufilter = [
+                    'user_id' => $this->user->user_id
                 ];
-                $error = true;
+
+                $upload = $upload_model->getByDate($ufilter);
+
+                $months = [];
+                foreach ($upload as $item) {
+                    $months[] = $item['month'];
+                }
+
+                if (!in_array(getCurrentMonthId(),$months)) {
+                    $json_data = [
+                        'status' => false,
+                        'message' => 'Cannot add other receipt. Upload for the month is closed.',
+                    ];
+                    $error = true;
+                }
             }
 
             if(!$error) {
