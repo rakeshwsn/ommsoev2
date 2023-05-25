@@ -12,9 +12,9 @@ $user  = service('user');
 		<h3 class="block-title"><?php echo $heading_title; ?></h3>
 		<div class="block-options">
 			<a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
-            <?php if(!$user->district_id){?>
+            <?php //$user->district_id?>
 			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
-            <?php }?>
+          
 		</div>
 	</div>
     </div>
@@ -90,6 +90,7 @@ $user  = service('user');
 						<th>Season</th>
 						<th>Pdf View</th>
 						<th>Verify</th>
+                        <th>Phase</th>
 						<th class="text-right no-sort">Actions</th>
 					</tr>
 				</thead>
