@@ -90,22 +90,9 @@ class IncentivemainModel extends Model
         $builder->join("detailed_incentive_data  di", "di.incetive_id=im.id", "left");
         $this->filter($builder, $data);
 
-
-
-
-        if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
-            }
-
-            if ($data['limit'] < 1) {
-                $data['limit'] = 10;
-            }
-            $builder->limit((int)$data['limit'], (int)$data['start']);
-        }
         //$builder->where($this->deletedField, null);
 
-        $res = $builder->get()->getResult();
+        $res = $builder->get()->getResultArray();
 
         return $res;
     }
@@ -167,7 +154,8 @@ class IncentivemainModel extends Model
 
     private function filter($builder, $data)
     {
-        // printr($data['filter_district']); exit;
+        
+
         if (!empty($data['filter_district'])) {
             $builder->where(
                 "im.district_id = '{$data['filter_district']}'"
