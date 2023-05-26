@@ -82,8 +82,11 @@
                 <!-- Project -->
                 <div class="block-content block-content-full">
                     <div class="row py-20">
-                        <div class="col-sm-12 invisible" data-toggle="appear">
+                        <div class="col-sm-8 invisible" data-toggle="appear">
                             <div id="container" style="height: 450px; margin: 0 auto"></div>
+                        </div>
+                        <div class="col-sm-4 invisible" data-toggle="appear">
+                            <div id="piechart" style="height: 450px; margin: 0 auto"></div>
                         </div>
                     </div>
                 </div>
@@ -175,21 +178,17 @@
                             options.series = data.series;
                         }
                         if(data.year){
-                            options.title.text = 'Expense vs Fund Received: '+data.year;
+                            options.title.text = 'Fund Received vs Expenditure: '+data.year;
                         }
                         options.yAxis.title.text = 'Amount (in Lakhs)';
                         // Redraw the chart with the updated configuration
                         chart = new Highcharts.Chart('container',options);
                         reloadAbstract(data);
+                        createPieChart(data.piechart);
                     },
                     error:function () {
 
                     }
-
-                });
-            }
-            if (chart_type === 'agency') {
-                $.ajax({
 
                 });
             }
@@ -225,6 +224,8 @@
                 }
             });
         });
+
+
     });
     function reloadAbstract(data) {
         $('#ob').text(data.abstract.ob);
@@ -232,6 +233,31 @@
         $('#ex').text(data.abstract.ex);
         $('#cb').text(data.abstract.cb);
         //coreAppearCountTo();
+    }
+
+    function createPieChart(data) {
+        // Prepare the data for the chart
+        var chartData = [];
+        for (var i = 0; i < data.length; i++) {
+            chartData.push({
+                name: data[i].name,
+                y: data[i].value
+            });
+        }
+
+        // Create the pie chart
+        Highcharts.chart('piechart', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Districtwise Achievement'
+            },
+            series: [{
+                name: 'Percentage',
+                data: chartData
+            }]
+        });
     }
 </script>
 

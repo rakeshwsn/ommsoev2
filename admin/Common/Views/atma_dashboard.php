@@ -29,13 +29,25 @@
 <div class="content">
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-2 abstract" id="ob-details">
+            <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
+                <div class="block-content block-content-full clearfix">
+                    <div class="float-right mt-15 d-none d-sm-block">
+                        <i class="fa fa-retweet fa-2x text-corporate"></i>
+                    </div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ob']?>">0</span> Lakh</div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
+                </div>
+            </a>
+        </div>
+        <!-- Row #1 -->
+        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$fr?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['fr']?>">0</span></div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
@@ -53,32 +65,32 @@
             </a>
         </div>
         */ ?>
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$ex?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ex']?>">0</span></div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
         </div>
 
-        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span  data-toggle="countTo" data-speed="1000" data-to="<?=$cb?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span  data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['cb']?>">0</span></div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance</div>
                 </div>
             </a>
         </div>
         <!-- END Row #1 -->
 
-        <div class="col-6 col-xl-3">
+        <div class="col-6 col-xl-2">
             <a class="block block-rounded block-bordered block-link-shadow" href="<?= $pendingstatus_url ?>">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -122,7 +134,10 @@
 
 
 <?php js_start(); ?>
-<script src="https://fastly.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
 
 <script type="text/javascript">
     $(function () {
@@ -175,6 +190,138 @@
         <?php endif; ?>
 
     });
+
+    var options = {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Fund Receipt vs Expense'
+        },
+        xAxis: {
+            categories: []
+        },
+        yAxis: {
+            title: {
+                text: 'Amount'
+            },
+            labels: {
+                format: '{value}'
+            }
+        },
+        tooltip: {
+            pointFormat: '<span style="color:{point.color}">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'
+        },
+        series: []
+    };
+
+    // create the chart
+    var chart = Highcharts.chart('container', options);
+
+    // add an event listener to detect when the user selects a new option
+    $(function () {
+        $('[name="chart_type"]').on('change',function () {
+            chart_type = $(this).val();
+            year = $('#year').val();
+            // update the chart options
+            if (chart_type === 'district') {
+                $.ajax({
+                    url:'<?=$chart_url?>',
+                    data:{year:year,chart_type:chart_type},
+                    type:'GET',
+                    dataType:'JSON',
+                    beforeSend:function () {
+
+                    },
+                    success:function (data) {
+                        if(data.xaxis){
+                            options.xAxis.categories = data.xaxis;
+                        }
+                        if(data.series){
+                            options.series = data.series;
+                        }
+                        if(data.year){
+                            options.title.text = 'Fund Received vs Expenditure: '+data.year;
+                        }
+                        options.yAxis.title.text = 'Amount (in Lakhs)';
+                        // Redraw the chart with the updated configuration
+                        chart = new Highcharts.Chart('container',options);
+                        reloadAbstract(data);
+                        createPieChart(data.piechart);
+                    },
+                    error:function () {
+
+                    }
+
+                });
+            }
+        });
+
+        $('[name="chart_type"]').trigger('change');
+
+        $('#year').on('change',function () {
+            $('[name="chart_type"]').trigger('change');
+        });
+
+        $('.abstract').click(function () {
+            year = $('#year').val();
+
+            $.ajax({
+                url:'<?=$abstract_url?>',
+                data:{year:year},
+                type:'GET',
+                dataType:'JSON',
+                beforeSend:function () {
+                    $('#modal-content').html('Loading...');
+                },
+                success:function (data) {
+                    $('#modal-content').html(data.html);
+                },
+                error:function () {
+
+                },
+                complete:function () {
+                    $("#modal-abstract").modal({
+                        backdrop: 'static',
+                    });
+                }
+            });
+        });
+
+
+    });
+    function reloadAbstract(data) {
+        $('#ob').text(data.abstract.ob);
+        $('#fr').text(data.abstract.fr);
+        $('#ex').text(data.abstract.ex);
+        $('#cb').text(data.abstract.cb);
+        //coreAppearCountTo();
+    }
+
+    function createPieChart(data) {
+        // Prepare the data for the chart
+        var chartData = [];
+        for (var i = 0; i < data.length; i++) {
+            chartData.push({
+                name: data[i].name,
+                y: data[i].value
+            });
+        }
+
+        // Create the pie chart
+        Highcharts.chart('piechart', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Districtwise Achievement'
+            },
+            series: [{
+                name: 'Percentage',
+                data: chartData
+            }]
+        });
+    }
 </script>
 <?php js_end(); ?>
 

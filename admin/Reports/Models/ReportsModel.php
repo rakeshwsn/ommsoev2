@@ -2664,4 +2664,126 @@ ORDER BY year_id, dist_yr.district_id";
 
         return $this->db->query($sql)->getResultArray();
     }
+
+    //for dashboard --rakesh 26/05/2023
+    public function getDistrictwiseOpening($filter=[]){
+        $year = $filter['year'];
+        $ly = $year-1;
+        $fund_agency_id = $filter['fund_agency_id'];
+
+        $sql = "WITH fr_upto AS (
+  SELECT
+    st.district_id,
+    SUM(tc.financial) AS fin
+  FROM soe_transaction_components tc
+  LEFT JOIN soe_transactions st ON tc.transaction_id = st.id
+  WHERE st.deleted_at IS NULL
+    AND tc.deleted_at IS NULL
+    AND st.transaction_type = 'fund_receipt'
+    AND st.fund_agency_id = $fund_agency_id
+    AND st.agency_type_id = 7
+    AND st.year BETWEEN 0 AND $year
+  GROUP BY st.district_id
+),
+ex_upto AS (
+  SELECT
+    st.district_id,
+    SUM(tc.financial) AS fin
+  FROM soe_transaction_components tc
+  LEFT JOIN soe_transactions st ON tc.transaction_id = st.id
+  WHERE st.deleted_at IS NULL
+    AND tc.deleted_at IS NULL
+    AND st.transaction_type = 'expense'
+    AND st.fund_agency_id = $fund_agency_id
+    AND st.agency_type_id IN (5, 6, 7)
+    AND st.year BETWEEN 0 AND $ly
+  GROUP BY st.district_id
+),
+expn AS (
+  SELECT
+    district_id,
+    SUM(total) AS ex_total
+  FROM vw_district_abstract_txn
+  WHERE transaction_type = 'expense'
+    AND year = $year
+    AND fund_agency_id = $fund_agency_id
+  GROUP BY district_id
+)
+SELECT
+  fr.district_id,
+  sd.name AS district,
+  (COALESCE(fr.fin, 0) - COALESCE(ex.fin, 0)) AS fr_total,
+  expn.ex_total
+FROM fr_upto fr
+LEFT JOIN ex_upto ex ON ex.district_id = fr.district_id
+LEFT JOIN soe_districts sd ON fr.district_id = sd.id
+LEFT JOIN expn ON expn.district_id = fr.district_id
+WHERE fr.district_id > 0";
+
+        return $this->db->query($sql)->getResult();
+    }
+
+    //for dashboard --rakesh 26/05/2023
+    public function getBlockwiseOpening($filter=[]){
+        $year = $filter['year'];
+        $ly = $year-1;
+        $fund_agency_id = $filter['fund_agency_id'];
+        $district_id = $filter['district_id'];
+
+        $sql = "WITH fr_upto AS (
+  SELECT
+    st.district_id,
+    st.block_id,
+    SUM(tc.financial) AS fin
+  FROM soe_transaction_components tc
+  LEFT JOIN soe_transactions st ON tc.transaction_id = st.id
+  WHERE st.deleted_at IS NULL
+    AND tc.deleted_at IS NULL
+    AND st.transaction_type = 'fund_receipt'
+    AND st.fund_agency_id = $fund_agency_id
+    AND st.agency_type_id IN (5,6)
+    AND st.year BETWEEN 0 AND $year
+  GROUP BY st.block_id
+),
+ex_upto AS (
+  SELECT
+    st.block_id,
+    SUM(tc.financial) AS fin
+  FROM soe_transaction_components tc
+  LEFT JOIN soe_transactions st ON tc.transaction_id = st.id
+  WHERE st.deleted_at IS NULL
+    AND tc.deleted_at IS NULL
+    AND st.transaction_type = 'expense'
+    AND st.fund_agency_id = $fund_agency_id
+    AND st.agency_type_id IN (5, 6)
+    AND st.year BETWEEN 0 AND $ly
+  GROUP BY st.block_id
+),
+expn AS (
+  SELECT
+      block_id,
+      SUM(stc.financial) ex_total
+    FROM soe_transactions st
+      INNER JOIN soe_transaction_components stc
+        ON st.id = stc.transaction_id
+    WHERE st.deleted_at IS NULL
+    AND stc.deleted_at IS NULL
+    AND st.transaction_type = 'expense'
+    AND st.year = $year
+    AND st.fund_agency_id = $fund_agency_id
+    GROUP BY st.block_id
+)
+SELECT
+  fr.block_id,
+  sb.name AS block,
+  (COALESCE(fr_upto.fin, 0) - COALESCE(ex.fin, 0)) AS fr_total,
+  expn.ex_total
+FROM fr_upto
+LEFT JOIN ex_upto ON ex_upto.block_id = fr_upto.block_id
+LEFT JOIN soe_blocks sb ON fr_upto.block_id = sb.id
+LEFT JOIN expn ON expn.block_id = fr.block_id
+WHERE fr.district = $district_id";
+
+        return $this->db->query($sql)->getResult();
+    }
 }

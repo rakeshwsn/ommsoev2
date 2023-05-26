@@ -83,7 +83,9 @@ class Dashboard extends AdminController
         $year = $this->request->getGet('year');
         $fund_agency_id = 1;
         if($chart_type=='district'){
-            $abstractDists = $this->reportModel->getTransactionAbstractDistrict(['year'=>$year]);
+            $abstractDists = $this->reportModel->getDistrictwiseOpening(['year'=>$year,
+                'fund_agency_id'=>$fund_agency_id
+            ]);
 
             $xaxis = [];
             foreach ($abstractDists as $dist) {
@@ -100,10 +102,50 @@ class Dashboard extends AdminController
                 ['name' => 'Fund Receipt','data' => $series_fr]
             ];
             $data['year'] = getYear($year);
+
+            //pie chart
+            $data['piechart'] = [];
+            foreach ($abstractDists as $abstractDist) {
+                $data['piechart'][] = [
+                    'name' => $abstractDist->district,
+                    'value' => round(($abstractDist->ex_total/$abstractDist->fr_total)*100,2)
+                ];
+
+            }
         }
 
-        if($chart_type=='agency'){
+        if($chart_type=='block'){
+            $abstractBlocks = $this->reportModel->getBlockwiseOpening([
+                'year'=>$year,
+                'fund_agency_id'=>$fund_agency_id,
+                'district_id'=>$this->user->district_id
+            ]);
 
+            $xaxis = [];
+            foreach ($abstractBlocks as $block) {
+                $xaxis[] = $block->block;
+            }
+            $series_ex = $series_fr = [];
+            foreach ($abstractBlocks as $block) {
+                $series_ex[] = in_lakh($block->ex_total,'');
+                $series_fr[] = in_lakh($block->fr_total,'');
+            }
+            $data['xaxis'] = $xaxis;
+            $data['series'] = [
+                ['name' => 'Expense','data' => $series_ex],
+                ['name' => 'Fund Receipt','data' => $series_fr]
+            ];
+            $data['year'] = getYear($year);
+
+            //pie chart
+            $data['piechart'] = [];
+            foreach ($abstractBlocks as $block) {
+                $data['piechart'][] = [
+                    'name' => $block->block,
+                    'value' => round(($block->ex_total/$block->fr_total)*100,2)
+                ];
+
+            }
         }
 
         //abstract
@@ -197,6 +239,7 @@ class Dashboard extends AdminController
         $filter = [
             'year' => $data['year_id'],
             'fund_agency_id' => $data['fund_agency_id'],
+            'district_id' => $data['district_id'],
         ];
 
         $abstract = $this->reportModel->getAbstractTotal($filter);
@@ -364,6 +407,13 @@ class Dashboard extends AdminController
             'fund_agency_id' => $this->user->fund_agency_id,
             'year_upto' => getCurrentYearId(),
         ];
+
+        //abstract
+        $data['abstract'] = $this->abstract_data([
+            'year_id'=>$data['year_id'],
+            'district_id' => $this->user->district_id,
+            'fund_agency_id'=>$data['fund_agency_id']
+        ]);
 
         $filter['transaction_type'] = 'fund_receipt';
         $filter['fund_agency_id'] = $this->user->fund_agency_id;
