@@ -439,6 +439,7 @@ class Dashboard extends AdminController
         ]);
 
         $this->pendingUploads($data);
+        $data['chart_url'] = admin_url('dashboard/chart');
 
         return $this->template->view('Admin\Common\Views\atma_dashboard', $data);
 

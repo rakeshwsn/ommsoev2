@@ -29,7 +29,7 @@
 <div class="content">
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
-        <div class="col-6 col-xl-2 abstract" id="ob-details">
+        <div class="col-6 col-xl-3 abstract" id="ob-details">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -41,7 +41,7 @@
             </a>
         </div>
         <!-- Row #1 -->
-        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -65,7 +65,7 @@
             </a>
         </div>
         */ ?>
-        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -77,7 +77,7 @@
             </a>
         </div>
 
-        <div class="col-6 col-xl-2" data-toggle="modal" data-target="#myModalone">
+        <div class="col-6 col-xl-3" data-toggle="modal" data-target="#myModalone">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -90,7 +90,7 @@
         </div>
         <!-- END Row #1 -->
 
-        <div class="col-6 col-xl-2">
+        <div class="col-6 col-xl-3">
             <a class="block block-rounded block-bordered block-link-shadow" href="<?= $pendingstatus_url ?>">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
@@ -105,9 +105,9 @@
         </div>
         <!-- END Row #1 -->
 		
-		 <div class="col-md-12 col-sm-4">
+		 <div class="col-md-12 col-sm-4 mb-4">
         <!-- Bars Chart -->
-        <div class="block" style="margin-bottom: -300px;">
+        <div class="block">
                 <div class="block-header block-header-default">
                     <h3 class="block-title">FUND RECEIPT/EXPENSE</h3>
                     <div class="block-options">
@@ -118,7 +118,7 @@
                 </div>
                 <div class="block-content block-content-full text-center">
                     <!-- Bars Chart Container -->
-                    <div id="chart-container"></div>
+                    <div id="chart-container" style="height: 300px;"></div>
                 </div>
             </div>
             <!-- END Bars Chart -->
