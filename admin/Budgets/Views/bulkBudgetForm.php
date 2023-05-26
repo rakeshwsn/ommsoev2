@@ -29,10 +29,20 @@ $validation = \Config\Services::validation();
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="input-status">District</label>
                         <div class="col-sm-10">
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $district_id), "id='district_id' class='form-control'")?>
+                           <?php 
+                            $select_attributes = array(
+                                'class' => 'form-control js-select2',
+                                'id' => 'district_id',
+                            );
+                            if ($active_district) {
+                                $select_attributes = array_merge($select_attributes, array('readonly' => 'readonly'));
+                            }
+                            echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $active_district), $select_attributes); ?>
+						
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
                         
                         </div>
+                        
                     </div>
                    
                     <div class="form-group row <?=$validation->hasError('block_id')?'is-invalid':''?>">

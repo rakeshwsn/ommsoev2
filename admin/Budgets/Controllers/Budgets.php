@@ -57,6 +57,7 @@ class Budgets extends AdminController {
         $data['fundagencies'] = (new BlockModel())->getFundAgencies();
         
         $data['user_id']=$this->user->getId();
+        $data['year']=getCurrentYearId();
 
         
         $data['active_district']=$this->user->district_id;
@@ -92,17 +93,21 @@ class Budgets extends AdminController {
         $filteredData = $this->budgetPlanModel->getAll($filter_data);
         //printr($filteredData);
         $years=(new YearModel())->asArray()->findAll();
-
+        
         $datatable=array();
         foreach($filteredData as $result) {
             $ykey=array_search($result->year,array_column($years,'id'));
-
-            $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
-            $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
-            $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
-            $action .= '</div>';
-
+            if(getCurrentYearId() == $years[$ykey]['id']){
+                $action  = '<div class="btn-group btn-group-sm pull-right">';
+                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
+                $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                $action .= '</div>';
+            }else{
+                $action  = '<div class="btn-group btn-group-sm pull-right">';
+                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                $action .= '</div>';
+            }
             $datatable[]=array(
                 '<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
                 $result->fund_agency,
@@ -212,8 +217,16 @@ class Budgets extends AdminController {
         $this->template->add_package(array('select2'),true);
         
         if ($this->request->getMethod(1) === 'POST' ){
+         
+            $planpostdata=$this->request->getPost();
+
+            if(!$this->request->getPost('block_id')){
+                $planpostdata['block_id'][]=0;
+            }
+
           
-           foreach($this->request->getPost('block_id') as $blockid){
+            
+            foreach($planpostdata['block_id'] as $blockid){
                 $plandata=[
                     'year'=>$this->request->getPost('year'),
                     'fund_agency_id'=>$this->request->getPost('fund_agency_id'),
@@ -230,7 +243,7 @@ class Budgets extends AdminController {
 
                 $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
             }
-           
+        
           
             $this->session->setFlashdata('message', 'Budget Updated Successfully.');
 
@@ -245,8 +258,8 @@ class Budgets extends AdminController {
         $data['district_id']=$district_id=$this->request->getGet('district_id');
         $data['block_id']=$block_id=$this->request->getGet('block_id');
         $agency_types=(new CommonModel())->getAgencyTypes();
-        if ($this->request->getGet('fund_agency_id') && $this->validateBulkBudget()){
-        
+        if ($this->request->getGet('fund_agency_id')){
+           
             $data['details']=1;
             if($block_id){
                 $phase=1;
@@ -289,7 +302,7 @@ class Budgets extends AdminController {
                 $data['components'][0]['district_id'] = $district_id;
                 $data['components'][0]['block_id'] = $block_id;
                 //$data['components'][$key]['budgets']=$components;
-                $data['components'][0]['budgets'] = $this->getBTable($components,0);
+                $data['components'][0]['budgets'] = $this->getBTable($components,'edit');
             }
 
         }
@@ -301,10 +314,14 @@ class Budgets extends AdminController {
 
         $data['fund_agencies'] = (new BlockModel())->getFundAgencies();
         $data['block_phases']=(new BlockModel())->getTotalPhaseByAgency(1);
-        $data['years']=(new YearModel())->findAll();
+        $data['years']=(new YearModel())->where('id',getCurrentYearId())->findAll();
         $data['districts']=(new DistrictModel())->findAll();
 
-        
+        $data['active_district']=$this->user->district_id;
+        if($data['active_district']){
+            $data['district_id']=$data['active_district'];
+        }
+
         return $this->template->view('Admin\Budgets\Views\bulkBudgetForm', $data);
     }
 
@@ -328,14 +345,11 @@ class Budgets extends AdminController {
     
     protected function validateBulkBudget(){
         $rules=[
-            'district_id' => array(
-                'label' => 'District',
-                'rules' => 'trim|required|max_length[500]'
-            ),
-            'block_id' => array(
+           
+            /*'block_id' => array(
                 'label' => 'Block',
                 'rules' => 'required'
-            ),
+            ),*/
 
         ];
 
@@ -417,7 +431,11 @@ class Budgets extends AdminController {
 
             $components = $this->budgetModel->getBudgetDetails($filter);
             //$components=[];
-            
+            if(getCurrentYearId() == $budgetplan_info->year){
+                $data['view']=$view="edit";
+            }else{
+                $data['view']=$view="show";
+            }
             if($components) {
                 $components = $this->buildTree($components);
                 $data['components'][0]['year'] = $budgetplan_info->year;
@@ -426,7 +444,7 @@ class Budgets extends AdminController {
                 $data['components'][0]['district_id'] = $budgetplan_info->district_id;
                 $data['components'][0]['block_id'] = $budgetplan_info->block_id;
                 //$data['components'][$key]['budgets']=$components;
-                $data['components'][0]['budgets'] = $this->getBTable($components,0);
+                $data['components'][0]['budgets'] = $this->getBTable($components,$view);
             }
             
 

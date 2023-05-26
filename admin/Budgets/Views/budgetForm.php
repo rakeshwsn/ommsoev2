@@ -7,34 +7,32 @@
             </div>
 
             <div class="block-content">
-                
-               
-                    <?php foreach($components as $key=> $component){?>
-                        <table class="table table-striped" id="block-components">
-                            <thead>
-                            <tr>
-                                <th width="5%">Number</th>
-                                <th width="40%">Component</th>
-                                <th width="10%">Units</th>
-                                <th width="15%">Rate</th>
-                                <th width="5%">Physical</th>
-                                <th width="20%">Financial</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
-                            <input type="hidden" name="phase" value="<?=$component['phase']?>">
-                            <input type="hidden" name="year" value="<?=$component['year']?>">
+                <?php foreach($components as $key=> $component){?>
+                    <table class="table table-striped" id="block-components">
+                        <thead>
+                        <tr>
+                            <th width="5%">Number</th>
+                            <th width="40%">Component</th>
+                            <th width="10%">Units</th>
+                            <th width="15%">Rate</th>
+                            <th width="5%">Physical</th>
+                            <th width="20%">Financial</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
+                        <input type="hidden" name="phase" value="<?=$component['phase']?>">
+                        <input type="hidden" name="year" value="<?=$component['year']?>">
 
-                            <?=$component['budgets']?>
-                            </tbody>
-                        </table>
-                   
-                    <?}?>
-
+                        <?=$component['budgets']?>
+                        </tbody>
+                    </table>
+                <?}?>
+                <?php if($view=="edit"){?>
                 <div class="text-right my-3">
                     <button type="submit" class="btn btn-primary" id="btn-save-menu">Save</button>
                 </div>
+                <?}?>
             </div>
         </div>
         <?php form_close(); ?>
