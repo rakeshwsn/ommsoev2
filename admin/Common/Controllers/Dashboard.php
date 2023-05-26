@@ -239,8 +239,10 @@ class Dashboard extends AdminController
         $filter = [
             'year' => $data['year_id'],
             'fund_agency_id' => $data['fund_agency_id'],
-            'district_id' => $data['district_id'],
         ];
+        if(isset($data['district_id'])){
+            $filter['district_id'] = $data['district_id'];
+        }
 
         $abstract = $this->reportModel->getAbstractTotal($filter);
 
