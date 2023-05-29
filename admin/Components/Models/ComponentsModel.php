@@ -143,7 +143,7 @@ class ComponentsModel extends Model
         }
 
         $sql .= " ORDER by sort_order";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 

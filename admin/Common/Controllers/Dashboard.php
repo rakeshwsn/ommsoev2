@@ -83,7 +83,8 @@ class Dashboard extends AdminController
         $year = $this->request->getGet('year');
         $fund_agency_id = 1;
         if($chart_type=='district'){
-            $abstractDists = $this->reportModel->getDistrictwiseOpening(['year'=>$year,
+            $abstractDists = $this->reportModel->getDistrictwiseOpening([
+                'year'=>$year,
                 'fund_agency_id'=>$fund_agency_id
             ]);
 
@@ -149,7 +150,14 @@ class Dashboard extends AdminController
         }
 
         //abstract
-        $data['abstract'] = $this->abstract_data(['year_id'=>$year,'fund_agency_id'=>$fund_agency_id]);
+        $filter = [
+            'year_id'=>$year,
+            'fund_agency_id'=>$fund_agency_id
+        ];
+        if($this->user->district_id){
+            $filter['district_id'] = $this->user->district_id;
+        }
+        $data['abstract'] = $this->abstract_data($filter);
 
         //add the header here
         header('Content-Type: application/json');
@@ -525,41 +533,6 @@ class Dashboard extends AdminController
 
         return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);
 
-    }
-
-    public function getSpmuChart() {
-        $this->reportModel = new ReportsModel();
-        $chart_type = $this->request->getGet('chart_type');
-        $data = [];
-
-        $filter = [
-            'fund_agency_id' => 1, //state plan
-            'year' => 1
-        ];
-        $result = $this->reportModel->getAgencywiseAbstract($filter);
-
-        if($chart_type=='all'){
-            foreach ($result as &$item) {
-                $item['fund_receipt'] = round(($item['fund_receipt']/100000),2);
-                $item['expense'] = round(($item['expense']/100000),2);
-            }
-        }
-        if($chart_type=='percentage'){
-            foreach ($result as &$item) {
-                $item['percentage'] = round((($item['expense']/$item['fund_receipt']) * 100),2);
-            }
-        }
-
-        if($result){
-            $data['status'] = true;
-            $data['data'] = $result;
-        } else {
-            $data['status'] = false;
-            $data['data'] = [];
-        }
-
-        return $this->response->setContentType('application/json')
-            ->setJSON($data);
     }
 
 }

@@ -190,9 +190,11 @@ class MIS extends AdminController
             'user_group' => $agency_type_id == 5 ? [5, 6] : $agency_type_id,
             'component_category' => 'program'
         ];
+
         $filter['fund_agency_id'] = $fund_agency_id;
 
-        if($district_id){
+        //fixed by rakesh --29/05
+        if($this->user->agency_type_id == $this->settings->district_user){
             $filter['district_id'] = $district_id;
             $filter['user_group'] = $agency_type_id;
         }

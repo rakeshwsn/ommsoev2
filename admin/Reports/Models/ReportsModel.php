@@ -1778,6 +1778,7 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         $ly = ($cy-1);
         $sql = "SELECT
   agency_type_id,
+  district_id,
   agency,
   (fr_ly_total - xp_ly_total) ob_total,
   res.fr_total,
@@ -1911,8 +1912,11 @@ FROM (SELECT
       ON xp_cy.district_id = agency.district_id
       AND xp_cy.agency_type_id = agency.agency_type_id
       AND agency.fund_agency_id = xp_cy.fund_agency_id
-  WHERE agency.fund_agency_id = $fund_agency_id) res";
-
+  WHERE agency.fund_agency_id = $fund_agency_id) res WHERE 1=1";
+        if(!empty($filter['district_id'])){
+            $sql .= " AND district_id=".$filter['district_id'];
+        }
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -2774,15 +2778,15 @@ expn AS (
     GROUP BY st.block_id
 )
 SELECT
-  fr.block_id,
+  fr_upto.block_id,
   sb.name AS block,
-  (COALESCE(fr_upto.fin, 0) - COALESCE(ex.fin, 0)) AS fr_total,
+  (COALESCE(fr_upto.fin, 0) - COALESCE(ex_upto.fin, 0)) AS fr_total,
   expn.ex_total
 FROM fr_upto
 LEFT JOIN ex_upto ON ex_upto.block_id = fr_upto.block_id
 LEFT JOIN soe_blocks sb ON fr_upto.block_id = sb.id
-LEFT JOIN expn ON expn.block_id = fr.block_id
-WHERE fr.district = $district_id";
+LEFT JOIN expn ON expn.block_id = fr_upto.block_id
+WHERE fr_upto.district_id = $district_id";
 
         return $this->db->query($sql)->getResult();
     }
