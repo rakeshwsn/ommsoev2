@@ -156,6 +156,9 @@ WHERE 1=1";
         if(!empty($filter['district_id'])){
             $sql .= " AND sd.id = ".$filter['district_id'];
         }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND sfa.id = ".$filter['fund_agency_id'];
+        }
         $sql .= " GROUP BY sb.fund_agency_id";
 
         if(!empty($filter['asObject'])){

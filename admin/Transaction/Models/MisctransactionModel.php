@@ -210,6 +210,7 @@ AND smta.deleted_at IS NULL AND status=1";
     }
 
     public function getHeadwiseAmount($filter=[]) {
+        $ati = [];
         $sql = "SELECT
   hd.name head,
   hd.txn_type,
@@ -225,6 +226,7 @@ FROM (SELECT
         } else {
             $sql .= " AND smth.agency_type_id = 5";
         }
+
         $sql .= " ) hd
   LEFT JOIN (SELECT
       smta.head_id,

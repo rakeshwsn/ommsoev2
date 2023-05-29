@@ -96,6 +96,7 @@
         $('select[name=\'district_id\']').bind('change', function() {
             $.ajax({
                 url: '<?php echo admin_url("district/block"); ?>/' + this.value,
+                data:{'fund_agency_id':<?=$fund_agency_id?>},
                 dataType: 'json',
                 beforeSend: function() {
                     //$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
@@ -109,17 +110,15 @@
 
                     if (json) {
                         $.each(json,function (i,v) {
-                            html += '<option value="' + v.id + '">' + v.name + '</option>';
                             html += '<option value="' + v.id + '"';
                             if(v.id=="<?=$active_block?>"){
                                 html +='selected = "selected"';
                             }
                             html += '>' + v.name + '</option>';
-                        })
+                        });
                     } else {
                         html += '<option value="">Select Block</option>';
                     }
-                
 
                     $('select[name=\'block_id\']').html(html);
                     $('select[name=\'block_id\']').select2();

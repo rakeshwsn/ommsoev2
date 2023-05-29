@@ -54,11 +54,10 @@ class Budgets extends AdminController {
 
         $data['districts']=(new DistrictModel())->getAll();
         $data['years'] = getAllYears();
-        $data['fundagencies'] = (new BlockModel())->getFundAgencies();
+        $data['fundagencies'] = (new BlockModel())->getFundAgencies(['fund_agency_id'=>$this->user->fund_agency_id]);
         
         $data['user_id']=$this->user->getId();
         $data['year']=getCurrentYearId();
-
         
         $data['active_district']=$this->user->district_id;
         if($data['active_district']){
@@ -68,6 +67,7 @@ class Budgets extends AdminController {
         if($data['active_block']){
             $data['block_id']=$data['active_block'];
         }
+        $data['fund_agency_id']=$this->user->fund_agency_id;
 
         return $this->template->view('Admin\Budgets\Views\budgetPlan', $data);
     }
@@ -223,8 +223,6 @@ class Budgets extends AdminController {
             if(!$this->request->getPost('block_id')){
                 $planpostdata['block_id'][]=0;
             }
-
-          
             
             foreach($planpostdata['block_id'] as $blockid){
                 $plandata=[
@@ -243,7 +241,6 @@ class Budgets extends AdminController {
 
                 $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
             }
-        
           
             $this->session->setFlashdata('message', 'Budget Updated Successfully.');
 
@@ -271,7 +268,6 @@ class Budgets extends AdminController {
                 $phase=0;
                 $category=['pmu', 'addl', 'procurement','iyom'];
             }
-
 
             $agency_type_id = 0;
             if($district_id==0 && empty($block_id)){
@@ -306,13 +302,12 @@ class Budgets extends AdminController {
             }
 
         }
-
         
         if(isset($this->error['warning'])){
             $data['error'] 	= $this->error['warning'];
         }
 
-        $data['fund_agencies'] = (new BlockModel())->getFundAgencies();
+        $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['fund_agency_id'=>$this->user->fund_agency_id]);
         $data['block_phases']=(new BlockModel())->getTotalPhaseByAgency(1);
         $data['years']=(new YearModel())->where('id',getCurrentYearId())->findAll();
         $data['districts']=(new DistrictModel())->findAll();
@@ -364,6 +359,7 @@ class Budgets extends AdminController {
 
         return !$this->error;
     }
+
     public function view(){
         $data=[];
         $data['heading_title'] 	= "Budgets Details";
@@ -455,58 +451,6 @@ class Budgets extends AdminController {
         }
     }
 
-    public function view_ols(){
-        $data=[];
-        $data['heading_title'] 	= "Budgets View";
-
-        $budget_plan_id=$this->uri->getSegment(4);
-
-        $budgetplan_info = $this->budgetPlanModel->find($budget_plan_id);
-        $fundagency=(new CommonModel())->getFundAgency($budgetplan_info->fund_agency_id);
-        $agencyphase=(new BlockModel())->getTotalPhaseByAgency($budgetplan_info->fund_agency_id);
-
-        $data['text_form'] = "Budget Details for ";
-
-
-
-        $agency_types=(new CommonModel())->getAgencyTypes();
-
-
-        if($budgetplan_info){
-            $data['budget_plan_id']=$budgetplan_info->id;
-            $data['fund_agency_id']=$budgetplan_info->fund_agency_id;
-            $data['phase']=$budgetplan_info->phase;
-            $data['year']=$budgetplan_info->year;
-            $filter=[
-                'budget_plan_id'=>$budgetplan_info->id,
-                'fund_agency_id'=>$budgetplan_info->fund_agency_id,
-                'phase'=>$budgetplan_info->phase,
-                'year'=>$budgetplan_info->year
-            ];
-            $agency_type_id = 0;
-            if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
-                $filter['agency_type_id'] = 8;
-            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
-                $filter['agency_type_id'] = 7;
-            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
-                $filter['agency_type_id'] = 5;
-            }
-            $components = $this->budgetModel->getBudgetDetails($filter);
-
-            $data['components'] = '';
-            if($components) {
-                $components = $this->buildTree($components);
-               //printr($components);
-                //exit;
-                $data['components'] = $this->getCTable($components,$agency_types);
-            }
-
-
-            return $this->template->view('Admin\Budgets\Views\budgetForm', $data);
-
-        }
-    }
-
     private function getTable($array,$key) {
         $html = '';
 
@@ -538,5 +482,11 @@ class Budgets extends AdminController {
 
         return $html;
 
+    }
+
+    public function delete($id) {
+        $this->budgetPlanModel->delete($id);
+
+        return redirect()->to(admin_url('budgets'))->with('message','Budget deleted successfully');
     }
 }

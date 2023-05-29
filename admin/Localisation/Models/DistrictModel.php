@@ -124,7 +124,7 @@ $sql .= " GROUP BY sd.id";
   phase
 FROM soe_blocks sb
 GROUP BY sb.district_id
-HAVING phase = 2')->getResultArray();
+HAVING phase > 1')->getResultArray();
 
     }
 }

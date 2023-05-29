@@ -160,6 +160,7 @@ class BudgetPlanModel extends Model
                 sfa.name LIKE '%{$data['filter_search']}%')"
             );
         }
+        $builder->where("sbp.deleted_at IS NULL");
 
     }
 

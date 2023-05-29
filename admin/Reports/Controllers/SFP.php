@@ -40,36 +40,38 @@ class SFP extends AdminController
             'user_id' => $this->user->user_id
         ];
 
+        // for fa and cbo;
+        $filter['agency_type_id'] = [5,6];
         if($data['agency_type_id']){
             $filter['agency_type_id'] = $data['agency_type_id'];
         } 
 
         //ob
-        $obs = $cbModel->getOpeningBalanceBreakup($filter);
+        $ob = $cbModel->getOpeningBalanceBreakup($filter);
 
-        $data['opening']['advance'] = 0;
-        $data['opening']['bank'] = 0;
-        $data['opening']['cash'] = 0;
-        $data['opening']['total'] = 0;
+        $data['opening']['advance'] = $ob->advance;
+        $data['opening']['bank'] = $ob->bank;
+        $data['opening']['cash'] = $ob->cash;
 
-        foreach ($obs as $ob) {
-            $data['opening']['advance'] += $ob->advance;
-            $data['opening']['bank'] += $ob->bank;
-            $data['opening']['cash'] += $ob->cash;
-
-            $data['opening']['total'] += ($ob->advance+$ob->bank+$ob->cash);
-        }
+        $data['opening']['total'] = ($ob->advance+$ob->bank+$ob->cash);
+        $data['opening']['total'] = number_format($data['opening']['total'],2,'.','');
 
         //fr & exp
         $reportModel = new ReportsModel();
         $filter['transaction_type'] = 'fund_receipt';
-        $data['fund_receipt'] = (float)$reportModel->getTransactionTotal($filter);
+        $data['fund_receipt'] = number_format($reportModel->getTransactionTotal($filter),2,'.','');
 
         $filter['transaction_type'] = 'expense';
-        $data['expense'] = (float)$reportModel->getTransactionTotal($filter);;
+        $data['expense'] = number_format($reportModel->getTransactionTotal($filter),2,'.','');
 
         //or
         $orModel = new MisctransactionModel();
+
+        unset($filter['agency_type_id']);
+        if($data['agency_type_id']){
+            $filter['agency_type_id'] = $data['agency_type_id'];
+        }
+
         $ors = $orModel->getHeadwiseAmount($filter);
 
         $or_total = 0;
@@ -81,11 +83,12 @@ class SFP extends AdminController
             ];
             $or_total += ($or->sign*$or->total);
         }
-        $data['or_total'] = $or_total;
+        $data['or_total'] = number_format($or_total,2,'.','');
 
         //cb
         $cbModel = new ClosingbalanceModel();
         unset($filter['transaction_type']);
+
         $cbs = $cbModel->where($filter)->findAll();
 
         $data['closing']['advance'] = 0;
@@ -100,6 +103,11 @@ class SFP extends AdminController
 
             $data['closing']['total'] += ($ob->advance+$ob->bank+$ob->cash);
         }
+        $data['closing']['advance'] = number_format($data['closing']['advance'],2,'.','');
+        $data['closing']['bank'] = number_format($data['closing']['bank'],2,'.','');
+        $data['closing']['cash'] = number_format($data['closing']['cash'],2,'.','');
+
+        $data['closing']['total'] = number_format($data['closing']['total'],2,'.','');
 
         $this->filterPanel($data);
 

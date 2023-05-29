@@ -145,34 +145,58 @@ class ClosingbalanceModel extends Model
     }
 
     public function getOpeningBalanceBreakup($filter=[]) {
+        $month = $filter['month'];
+        $year = $filter['year'];
+        if($month-1==0 && $year-1==0){
+            $month = $month-1;
+            $year = $year-1;
+        } else if($year-1>0){
+            $month = 12;
+            $year = $year-1;
+        } else {
+            $month=$month-1;
+        }
         $sql = "SELECT
-  *
-FROM soe_closing_balances scb
-WHERE scb.deleted_at IS NULL";
- // AND scb.status = 1";
+  SUM(advance) advance,
+  SUM(bank) bank,
+  SUM(cash) cash
+FROM (SELECT
+    *
+  FROM soe_closing_balances scb
+  WHERE scb.deleted_at IS NULL";
         if(!empty($filter['block_id'])){
             $sql .= " AND scb.block_id = ".$filter['block_id'];
         }
-        if(!empty($filter['user_id'])){
-            $sql .= " AND scb.user_id = ".$filter['user_id'];
+        if(!empty($filter['agency_type_id'])){
+            $ati = (array)$filter['agency_type_id'];
+            $sql .= " AND scb.agency_type_id IN (".implode(',',$ati).")";
+        }
+        $sql .= " AND scb.month = ".$month."
+    AND scb.year = ".$year.") cb";
+
+        return $this->db->query($sql)->getFirstRow();
+    }
+
+    public function getOpeningBalanceBreakupOld($filter=[]) {
+        $ati = [];
+        $sql = "SELECT SUM(advance) advance,SUM(bank) bank,SUM(cash) cash FROM 
+(SELECT
+  *
+FROM soe_closing_balances scb
+WHERE scb.deleted_at IS NULL";
+        if(!empty($filter['block_id'])){
+            $sql .= " AND scb.block_id = ".$filter['block_id'];
         }
         if(!empty($filter['agency_type_id'])){
-            $sql .= " AND scb.agency_type_id = ".$filter['agency_type_id'];
+            $ati = (array)$filter['agency_type_id'];
+            $sql .= " AND scb.agency_type_id IN (".implode(',',$ati).")";
         }
-        if(!empty($filter['month'])){
-            if($filter['month']-1==0){
-                $month = $filter['month']-1;
-            }
-            $sql .= " AND scb.month = ".$month;
-        }
-        if(!empty($filter['year'])){
-            if($filter['year']-1==0){
-                $year = $filter['year']-1;
-            }
-            $sql .= " AND scb.year = ".$year;
-        }
-
-        return $this->db->query($sql)->getResult();
+        $sql .= " 
+AND scb.month != ".$filter['month']."
+AND scb.year != ".$filter['year']."
+ORDER BY id DESC LIMIT ".count($ati).") cb";
+//echo $sql;exit;
+        return $this->db->query($sql)->getFirstRow();
     }
 
     public function getOpeningBalanceByMonth($filter=[]) {

@@ -107,13 +107,13 @@
                 </tr>
                 <tr class="item-row">
                     <td>&nbsp;</td>
-                    <td><strong>Fund Receipt</strong></td>
+                    <td><strong>Fund Receipt (Add)</strong></td>
                     <td>&nbsp;</td>
                     <td><strong><?=$fund_receipt?></strong></td>
                     <td>&nbsp;</td>
                 </tr>
                 <tr class="heading">
-                    <td colspan="5">Expenditure</td>
+                    <td colspan="5">Expenditure (Less)</td>
                 </tr>
                 <tr class="item-row">
                     <td>&nbsp;</td>
