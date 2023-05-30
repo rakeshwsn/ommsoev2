@@ -237,11 +237,11 @@ FROM (SELECT
     WHERE smt.deleted_at IS NULL
     AND smta.deleted_at IS NULL
     AND smt.status = 1";
-        if(!empty($filter['block_id'])){
-            $sql .= " AND smt.block_id = ".$filter['block_id'];
+        if(isset($filter['block_id'])){
+            $sql .= " AND smt.block_id = ".(int)$filter['block_id'];
         }
-        if(!empty($filter['district_id'])){
-            $sql .= " AND smt.district_id = ".$filter['district_id'];
+        if(isset($filter['district_id'])){
+            $sql .= " AND smt.district_id = ".(int)$filter['district_id'];
         }
         if(!empty($filter['month'])){
             $sql .= " AND smt.month = ".$filter['month'];
@@ -255,7 +255,7 @@ FROM (SELECT
         $sql .= " 
     GROUP BY smta.head_id) amt
     ON amt.head_id = hd.id";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 

@@ -24,11 +24,6 @@ class SFP extends AdminController
             $data['month_id'] = $this->request->getGet('month');
         }
 
-        $data['agency_type_id'] = '';
-        if($this->request->getGet('agency_type_id')){
-            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
-        }
-
         $cbModel = new ClosingbalanceModel();
 
         $data['opening'] = [];
@@ -41,10 +36,18 @@ class SFP extends AdminController
         ];
 
         // for fa and cbo;
-        $filter['agency_type_id'] = [5,6];
-        if($data['agency_type_id']){
-            $filter['agency_type_id'] = $data['agency_type_id'];
-        } 
+        if($this->user->agency_type_id==$this->settings->block_user){
+            $filter['agency_type_id'] = [5,6];
+        }
+
+        if($this->user->agency_type_id==$this->settings->district_user){
+            $filter['agency_type_id'] = [7];
+            $filter['district_id'] = $this->user->district_id;
+        }
+
+        if($this->request->getGet('agency_type_id')){
+            $filter['agency_type_id'] = $this->request->getGet('agency_type_id');
+        }
 
         //ob
         $ob = $cbModel->getOpeningBalanceBreakup($filter);
@@ -68,8 +71,8 @@ class SFP extends AdminController
         $orModel = new MisctransactionModel();
 
         unset($filter['agency_type_id']);
-        if($data['agency_type_id']){
-            $filter['agency_type_id'] = $data['agency_type_id'];
+        if($this->request->getGet('agency_type_id')){
+            $filter['agency_type_id'] = $this->request->getGet('agency_type_id');
         }
 
         $ors = $orModel->getHeadwiseAmount($filter);
@@ -79,7 +82,7 @@ class SFP extends AdminController
         foreach ($ors as $or) {
             $data['or'][] = [
                 'head' => $or->head,
-                'total' => $or->total
+                'total' => number_format($or->total,2,'.','')
             ];
             $or_total += ($or->sign*$or->total);
         }
@@ -140,7 +143,11 @@ class SFP extends AdminController
         }
 
         $userModel  = new UserModel();
-
+        $data['agency_type_id'] = $this->user->agency_type_id;
+        if($this->request->getGet('agency_type_id')){
+            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
+        }
+        $data['agency_type_name'] = '';
         if($data['agency_type_id']) {
             $data['agency_type_name'] = (new UserGroupModel())->where(['id' => $data['agency_type_id']])->first()->name;
         }

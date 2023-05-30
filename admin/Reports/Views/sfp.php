@@ -33,9 +33,8 @@
                             </select>
                         </div>
                     <?php endif; ?>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-2">
+                    <div class="col-md-2 mt-2">
+                        <br>
                         <button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-filter"></i> Filter</button>
                     </div>
                 </div>

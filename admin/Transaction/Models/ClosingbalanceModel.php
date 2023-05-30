@@ -164,8 +164,11 @@ FROM (SELECT
     *
   FROM soe_closing_balances scb
   WHERE scb.deleted_at IS NULL";
-        if(!empty($filter['block_id'])){
-            $sql .= " AND scb.block_id = ".$filter['block_id'];
+        if(isset($filter['block_id'])){
+            $sql .= " AND scb.block_id = ".(int)$filter['block_id'];
+        }
+        if(isset($filter['district_id'])){
+            $sql .= " AND scb.district_id = ".$filter['district_id'];
         }
         if(!empty($filter['agency_type_id'])){
             $ati = (array)$filter['agency_type_id'];
@@ -173,7 +176,7 @@ FROM (SELECT
         }
         $sql .= " AND scb.month = ".$month."
     AND scb.year = ".$year.") cb";
-
+//echo $sql; exit;
         return $this->db->query($sql)->getFirstRow();
     }
 
