@@ -523,7 +523,7 @@ class Dashboard extends AdminController
 
     protected function spmu_dashboard(&$data){
 
-        //abstract
+        //abstract --rakesh
         $data['abstract'] = $this->abstract_data([
             'year_id'=>$data['year_id'],
             'fund_agency_id'=>$data['fund_agency_id']
