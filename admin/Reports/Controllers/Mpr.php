@@ -149,7 +149,10 @@ class Mpr extends AdminController
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
 
         $data['components'] = $this->getTable($components, 'view');
-//dd($components);
+
+        //mpr table html for excel and view --rakesh --092/06/23
+        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
+
         if($data['district_id']) {
             $data['district'] = (new DistrictModel())->find($data['district_id'])->name;
             $data['blocks'] = $this->block_model->where(
@@ -173,7 +176,9 @@ class Mpr extends AdminController
         $this->filterPanel($data);
 
         if($action=='download'){
-            $this->download($data,$components);
+            $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
+
+            $this->createExcelFromHTML($data['mpr_table'],$filename);
             exit;
         }
 

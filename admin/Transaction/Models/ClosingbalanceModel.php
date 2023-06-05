@@ -389,7 +389,7 @@ AND st.transaction_type = 'expense'
 AND st.block_id=$block_id AND fund_agency_id = $fund_agency_id
 AND st.year=$year
 AND st.month < $month";
-
+echo $sql;exit;
             return $this->db->query($sql)->getFirstRow();
 
         } else if($this->settings->district_user == $agency_type){

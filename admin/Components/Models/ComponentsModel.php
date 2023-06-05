@@ -109,6 +109,40 @@ class ComponentsModel extends Model
       sca.parent,
       sca.sort_order,
       sc.row_type,
+      sc.category,
+      agency_type_id
+  FROM (SELECT
+      c.*,
+      sca.fund_agency_id,agency_type_id
+    FROM soe_components_agency sca
+      LEFT JOIN soe_components c
+        ON component_id = c.id
+    WHERE 1=1";
+        if(!empty($filter['user_group'])){
+            $user_group = (array)$filter['user_group'];
+            $sql .= " AND sca.agency_type_id IN (".implode(',',$user_group).")";
+        } else {
+            $sql .= " AND sca.agency_type_id IS NULL ";
+        }
+        $sql .= " AND sca.fund_agency_id = ".$filter['fund_agency_id']." GROUP BY sca.component_id) sc
+    LEFT JOIN soe_components_assign sca
+      ON sca.component_id = sc.id
+      AND sca.fund_agency_id = sc.fund_agency_id";
+
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getComponents_bk($filter=[]) {
+        $filter['fund_agency_id'] = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+
+        $sql = "SELECT
+      sca.id assign_id,
+      sc.id component_id,
+      sca.number,
+      sc.description,
+      sca.parent,
+      sca.sort_order,
+      sc.row_type,
       sc.category
     FROM (SELECT
         *
@@ -143,7 +177,7 @@ class ComponentsModel extends Model
         }
 
         $sql .= " ORDER by sort_order";
-//echo $sql;exit;
+
         return $this->db->query($sql)->getResultArray();
     }
 

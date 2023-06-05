@@ -4,10 +4,13 @@ namespace App\Traits;
 
 use Admin\Reports\Models\ReportsModel;
 use Config\ExcelStyles;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 trait ReportTrait {
 
@@ -29,14 +32,14 @@ trait ReportTrait {
                     <td>'.in_lakh($this->tot_bud_fin).'</td>
                     <td>'.$this->tot_fr_upto_phy.'</td>
                     <td>'.in_lakh($this->tot_fr_upto_fin).'</td>
-                    <td id="gt_mon_phy">'.$this->tot_fr_mon_phy.'</td>
-                    <td id="gt_mon_fin">'.in_lakh($this->tot_fr_mon_fin).'</td>
-                    <td id="gt_cum_phy">'.$this->tot_fr_cum_phy.'</td>
-                    <td id="gt_cum_fin">'.in_lakh($this->tot_fr_cum_fin).'</td>
-                    <td id="gt_mon_phy">'.$this->tot_exp_mon_phy.'</td>
-                    <td id="gt_mon_fin">'.in_lakh($this->tot_exp_mon_fin).'</td>
-                    <td id="gt_cum_phy">'.$this->tot_exp_cum_phy.'</td>
-                    <td id="gt_cum_fin">'.in_lakh($this->tot_exp_cum_fin).'</td>
+                    <td>'.$this->tot_fr_mon_phy.'</td>
+                    <td>'.in_lakh($this->tot_fr_mon_fin).'</td>
+                    <td>'.$this->tot_fr_cum_phy.'</td>
+                    <td>'.in_lakh($this->tot_fr_cum_fin).'</td>
+                    <td>'.$this->tot_exp_mon_phy.'</td>
+                    <td>'.in_lakh($this->tot_exp_mon_fin).'</td>
+                    <td>'.$this->tot_exp_cum_phy.'</td>
+                    <td>'.in_lakh($this->tot_exp_cum_fin).'</td>
                     <td>'.$this->tot_cb_phy.'</td>
                     <td>'.in_lakh($this->tot_cb_fin).'</td>
                     </tr>';
@@ -161,7 +164,7 @@ trait ReportTrait {
                     </tr>
                 ';
             } else {
-                $html .= '<tr data-parent="'.$item['parent'].'">
+                $html .= '<tr class="child" data-parent="'.$item['parent'].'">
                     <td>' . $item['number'] . ' </td>
                     <td>' . $item['description'] . ' </td>
                     <td>' . $item['ob_phy'] . ' </td>
@@ -216,182 +219,6 @@ trait ReportTrait {
 
         return $html;
 
-    }
-
-    protected function download($data,$components){
-        $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_bud_phy = $this->tot_bud_fin = $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_fr_upto_phy = $this->tot_fr_upto_fin = 0;
-        $this->tot_fr_mon_phy = $this->tot_fr_mon_fin = $this->tot_fr_cum_phy = $this->tot_fr_cum_fin = 0;
-
-        $this->tot_cb_phy = $this->tot_cb_fin = $this->tot_exp_upto_phy = $this->tot_exp_upto_fin = 0;
-        $this->tot_exp_mon_phy = $this->tot_exp_mon_fin = $this->tot_exp_cum_phy = $this->tot_exp_cum_fin = 0;
-
-        $spreadsheet = new Spreadsheet();
-
-        $activeSheet = $spreadsheet->getActiveSheet();
-        $activeSheet->setTitle('Report');
-
-//row 1
-        $row = 1;
-//heading
-        $activeSheet->mergeCells("A$row:H$row");
-        $data['heading'] = 'Statement of Expenditure(SoE), Odisha Millets Mission';
-        $activeSheet->setCellValue("A$row", $data['heading']);
-        $activeSheet->getStyle("A$row")->applyFromArray(ExcelStyles::heading1());
-
-        $activeSheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        if($data['block_id'] || $data['district_id']) {
-            $row++;
-            $activeSheet->mergeCells("A$row:H$row");
-
-            $level_text = '';
-            $level_value = '';
-            if ($data['block_id']) {
-                $level_text = 'Block';
-                $level_value = $data['block'];
-            }
-            if ($data['district_id']) {
-                $level_text = 'District';
-                $level_value = $data['district'] . ' | Blocks: ' . count($data['blocks']);
-            }
-
-            $activeSheet->setCellValue("A$row", 'Name of ' . $level_text . ' : ' . $level_value);
-            $activeSheet->getStyle("A$row")->applyFromArray(ExcelStyles::heading2());
-            $activeSheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        }
-
-        $row++;
-        $activeSheet->mergeCells("A$row:H$row");
-
-        $activeSheet->setCellValue("A$row", 'Month : '.$data['month_name'].' | Year : '.$data['fin_year']);
-
-        $activeSheet->getStyle("A$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-//new row
-        $row++;
-        $activeSheet->mergeCells("C$row:D".($row+1));
-        $activeSheet->mergeCells("E$row:F".($row+1));
-        $activeSheet->mergeCells("G$row:L$row");
-        $activeSheet->mergeCells("M$row:P$row");
-        $activeSheet->mergeCells("O$row:P".($row+1));
-        $activeSheet->mergeCells("Q$row:R".($row+1));
-
-        $activeSheet->mergeCells("A$row:A".($row+2));
-        $activeSheet->setCellValue("A$row", "Sl.No.");
-        $activeSheet->mergeCells("B$row:B".($row+2));
-        $activeSheet->setCellValue("B$row", "Details");
-        $activeSheet->setCellValue("C$row", "Opening balance ");
-        $activeSheet->setCellValue("E$row", "Target ".$data['fin_year']);
-//        $activeSheet->setCellValue("H$row", "Allotment received from " .$data['fund_agency']);
-        $activeSheet->setCellValue("G$row", "Allotment received ");
-        $activeSheet->setCellValue("M$row", "Expenditure");
-        $activeSheet->setCellValue("Q$row", "Unspent Balance upto the month");
-
-        $activeSheet->getStyle("A$row:R$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->getRowDimension($row)->setRowHeight(-1);
-        $activeSheet->getStyle("A$row:R$row")->getAlignment()->setWrapText(true);
-        $activeSheet->getStyle("A$row:R$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        $activeSheet->getStyle("C$row")->getAlignment()->setWrapText(true);
-        $activeSheet->getStyle("E$row")->getAlignment()->setWrapText(true);
-
-        $row++;
-        $activeSheet->mergeCells("G$row:H$row");
-        $activeSheet->mergeCells("I$row:J$row");
-        $activeSheet->mergeCells("K$row:L$row");
-        $activeSheet->mergeCells("M$row:N$row");
-        $activeSheet->mergeCells("O$row:P$row");
-
-        $activeSheet->setCellValue("G$row", "As per statement upto prev month");
-        $activeSheet->setCellValue("I$row", "During the month");
-        $activeSheet->setCellValue("K$row", "Upto the month");
-        $activeSheet->setCellValue("M$row", "During the month");
-        $activeSheet->setCellValue("O$row", "Cumulative Expenditure upto the month");
-
-        $activeSheet->getStyle("G$row:L$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->getStyle("G$row:L$row")->getAlignment()->setWrapText(true);
-        $activeSheet->getStyle("M$row:P$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->getStyle("M$row:P$row")->getAlignment()->setWrapText(true);
-        $activeSheet->getRowDimension($row)->setRowHeight(-1);
-
-//new row
-        $row++;
-        $activeSheet->setCellValue("C$row", "Phy");
-        $activeSheet->setCellValue("D$row", "Fin");
-        $activeSheet->setCellValue("E$row", "Phy");
-        $activeSheet->setCellValue("F$row", "Fin");
-        $activeSheet->setCellValue("G$row", "Phy");
-        $activeSheet->setCellValue("H$row", "Fin");
-        $activeSheet->setCellValue("I$row", "Phy");
-        $activeSheet->setCellValue("J$row", "Fin");
-        $activeSheet->setCellValue("K$row", "Phy");
-        $activeSheet->setCellValue("L$row", "Fin");
-        $activeSheet->setCellValue("M$row", "Phy");
-        $activeSheet->setCellValue("N$row", "Fin");
-        $activeSheet->setCellValue("O$row", "Phy");
-        $activeSheet->setCellValue("P$row", "Fin");
-        $activeSheet->setCellValue("Q$row", "Phy");
-        $activeSheet->setCellValue("R$row", "Fin");
-        $activeSheet->getStyle("A$row:R$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->getStyle("A$row:R$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-//$activeSheet->rangeToArray('B4:N7', NULL, True, True);
-
-        $activeSheet->getColumnDimension("A")->setWidth(10);
-        $activeSheet->getColumnDimension("B")->setWidth(36);
-        $activeSheet->getColumnDimension("C")->setWidth(10);
-        $activeSheet->getColumnDimension("D")->setWidth(18);
-        $activeSheet->getColumnDimension("E")->setWidth(10);
-        $activeSheet->getColumnDimension("F")->setWidth(18);
-        $activeSheet->getColumnDimension("G")->setWidth(10);
-        $activeSheet->getColumnDimension("H")->setWidth(18);
-        $activeSheet->getColumnDimension("I")->setWidth(10);
-        $activeSheet->getColumnDimension("J")->setWidth(18);
-        $activeSheet->getColumnDimension("K")->setWidth(10);
-        $activeSheet->getColumnDimension("L")->setWidth(18);
-        $activeSheet->getColumnDimension("M")->setWidth(10);
-        $activeSheet->getColumnDimension("N")->setWidth(18);
-        $activeSheet->getColumnDimension("O")->setWidth(10);
-        $activeSheet->getColumnDimension("P")->setWidth(18);
-        $activeSheet->getColumnDimension("Q")->setWidth(10);
-        $activeSheet->getColumnDimension("R")->setWidth(18);
-
-//new row
-        //data row
-
-        $this->fillExcel($activeSheet,$row,$components);
-
-        $row++;
-
-        $activeSheet->getStyle("A$row:B$row")->applyFromArray(ExcelStyles::fill_grey());
-        $activeSheet->mergeCells("A$row:B$row");
-        $activeSheet->getStyle("A$row:B$row")->applyFromArray(ExcelStyles::heading2());
-        $activeSheet->setCellValue("A$row", 'Grand Total');
-
-        $activeSheet->setCellValue("C$row", $this->tot_ob_phy);
-        $activeSheet->setCellValue("D$row", $this->tot_ob_fin);
-        $activeSheet->setCellValue("E$row", $this->tot_bud_phy);
-        $activeSheet->setCellValue("F$row", $this->tot_bud_fin);
-        $activeSheet->setCellValue("G$row", $this->tot_fr_upto_phy);
-        $activeSheet->setCellValue("H$row", $this->tot_fr_upto_fin);
-        $activeSheet->setCellValue("I$row", $this->tot_fr_mon_phy);
-        $activeSheet->setCellValue("J$row", $this->tot_fr_mon_fin);
-        $activeSheet->setCellValue("K$row", $this->tot_fr_cum_phy);
-        $activeSheet->setCellValue("L$row", $this->tot_fr_cum_fin);
-        $activeSheet->setCellValue("M$row", $this->tot_exp_mon_phy);
-        $activeSheet->setCellValue("N$row", $this->tot_exp_mon_fin);
-        $activeSheet->setCellValue("O$row", $this->tot_exp_cum_phy);
-        $activeSheet->setCellValue("P$row", $this->tot_exp_cum_fin);
-        $activeSheet->setCellValue("Q$row", $this->tot_cb_phy);
-        $activeSheet->setCellValue("R$row", $this->tot_cb_fin);
-
-        $writer = new Xls($spreadsheet);
-
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xls"');
-        ob_end_clean();
-        $writer->save("php://output");
     }
 
     protected function fillExcel(&$activeSheet,&$row,$components) {
@@ -654,4 +481,135 @@ trait ReportTrait {
 
         return $data;
     }
+
+    public function createExcelFromHTML($html,$filename){
+
+        $reader = new Html();
+
+        $html = preg_replace("/&(?!\S+;)/", "&amp;", $html);
+
+        $spreadsheet = $reader->loadFromString($html);
+        $spreadsheet->setActiveSheetIndex(0);
+        $worksheet = $spreadsheet->getActiveSheet();
+
+        $cellStyle = [
+            'heading1'=>[
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                    'color'=>['rgb' => 'ffffff'],
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['rgb' => '2C3B49'],
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ],
+            'heading2'=>[
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['rgb' => 'C0C0C0'],
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ],
+            'heading3'=>[
+                'font' => [
+                    'bold' => true,
+                    'size' => 12,
+                ],
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'color' => ['rgb' => 'C0C0C0'],
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ]
+        ];
+
+        // Load HTML content into a DOM object
+        $table = new \DOMDocument();
+        $table->loadHTML($html);
+
+        $rows = $table->getElementsByTagName('tr');
+
+        foreach ($worksheet->getRowIterator() as $row) {
+            // Find the corresponding row element in the HTML table
+            $rowIndex = $row->getRowIndex();
+
+            $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
+
+            // Get the class name of the row element
+            $className = $rowElement->getAttribute('class');
+
+            // Check if the class name matches a highlight class from the HTML table
+            if (preg_match('/highlight-(\w+)/', $className, $matches)) {
+                $highlightClass = $matches[1];
+
+                // Set the fill color based on the highlight class
+                $fillColor = null;
+                switch ($highlightClass) {
+                    case 'heading1':
+                        $fillColor = $cellStyle['heading1'];
+                        break;
+                    case 'heading2':
+                        $fillColor = $cellStyle['heading2'];
+                        break;
+                    case 'heading3':
+                        $fillColor = $cellStyle['heading3'];
+                        break;
+                }
+
+                if ($fillColor) {
+                    $lastColumnIndex = $worksheet->getHighestColumn();
+                    $range = 'A' . $rowIndex . ':' . $lastColumnIndex . $rowIndex;
+                    $worksheet->getStyle($range)->applyFromArray($fillColor);
+
+                }
+            }
+        }
+
+        // Set auto-size column widths for all columns
+        foreach ($spreadsheet->getActiveSheet()->getColumnIterator() as $column) {
+            $spreadsheet->getActiveSheet()->getColumnDimension($column->getColumnIndex())->setAutoSize(false);
+        }
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'. $filename .'"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit();
+    }
+
 }
