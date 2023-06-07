@@ -1377,8 +1377,329 @@ $sql .= " GROUP BY sb.component_id) bud ON bud.component_id=comp.component_id
         return $this->db->query($sql)->getResultArray();
 
     }
+    public function getAbstractMpr($filter=[]){
+        $last_year = ($filter['year_id']-1);
 
-    public function getAbstractMPR($filter=[]) {
+        $sql = "SELECT
+    res.scomponent_id,
+  res.component_id,
+  `number`,
+  description,
+  parent,
+  sort_order,
+  row_type,
+  (res.fr_upto_phy - res.exp_upto_phy) ob_phy,
+  (res.fr_upto_fin - res.exp_upto_fin) ob_fin,
+  res.bud_phy,
+  res.bud_fin,
+  res.fr_upto_cy_phy fr_upto_phy,
+  res.fr_upto_cy_fin fr_upto_fin,
+  res.fr_mon_phy,
+  res.fr_mon_fin,
+  (res.fr_upto_cy_phy + res.fr_mon_phy) fr_cum_phy,
+  (res.fr_upto_cy_fin + res.fr_mon_fin) fr_cum_fin,
+  res.exp_upto_cy_phy exp_upto_phy,
+  res.exp_upto_cy_fin exp_upto_fin,
+  res.exp_mon_phy,
+  res.exp_mon_fin,
+  (res.exp_upto_cy_phy + res.exp_mon_phy) exp_cum_phy,
+  (res.exp_upto_cy_fin + res.exp_mon_fin) exp_cum_fin,
+  (res.fr_upto_phy - res.exp_upto_phy + res.fr_mon_phy - res.exp_mon_phy) cb_phy,
+  (res.fr_upto_fin - res.exp_upto_fin + res.fr_mon_fin - res.exp_mon_fin) cb_fin
+FROM (SELECT
+    comp.*,
+    bud.phy bud_phy,
+    bud.fin bud_fin,
+    COALESCE(expn_mon.phy, 0) exp_mon_phy,
+    COALESCE(expn_mon.fin, 0) exp_mon_fin,
+    COALESCE(fr_mon.phy, 0) fr_mon_phy,
+    COALESCE(fr_mon.fin, 0) fr_mon_fin,
+    COALESCE(exp_upto.phy, 0) exp_upto_phy,
+    COALESCE(exp_upto.fin, 0) exp_upto_fin,
+    COALESCE(fr_upto.phy, 0) fr_upto_phy,
+    COALESCE(fr_upto.fin, 0) fr_upto_fin,
+    COALESCE(exp_upto_cy.phy, 0) exp_upto_cy_phy,
+    COALESCE(exp_upto_cy.fin, 0) exp_upto_cy_fin,
+    COALESCE(fr_upto_cy.phy, 0) fr_upto_cy_phy,
+    COALESCE(fr_upto_cy.fin, 0) fr_upto_cy_fin
+  FROM (SELECT
+      sca.id scomponent_id,
+      sc.id component_id,
+      sca.number,
+      sc.description,
+      sca.parent,
+      sca.sort_order,
+      sc.row_type,
+      sc.category,
+      agency_type_id
+  FROM (SELECT
+      c.*,
+      sca.fund_agency_id,agency_type_id
+    FROM soe_components_agency sca
+      LEFT JOIN soe_components c
+        ON component_id = c.id
+    WHERE 1=1";
+        if(!empty($filter['component_agency_type_id'])){
+            $sql .= " AND sca.agency_type_id = ".$filter['component_agency_type_id'];
+        } else {
+            $sql .= " AND sca.agency_type_id IS NULL ";
+        }
+        $sql .= " AND sca.fund_agency_id = ".$filter['fund_agency_id'].") sc
+    LEFT JOIN soe_components_assign sca
+      ON sca.component_id = sc.id
+      AND sca.fund_agency_id = sc.fund_agency_id GROUP BY component_id,sca.number) comp
+    LEFT JOIN user_group ug
+      ON comp.agency_type_id = ug.id
+    LEFT JOIN (SELECT
+  component_id,
+  agency_type_id,
+  units,
+  unit_cost,
+  SUM(physical) phy,
+  SUM(financial) fin,
+  block_category
+FROM soe_budgets_plan bp
+  LEFT JOIN soe_budgets b
+    ON b.budget_plan_id = bp.ID
+WHERE fund_agency_id =  ".$filter['fund_agency_id']."
+AND bp.year =  ".$filter['year_id'];
+if(!empty($filter['block_id'])){
+    $sql .= " AND block_id =  ".$filter['block_id'];
+}
+if(!empty($filter['district_id'])){
+    $sql .= " AND district_id =  ".$filter['district_id'];
+}
+$sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
+
+        /* ******************transaction starts****************** */
+        /* ******************month's expense****************** */
+        $sql .= " LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+        $sql .= " AND t.status = 1";
+
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['month_id'])){
+            $sql .= " AND t.month = ".$filter['month_id'];
+        }
+        if(!empty($filter['year_id'])){
+            $sql .= " AND t.year = ".$filter['year_id'];
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) expn_mon
+      ON comp.component_id = expn_mon.component_id";
+        /* ******************month's fundreceipt****************** */
+        $sql .= " LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+        $sql .= " AND t.status = 1";
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        } else if(empty($filter['block_id'])) {
+            // exclude block fund receipt when user is not block user.
+            $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
+        }
+
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+            if(!empty($filter['block_user_id'])){
+                $sql .= " AND t.user_id = ".$filter['block_user_id'];
+            }
+        }
+        if(!empty($filter['month_id'])){
+            $sql .= " AND t.month = ".$filter['month_id'];
+        }
+        if(!empty($filter['year_id'])){
+            $sql .= " AND t.year = ".$filter['year_id'];
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) fr_mon
+      ON comp.component_id = fr_mon.component_id";
+        /* ******************expense upto last month****************** */
+        $sql .= "
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+        $sql .= " AND t.status = 1";
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['month_id']) && !empty($filter['year_id'])){
+            $this_month = ($filter['month_id'] - 1);
+            $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
+      OR (t.year = ".$filter['year_id']."
+      AND t.month BETWEEN 0 AND $this_month))";
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) exp_upto
+      ON comp.component_id = exp_upto.component_id";
+        /* ******************fundreceipt upto last month****************** */
+        $sql .= "
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+        $sql .= " AND t.status = 1";
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        } else if(empty($filter['block_id'])) {
+            // exclude block fund receipt when user is not block user.
+            $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
+        }
+
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+            if(!empty($filter['block_user_id'])){
+                $sql .= " AND t.user_id = ".$filter['block_user_id'];
+            }
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['month_id']) && !empty($filter['year_id'])){
+            $last_month = ($filter['month_id'] - 1);
+            $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
+      OR (t.year = ".$filter['year_id']."
+      AND t.month BETWEEN 0 AND $last_month))";
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) fr_upto
+      ON comp.component_id = fr_upto.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'fund_receipt'";
+        $sql .= " AND t.status = 1";
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        } else if(empty($filter['block_id'])) {
+            // exclude block fund receipt when user is not block user.
+            $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+            if(!empty($filter['block_user_id'])){
+                $sql .= " AND t.user_id = ".$filter['block_user_id'];
+            }
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['month_id']) && !empty($filter['year_id'])){
+            $last_month = ($filter['month_id'] - 1);
+            $sql .= " AND (t.year = ".$filter['year_id']."
+      AND t.month BETWEEN 0 AND $last_month)";
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) fr_upto_cy
+      ON comp.component_id = fr_upto_cy.component_id
+    LEFT JOIN (SELECT
+        tc.component_id,
+        SUM(physical) phy,
+        SUM(financial) fin
+      FROM soe_transactions t
+        RIGHT JOIN soe_transaction_components tc
+          ON t.id = tc.transaction_id
+      WHERE t.deleted_at IS NULL
+      AND tc.deleted_at IS NULL
+      AND t.transaction_type = 'expense'";
+        $sql .= " AND t.status = 1";
+        if(isset($filter['block_user']) && $filter['block_user']){
+            if(!empty($filter['user_id'])){
+                $sql .= " AND t.user_id = ".$filter['user_id'];
+            }
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND t.block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND t.district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['month_id']) && !empty($filter['year_id'])){
+            $last_month = ($filter['month_id'] - 1);
+            $sql .= " AND (t.year = ".$filter['year_id']."
+      AND t.month BETWEEN 0 AND $last_month)";
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+        $sql .= " GROUP BY tc.component_id) exp_upto_cy
+      ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResultArray();
+
+    }
+    public function getAbstractMPR_old($filter=[]) {
 
         $last_year = ($filter['year_id']-1);
 
@@ -1444,7 +1765,7 @@ FROM (SELECT
         AND fund_agency_id = ".$filter['fund_agency_id'].") sc
         LEFT JOIN (SELECT
             *
-          FROM soe_budgets2
+          FROM soe_budgets
           GROUP BY component_id) sb
           ON sb.component_id = sc.id
         LEFT JOIN user_group ug
@@ -1477,7 +1798,7 @@ FROM (SELECT
           sb.agency_type_id,
           sb.block_category
         FROM soe_block_budgets sbb
-          LEFT JOIN soe_budgets2 sb
+          LEFT JOIN soe_budgets sb
             ON sbb.budget_id = sb.id
         WHERE sb.deleted_at IS NULL
         AND sbb.deleted_at IS NULL";
@@ -1724,7 +2045,7 @@ FROM (SELECT
         ON comp.component_id = exp_upto_cy.component_id) res
     ON abst.component_id = res.component_id
 GROUP BY abst.heading_id";
-
+        //echo $sql;
         return $this->db->query($sql)->getResult();
     }
 

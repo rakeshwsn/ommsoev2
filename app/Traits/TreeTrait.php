@@ -50,6 +50,51 @@ trait TreeTrait {
         return $fnBuilder($grouped[0]);
     }
 
+    public function calculateAbstractSum(&$components) {
+        foreach ($components as &$component) {
+            if (isset($component['children']) && !empty($component['children'])) {
+                $this->calculateAbstractSum($component['children']);
+                
+                $sum = array(
+                    'ob_phy' => 0,
+                    'ob_fin' => 0,
+                    'bud_phy' => 0,
+                    'bud_fin' => 0,
+                    'fr_upto_phy' => 0,
+                    'fr_upto_fin' => 0,
+                   'fr_mon_phy' => 0,
+                   'fr_mon_fin' => 0,
+                   'fr_cum_phy' => 0,
+                   'fr_cum_fin' => 0,
+                   'exp_upto_phy' => 0,
+                   'exp_upto_fin' => 0,
+                   'exp_mon_phy' => 0,
+                   'exp_mon_fin' => 0,
+                   'exp_cum_phy' => 0,
+                   'exp_cum_fin' => 0,
+                   'cb_phy' => 0,
+                   'cb_fin' => 0
+
+                ); 
+                
+                foreach ($component['children'] as $child) {
+                    foreach ($child as $key => $value) {
+                        if (array_key_exists($key, $sum)) { // Only sum specified fields
+                            if (is_numeric($value)) {
+                                $sum[$key] += $value;
+                            }
+                        }
+                    }
+                }
+                
+                foreach ($sum as $key => $value) {
+                    $component[$key] = $value;
+                }
+            }
+        }
+        
+        return $components;
+    }
     public function nestedHTMLTree($list, $depth = 1) {
         $nav = '<ul class="dd-list">';
 
@@ -435,8 +480,86 @@ trait TreeTrait {
 
         return $html;
 
+
     }
 
-    
+
+    private function getAbstarctTable($components) {
+
+        $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_bud_phy = $this->tot_bud_fin =$this->tot_fr_upto_phy = $this->tot_fr_upto_fin = $this->tot_fr_mon_phy = $this->tot_fr_mon_fin=0;
+        $this->tot_fr_cum_phy = $this->tot_fr_cum_fin = $this->tot_exp_mon_phy=$this->tot_exp_mon_fin=$this->tot_exp_cum_phy=$this->tot_exp_cum_fin=$this->tot_cb_phy=$this->tot_cb_fin=0;
+
+        $html = '';
+
+        foreach ($components as $component) {
+             
+            $html .= '<tr>
+                <td>' . $component['number'] . '</td>
+                <td>' . $component['description'] . '</td>
+                <td>' . $component['ob_phy'] . '</td>
+                <td>' . $component['ob_fin'] . '</td>
+                <td>' . $component['bud_phy'] . '</td>
+                <td>' . $component['bud_fin'] . '</td>
+                <td>' . $component['fr_upto_phy'] . '</td>
+                <td>' . $component['fr_upto_fin'] . '</td>
+                <td>' . $component['fr_mon_phy'] . '</td>
+                <td>' . $component['fr_mon_fin'] . '</td>
+                <td>' . $component['fr_cum_phy'] . '</td>
+                <td>' . $component['fr_cum_fin'] . '</td>
+                <td>' . $component['exp_mon_phy'] . '</td>
+                <td>' . $component['exp_mon_fin'] . '</td>
+                <td>' . $component['exp_cum_phy'] . '</td>
+                <td>' . $component['exp_cum_fin'] . '</td>
+                <td>' . $component['cb_phy'] . '</td>
+                <td>' . $component['cb_fin'] . '</td>
+                
+                ';
+            
+            
+            $html .= '</tr>';
+
+            $this->tot_ob_phy += (int)$component['ob_phy'];
+            $this->tot_ob_fin += (float)$component['ob_fin'];
+            $this->tot_bud_phy += (int)$component['bud_phy'];
+            $this->tot_bud_fin += (float)$component['bud_fin'];
+            $this->tot_exp_mon_phy += (int)$component['exp_mon_phy'];
+            $this->tot_exp_mon_fin += (float)$component['exp_mon_fin'];
+            $this->tot_exp_cum_phy += (int)$component['exp_cum_phy'];
+            $this->tot_exp_cum_fin += (float)$component['exp_cum_fin'];
+            $this->tot_fr_upto_phy += (int)$component['fr_upto_phy'];
+            $this->tot_fr_upto_fin += (float)$component['fr_upto_fin'];
+            $this->tot_fr_mon_phy += (int)$component['fr_mon_phy'];
+            $this->tot_fr_mon_fin += (float)$component['fr_mon_fin'];
+            $this->tot_fr_cum_phy += (int)$component['fr_cum_phy'];
+            $this->tot_fr_cum_fin += (float)$component['fr_cum_fin'];
+            $this->tot_cb_phy += $component['cb_phy'];
+            $this->tot_cb_fin += $component['cb_fin'];
+            
+        }
+
+        //grand total
+        $html .= '<tr class="subtotal bg-yellow">
+                    <td colspan="2">Grand Total</td>
+                    <td>'.$this->tot_ob_phy.'</td>
+                    <td>'.in_lakh($this->tot_ob_fin).'</td>
+                    <td>'.$this->tot_bud_phy.'</td>
+                    <td>'.in_lakh($this->tot_bud_fin).'</td>
+                    <td>'.$this->tot_fr_upto_phy.'</td>
+                    <td>'.in_lakh($this->tot_fr_upto_fin).'</td>
+                    <td>'.$this->tot_fr_mon_phy.'</td>
+                    <td>'.in_lakh($this->tot_fr_mon_fin).'</td>
+                    <td>'.$this->tot_fr_cum_phy.'</td>
+                    <td>'.in_lakh($this->tot_fr_cum_fin).'</td>
+                    <td>'.$this->tot_exp_mon_phy.'</td>
+                    <td>'.in_lakh($this->tot_exp_mon_fin).'</td>
+                    <td>'.$this->tot_exp_cum_phy.'</td>
+                    <td>'.in_lakh($this->tot_exp_cum_fin).'</td>
+                    <td>'.$this->tot_cb_phy.'</td>
+                    <td>'.in_lakh($this->tot_cb_fin).'</td>
+                    </tr>';
+
+        return $html;
+
+    }
 
 }

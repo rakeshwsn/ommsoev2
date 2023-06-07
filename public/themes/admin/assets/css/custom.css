@@ -1,5 +1,17 @@
-.tableFixHead { overflow-y: auto; max-height: 500px; }
-
+.tableFixHead { overflow-y: auto; height: 500px; }
+.tableFixHead .table{
+    border-collapse: separate;
+    border-spacing: 0px;
+  }
+  .tableFixHead thead {
+          position: sticky;
+          top: 0;
+          z-index: 1;
+  }
+  .tableFixHead thead th{
+    border-top: 0.1px solid #fff;
+  }
+  
 table .custom-table {
     display: table;
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
