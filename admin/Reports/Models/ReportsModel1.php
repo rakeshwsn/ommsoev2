@@ -770,7 +770,7 @@ FROM (SELECT
         AND fund_agency_id = ".$filter['fund_agency_id'].") sc
         LEFT JOIN (SELECT
             *
-          FROM soe_budgets2
+          FROM soe_budgets
           GROUP BY component_id) sb
           ON sb.component_id = sc.id
         LEFT JOIN user_group ug
