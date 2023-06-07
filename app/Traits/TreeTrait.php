@@ -75,7 +75,7 @@ trait TreeTrait {
                    'cb_phy' => 0,
                    'cb_fin' => 0
 
-                ); // Initialize sum for specified fields
+                ); 
                 
                 foreach ($component['children'] as $child) {
                     foreach ($child as $key => $value) {

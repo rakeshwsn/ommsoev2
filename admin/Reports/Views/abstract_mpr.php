@@ -25,10 +25,10 @@
 
 <?php js_start(); ?>
 $(function () {
-    var $th = $('.tableFixHead').find('thead th');
+    /*var $th = $('.tableFixHead').find('thead th');
     $('.tableFixHead').on('scroll', function() {
         $th.css('transform', 'translateY('+ this.scrollTop +'px)');
-    });
+    });*/
 });
 <?php js_end(); ?>
 </script>
