@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Html;
 
 class Export
 {
-    public function createExcelFromHTML($html,$filename){
+    public static function createExcelFromHTML($html,$filename,$return = false){
 
         $reader = new Html();
 
@@ -47,6 +47,9 @@ class Export
                     case 'heading3':
                         $fillColor = ExcelStyles::heading3();
                         break;
+                    case 'heading4':
+                        $fillColor = ExcelStyles::fill_yellow();
+                        break;
                 }
 
                 if ($fillColor) {
@@ -65,12 +68,17 @@ class Export
                 ->setAutoSize(false);
         }
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'. $filename .'"');
-        header('Cache-Control: max-age=0');
+    
+        if($return){
+            return $spreadsheet;
+        }else{
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'. $filename .'"');
+            header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit();
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit();
+        }
     }
 }
