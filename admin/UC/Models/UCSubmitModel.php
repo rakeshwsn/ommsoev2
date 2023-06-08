@@ -26,8 +26,9 @@ class UCSubmitModel extends Model
 	protected $updatedField         = '';
 	protected $deletedField         = 'deleted_at';
 
-    public function getRecipientId($district_id) {
-        $sql = "SELECT id FROM soe_uc_recipients r WHERE r.district_id=".(int)$district_id;
+    //add fund agency id (niranjan)
+    public function getRecipientId($district_id,$fund_agency_id=1) {
+        $sql = "SELECT id FROM soe_uc_recipients r WHERE r.district_id=".(int)$district_id ." AND r.fund_agency_id=".(int)$fund_agency_id;
 
         $res = $this->db->query($sql)->getFirstRow();
 

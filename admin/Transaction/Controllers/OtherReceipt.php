@@ -5,6 +5,7 @@ namespace Admin\Transaction\Controllers;
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
 use Admin\Localisation\Models\BlockModel;
+use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Transaction\Models\MisctransactionModel;
 use Admin\Transaction\Models\MisctxnamtModel;
 use Admin\Users\Models\UserGroupModel;
@@ -14,9 +15,11 @@ use Config\Url;
 class OtherReceipt extends AdminController
 {
 //    use CommonTrait;
-    private $txnModel;
+    private $txnModel,$cbModel;
+
     public function __construct() {
         $this->txnModel = new MisctransactionModel();
+        $this->cbModel = new ClosingbalanceModel();
     }
 
     public function index() {
@@ -102,7 +105,8 @@ class OtherReceipt extends AdminController
     }
 
     public function add() {
-
+        $this->error="";
+        $json_data=[];
         if(!$this->request->isAJAX()){
             return $this->response->setStatusCode(404);
         }
@@ -135,7 +139,9 @@ class OtherReceipt extends AdminController
             'user_id' => $this->user->user_id,
         ];
 
-        if($this->request->getMethod(1)=='POST' && $this->_validate($condition)){
+        $this->_validate($condition);
+
+        if($this->request->getMethod(1)=='POST'){
             $txn_id = $this->txnModel
                 ->insert([
                     'month'=>$month,
@@ -163,54 +169,19 @@ class OtherReceipt extends AdminController
             ];
             $this->session->setFlashData('message','Other receipt added.');
 
-        } else if($this->request->getMethod(1)!='POST') {
-            $error = false;
+        } 
 
-            //validate if exists
-            $txn = $this->txnModel
-                ->where($condition)
-                ->find();
-
-            if ($txn) {
-                $json_data = [
-                    'status' => false,
-                    'message' => 'Other receipt already exists for the month.',
-                ];
-                $error = true;
-            }
-
-            // validate if dates are allowed.
-            if(env('soe.uploadDateValidation')){
-
-                $upload_model = new AllowuploadModel();
-
-                $ufilter = [
-                    'user_id' => $this->user->user_id
-                ];
-
-                $upload = $upload_model->getByDate($ufilter);
-
-                $months = [];
-                foreach ($upload as $item) {
-                    $months[] = $item['month'];
-                }
-
-                if (!in_array(getCurrentMonthId(),$months)) {
-                    $json_data = [
-                        'status' => false,
-                        'message' => 'Cannot add other receipt. Upload for the month is closed.',
-                    ];
-                    $error = true;
-                }
-            }
-
-            if(!$error) {
-                $json_data = [
-                    'status' => true,
-                    'title' => 'Other receipt for ' . getMonthById($month)['name'] . ' ' . getCurrentYear(),
-                    'html' => $this->getForm()
-                ];
-            }
+        if(!$this->error) {
+            $json_data = [
+                'status' => true,
+                'title' => 'Other receipt for ' . getMonthById($month)['name'] . ' ' . getCurrentYear(),
+                'html' => $this->getForm()
+            ];
+        }else{
+            $json_data = [
+                'status' => false,
+                'message' => $this->error
+            ];
         }
 
         return $this->response->setJSON($json_data);
@@ -359,6 +330,7 @@ class OtherReceipt extends AdminController
     }
 
     private function _validate($condition){
+        $this->error="";
         $condition = [
             'month' => $condition['month'],
             'year' => $condition['year'],
@@ -373,6 +345,39 @@ class OtherReceipt extends AdminController
             ->where($condition)
             ->find();
 
-        return !$txn;
+        $cb = $this->cbModel
+            ->where($condition)
+            ->find();
+       
+        if( $cb){
+            $this->error="Can not add other Receipt. Closing balance already exist" ;
+        }else if($txn){
+           $this->error="Can not add other Receipt. Other receipt already exist" ;
+            
+        }
+        else if(env('soe.uploadDateValidation')){
+
+            $upload_model = new AllowuploadModel();
+
+            $ufilter = [
+                'user_id' => $this->user->user_id
+            ];
+
+            $upload = $upload_model->getByDate($ufilter);
+
+            $months = [];
+            foreach ($upload as $item) {
+                $months[] = $item['month'];
+            }
+
+            if (!in_array(getCurrentMonthId(),$months)) {
+                $this->error='Cannot add other receipt. Upload for the month is closed.';
+                
+            }
+        }
+
+        return $this->error;
     }
+
+    
 }

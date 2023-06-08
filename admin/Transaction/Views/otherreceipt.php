@@ -1,5 +1,6 @@
 <!-- Main content -->
 <section class="content">
+    <h2 class="content-heading">Other Receipt</h2>
     <div id="message"></div>
     <div class="block" id="upload-controls">
             <div class="block-content block-content-full">

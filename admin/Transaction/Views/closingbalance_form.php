@@ -45,7 +45,7 @@
                     <tr>
                         <th style="width:300px;">Particulars</th>
                         <th style="width:300px;">Amount</th>
-                        <th>Attachment</th>
+                        <th>Attachment (only jpg/png/pdf file allowed upto 12MB)</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -218,8 +218,8 @@
     $('#btn-submit').click(function(e){
         $('.fileerror').remove();
         $('.filepath').each(function(){
-            amt = $(this).closest('tr').find('.amount').val();
-            if(amt != '' && $(this).val()==''){
+            amt = parseFloat($(this).closest('tr').find('.amount').val());
+            if(amt && $(this).val()==''){
                 $(this).closest('td').append('<small class="text-danger fileerror">(This file is required.)</small>');
                 e.preventDefault();
             }

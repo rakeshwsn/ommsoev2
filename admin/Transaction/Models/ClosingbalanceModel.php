@@ -114,7 +114,9 @@ class ClosingbalanceModel extends Model
         $fund_agency_id = $filter['fund_agency_id'];
 
         if($block_id){
+            
             $sql = "CALL proc_get_ledger_statement($block_id,$year,$agency_type_id,$user_id,$fund_agency_id)";
+           
         }
 
         if($district_id){
@@ -389,7 +391,7 @@ AND st.transaction_type = 'expense'
 AND st.block_id=$block_id AND fund_agency_id = $fund_agency_id
 AND st.year=$year
 AND st.month < $month";
-echo $sql;exit;
+
             return $this->db->query($sql)->getFirstRow();
 
         } else if($this->settings->district_user == $agency_type){

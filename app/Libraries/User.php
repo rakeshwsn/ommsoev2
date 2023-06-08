@@ -41,7 +41,7 @@ class User
 
         $user_group_model = new UserGroupModel();
         $user_group = $user_group_model->find($user->user_group_id);
-
+        
         $this->user_id = $user->id;
         $this->username = $user->username;
         $this->firstname = $user->firstname;

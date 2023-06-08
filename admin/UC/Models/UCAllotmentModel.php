@@ -120,7 +120,7 @@ FROM soe_uc_allotment sua
 WHERE sua.deleted_at IS NULL
 AND sua.year = ".$filter['year']."
 AND sua.recipient_id = ".$filter['recipient_id'];
-
+//echo $sql ;
         return $this->db->query($sql)->getResult();
     }
 

@@ -188,6 +188,8 @@ class ClosingBalance extends AdminController {
 
         $this->validateUpload($year,$month,$data);
 
+
+
         foreach($this->cbModel->getFieldNames() as $field){
             if($this->request->getPost($field)){
                 $data[$field] = $this->request->getPost($field);
@@ -197,6 +199,9 @@ class ClosingBalance extends AdminController {
                 $data[$field] = '';
             }
         }
+
+        $data['agency_type_id']=$agency_type_id;
+        
 
         $data['advance_file_url'] = '';
         if($cb && $cb->advance_file){

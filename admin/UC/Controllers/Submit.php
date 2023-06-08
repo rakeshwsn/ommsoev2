@@ -13,9 +13,12 @@ class Submit extends AdminController{
         $data = [];
 
         $ucModel = new UCSubmitModel();
-
+        $subModel = new UCSubmitModel();
+        // added recipient_id instead of distict(niranjan)
         if($this->user->district_id) {
-            $filter = ['district_id' => $this->user->district_id];
+            $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
+
+            $filter = ['recipient_id' => $recipient_id];
         } else {
             if($this->user->agency_type_id==$this->settings->ps_user){
                 $filter = ['recipient_id' => 23];
@@ -65,7 +68,7 @@ class Submit extends AdminController{
 	    $allModel = new UCAllotmentModel();
 	    $subModel = new UCSubmitModel();
 
-	    $recipient_id = $subModel->getRecipientId($this->user->district_id);
+	    $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
 
 	    $allotments = $allModel->getAllotments(['year'=>$year,'recipient_id'=>$recipient_id]);
 
