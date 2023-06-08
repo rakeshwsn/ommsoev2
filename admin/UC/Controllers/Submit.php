@@ -203,7 +203,7 @@ class Submit extends AdminController{
             'document' => [
                 'uploaded[document]',
                 'mime_in[document,application/pdf]',
-                'max_size[document,2048]',
+                'max_size[document,12048]',   //rakesh updated filesize to 12mb -- 08/06/23
                 'ext_in[document,pdf,PDF]',
             ]
         ]);
