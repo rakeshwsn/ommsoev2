@@ -150,7 +150,11 @@ class Mpr extends AdminController
 
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
 
-        $data['components'] = $this->getTable($components, 'view');
+        if($action=='download') {
+            $data['components'] = $this->getTable($components, 'download');
+        } else {
+            $data['components'] = $this->getTable($components, 'view');
+        }
 
         //mpr table html for excel and view --rakesh --092/06/23
         $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
@@ -179,7 +183,7 @@ class Mpr extends AdminController
 
         if($action=='download'){
             $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
-            $export=service('export');
+
             $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
             if($spreadsheet){
                 $worksheet = $spreadsheet->getActiveSheet();
@@ -199,10 +203,7 @@ class Mpr extends AdminController
                 for ($row = 1; $row <= $highestRow; $row++) {
                     $cell = $worksheet->getCell($columnIndex . $row);
                     $cell->getStyle()->getAlignment()->setWrapText(true);
-                    
                 }
-
-                
                 
                 $worksheet->getColumnDimension($columnIndex)->setWidth(20);
 
@@ -221,8 +222,6 @@ class Mpr extends AdminController
 
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
     }
-
-  
 
     //created by Niranjan
     public function abstractMpr($action='') {
