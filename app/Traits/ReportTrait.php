@@ -24,7 +24,7 @@ trait ReportTrait {
         if($action=='view'){
             $html = $this->generateTable($array,$action);
             //grand total
-            $html .= '<tr class="subtotal bg-yellow">
+            $html .= '<tr class="subtotal bg-yellow highlight-heading2">
                     <td colspan="2">Grand Total</td>
                     <td>'.$this->tot_ob_phy.'</td>
                     <td>'.in_lakh($this->tot_ob_fin).'</td>
@@ -157,10 +157,9 @@ trait ReportTrait {
             }
 
             if($item['row_type']=='heading') {
-                $html .= '<tr class="heading">
+                $html .= '<tr class="heading highlight-heading1">
                     <th>' . $item['number'] . '</th>
-                    <th>' . $item['description'] . '</th>
-                    <th colspan="16"></th>
+                    <th colspan="17">' . $item['description'] . '</th>
                     </tr>
                 ';
             } else {
@@ -194,7 +193,7 @@ trait ReportTrait {
 
             if (!empty($item['children'])){
                 $html .= $this->generateTable($item['children'],$action);
-                $html .= '<tr class="subtotal" data-parent="'.$item['component_id'].'">
+                $html .= '<tr class="subtotal highlight-heading4" data-parent="'.$item['component_id'].'">
                     <td colspan="2">Sub Total</td>
                     <td>'.$this->ob_phy.'</td>
                     <td>'.in_lakh($this->ob_fin).'</td>
@@ -482,7 +481,7 @@ trait ReportTrait {
         return $data;
     }
 
-    public function createExcelFromHTML($html,$filename){
+    public function createExcelFromHTML($html,$filename,$return=false){
 
         $reader = new Html();
 
@@ -603,13 +602,17 @@ trait ReportTrait {
             $spreadsheet->getActiveSheet()->getColumnDimension($column->getColumnIndex())->setAutoSize(false);
         }
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'. $filename .'"');
-        header('Cache-Control: max-age=0');
+        if($return){
+            return $spreadsheet;
+        }else{
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'. $filename .'"');
+            header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit();
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit();
+        }
     }
 
 }

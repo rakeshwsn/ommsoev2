@@ -2,7 +2,7 @@
 
 namespace Config;
 
-
+use App\Libraries\Export;
 use App\Libraries\Shortcode;
 use CodeIgniter\Config\BaseService;
 use Config\Template as TemplateConfig;
@@ -76,5 +76,15 @@ class Services extends BaseService
         }
 
         return new Shortcode();
+    }
+
+    public static function export($getShared = true)
+    {
+        if ($getShared)
+        {
+            return static::getSharedInstance('export');
+        }
+
+        return new Export();
     }
 }
