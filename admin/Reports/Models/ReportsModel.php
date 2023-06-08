@@ -3044,7 +3044,7 @@ LEFT JOIN ex_upto ex ON ex.district_id = fr.district_id
 LEFT JOIN soe_districts sd ON fr.district_id = sd.id
 LEFT JOIN expn ON expn.district_id = fr.district_id
 WHERE fr.district_id > 0";
-
+echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 

@@ -178,11 +178,6 @@
             $(parent).find('.cum_fin').text(cum_fin);
         });
 
-        var $th = $('.tableFixHead').find('thead th')
-        $('.tableFixHead').on('scroll', function() {
-            $th.css('transform', 'translateY('+ this.scrollTop +'px)');
-        });
-
     });
 
 </script>
