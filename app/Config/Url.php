@@ -54,6 +54,7 @@ class Url {
     const ucSubmitEdit = 'admin/uc/submit/edit';
     const ucSubmitUpload = 'admin/uc/submit/upload';
     const mprDownload = 'admin/reports/mpr/download';
+    const abstractMprDownload = 'admin/reports/abstractmpr/download';
     const mprUpload = 'admin/reports/mprupload/upload';
     const mis = 'admin/mis';
     const misAdd = 'admin/mis/add';

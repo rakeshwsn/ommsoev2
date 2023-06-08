@@ -350,12 +350,15 @@ class Mpr extends AdminController
         $components = $reportModel->getMPR($filter);
 
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
-        //print_r($components);
         
         $components=$this->calculateAbstractSum($components);
-       
 
-        $data['components'] = $this->getAbstarctTable($components);
+        //rakesh
+        if($action=='download'){
+            $data['components'] = $this->getAbstarctTable($components,'download');
+        } else {
+            $data['components'] = $this->getAbstarctTable($components);
+        }
 
         //mpr table html for excel and view --rakesh --092/06/23
         $data['mpr_table'] = view('Admin\Reports\Views\abstract_mpr_table', $data);
@@ -383,13 +386,43 @@ class Mpr extends AdminController
         $this->filterPanel($data);
 
         if($action=='download'){
-            $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
+            $filename = 'Abstract_MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
 
-            $this->createExcelFromHTML($data['mpr_table'],$filename);
+            $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
+            if($spreadsheet){
+                $worksheet = $spreadsheet->getActiveSheet();
+                $columnIndex = 'B'; // Change this to the desired column index
+                $wordWrapCols=[
+                    'G2','O2','Q1'
+                ];
+                foreach($wordWrapCols as $col){
+                    $cell = $worksheet->getCell($col);
+                    $cell->getStyle()->getAlignment()->setWrapText(true);
+                }
+
+                // Get the highest row index in the column
+                $highestRow = $worksheet->getHighestRow();
+
+                // Apply word wrap to each cell in column B
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $cell = $worksheet->getCell($columnIndex . $row);
+                    $cell->getStyle()->getAlignment()->setWrapText(true);
+                }
+
+                $worksheet->getColumnDimension($columnIndex)->setWidth(20);
+
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="'. $filename .'"');
+                header('Cache-Control: max-age=0');
+
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+                exit();
+            }
             exit;
         }
 
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&agency_type_id='.$data['agency_type_id'];
+        $data['download_url'] = Url::abstractMprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&agency_type_id='.$data['agency_type_id'];
 
         return $this->template->view('Admin\Reports\Views\abstract_mpr', $data);
     }

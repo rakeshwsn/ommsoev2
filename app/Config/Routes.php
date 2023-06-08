@@ -165,6 +165,7 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->add('reports/mprupload/upload','Reports\Controllers\MprUpload::upload');
     $routes->add('reports/mprupload','Reports\Controllers\MprUpload::index');
     $routes->add('reports/abstractmpr','Reports\Controllers\Mpr::abstractMpr');
+    $routes->add('reports/abstractmpr/download','Reports\Controllers\Mpr::abstractMpr/download');
 
 	//niranjan
 	$routes->get('reports/oldmpr','Reports\Controllers\Oldmpr::index');

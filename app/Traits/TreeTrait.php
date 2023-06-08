@@ -484,7 +484,7 @@ trait TreeTrait {
     }
 
 
-    private function getAbstarctTable($components) {
+    private function getAbstarctTable($components,$action='') {
 
         $this->tot_ob_phy = $this->tot_ob_fin = $this->tot_bud_phy = $this->tot_bud_fin =$this->tot_fr_upto_phy = $this->tot_fr_upto_fin = $this->tot_fr_mon_phy = $this->tot_fr_mon_fin=0;
         $this->tot_fr_cum_phy = $this->tot_fr_cum_fin = $this->tot_exp_mon_phy=$this->tot_exp_mon_fin=$this->tot_exp_cum_phy=$this->tot_exp_cum_fin=$this->tot_cb_phy=$this->tot_cb_fin=0;
@@ -492,29 +492,51 @@ trait TreeTrait {
         $html = '';
 
         foreach ($components as $component) {
-             
-            $html .= '<tr>
-                <td>' . $component['number'] . '</td>
-                <td>' . $component['description'] . '</td>
-                <td>' . $component['ob_phy'] . '</td>
-                <td>' . $component['ob_fin'] . '</td>
-                <td>' . $component['bud_phy'] . '</td>
-                <td>' . $component['bud_fin'] . '</td>
-                <td>' . $component['fr_upto_phy'] . '</td>
-                <td>' . $component['fr_upto_fin'] . '</td>
-                <td>' . $component['fr_mon_phy'] . '</td>
-                <td>' . $component['fr_mon_fin'] . '</td>
-                <td>' . $component['fr_cum_phy'] . '</td>
-                <td>' . $component['fr_cum_fin'] . '</td>
-                <td>' . $component['exp_mon_phy'] . '</td>
-                <td>' . $component['exp_mon_fin'] . '</td>
-                <td>' . $component['exp_cum_phy'] . '</td>
-                <td>' . $component['exp_cum_fin'] . '</td>
-                <td>' . $component['cb_phy'] . '</td>
-                <td>' . $component['cb_fin'] . '</td>
-                
-                ';
-            
+
+            if($action=='download'){
+                $html .= '<tr>
+                    <td>' . $component['number'] . '</td>
+                    <td>' . $component['description'] . '</td>
+                    <td>' . $component['ob_phy'] . '</td>
+                    <td>' . $component['ob_fin'] . '</td>
+                    <td>' . $component['bud_phy'] . '</td>
+                    <td>' . $component['bud_fin'] . '</td>
+                    <td>' . $component['fr_upto_phy'] . '</td>
+                    <td>' . $component['fr_upto_fin'] . '</td>
+                    <td>' . $component['fr_mon_phy'] . '</td>
+                    <td>' . $component['fr_mon_fin'] . '</td>
+                    <td>' . $component['fr_cum_phy'] . '</td>
+                    <td>' . $component['fr_cum_fin'] . '</td>
+                    <td>' . $component['exp_mon_phy'] . '</td>
+                    <td>' . $component['exp_mon_fin'] . '</td>
+                    <td>' . $component['exp_cum_phy'] . '</td>
+                    <td>' . $component['exp_cum_fin'] . '</td>
+                    <td>' . $component['cb_phy'] . '</td>
+                    <td>' . $component['cb_fin'] . '</td>
+                    ';
+            } else {
+                $html .= '<tr>
+                    <td>' . $component['number'] . '</td>
+                    <td>' . $component['description'] . '</td>
+                    <td>' . $component['ob_phy'] . '</td>
+                    <td>' . in_lakh($component['ob_fin']) . '</td>
+                    <td>' . $component['bud_phy'] . '</td>
+                    <td>' . in_lakh($component['bud_fin']) . '</td>
+                    <td>' . $component['fr_upto_phy'] . '</td>
+                    <td>' . in_lakh($component['fr_upto_fin']) . '</td>
+                    <td>' . $component['fr_mon_phy'] . '</td>
+                    <td>' . in_lakh($component['fr_mon_fin']) . '</td>
+                    <td>' . $component['fr_cum_phy'] . '</td>
+                    <td>' . in_lakh($component['fr_cum_fin']) . '</td>
+                    <td>' . $component['exp_mon_phy'] . '</td>
+                    <td>' . in_lakh($component['exp_mon_fin']) . '</td>
+                    <td>' . $component['exp_cum_phy'] . '</td>
+                    <td>' . in_lakh($component['exp_cum_fin']) . '</td>
+                    <td>' . $component['cb_phy'] . '</td>
+                    <td>' . in_lakh($component['cb_fin']) . '</td>
+                    ';
+            }
+
             
             $html .= '</tr>';
 
@@ -538,7 +560,28 @@ trait TreeTrait {
         }
 
         //grand total
-        $html .= '<tr class="subtotal bg-yellow">
+        if($action=='download'){
+            $html .= '<tr class="subtotal bg-yellow">
+                    <td colspan="2">Grand Total</td>
+                    <td>'.$this->tot_ob_phy.'</td>
+                    <td>'.$this->tot_ob_fin.'</td>
+                    <td>'.$this->tot_bud_phy.'</td>
+                    <td>'.$this->tot_bud_fin.'</td>
+                    <td>'.$this->tot_fr_upto_phy.'</td>
+                    <td>'.$this->tot_fr_upto_fin.'</td>
+                    <td>'.$this->tot_fr_mon_phy.'</td>
+                    <td>'.$this->tot_fr_mon_fin.'</td>
+                    <td>'.$this->tot_fr_cum_phy.'</td>
+                    <td>'.$this->tot_fr_cum_fin.'</td>
+                    <td>'.$this->tot_exp_mon_phy.'</td>
+                    <td>'.$this->tot_exp_mon_fin.'</td>
+                    <td>'.$this->tot_exp_cum_phy.'</td>
+                    <td>'.$this->tot_exp_cum_fin.'</td>
+                    <td>'.$this->tot_cb_phy.'</td>
+                    <td>'.$this->tot_cb_fin.'</td>
+                    </tr>';
+        } else {
+            $html .= '<tr class="subtotal bg-yellow">
                     <td colspan="2">Grand Total</td>
                     <td>'.$this->tot_ob_phy.'</td>
                     <td>'.in_lakh($this->tot_ob_fin).'</td>
@@ -557,6 +600,8 @@ trait TreeTrait {
                     <td>'.$this->tot_cb_phy.'</td>
                     <td>'.in_lakh($this->tot_cb_fin).'</td>
                     </tr>';
+        }
+
 
         return $html;
 
