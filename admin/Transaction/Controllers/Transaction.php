@@ -815,8 +815,6 @@ class Transaction extends AdminController {
             }
         }
 
-
-
         if($this->request->getMethod(1)=='POST'){
 
             $txn_data = [
