@@ -1264,7 +1264,8 @@ FROM (SELECT
     GROUP BY smt.block_id) int_ref
     ON int_ref.block_id = user.block_id
   ORDER BY user_group_id, block";
-
+echo $sql;
+exit;
         return $this->db->query($sql)->getResultArray();
     }
 

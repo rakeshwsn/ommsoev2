@@ -2339,6 +2339,9 @@ FROM (SELECT
                 $sql .= " AND u.user_group_id = " . $filter['agency_type_id'];
             }
         }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND u.fund_agency_id = ".$filter['fund_agency_id'];
+        }
         $sql .= " GROUP BY u.block_id) user
   LEFT JOIN (SELECT
       smt.user_id,

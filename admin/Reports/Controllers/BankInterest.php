@@ -41,6 +41,7 @@ class BankInterest extends AdminController
             'month_id' => $data['month_id'],
             'district_id' => $this->user->district_id,
             'agency_type_id' => [5,6],
+            'fund_agency_id'=> $this->user->fund_agency_id,
         ];
         if($data['agency_type_id']){
             $filter['agency_type_id'] = $data['agency_type_id'];
@@ -64,7 +65,8 @@ class BankInterest extends AdminController
         if($data['agency_type_id'] == '' || $data['agency_type_id'] == $this->settings->district_user) {
             $filter['agency_type_id'] = 7;
             $atma_report = $reportModel->getInterestReport($filter);
-
+            //echo $reportModel->db->getLastQuery();
+            //exit;
             foreach ($atma_report as &$item) {
                 $item['int_total'] = $item['int_upto'] + $item['int_mon'];
                 $item['balance'] = '';
