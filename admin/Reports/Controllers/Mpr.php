@@ -59,6 +59,11 @@ class Mpr extends AdminController
             $data['block_id'] = $this->request->getGet('block_id');
         }
 
+        $data['agency_type_id'] = '';
+        if($this->request->getGet('agency_type_id')){
+            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
+        }
+
         if($this->user->agency_type_id==$this->settings->block_user){
             $data['block_id'] = $this->user->block_id;
         }
@@ -144,6 +149,7 @@ class Mpr extends AdminController
         }
         if($this->user->agency_type_id==$this->settings->district_user){
             $filter['district_user_id'] = $data['district_user_id'];
+            $filter['agency_type_id'] = $data['agency_type_id'];
         }
 
         $components = $reportModel->getMpr($filter);
@@ -435,6 +441,7 @@ class Mpr extends AdminController
         $data['filter_panel'] = '';
         $data['get_block_url'] = Url::getBlocks;
         $data['get_district_url'] = Url::getDistricts;
+        
         if($this->user->agency_type_id==$this->settings->district_user) {
             $filter = [
                 'district_id' => $this->user->district_id,
@@ -442,6 +449,7 @@ class Mpr extends AdminController
             if($this->user->fund_agency_id){
                 $filter['fund_agency_id'] = $this->user->fund_agency_id;
             }
+            $data['agency_types']=(new UserGroupModel())->where('id',$this->settings->district_user)->asArray()->findAll();
             $data['blocks'] = $this->block_model->where($filter)->asArray()->findAll();
             $data['filter_panel'] = view('Admin\Reports\Views\district_filter_panel',$data);
         }

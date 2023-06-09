@@ -17,6 +17,13 @@
                 <?php } ?>
             </select>
         </div>
+        <div class="col-md-2">
+            <select name="fund_agency_id" id="fund_agency_id" class="form-control">
+                <?php foreach ($fund_agencies as $fund_agency) { ?>
+                    <option value="<?=$fund_agency['fund_agency_id']?>" <?php if($fund_agency['fund_agency_id']==$fund_agency_id){echo 'selected';} ?>><?=$fund_agency['fund_agency']?></option>
+                <?php } ?>
+            </select>
+        </div>
     </div>
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
@@ -160,11 +167,12 @@
         $('[name="chart_type"]').on('change',function () {
             chart_type = $(this).val();
             year = $('#year').val();
+            fund_agency_id = $('#fund_agency_id').val();
             // update the chart options
             if (chart_type === 'district') {
                 $.ajax({
                     url:'<?=$chart_url?>',
-                    data:{year:year,chart_type:chart_type},
+                    data:{year:year,chart_type:chart_type,fund_agency_id:fund_agency_id},
                     type:'GET',
                     dataType:'JSON',
                     beforeSend:function () {
@@ -197,6 +205,9 @@
         $('[name="chart_type"]').trigger('change');
 
         $('#year').on('change',function () {
+            $('[name="chart_type"]').trigger('change');
+        });
+        $('#fund_agency_id').on('change',function () {
             $('[name="chart_type"]').trigger('change');
         });
 

@@ -823,6 +823,9 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         if(!empty($filter['fund_agency_id'])){
             $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
         }
+        if(!empty($filter['agency_type_id'])){ 
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
+        }
         $sql .= " GROUP BY tc.component_id) expn_mon
       ON comp.component_id = expn_mon.component_id";
         /* ******************month's fundreceipt****************** */
@@ -841,10 +844,13 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
             if(!empty($filter['user_id'])){
                 $sql .= " AND t.user_id = ".$filter['user_id'];
             }
-        } else if(empty($filter['block_id'])) {
+        } else if(!empty($filter['agency_type_id'])){ //added by niranjan
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
+        }else if(empty($filter['block_id'])) {
             // exclude block fund receipt when user is not block user.
             $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
         }
+
 
         if(!empty($filter['district_id'])){
             $sql .= " AND t.district_id = ".$filter['district_id'];
@@ -899,6 +905,9 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         if(!empty($filter['fund_agency_id'])){
             $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
         }
+        if(!empty($filter['agency_type_id'])){ //added by niranjan
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
+        }
         $sql .= " GROUP BY tc.component_id) exp_upto
       ON comp.component_id = exp_upto.component_id";
         /* ******************fundreceipt upto last month****************** */
@@ -918,7 +927,9 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
             if(!empty($filter['user_id'])){
                 $sql .= " AND t.user_id = ".$filter['user_id'];
             }
-        } else if(empty($filter['block_id'])) {
+        } else if(!empty($filter['agency_type_id'])){ //added by niranjan
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
+        }else if(empty($filter['block_id'])) {
             // exclude block fund receipt when user is not block user.
             $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
         }
@@ -958,10 +969,13 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
             if(!empty($filter['user_id'])){
                 $sql .= " AND t.user_id = ".$filter['user_id'];
             }
-        } else if(empty($filter['block_id'])) {
+        } else if(!empty($filter['agency_type_id'])){ //added by niranjan
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
+        }else if(empty($filter['block_id'])) {
             // exclude block fund receipt when user is not block user.
             $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
         }
+
         if(!empty($filter['block_id'])){
             $sql .= " AND t.block_id = ".$filter['block_id'];
             if(!empty($filter['block_user_id'])){
@@ -1010,6 +1024,10 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         }
         if(!empty($filter['fund_agency_id'])){
             $sql .= " AND t.fund_agency_id = ".$filter['fund_agency_id'];
+        }
+
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
@@ -3047,7 +3065,7 @@ LEFT JOIN ex_upto ex ON ex.district_id = fr.district_id
 LEFT JOIN soe_districts sd ON fr.district_id = sd.id
 LEFT JOIN expn ON expn.district_id = fr.district_id
 WHERE fr.district_id > 0";
-echo $sql;exit;
+
         return $this->db->query($sql)->getResult();
     }
 
