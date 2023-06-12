@@ -56,7 +56,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="fa fa-retweet fa-2x text-corporate"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ob']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-speed="1000" data-to="0">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
                 </div>
             </a>
@@ -68,7 +68,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['fr']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr" data-speed="1000" data-to="0">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
@@ -79,7 +79,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ex']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-speed="1000" data-to="0">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
@@ -90,7 +90,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['cb']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-speed="1000" data-to="0">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on date</small></div>
                 </div>
             </a>

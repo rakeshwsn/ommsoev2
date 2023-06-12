@@ -2111,7 +2111,20 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         return $this->db->query($sql)->getFirstRow()->total;
     }
 
+    // for district level
     public function getAbstractTotal($filter=[]) {
+
+        if(!empty($filter['block_id'])){
+            $sql = $this->getBlockAbstractTotal($filter);
+        } else {
+            $sql = $this->getDistrictAbstractTotal($filter);
+        }
+//echo $sql;exit;
+        return $this->db->query($sql)->getResult();
+    }
+
+    //for district level
+    public function getDistrictAbstractTotal($filter){
         $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
         $cy = isset($filter['year']) ? $filter['year']:getCurrentYearId();
         $ly = ($cy-1);
@@ -2132,11 +2145,15 @@ FROM (SELECT
     COALESCE(fr_cy.total, 0) fr_total,
     COALESCE(xp_cy.total, 0) xp_total
   FROM (SELECT
-      u.user_group_id agency_type_id,
-      u.district_id,
-      u.fund_agency_id
-    FROM user u
-    WHERE u.user_group_id IN (7, 8, 9, 11)) agency LEFT JOIN soe_districts d ON d.id=agency.district_id
+  st.agency_type_id,
+  st.district_id,
+  st.fund_agency_id
+FROM soe_transactions st
+WHERE st.fund_agency_id = $fund_agency_id
+AND st.agency_type_id NOT IN (5, 6)
+GROUP BY st.agency_type_id,
+         st.district_id,
+         st.fund_agency_id) agency LEFT JOIN soe_districts d ON d.id=agency.district_id
     LEFT JOIN user_group ug ON agency.agency_type_id=ug.id
     LEFT JOIN (SELECT
         st.agency_type_id,
@@ -2187,7 +2204,7 @@ FROM (SELECT
       AND stc.deleted_at IS NULL
       AND st.transaction_type = 'expense'
       AND st.district_id = 0
-      AND st.fund_agency_id = 1
+      AND st.fund_agency_id = $fund_agency_id
       AND st.status = 1
       AND (st.year BETWEEN 0 AND $ly)
       GROUP BY st.agency_type_id,
@@ -2256,7 +2273,100 @@ FROM (SELECT
             $sql .= " AND district_id=".$filter['district_id'];
         }
 //echo $sql;exit;
-        return $this->db->query($sql)->getResult();
+        return $sql;
+    }
+
+    //for block level
+    public function getBlockAbstractTotal($filter){
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+        $cy = isset($filter['year']) ? $filter['year']:getCurrentYearId();
+        $ly = ($cy-1);
+        $sql = "SELECT
+  agency_type_id,
+  res.block_id,
+  agency,
+  (fr_ly_total - xp_ly_total) ob_total,
+  res.fr_total,
+  res.xp_total,
+  (fr_ly_total - xp_ly_total + fr_total - xp_total) cb_total
+FROM (SELECT
+    agency.agency_type_id,
+    agency.block_id,
+    CASE WHEN agency.block_id > 0 THEN b.name ELSE ug.name END AS agency,
+    COALESCE(fr_ly.total, 0) fr_ly_total,
+    COALESCE(xp_ly.total, 0) xp_ly_total,
+    COALESCE(fr_cy.total, 0) fr_total,
+    COALESCE(xp_cy.total, 0) xp_total
+  FROM (SELECT
+      u.user_group_id agency_type_id,
+      u.block_id,
+      u.fund_agency_id
+    FROM user u
+    WHERE u.id=".$filter['user_id'].") agency
+    LEFT JOIN soe_blocks b
+      ON b.id = agency.block_id
+    LEFT JOIN user_group ug
+      ON agency.agency_type_id = ug.id
+    LEFT JOIN (SELECT
+        st.agency_type_id,
+        st.block_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.block_id) fr_ly
+      ON agency.block_id = fr_ly.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.block_id) xp_ly
+      ON agency.block_id = xp_ly.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.block_id) fr_cy
+      ON fr_cy.block_id = agency.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.block_id) xp_cy
+      ON xp_cy.block_id = agency.block_id) res";
+
+        return $sql;
     }
 
     protected function appendFilter($filter) {
@@ -2418,7 +2528,8 @@ AS
   int_upto.firstname,
   COALESCE(int_upto.tot_int, 0) tot_int_upto,
   COALESCE(int_mon.tot_int, 0) tot_int_mon,
-  COALESCE(ref_upto.tot_ref, 0) tot_ref
+  COALESCE(ref_upto.tot_ref, 0) tot_ref_upto,
+  COALESCE(ref_mon.tot_ref, 0) tot_ref_mon
 FROM (SELECT
     CASE WHEN bi.block_id = 0 THEN CONCAT('ATMA ', bi.district) ELSE bi.block END AS block,
     bi.firstname,
@@ -2457,12 +2568,27 @@ FROM (SELECT
       ref.fund_agency_id,
       SUM(ref.total_refund) tot_ref
     FROM refund ref
-    WHERE ref.year BETWEEN 0 AND $year
+    WHERE ((ref.year BETWEEN 0 AND $last_year)
+  OR (ref.year = $year
+  AND ref.month BETWEEN 0 AND $last_month))
     GROUP BY ref.block_id) ref_upto
     ON ref_upto.block_id = int_upto.block_id
     AND int_upto.district_id = ref_upto.district_id
     AND int_upto.agency_type_id = ref_upto.agency_type_id
-    AND int_upto.fund_agency_id = ref_upto.fund_agency_id";
+    AND int_upto.fund_agency_id = ref_upto.fund_agency_id
+  LEFT JOIN (SELECT
+      ref.block_id,
+      ref.district_id,
+      ref.agency_type_id,
+      ref.fund_agency_id,
+      SUM(ref.total_refund) tot_ref
+    FROM refund ref
+    WHERE ref.year = $year AND ref.month = $month
+    GROUP BY ref.block_id) ref_mon
+    ON ref_mon.block_id = int_upto.block_id
+    AND int_upto.district_id = ref_mon.district_id
+    AND int_upto.agency_type_id = ref_mon.agency_type_id
+    AND int_upto.fund_agency_id = ref_mon.fund_agency_id";
 //echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
@@ -2604,7 +2730,239 @@ FROM (SELECT
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getUploadStatus($filter=[]) {
+    public function getUploadStatus($filter=[]){
+        $sql="SELECT
+        *
+        FROM (SELECT
+            bl.district_id,
+            bl.district,
+            bl.block_id,
+            bl.block,
+            fch.frc_status,
+            och.orc_status,
+            fr.fr_status,
+            ex.ex_status,
+            `or`.or_status,
+            cb.cb_status,
+            mis.mis_status
+        FROM (SELECT
+            bl.district_id,
+            bl.id block_id,
+            bl.name block,
+            dist.name district
+        FROM (select * from soe_blocks sb where 1=1";
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND sb.fund_agency_id = '".$filter['fund_agency_id']."'";
+        }
+        if(!empty($filter['district_id'])){
+            $sql .= " AND sb.district_id = '".$filter['district_id']."'";
+        }
+        $sql .= ") bl
+        LEFT JOIN soe_districts dist
+              ON bl.district_id = dist.id) bl
+        
+        LEFT JOIN (SELECT
+              sfrc.status AS frc_status,
+              sfrc.block_id
+            FROM soe_fund_receipt_check sfrc
+            WHERE sfrc.month = ".$filter['month']."
+            AND sfrc.year = ".$filter['year']."
+            AND sfrc.check_type = 'fr'
+            AND sfrc.agency_type_id = 5) fch
+            ON bl.block_id = fch.block_id
+      
+          LEFT JOIN (SELECT
+              sfrc.status AS orc_status,
+              sfrc.block_id
+            FROM soe_fund_receipt_check sfrc
+            WHERE sfrc.month = ".$filter['month']."
+            AND sfrc.year = ".$filter['year']."
+            AND sfrc.check_type = 'or'
+            AND sfrc.agency_type_id = 5) och
+            ON bl.block_id = och.block_id
+      
+          LEFT JOIN (SELECT
+              CASE WHEN COUNT(*) = COUNT(st.status) THEN CASE WHEN SUM(st.status) = 3 THEN 0 ELSE MIN(COALESCE(st.status, 1)) END ELSE NULL END AS fr_status,
+              st.block_id
+            FROM soe_transactions st
+            WHERE st.deleted_at IS NULL
+            AND st.transaction_type = 'fund_receipt'
+            AND st.month = ".$filter['month']."
+            AND st.year = ".$filter['year']."
+            AND st.agency_type_id IN (5, 6)
+            GROUP BY st.block_id) fr
+            ON bl.block_id = fr.block_id
+      
+          LEFT JOIN (SELECT
+              CASE WHEN COUNT(*) = COUNT(st.status) THEN CASE WHEN SUM(st.status) = 3 THEN 0 ELSE MIN(COALESCE(st.status, 1)) END ELSE NULL END AS ex_status,
+              st.block_id
+            FROM soe_transactions st
+            WHERE st.deleted_at IS NULL
+            AND st.transaction_type = 'expense'
+            AND st.month = ".$filter['month']."
+            AND st.year = ".$filter['year']."
+            AND st.agency_type_id IN (5, 6)
+            GROUP BY st.block_id) ex
+            ON bl.block_id = ex.block_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(smt.status) THEN CASE WHEN SUM(smt.status) = 3 THEN 0 ELSE MIN(COALESCE(smt.status, 1)) END ELSE NULL END AS or_status,
+              smt.block_id
+            FROM soe_misc_transactions smt
+            WHERE smt.deleted_at IS NULL
+            AND smt.month = ".$filter['month']."
+            AND smt.year = ".$filter['year']."
+            AND smt.agency_type_id IN (5, 6)
+            GROUP BY smt.block_id) `or`
+            ON bl.block_id = `or`.block_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(scb.status) THEN CASE WHEN SUM(scb.status) = 3 THEN 0 ELSE MIN(COALESCE(scb.status, 1)) END ELSE NULL END AS cb_status,
+              scb.block_id
+            FROM soe_closing_balances scb
+            WHERE scb.deleted_at IS NULL
+            AND scb.month = ".$filter['month']."
+            AND scb.year = ".$filter['year']."
+            AND scb.agency_type_id IN (5, 6)
+            GROUP BY scb.block_id) cb
+            ON bl.block_id = cb.block_id
+          LEFT JOIN (SELECT
+              CASE WHEN COUNT(*) = COUNT(ms.status) THEN CASE WHEN SUM(ms.status) = 3 THEN 0 ELSE MIN(COALESCE(ms.status, 1)) END ELSE NULL END AS mis_status,
+              ms.block_id
+            FROM mis_submissions ms
+            WHERE ms.deleted_at IS NULL
+            AND ms.month = ".$filter['month']."
+            AND ms.year = ".$filter['year']."
+            AND ms.agency_type_id IN (5, 6)
+            GROUP BY ms.block_id) mis
+            ON bl.block_id = mis.block_id) bl_sts
+      
+      UNION ALL
+      (SELECT
+          dist.district_id,
+          dist.district,
+          dist.district_id block_id,
+          
+          CASE WHEN  dist.fund_agency_id = 1 THEN  CONCAT('ATMA ', dist.district) ELSE CONCAT('ATMA DMF ', dist.district) END block,
+          dist_frc.frc_status,
+          dist_orc.orc_status,
+      
+          fr.fr_status,
+          ex.ex_status,
+          `or`.or_status,
+          cb.cb_status,
+          mis.mis_status
+        FROM (SELECT
+            sd.id district_id,
+            sd.name district,
+            u.fund_agency_id
+          FROM soe_districts sd LEFT JOIN user u ON sd.id=u.district_id
+          WHERE block_id=0 AND u.user_group_id=7";
+          if(!empty($filter['fund_agency_id'])){
+              $sql .= " AND u.fund_agency_id = '".$filter['fund_agency_id']."'";
+          }
+          if(!empty($filter['district_id'])){
+              $sql .= " AND sd.id = '".$filter['district_id']."'";
+          }
+          $sql .= " ) dist 
+          LEFT JOIN (SELECT
+              sfrc.status AS frc_status,
+              sfrc.district_id
+            FROM soe_fund_receipt_check sfrc
+            WHERE sfrc.month = ".$filter['month']."
+            AND sfrc.year = ".$filter['year']."
+            AND sfrc.block_id = 0
+            AND sfrc.check_type = 'fr'
+            AND sfrc.agency_type_id = 7) dist_frc
+            ON dist.district_id = dist_frc.district_id
+      
+      
+          LEFT JOIN (SELECT
+              sfrc.status AS orc_status,
+              sfrc.district_id
+            FROM soe_fund_receipt_check sfrc
+            WHERE sfrc.month = ".$filter['month']."
+            AND sfrc.year = ".$filter['year']."
+            AND sfrc.block_id = 0
+            AND sfrc.check_type = 'or'
+            AND sfrc.agency_type_id = 7) dist_orc
+            ON dist.district_id = dist_orc.district_id
+      
+          LEFT JOIN (SELECT
+              CASE WHEN COUNT(*) = COUNT(st.status) THEN CASE WHEN SUM(st.status) = 3 THEN 0 ELSE MIN(COALESCE(st.status, 1)) END ELSE NULL END AS fr_status,
+              st.district_id
+            FROM soe_transactions st
+            WHERE st.deleted_at IS NULL
+            AND st.transaction_type = 'fund_receipt'
+            AND st.month = ".$filter['month']."
+            AND st.year = ".$filter['year']."
+            AND st.block_id = 0
+            AND st.agency_type_id = 7
+            GROUP BY st.district_id) fr
+            ON dist.district_id = fr.district_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(st.status) THEN CASE WHEN SUM(st.status) = 3 THEN 0 ELSE MIN(COALESCE(st.status, 1)) END ELSE NULL END AS ex_status,
+              st.district_id
+            FROM soe_transactions st
+            WHERE st.deleted_at IS NULL
+            AND st.transaction_type = 'expense'
+            AND st.month = ".$filter['month']."
+            AND st.year = ".$filter['year']."
+            AND st.block_id = 0
+            AND st.agency_type_id = 7
+            GROUP BY st.district_id) ex
+            ON dist.district_id = ex.district_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(smt.status) THEN CASE WHEN SUM(smt.status) = 3 THEN 0 ELSE MIN(COALESCE(smt.status, 1)) END ELSE NULL END AS or_status,
+              smt.district_id
+            FROM soe_misc_transactions smt
+            WHERE smt.deleted_at IS NULL
+            AND smt.month = ".$filter['month']."
+            AND smt.year = ".$filter['year']."
+            AND smt.block_id = 0
+            AND smt.agency_type_id = 7
+            GROUP BY smt.district_id) `or`
+            ON dist.district_id = `or`.district_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(scb.status) THEN CASE WHEN SUM(scb.status) = 3 THEN 0 ELSE MIN(COALESCE(scb.status, 1)) END ELSE NULL END AS cb_status,
+              scb.district_id
+            FROM soe_closing_balances scb
+            WHERE scb.deleted_at IS NULL
+            AND scb.month = ".$filter['month']."
+            AND scb.year = ".$filter['year']."
+            AND scb.block_id = 0
+            AND scb.agency_type_id = 7
+            GROUP BY scb.district_id) cb
+            ON dist.district_id = cb.district_id
+      
+          LEFT JOIN (SELECT
+      
+              CASE WHEN COUNT(*) = COUNT(ms.status) THEN CASE WHEN SUM(ms.status) = 3 THEN 0 ELSE MIN(COALESCE(ms.status, 1)) END ELSE NULL END AS mis_status,
+              ms.district_id
+            FROM mis_submissions ms
+            WHERE ms.deleted_at IS NULL
+            AND ms.month = ".$filter['month']."
+            AND ms.year = ".$filter['year']."
+            AND ms.block_id = 0
+            AND ms.agency_type_id = 7
+            GROUP BY ms.district_id) mis
+            ON dist.district_id = mis.district_id)
+      ORDER BY district ASC";
+       //echo $sql;
+      // exit;
+        return $this->db->query($sql)->getResult();
+
+    }
+
+    public function getUploadStatus_old($filter=[]) {
 
         $sql = "SELECT * FROM 
 (SELECT
@@ -2782,6 +3140,26 @@ FROM (SELECT
     ON dist.district_id = mis.district_id AND mis.fund_agency_id=dist.fund_agency_id) ORDER BY district,block";
 //echo $sql;exit;
         return $this->db->query($sql)->getResult();
+    }
+
+    public function getMisStatus($filter){
+        $sql="SELECT
+        *
+        FROM mis_submissions ms
+        WHERE ms.deleted_at IS NULL
+        AND ms.month = ".$filter['month']."
+        AND ms.year = ".$filter['year'];
+        if(!empty($filter['district_id'])){
+            $sql .= " AND ms.district_id = '".$filter['district_id']."'";
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND ms.block_id = '".$filter['block_id']."'";
+        }
+        return $this->db->query($sql)->getRow();
+    }
+
+    public function getFRStatus($filter){
+        
     }
 	
 	public function getTransactionAbstractDistrict($filter=[]){

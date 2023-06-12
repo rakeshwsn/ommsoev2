@@ -333,7 +333,7 @@ trait ReportTrait {
         foreach ($blocks as $block) {
 
             $fr_sts = 3;
-            if($block->fch_status==null || $block->fch_status==0){
+            if($block->frc_status==null || $block->frc_status==0){
                 $fr_sts = 4;
             }
             if($block->fr_status != null){
