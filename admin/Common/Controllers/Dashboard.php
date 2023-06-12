@@ -77,11 +77,13 @@ class Dashboard extends AdminController
         return $this->template->view('Admin\Common\Views\dashboard', $data);
     }
 
+   
+
     public function chart() {
         $data = [];
         $chart_type = $this->request->getGet('chart_type');
         $year = $this->request->getGet('year');
-        $fund_agency_id = 1;
+        $fund_agency_id = $this->request->getGet('fund_agency_id')?:$this->user->fund_agency_id;
         if($chart_type=='district'){
             $abstractDists = $this->reportModel->getDistrictwiseOpening([
                 'year'=>$year,
@@ -363,44 +365,16 @@ class Dashboard extends AdminController
         $filter = [
             'user_id' => $this->user->user_id,
             'block_id' => $this->user->block_id,
+            'fund_agency_id' => $this->user->fund_agency_id,
             'year_upto' => getCurrentYearId(),
         ];
 
-//        $data['ob'] = $this->reportModel->getOpeningBalanceTotal($filter);
-
-        $filter['transaction_type'] = 'fund_receipt';
-        $data['fr'] = $this->reportModel->getTransactionTotal($filter);
-
-        $filter['transaction_type'] = 'expense';
-        $data['ex'] = $this->reportModel->getTransactionTotal($filter);
-
-        $filter['month'] = getMonthIdByMonth(date('m'));
+        //$filter['month'] = getMonthIdByMonth(date('m'));
         $filter['year'] = getCurrentYearId();
 
-        $data['cb'] = $this->reportModel->getClosingBalanceTotal($filter);
-        /*
-                $this->reportModel = new ReportsModel();
-                $data['components'] = [];
-                $filter = [
-                    'user_id' => $this->user->user_id,
-                    'block_id' => $this->user->block_id,
-                    'month_id' => getMonthIdByMonth(date('m')),
-                    'year_id' => getCurrentYearId(),
-                    'agency_type_id' => [5]
-                ];
-                $filter['block_users'] = [5,6];
-                $filter['block_user'] = false;
-                if($this->user->agency_type_id==$this->settings->block_user){
-                    $filter['block_user'] = true;
-                }
-                $filter['fund_agency_id'] =  $this->user->fund_agency_id;
-
-                $components = $this->reportModel->getMpr($filter);
-                $components = $this->buildTree($components,'parent','component_id');
-
-                $data['components'] = $this->getTable($components,'view');
-        */
+        
         $data['components'] = [];
+        $data['chart_url'] = admin_url('dashboard/chart');
         return $this->template->view('Admin\Common\Views\fa_dashboard', $data);
 
     }
@@ -426,7 +400,7 @@ class Dashboard extends AdminController
         ]);
 
         $filter['transaction_type'] = 'fund_receipt';
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+        
 
         $data['fr'] = $this->reportModel->getTransactionTotal($filter);
 
@@ -529,6 +503,8 @@ class Dashboard extends AdminController
             'fund_agency_id'=>$data['fund_agency_id']
         ]);
 
+        $data['fund_agencies']=(new BlockModel())->getFundAgencies();
+        
         $data['chart_url'] = admin_url('dashboard/chart');
 
         return $this->template->view('Admin\Common\Views\spmu_dashboard', $data);

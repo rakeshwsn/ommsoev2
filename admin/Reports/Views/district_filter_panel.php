@@ -10,6 +10,7 @@
                             <?php if($blocks): ?>
                             <th>Block</th>
                             <?php endif; ?>
+                            <td>Agency Type</td>
                             <th>Filter</th>
                         </tr>
                         <tr>
@@ -37,6 +38,14 @@
                                 </select>
                             </td>
                             <?php endif; ?>
+                            <td>
+                                <select class="form-control" id="agency_type_id" name="agency_type_id">
+                                    <option value="">All Agency</option>
+                                    <?php foreach ($agency_types as $agency_type): ?>
+                                        <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
                             <td>
                                 <button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-filter"></i> Filter</button>
                             </td>

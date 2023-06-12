@@ -1,14 +1,36 @@
 
 <div class="content">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <select name="year" id="year" class="form-control">
+                <?php foreach ($years as $year) { ?>
+                    <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
+                        echo 'selected';
+                    } ?>><?= $year['name'] ?></option>
+                <?php } ?>
+            </select>
+        </div>
+    </div>
     <div class="row invisible" data-toggle="appear">
         <!-- Row #1 -->
         <div class="col-6 col-xl-3">
             <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
                 <div class="block-content block-content-full clearfix">
                     <div class="float-right mt-15 d-none d-sm-block">
+                        <i class="fa fa-retweet fa-2x text-corporate"></i>
+                    </div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-speed="1000" data-to="0">0</span></div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-xl-3">
+            <a class="block block-rounded block-bordered block-link-shadow" href="javascript:void(0)">
+                <div class="block-content block-content-full clearfix">
+                    <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$fr?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr"id="fr" data-speed="1000" data-to="0">0</span></div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
@@ -19,7 +41,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span data-toggle="countTo" data-speed="1000" data-to="<?=$ex?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-speed="1000" data-to="0">0</span></div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
@@ -30,8 +52,8 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span  data-toggle="countTo" data-speed="1000" data-to="<?=$cb?>">0</span></div>
-                    <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on date</small></div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-speed="1000" data-to="0">0</span></div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance</div>
                 </div>
             </a>
         </div>
@@ -237,6 +259,36 @@
         <?php endif; ?>
 
     });
+
+    $(function () {
+       
+        $('#year').on('change', function () {
+            year = $('#year').val();
+            $.ajax({
+                url: '<?=$chart_url?>',
+                data: {year: year},
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function () {
+
+                },
+                success: function (data) {
+                    reloadAbstract(data);
+                },
+                error: function () {
+
+                }
+
+            });
+        });
+        $('#year').trigger('change');
+    });
+    function reloadAbstract(data) {
+        $('#ob').text(data.abstract.ob);
+        $('#fr').text(data.abstract.fr);
+        $('#ex').text(data.abstract.ex);
+        $('#cb').text(data.abstract.cb);
+    }
 </script>
 <?php js_end(); ?>
 
