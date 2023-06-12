@@ -2731,6 +2731,9 @@ FROM (SELECT
             bl.name block,
             dist.name district
         FROM (select * from soe_blocks sb where 1=1";
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND sb.fund_agency_id = '".$filter['fund_agency_id']."'";
+        }
         if(!empty($filter['district_id'])){
             $sql .= " AND sb.district_id = '".$filter['district_id']."'";
         }
@@ -2821,7 +2824,8 @@ FROM (SELECT
           dist.district_id,
           dist.district,
           dist.district_id block_id,
-          CONCAT('ATMA ', dist.district) block,
+          
+          CASE WHEN  dist.fund_agency_id = 1 THEN  CONCAT('ATMA ', dist.district) ELSE CONCAT('ATMA DMF ', dist.district) END block,
           dist_frc.frc_status,
           dist_orc.orc_status,
       
@@ -2832,11 +2836,12 @@ FROM (SELECT
           mis.mis_status
         FROM (SELECT
             sd.id district_id,
-            sd.name district
-          FROM soe_districts sd
-          WHERE 1=1";
+            sd.name district,
+            u.fund_agency_id
+          FROM soe_districts sd LEFT JOIN user u ON sd.id=u.district_id
+          WHERE block_id=0 AND u.user_group_id=7";
           if(!empty($filter['fund_agency_id'])){
-              $sql .= " AND fund_agency_id = '".$filter['fund_agency_id']."'";
+              $sql .= " AND u.fund_agency_id = '".$filter['fund_agency_id']."'";
           }
           if(!empty($filter['district_id'])){
               $sql .= " AND sd.id = '".$filter['district_id']."'";
@@ -2931,7 +2936,8 @@ FROM (SELECT
             GROUP BY ms.district_id) mis
             ON dist.district_id = mis.district_id)
       ORDER BY district ASC";
-       
+       //echo $sql;
+      // exit;
         return $this->db->query($sql)->getResult();
 
     }
