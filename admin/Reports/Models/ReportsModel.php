@@ -2111,7 +2111,20 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         return $this->db->query($sql)->getFirstRow()->total;
     }
 
+    // for district level
     public function getAbstractTotal($filter=[]) {
+
+        if(!empty($filter['block_id'])){
+            $sql = $this->getBlockAbstractTotal($filter);
+        } else if(!empty($filter['district_id'])){
+            $sql = $this->getDistrictAbstractTotal($filter);
+        }
+//echo $sql;exit;
+        return $this->db->query($sql)->getResult();
+    }
+
+    //for district level
+    public function getDistrictAbstractTotal($filter){
         $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
         $cy = isset($filter['year']) ? $filter['year']:getCurrentYearId();
         $ly = ($cy-1);
@@ -2255,8 +2268,101 @@ FROM (SELECT
         if(!empty($filter['district_id'])){
             $sql .= " AND district_id=".$filter['district_id'];
         }
-//echo $sql;exit;
-        return $this->db->query($sql)->getResult();
+
+        return $sql;
+    }
+
+    //for block level
+    public function getBlockAbstractTotal($filter){
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+        $cy = isset($filter['year']) ? $filter['year']:getCurrentYearId();
+        $ly = ($cy-1);
+        $sql = "SELECT
+  agency_type_id,
+  res.block_id,
+  agency,
+  (fr_ly_total - xp_ly_total) ob_total,
+  res.fr_total,
+  res.xp_total,
+  (fr_ly_total - xp_ly_total + fr_total - xp_total) cb_total
+FROM (SELECT
+    agency.agency_type_id,
+    agency.block_id,
+    CASE WHEN agency.block_id > 0 THEN b.name ELSE ug.name END AS agency,
+    COALESCE(fr_ly.total, 0) fr_ly_total,
+    COALESCE(xp_ly.total, 0) xp_ly_total,
+    COALESCE(fr_cy.total, 0) fr_total,
+    COALESCE(xp_cy.total, 0) xp_total
+  FROM (SELECT
+      u.user_group_id agency_type_id,
+      u.block_id,
+      u.fund_agency_id
+    FROM user u
+    WHERE u.id=".$filter['user_id'].") agency
+    LEFT JOIN soe_blocks b
+      ON b.id = agency.block_id
+    LEFT JOIN user_group ug
+      ON agency.agency_type_id = ug.id
+    LEFT JOIN (SELECT
+        st.agency_type_id,
+        st.block_id,
+        st.fund_agency_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.block_id) fr_ly
+      ON agency.block_id = fr_ly.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND (st.year BETWEEN 0 AND $ly)
+      GROUP BY st.block_id) xp_ly
+      ON agency.block_id = xp_ly.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'fund_receipt'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.block_id) fr_cy
+      ON fr_cy.block_id = agency.block_id
+    LEFT JOIN (SELECT
+        st.block_id,
+        SUM(stc.financial) total
+      FROM soe_transactions st
+        JOIN soe_transaction_components stc
+          ON st.id = stc.transaction_id
+      WHERE st.deleted_at IS NULL
+      AND stc.deleted_at IS NULL
+      AND st.transaction_type = 'expense'
+      AND st.user_id = ".$filter['user_id']."
+      AND st.status = 1
+      AND st.year = $cy
+      GROUP BY st.block_id) xp_cy
+      ON xp_cy.block_id = agency.block_id) res";
+
+        return $sql;
     }
 
     protected function appendFilter($filter) {
