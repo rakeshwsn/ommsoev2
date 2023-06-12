@@ -56,7 +56,6 @@
                     <th class="">Interest upto last month</th>
                     <th class="">Interest during the month</th>
                     <th class="">Total interest</th>
-                    <th class="">Refund upto last month</th>
                     <th class="">Refund during the month</th>
                     <th class="text-right">Balance </th>
                 </tr>
@@ -69,7 +68,6 @@
                     <td><?=$item['int_upto']?></td>
                     <td><?=$item['int_mon']?></td>
                     <td><?=$item['int_total']?></td>
-                    <td><?=$item['tot_ref_upto']?></td>
                     <td><?=$item['tot_ref_mon']?></td>
                     <td><?=$item['balance']?></td>
                 </tr>
@@ -81,7 +79,6 @@
                     <th><?=$total['int_upto']?></th>
                     <th><?=$total['int_mon']?></th>
                     <th><?=$total['int_total']?></th>
-                    <th><?=$total['tot_ref_upto']?></th>
                     <th><?=$total['tot_ref_mon']?></th>
                     <th><?=$total['balance']?></th>
                 </tr>
