@@ -2149,7 +2149,7 @@ FROM (SELECT
   st.district_id,
   st.fund_agency_id
 FROM soe_transactions st
-WHERE st.fund_agency_id = 1
+WHERE st.fund_agency_id = $fund_agency_id
 AND st.agency_type_id NOT IN (5, 6)
 GROUP BY st.agency_type_id,
          st.district_id,
@@ -2204,7 +2204,7 @@ GROUP BY st.agency_type_id,
       AND stc.deleted_at IS NULL
       AND st.transaction_type = 'expense'
       AND st.district_id = 0
-      AND st.fund_agency_id = 1
+      AND st.fund_agency_id = $fund_agency_id
       AND st.status = 1
       AND (st.year BETWEEN 0 AND $ly)
       GROUP BY st.agency_type_id,
