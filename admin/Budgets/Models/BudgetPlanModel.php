@@ -78,9 +78,6 @@ class BudgetPlanModel extends Model
 
     public function getAll($data = array()){
         $builder=$this->db->table("{$this->table} sbp");
-        $builder->join("soe_fund_agency sfa","sbp.fund_agency_id=sfa.id","left");
-        $builder->join("soe_blocks sb","sb.id=sbp.block_id","left");
-        $builder->join("soe_districts sd","sd.id=sbp.district_id","left");
         $this->filter($builder,$data);
 
         $builder->select("sbp.*,sfa.name as fund_agency,sd.name as district,sb.name as block");
@@ -135,9 +132,9 @@ class BudgetPlanModel extends Model
 
     }
     private function filter($builder,$data){
-        $builder->join("soe_fund_agency fa","sbp.fund_agency_id=fa.id","left");
-        $builder->join('soe_districts d','d.id=sbp.district_id','left');
-        $builder->join('soe_blocks b','b.id=sbp.block_id','left');
+        $builder->join("soe_fund_agency sfa","sbp.fund_agency_id=sfa.id","left");
+        $builder->join("soe_blocks sb","sb.id=sbp.block_id","left");
+        $builder->join("soe_districts sd","sd.id=sbp.district_id","left");
         
         if(!empty($data['filter_district_id'])){
             $builder->where("sbp.district_id  = '".$data['filter_district_id']."'");
@@ -156,9 +153,7 @@ class BudgetPlanModel extends Model
         }
         
         if (!empty($data['filter_search'])) {
-            $builder->where("(
-                sfa.name LIKE '%{$data['filter_search']}%')"
-            );
+            $builder->where("sb.name LIKE '%{$data['filter_search']}%'");
         }
         $builder->where("sbp.deleted_at IS NULL");
 
