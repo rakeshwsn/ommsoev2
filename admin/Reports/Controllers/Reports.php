@@ -2,6 +2,7 @@
 namespace Admin\Reports\Controllers;
 
 use Admin\Common\Models\CommonModel;
+use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Reports\Models\ReportsModel;
 use App\Controllers\AdminController;
@@ -12,10 +13,27 @@ class Reports extends AdminController
 {
     use ReportTrait;
 
+    private $reportModel;
+
+    public function __construct(){
+		$this->reportModel=new ReportsModel();
+    }
     public function index() {
         $data = [];
         helper(['form']);
         return $this->template->view('Admin\Reports\Views\index', $data);
+    }
+
+    public function uploadStatus_old() {
+
+        $data['districts'] = (new DistrictModel())->asArray()->findAll();
+        $data['district_id'] = '';
+        if($this->request->getGet('district_id')){
+            $data['district_id'] = $this->request->getGet('district_id');
+        }
+        $data = array_merge($this->getUploadStatus($data),$data);
+
+        return $this->template->view('Admin\Reports\Views\upload_status',$data);
     }
 
     public function uploadStatus() {
@@ -28,6 +46,22 @@ class Reports extends AdminController
         $data = array_merge($this->getUploadStatus($data),$data);
 
         return $this->template->view('Admin\Reports\Views\upload_status',$data);
+
+    }
+
+    public function misStatus($filter){
+        //print_r($filter);
+        $statusdata=$this->reportModel->getMisStatus($filter);
+        if($statusdata){
+            return $statusdata->status;
+        }
+    }
+
+    public function frStatus($filter){
+        $statusdata=$this->reportModel->getFRStatus($filter);
+        if($statusdata){
+            return $statusdata->status;
+        }
     }
 
     public function pendingStatus()

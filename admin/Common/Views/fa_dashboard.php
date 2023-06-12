@@ -218,7 +218,7 @@
         $('.btn-fr').click(function () {
             choice = $(this).data('value');
             $.ajax({
-                data:{choice:choice},
+                data:{choice:choice,check_type:'fr'},
                 type:'GET',
                 dataType:'JSON',
                 success:function (json) {
