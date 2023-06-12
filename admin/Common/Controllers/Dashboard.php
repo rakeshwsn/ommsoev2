@@ -159,6 +159,9 @@ class Dashboard extends AdminController
         if($this->user->district_id){
             $filter['district_id'] = $this->user->district_id;
         }
+        if($this->user->block_id){
+            $filter['block_id'] = $this->user->block_id;
+        }
         $data['abstract'] = $this->abstract_data($filter);
 
         //add the header here
@@ -252,6 +255,10 @@ class Dashboard extends AdminController
         ];
         if(isset($data['district_id'])){
             $filter['district_id'] = $data['district_id'];
+        }
+        if(isset($data['block_id'])){
+            $filter['block_id'] = $data['block_id'];
+            $filter['user_id'] = $this->user->user_id;
         }
 
         $abstract = $this->reportModel->getAbstractTotal($filter);

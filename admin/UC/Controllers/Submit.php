@@ -15,7 +15,7 @@ class Submit extends AdminController{
         $ucModel = new UCSubmitModel();
         $subModel = new UCSubmitModel();
         // added recipient_id instead of distict(niranjan)
-        if($this->user->district_id) {
+        if ($this->user->agency_type_id == $this->settings->district_user) {
             $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
 
             $filter = ['recipient_id' => $recipient_id];
