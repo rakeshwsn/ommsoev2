@@ -53,7 +53,8 @@ class BankInterest extends AdminController
         $int_upto = 0;
         $int_mon = 0;
         $int_total = 0;
-        $int_ref_block = 0;
+        $tot_ref_upto = 0;
+        $tot_ref_mon = 0;
         $balance = 0;
         foreach ($agencies as $agency) {
             $data['agencies'][] = [
@@ -61,15 +62,17 @@ class BankInterest extends AdminController
                 'int_upto' => in_rupees($agency->tot_int_upto),
                 'int_mon' => in_rupees($agency->tot_int_mon),
                 'int_total' => in_rupees($agency->tot_int_upto+$agency->tot_int_mon),
-                'int_ref_block' => in_rupees($agency->tot_ref),
-                'balance' => in_rupees($agency->tot_int_upto+$agency->tot_int_mon-$agency->tot_ref),
+                'tot_ref_upto' => in_rupees($agency->tot_ref_upto),
+                'tot_ref_mon' => in_rupees($agency->tot_ref_mon),
+                'balance' => in_rupees(($agency->tot_int_upto+$agency->tot_int_mon)-($agency->tot_ref_upto+$agency->tot_ref_mon)),
             ];
 
             $int_upto += $agency->tot_int_upto;
             $int_mon += $agency->tot_int_mon;
             $int_total += $agency->tot_int_upto+$agency->tot_int_mon;
-            $int_ref_block += $agency->tot_ref;
-            $balance += $agency->tot_int_upto+$agency->tot_int_mon-$agency->tot_ref;
+            $tot_ref_upto += $agency->tot_ref_upto;
+            $tot_ref_mon += $agency->tot_ref_mon;
+            $balance += ($agency->tot_int_upto+$agency->tot_int_mon)-($agency->tot_ref_upto+$agency->tot_ref_mon);
         }
 
         $data['total'] = [
@@ -77,7 +80,8 @@ class BankInterest extends AdminController
             'int_upto' => in_rupees($int_upto),
             'int_mon' => in_rupees($int_mon),
             'int_total' => in_rupees($int_total),
-            'int_ref_block' => in_rupees($int_ref_block),
+            'tot_ref_upto' => in_rupees($tot_ref_upto),
+            'tot_ref_mon' => in_rupees($tot_ref_mon),
             'balance' => in_rupees($balance)
         ];
 

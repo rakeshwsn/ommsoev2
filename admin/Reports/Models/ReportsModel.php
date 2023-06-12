@@ -2145,11 +2145,15 @@ FROM (SELECT
     COALESCE(fr_cy.total, 0) fr_total,
     COALESCE(xp_cy.total, 0) xp_total
   FROM (SELECT
-      u.user_group_id agency_type_id,
-      u.district_id,
-      u.fund_agency_id
-    FROM user u
-    WHERE u.user_group_id IN (7, 8, 9, 11)) agency LEFT JOIN soe_districts d ON d.id=agency.district_id
+  st.agency_type_id,
+  st.district_id,
+  st.fund_agency_id
+FROM soe_transactions st
+WHERE st.fund_agency_id = 1
+AND st.agency_type_id NOT IN (5, 6)
+GROUP BY st.agency_type_id,
+         st.district_id,
+         st.fund_agency_id) agency LEFT JOIN soe_districts d ON d.id=agency.district_id
     LEFT JOIN user_group ug ON agency.agency_type_id=ug.id
     LEFT JOIN (SELECT
         st.agency_type_id,
@@ -2268,7 +2272,7 @@ FROM (SELECT
         if(!empty($filter['district_id'])){
             $sql .= " AND district_id=".$filter['district_id'];
         }
-
+//echo $sql;exit;
         return $sql;
     }
 
@@ -2524,7 +2528,8 @@ AS
   int_upto.firstname,
   COALESCE(int_upto.tot_int, 0) tot_int_upto,
   COALESCE(int_mon.tot_int, 0) tot_int_mon,
-  COALESCE(ref_upto.tot_ref, 0) tot_ref
+  COALESCE(ref_upto.tot_ref, 0) tot_ref_upto,
+  COALESCE(ref_mon.tot_ref, 0) tot_ref_mon
 FROM (SELECT
     CASE WHEN bi.block_id = 0 THEN CONCAT('ATMA ', bi.district) ELSE bi.block END AS block,
     bi.firstname,
@@ -2563,12 +2568,27 @@ FROM (SELECT
       ref.fund_agency_id,
       SUM(ref.total_refund) tot_ref
     FROM refund ref
-    WHERE ref.year BETWEEN 0 AND $year
+    WHERE ((ref.year BETWEEN 0 AND $last_year)
+  OR (ref.year = $year
+  AND ref.month BETWEEN 0 AND $last_month))
     GROUP BY ref.block_id) ref_upto
     ON ref_upto.block_id = int_upto.block_id
     AND int_upto.district_id = ref_upto.district_id
     AND int_upto.agency_type_id = ref_upto.agency_type_id
-    AND int_upto.fund_agency_id = ref_upto.fund_agency_id";
+    AND int_upto.fund_agency_id = ref_upto.fund_agency_id
+  LEFT JOIN (SELECT
+      ref.block_id,
+      ref.district_id,
+      ref.agency_type_id,
+      ref.fund_agency_id,
+      SUM(ref.total_refund) tot_ref
+    FROM refund ref
+    WHERE ref.year = $year AND ref.month = $month
+    GROUP BY ref.block_id) ref_mon
+    ON ref_mon.block_id = int_upto.block_id
+    AND int_upto.district_id = ref_mon.district_id
+    AND int_upto.agency_type_id = ref_mon.agency_type_id
+    AND int_upto.fund_agency_id = ref_mon.fund_agency_id";
 //echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }

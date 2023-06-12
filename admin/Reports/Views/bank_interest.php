@@ -56,7 +56,8 @@
                     <th class="">Interest upto last month</th>
                     <th class="">Interest during the month</th>
                     <th class="">Total interest</th>
-                    <th class="">Refund in Rs.</th>
+                    <th class="">Refund upto last month</th>
+                    <th class="">Refund during the month</th>
                     <th class="text-right">Balance </th>
                 </tr>
                 </thead>
@@ -68,7 +69,8 @@
                     <td><?=$item['int_upto']?></td>
                     <td><?=$item['int_mon']?></td>
                     <td><?=$item['int_total']?></td>
-                    <td><?=$item['int_ref_block']?></td>
+                    <td><?=$item['tot_ref_upto']?></td>
+                    <td><?=$item['tot_ref_mon']?></td>
                     <td><?=$item['balance']?></td>
                 </tr>
                 <?php $i++; endforeach; ?>
@@ -79,7 +81,8 @@
                     <th><?=$total['int_upto']?></th>
                     <th><?=$total['int_mon']?></th>
                     <th><?=$total['int_total']?></th>
-                    <th><?=$total['int_ref_block']?></th>
+                    <th><?=$total['tot_ref_upto']?></th>
+                    <th><?=$total['tot_ref_mon']?></th>
                     <th><?=$total['balance']?></th>
                 </tr>
                 </tfoot>
