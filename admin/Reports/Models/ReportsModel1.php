@@ -1269,6 +1269,8 @@ exit;
         return $this->db->query($sql)->getResultArray();
     }
 
+    
+
     public function getUploadStatus($filter=[]) {
 
         $sql = "SELECT * FROM 

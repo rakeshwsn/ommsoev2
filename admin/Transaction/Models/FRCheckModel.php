@@ -35,7 +35,7 @@ class FRCheckModel extends Model
 	protected $afterInsert          = [];
 	protected $beforeUpdate         = [];
 	protected $afterUpdate          = [];
-	protected $beforeFind           = ['checkType'];
+	protected $beforeFind           = []; // remove checkType by niranjan
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];

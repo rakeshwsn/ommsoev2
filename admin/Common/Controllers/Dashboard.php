@@ -33,10 +33,10 @@ class Dashboard extends AdminController
         $data = [];
 
         if (!$this->request->isAJAX()) {
-            $data['fr_check'] = $this->fund_receipt_check();
-            $data['or_check'] = $this->other_receipt_check();
+            $data['fr_check'] = $this->receipt_check('fr');
+            $data['or_check'] = $this->receipt_check('or');
         } else {
-            return $this->fund_receipt_check();
+            return $this->receipt_check(); //only for ajax call
         }
 
         $data['fr_url'] = site_url(Url::transactionAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
@@ -78,7 +78,7 @@ class Dashboard extends AdminController
     }
 
    
-
+    
     public function chart() {
         $data = [];
         $chart_type = $this->request->getGet('chart_type');
@@ -272,92 +272,45 @@ class Dashboard extends AdminController
         return $data;
     }
 
-    protected function fund_receipt_check()
+    protected function receipt_check($check_type='')
     {
 
         $frcModel = new FRCheckModel();
-
+        $check_type = $this->request->getGet('check_type')?:$check_type;
+        $data = [
+            'month' => getCurrentMonthId(),
+            'year' => getCurrentYearId(),
+            'district_id' => $this->user->district_id,
+            'block_id' => $this->user->block_id,
+            'fund_agency_id' => $this->user->fund_agency_id,
+            'agency_type_id' => $this->user->agency_type_id,
+            'check_type' =>$check_type
+        ];
+        
+        $fr = $frcModel->where($data)->first();
+       
         if ($this->request->isAJAX()) {
             $choice = $this->request->getGet('choice');
-            $check_type = $this->request->getGet('check_type');
+            
 
-            $data = [
-                'month' => getCurrentMonthId(),
-                'year' => getCurrentYearId(),
-                'district_id' => $this->user->district_id,
-                'block_id' => $this->user->block_id,
-                'fund_agency_id' => $this->user->fund_agency_id,
-                'check_type' => 'fr'
-            ];
             if ($choice == 'yes') {
                 $data['status'] = 1;
             } else {
                 $data['status'] = 0;
             }
-            if ($check_type == 'or') {
-                $data['check_type'] = 'or';
-            } else {
-                $data['check_type'] = 'fr';
+           
+            if(!$fr){
+                $frcModel->insert($data);
             }
-
-            $frcModel->insert($data);
-
+            
             return $this->response->setJSON(['success' => true]);
 
         }
 
-        $where = [
-            'block_id' => $this->user->block_id,
-            'district_id' => $this->user->district_id,
-            'month' => getCurrentMonthId(),
-            'year' => getCurrentYearId(),
-        ];
-
-        $fr = $frcModel->where($where)->first();
-
         return !$fr;
     }
 
-    protected function other_receipt_check()
-    {
-
-        $frcModel = new ORCheckModel();
-
-        if ($this->request->isAJAX()) {
-            $choice = $this->request->getGet('choice');
-
-            $data = [
-                'month' => getCurrentMonthId(),
-                'year' => getCurrentYearId(),
-                'district_id' => $this->user->district_id,
-                'block_id' => $this->user->block_id,
-                'fund_agency_id' => $this->user->fund_agency_id,
-                'check_type' => 'or'
-            ];
-            if ($choice == 'yes') {
-                $data['status'] = 1;
-            } else {
-                $data['status'] = 0;
-            }
-
-            $frcModel->insert($data);
-
-            return $this->response->setJSON(['success' => true]);
-
-        }
-
-        $where = [
-            'block_id' => $this->user->block_id,
-            'district_id' => $this->user->district_id,
-            'month' => getCurrentMonthId(),
-            'year' => getCurrentYearId(),
-        ];
-
-        $fr = $frcModel->where($where)->first();
-
-        return !$fr;
-    }
-
+    
     protected function fa_dashboard(&$data)
     {
         $this->reportModel = new ReportsModel();
