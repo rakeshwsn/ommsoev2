@@ -52,19 +52,19 @@
                 <thead>
                 <tr>
                     <th class="text-center" style="width: 50px;">Sl. No.</th>
-                    <th>Block</th>
+                    <th>Agency</th>
                     <th class="">Interest upto last month</th>
                     <th class="">Interest during the month</th>
                     <th class="">Total interest</th>
-                    <th class="">Refund by FA & FPO in Rs.</th>
+                    <th class="">Refund in Rs.</th>
                     <th class="text-right">Balance </th>
                 </tr>
                 </thead>
                 <tbody>
-                <?php $i = 1; foreach ($report as $item): ?>
+                <?php $i = 1; foreach ($agencies as $item): ?>
                 <tr>
                     <td><?=$i?></td>
-                    <td><?=$item['block']?></td>
+                    <td><?=$item['agency']?></td>
                     <td><?=$item['int_upto']?></td>
                     <td><?=$item['int_mon']?></td>
                     <td><?=$item['int_total']?></td>
@@ -72,26 +72,17 @@
                     <td><?=$item['balance']?></td>
                 </tr>
                 <?php $i++; endforeach; ?>
-                <tr>
-                    <td colspan="4">Sub Total</td>
-                    <td ><?=$sub_total?></td>
-                </tr>
-                <tr>
-                    <td ><?=$i?></td>
-                    <td >Refund to DA & FP(O)</td>
-                    <td></td>
-                    <td></td>
-                    <td><?=$atma_ref?></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td colspan="4">Balance as on dated</td>
-                    <td ><?=$balance?></td>
-                    <td></td>
-                    <td></td>
-                </tr>
                 </tbody>
+                <tfoot>
+                <tr>
+                    <th colspan="2"><?=$total['agency']?></th>
+                    <th><?=$total['int_upto']?></th>
+                    <th><?=$total['int_mon']?></th>
+                    <th><?=$total['int_total']?></th>
+                    <th><?=$total['int_ref_block']?></th>
+                    <th><?=$total['balance']?></th>
+                </tr>
+                </tfoot>
             </table>
         </div>
     </div>

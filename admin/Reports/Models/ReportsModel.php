@@ -2288,6 +2288,169 @@ FROM (SELECT
 
     public function getInterestReport($filter=[]) {
 
+        $year = getCurrentYearId();
+        $last_year = $year-1;
+        if(!empty($filter['year_id'])){
+            $year = $filter['year_id'];
+            $last_year = ($filter['year_id']-1);
+        }
+        $month = getMonthIdByMonth(date('m'));
+        $last_month = $month-1;
+        if(!empty($filter['month_id'])){
+            $month = $filter['month_id'];
+            $last_month = ($filter['month_id']-1);
+        }
+
+        $sql = "WITH bank_int
+AS
+(SELECT
+      usr.firstname,
+      res.agency_type_id,
+      res.district_id,
+      sd.name district,
+      res.block_id,
+      bl.name block,
+      res.fund_agency_id,
+      res.year,
+      res.month,
+      res.total_interest
+    FROM (SELECT
+        u.firstname,
+        u.user_group_id,
+        u.district_id,
+        u.block_id,
+        u.fund_agency_id
+      FROM user u
+      WHERE u.user_group_id IN (".implode(',',(array)$filter['agency_type_id']).")) usr
+      LEFT JOIN (SELECT
+          smt.agency_type_id,
+          smt.district_id,
+          smt.block_id,
+          smt.fund_agency_id,
+          smt.year,
+          smt.month,
+          smta.amount total_interest
+        FROM soe_misc_transactions smt
+          LEFT JOIN soe_misc_txn_amt smta
+            ON smt.id = smta.txn_id
+        WHERE smt.deleted_at IS NULL
+        AND smta.deleted_at IS NULL
+        AND smt.status = 1
+        AND smta.head_id IN (SELECT
+            id
+          FROM soe_misc_txn_heads smth
+          WHERE smth.name LIKE '%bank interest%')) res
+        ON res.agency_type_id = usr.user_group_id
+        AND res.district_id = usr.district_id
+        AND res.block_id = usr.block_id
+        AND res.fund_agency_id = usr.fund_agency_id
+      LEFT JOIN soe_blocks bl
+        ON bl.id = res.block_id
+      LEFT JOIN soe_districts sd
+        ON res.district_id = sd.id
+    WHERE usr.district_id = ".$filter['district_id']."
+    AND usr.fund_agency_id = ".$filter['fund_agency_id']."),
+refund
+AS
+(SELECT
+      usr.firstname,
+      res.agency_type_id,
+      res.district_id,
+      res.block_id,
+      res.fund_agency_id,
+      res.year,
+      res.month,
+      res.total_refund
+    FROM (SELECT
+        u.firstname,
+        u.user_group_id,
+        u.district_id,
+        u.block_id,
+        u.fund_agency_id
+      FROM user u
+      WHERE u.user_group_id IN (".implode(',',(array)$filter['agency_type_id']).")) usr
+      LEFT JOIN (SELECT
+          smt.agency_type_id,
+          smt.district_id,
+          smt.block_id,
+          smt.fund_agency_id,
+          smt.year,
+          smt.month,
+          smta.amount total_refund
+        FROM soe_misc_transactions smt
+          LEFT JOIN soe_misc_txn_amt smta
+            ON smt.id = smta.txn_id
+        WHERE smt.deleted_at IS NULL
+        AND smta.deleted_at IS NULL
+        AND smt.status = 1
+        AND smta.head_id IN (SELECT
+            id
+          FROM soe_misc_txn_heads smth
+          WHERE smth.name LIKE '%Interest Refund%')) res
+        ON res.agency_type_id = usr.user_group_id
+        AND res.district_id = usr.district_id
+        AND res.block_id = usr.block_id
+        AND res.fund_agency_id = usr.fund_agency_id
+    WHERE usr.district_id = ".$filter['district_id']."
+    AND usr.fund_agency_id = ".$filter['fund_agency_id'].")";
+
+  /* -- interest upto ------------------------ */
+ $sql .= " SELECT
+  int_upto.block,
+  int_upto.firstname,
+  COALESCE(int_upto.tot_int, 0) tot_int_upto,
+  COALESCE(int_mon.tot_int, 0) tot_int_mon,
+  COALESCE(ref_upto.tot_ref, 0) tot_ref
+FROM (SELECT
+    CASE WHEN bi.block_id = 0 THEN CONCAT('ATMA ', bi.district) ELSE bi.block END AS block,
+    bi.firstname,
+    bi.block_id,
+    bi.district_id,
+    bi.agency_type_id,
+    bi.fund_agency_id,
+    SUM(bi.total_interest) tot_int
+  FROM bank_int bi
+  WHERE ((bi.year BETWEEN 0 AND $last_year)
+  OR (bi.year = $year
+  AND bi.month BETWEEN 0 AND $last_month))
+  GROUP BY bi.block_id) int_upto";
+  /* -- interest month ----------------------  */
+  $sql .= " LEFT JOIN (SELECT
+    CASE WHEN bi.block_id = 0 THEN CONCAT('ATMA ', bi.district) ELSE bi.block END AS block,
+    bi.firstname,
+    bi.block_id,
+    bi.district_id,
+    bi.agency_type_id,
+    bi.fund_agency_id,
+    SUM(bi.total_interest) tot_int
+  FROM bank_int bi
+  WHERE bi.year = $year
+  AND bi.month = $month
+  GROUP BY bi.block_id) int_mon
+    ON int_mon.block_id = int_upto.block_id
+    AND int_upto.district_id = int_mon.district_id
+    AND int_upto.agency_type_id = int_mon.agency_type_id
+    AND int_upto.fund_agency_id = int_mon.fund_agency_id";
+  /* -- refund upto ----------------- */
+  $sql .= " LEFT JOIN (SELECT
+      ref.block_id,
+      ref.district_id,
+      ref.agency_type_id,
+      ref.fund_agency_id,
+      SUM(ref.total_refund) tot_ref
+    FROM refund ref
+    WHERE ref.year BETWEEN 0 AND $year
+    GROUP BY ref.block_id) ref_upto
+    ON ref_upto.block_id = int_upto.block_id
+    AND int_upto.district_id = ref_upto.district_id
+    AND int_upto.agency_type_id = ref_upto.agency_type_id
+    AND int_upto.fund_agency_id = ref_upto.fund_agency_id";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResult();
+    }
+
+    public function getInterestReport_bk($filter=[]) {
+
         $bi_head_id = 0;
         $ref_head_id = 0;
         if(!empty($filter['agency_type_id'])){
@@ -2419,7 +2582,7 @@ FROM (SELECT
     GROUP BY smt.block_id) int_ref
     ON int_ref.block_id = user.block_id
   ORDER BY user_group_id, block";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 

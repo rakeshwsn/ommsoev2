@@ -361,6 +361,7 @@ class ClosingBalance extends AdminController {
         $data['bank'] = '';
         $data['cash'] = '';
         $data['status'] = '';
+
         if($cb) {
             $data['advance'] = $cb->advance;
             $data['bank'] = $cb->bank;

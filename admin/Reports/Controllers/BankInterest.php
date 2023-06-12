@@ -40,49 +40,46 @@ class BankInterest extends AdminController
             'year_id' => $data['year_id'],
             'month_id' => $data['month_id'],
             'district_id' => $this->user->district_id,
-            'agency_type_id' => [5,6],
+            'agency_type_id' => [5,6,7],
             'fund_agency_id'=> $this->user->fund_agency_id,
         ];
         if($data['agency_type_id']){
             $filter['agency_type_id'] = $data['agency_type_id'];
         }
 
-        $total_int = 0;
-        $fa_report = [];
-        if($data['agency_type_id'] == ''
-            || $data['agency_type_id'] == $this->settings->block_user
-            || $data['agency_type_id'] == $this->settings->cbo_user) {
-            $fa_report = $reportModel->getInterestReport($filter);
-            foreach ($fa_report as &$item) {
-                $item['int_total'] = ($item['int_upto'] + $item['int_mon']);
-                $item['balance'] = ($item['int_total'] - $item['int_ref_block']);
-                $total_int += $item['int_total'];
-            }
+        $agencies = $reportModel->getInterestReport($filter);
+
+        $data['agencies'] = [];
+        $int_upto = 0;
+        $int_mon = 0;
+        $int_total = 0;
+        $int_ref_block = 0;
+        $balance = 0;
+        foreach ($agencies as $agency) {
+            $data['agencies'][] = [
+                'agency' => $agency->block,
+                'int_upto' => in_rupees($agency->tot_int_upto),
+                'int_mon' => in_rupees($agency->tot_int_mon),
+                'int_total' => in_rupees($agency->tot_int_upto+$agency->tot_int_mon),
+                'int_ref_block' => in_rupees($agency->tot_ref),
+                'balance' => in_rupees($agency->tot_int_upto+$agency->tot_int_mon-$agency->tot_ref),
+            ];
+
+            $int_upto += $agency->tot_int_upto;
+            $int_mon += $agency->tot_int_mon;
+            $int_total += $agency->tot_int_upto+$agency->tot_int_mon;
+            $int_ref_block += $agency->tot_ref;
+            $balance += $agency->tot_int_upto+$agency->tot_int_mon-$agency->tot_ref;
         }
 
-        $atma_ref = 0;
-        $atma_report = [];
-        if($data['agency_type_id'] == '' || $data['agency_type_id'] == $this->settings->district_user) {
-            $filter['agency_type_id'] = 7;
-            $atma_report = $reportModel->getInterestReport($filter);
-            //echo $reportModel->db->getLastQuery();
-            //exit;
-            foreach ($atma_report as &$item) {
-                $item['int_total'] = $item['int_upto'] + $item['int_mon'];
-                $item['balance'] = '';
-                $atma_ref += $item['int_ref_block'];
-                $item['int_ref_block'] = '';
-                $total_int += $item['int_total'];
-            }
-
-        }
-        $data['sub_total'] = $total_int;
-        $data['atma_ref'] = $atma_ref;
-        $data['balance'] = $data['sub_total'] - $data['atma_ref'];
-
-        $report = array_merge($fa_report,$atma_report);
-
-        $data['report'] = $report;
+        $data['total'] = [
+            'agency' => 'Total',
+            'int_upto' => in_rupees($int_upto),
+            'int_mon' => in_rupees($int_mon),
+            'int_total' => in_rupees($int_total),
+            'int_ref_block' => in_rupees($int_ref_block),
+            'balance' => in_rupees($balance)
+        ];
 
         return $this->template->view('Admin\Reports\Views\bank_interest', $data);
     }
