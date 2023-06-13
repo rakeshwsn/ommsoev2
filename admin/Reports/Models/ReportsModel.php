@@ -2107,7 +2107,7 @@ WHERE st.deleted_at IS NULL
 AND stc.deleted_at IS NULL AND st.status = 1";
 
         $sql .= $this->appendFilter($filter);
-
+//echo $sql;exit;
         return $this->db->query($sql)->getFirstRow()->total;
     }
 

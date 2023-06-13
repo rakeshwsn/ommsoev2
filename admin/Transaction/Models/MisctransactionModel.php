@@ -222,7 +222,7 @@ FROM (SELECT
   FROM soe_misc_txn_heads smth
   WHERE 1=1";
         if(!empty($filter['agency_type_id'])){
-            $sql .= " AND smth.agency_type_id = ".$filter['agency_type_id'];
+            $sql .= " AND smth.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
         } else {
             $sql .= " AND smth.agency_type_id = 5";
         }
@@ -250,7 +250,7 @@ FROM (SELECT
             $sql .= " AND smt.year = ".$filter['year'];
         }
         if(!empty($filter['agency_type_id'])){
-            $sql .= " AND smt.agency_type_id = ".$filter['agency_type_id'];
+            $sql .= " AND smt.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
         }
         $sql .= " 
     GROUP BY smta.head_id) amt
