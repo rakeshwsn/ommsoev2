@@ -94,7 +94,6 @@ class Transaction extends AdminController {
         $data['message'] = $this->session->getFlashdata('message');
 
         $this->filterOptions($data);
-
         return $this->template->view('Admin\Transaction\Views\index', $data);
     }
 

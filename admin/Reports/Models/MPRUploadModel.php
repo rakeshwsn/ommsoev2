@@ -49,22 +49,26 @@ class MPRUploadModel extends Model {
         }
 
         $sql = "SELECT
-  vaym.year_id,
-  vaym.month_id,
-  vaym.year,
-  vaym.month,
-  smu.file,
-  smu.created_at
-FROM vw_all_year_month vaym
-  LEFT JOIN (SELECT
-      *
-    FROM soe_mpr_uploads
-    WHERE district_id = '".$filter['district_id']."'
-    AND fund_agency_id = '".$filter['fund_agency_id']."') smu
-    ON vaym.year_id = smu.year
-    AND vaym.month_id = smu.month
-WHERE vaym.year_id = '".$filter['year_id']."'";
+        vaym.year_id,
+        vaym.month_id,
+        vaym.year,
+        vaym.month,
+        smu.file,
+        smu.created_at
+        FROM vw_all_year_month vaym
+        LEFT JOIN (SELECT
+            *
+            FROM soe_mpr_uploads
+            WHERE district_id = '".$filter['district_id']."'
+            AND fund_agency_id = '".$filter['fund_agency_id']."') smu
+            ON vaym.year_id = smu.year
+            AND vaym.month_id = smu.month
+        WHERE vaym.year_id = '".$filter['year_id']."'";
         
         return $this->db->query($sql)->getResult();
+    }
+
+    public function getMPRByDistricts($year,$month){
+
     }
 }

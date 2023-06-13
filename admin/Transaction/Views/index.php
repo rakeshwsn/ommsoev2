@@ -4,7 +4,7 @@
     <div class="block" id="upload-controls">
             <div class="block-content block-content-full">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="year" name="year" required>
                             <option value="">Choose Year</option>
                             <?php foreach ($years as $year) { ?>
@@ -12,7 +12,7 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="month" name="month" required>
                             <option value="">Choose Month</option>
                             <?php foreach ($months as $month) { ?>
@@ -20,14 +20,14 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="txn_type" name="txn_type" required>
                             <option value="expense">Expense</option>
                             <option value="fund_receipt">Fund Receipt</option>
                         </select>
                     </div>
                     <?php if($agency_types): ?>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select class="form-control" id="agency_type_id" name="agency_type_id" required>
                                 <?php foreach ($agency_types as $agency_type) : ?>
                                     <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
@@ -36,7 +36,7 @@
                         </div>
                     <?php endif; ?>
                     <?php if($fund_agencies): ?>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <select class="form-control" id="fund_agency_id" name="fund_agency_id" required>
                                 <?php foreach ($fund_agencies as $fund_agency) : ?>
                                     <option value="<?=$fund_agency['fund_agency_id']?>" <?php if($fund_agency['fund_agency_id']==$fund_agency_id){echo 'selected';} ?>><?=$fund_agency['fund_agency']?></option>
@@ -45,7 +45,7 @@
                         </div>
                     <?php endif; ?>
                     <?php if($districts): ?>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="district_id" name="district_id">
                             <option value="">Choose District (if district level)</option>
                             <?php foreach ($districts as $district): ?>
@@ -55,7 +55,7 @@
                     </div>
                     <?php endif; ?>
                     <?php if($blocks): ?>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <select class="form-control" id="block_id" name="block_id">
                             <option value="">Choose Block (if block level)</option>
                             <?php foreach ($blocks as $block): ?>
@@ -97,7 +97,7 @@
                     <?php endif; ?>
                     <?php if($upload_enabled): ?>
                         <div class="col-md-2 upload-btn">
-                            <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add New</button>
+                            <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Add Neww</button>
                         </div>
                     <?php endif; ?>
                 </div>

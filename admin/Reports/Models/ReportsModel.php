@@ -2149,7 +2149,7 @@ FROM (SELECT
   st.district_id,
   st.fund_agency_id
 FROM soe_transactions st
-WHERE st.fund_agency_id = 1
+WHERE st.fund_agency_id = $fund_agency_id
 AND st.agency_type_id NOT IN (5, 6)
 GROUP BY st.agency_type_id,
          st.district_id,
@@ -2204,7 +2204,7 @@ GROUP BY st.agency_type_id,
       AND stc.deleted_at IS NULL
       AND st.transaction_type = 'expense'
       AND st.district_id = 0
-      AND st.fund_agency_id = 1
+      AND st.fund_agency_id = $fund_agency_id
       AND st.status = 1
       AND (st.year BETWEEN 0 AND $ly)
       GROUP BY st.agency_type_id,
@@ -2751,6 +2751,9 @@ FROM (SELECT
             bl.name block,
             dist.name district
         FROM (select * from soe_blocks sb where 1=1";
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND sb.fund_agency_id = '".$filter['fund_agency_id']."'";
+        }
         if(!empty($filter['district_id'])){
             $sql .= " AND sb.district_id = '".$filter['district_id']."'";
         }
@@ -2841,7 +2844,8 @@ FROM (SELECT
           dist.district_id,
           dist.district,
           dist.district_id block_id,
-          CONCAT('ATMA ', dist.district) block,
+          
+          CASE WHEN  dist.fund_agency_id = 1 THEN  CONCAT('ATMA ', dist.district) ELSE CONCAT('ATMA DMF ', dist.district) END block,
           dist_frc.frc_status,
           dist_orc.orc_status,
       
@@ -2852,11 +2856,12 @@ FROM (SELECT
           mis.mis_status
         FROM (SELECT
             sd.id district_id,
-            sd.name district
-          FROM soe_districts sd
-          WHERE 1=1";
+            sd.name district,
+            u.fund_agency_id
+          FROM soe_districts sd LEFT JOIN user u ON sd.id=u.district_id
+          WHERE block_id=0 AND u.user_group_id=7";
           if(!empty($filter['fund_agency_id'])){
-              $sql .= " AND fund_agency_id = '".$filter['fund_agency_id']."'";
+              $sql .= " AND u.fund_agency_id = '".$filter['fund_agency_id']."'";
           }
           if(!empty($filter['district_id'])){
               $sql .= " AND sd.id = '".$filter['district_id']."'";
@@ -2951,7 +2956,8 @@ FROM (SELECT
             GROUP BY ms.district_id) mis
             ON dist.district_id = mis.district_id)
       ORDER BY district ASC";
-       
+       //echo $sql;
+      // exit;
         return $this->db->query($sql)->getResult();
 
     }
