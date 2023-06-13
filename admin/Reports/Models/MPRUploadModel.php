@@ -68,7 +68,31 @@ class MPRUploadModel extends Model {
         return $this->db->query($sql)->getResult();
     }
 
-    public function getMPRByDistricts($year,$month){
-
+    public function getMPRByDistricts($filter=[]){
+        $sql="
+        SELECT
+            sd.id,
+            sd.name,
+            smu.year,
+            smu.month,
+            smu.file,
+            smu.fund_agency_id,
+            smu.created_at
+            FROM (SELECT
+                sd.id,
+                sd.name
+            FROM soe_districts sd
+                LEFT JOIN soe_blocks sb
+                ON sd.id = sb.district_id
+            WHERE sb.fund_agency_id = '".$filter['fund_agency_id']."'
+            GROUP BY sb.district_id) sd
+            LEFT JOIN (SELECT
+                *
+                FROM soe_mpr_uploads
+                WHERE year ='".$filter['year_id']."'
+                AND month = '".$filter['month_id']."'
+                AND deleted_at IS NULL) smu
+                ON sd.id = smu.district_id";
+        return $this->db->query($sql)->getResult();  
     }
 }

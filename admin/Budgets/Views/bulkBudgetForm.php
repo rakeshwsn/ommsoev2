@@ -37,7 +37,7 @@ $validation = \Config\Services::validation();
                             if ($active_district) {
                                 $select_attributes = array_merge($select_attributes, array('readonly' => 'readonly'));
                             }
-                            echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $active_district), $select_attributes); ?>
+                            echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $district_id), $select_attributes); ?>
 						
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
                         
