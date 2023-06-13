@@ -26,12 +26,13 @@
                                     <td><?=$allotment['year']?></td>
                                     <td><?=$allotment['allotment_date']?></td>
                                     <td><?=$allotment['amount']?></td>
-                                    <td><?=$allotment['action']?></td>
+                                    <td></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
                                 <td colspan="2">Total</td>
                                 <td ><?=number_format($total_allotment,2)?></td>
+                                <td><?=$allotment['action']?></td>
                             </tr>
                         <?php else: ?>
                             <tr>
