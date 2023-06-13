@@ -12,7 +12,7 @@
                         <th>District/Agency</th>
                         <th>Year</th>
                         <th>Allotment Date</th>
-                        <th>Allotment From SPMU (in lakh)</th>
+                        <th>Allotment From SPMU</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -23,13 +23,13 @@
                             <td><?=$allotment['recipient']?></td>
                             <td><?=$allotment['year']?></td>
                             <td><?=$allotment['allotment_date']?></td>
-                            <td><?=$allotment['amount']?></td>
+                            <td><?=in_rupees($allotment['amount'])?></td>
                             <td><?=$allotment['action']?></td>
                         </tr>
                     <?php endforeach; ?>
                         <tr>
                             <td colspan="3">Total</td>
-                            <td><?=number_format($total_allotment,2)?></td>
+                            <td><?=in_rupees($total_allotment)?></td>
                             <td></td>
                         </tr>
                     <?php else: ?>
@@ -58,7 +58,7 @@
                         <th>Date</th>
                         <th>Letter No</th>
                         <th>Page No</th>
-                        <th>UC Submitted (in lakh)</th>
+                        <th>UC Submitted</th>
                         <th>Document</th>
                     </tr>
                     </thead>
@@ -69,13 +69,13 @@
                                 <td><?=$allotment['date_submit']?></td>
                                 <td><?=$allotment['letter_no']?></td>
                                 <td><?=$allotment['page_no']?></td>
-                                <td><?=$allotment['amount']?></td>
+                                <td><?=in_rupees($allotment['amount'])?></td>
                                 <td><?php if($allotment['document']) { ?><a href="<?=$allotment['document']?>" class="btn btn-primary" target="_blank"><i class="fa fa-file-pdf-o"></i></a><?php } ?></td>
                             </tr>
                         <?php endforeach; ?>
                         <tr>
                             <td colspan="3">Total</td>
-                            <td><?=number_format($total_uc,2)?></td>
+                            <td><?=in_rupees($total_uc)?></td>
                             <td></td>
                         </tr>
                     <?php else: ?>
