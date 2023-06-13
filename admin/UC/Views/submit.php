@@ -77,17 +77,17 @@
                                 <td><?=$allotment['year']?></td>
                                 <td><?=$allotment['uc_date']?></td>
                                 <td><?=$allotment['letter_no']?></td>
-                                <td><?=$allotment['allotment']?></td>
-                                <td><?=$allotment['uc_submitted']?></td>
-                                <td><?=$allotment['uc_balance']?></td>
+                                <td><?=in_rupees($allotment['allotment'])?></td>
+                                <td><?=in_rupees($allotment['uc_submitted'])?></td>
+                                <td><?=in_rupees($allotment['uc_balance'])?></td>
                                 <td><?=$allotment['action']?></td>
                             </tr>
                         <?php endforeach; ?>
                             <tr>
                                 <td colspan="3">Total</td>
-                                <td><?=$total_allotment?></td>
-                                <td><?=$total_uc_submitted?></td>
-                                <td><?=$total_uc_balance?></td>
+                                <td><?=in_rupees($total_allotment)?></td>
+                                <td><?=in_rupees($total_uc_submitted)?></td>
+                                <td><?=in_rupees($total_uc_balance)?></td>
                             </tr>
                         <?php else: ?>
                             <tr>

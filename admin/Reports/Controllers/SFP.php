@@ -70,7 +70,7 @@ class SFP extends AdminController
         //or
         $orModel = new MisctransactionModel();
 
-        unset($filter['agency_type_id']);
+//        unset($filter['agency_type_id']);
         if($this->request->getGet('agency_type_id')){
             $filter['agency_type_id'] = $this->request->getGet('agency_type_id');
         }
@@ -92,6 +92,17 @@ class SFP extends AdminController
         $cbModel = new ClosingbalanceModel();
         unset($filter['transaction_type']);
 
+        if($this->user->agency_type_id==$this->settings->district_user){
+            $filter['agency_type_id'] = 7;
+        }
+//        if($this->user->agency_type_id==$this->settings->block_user){
+//            $filter['agency_type_id'] = 5;
+//        }
+        if($this->request->getGet('agency_type_id')){
+            $filter['agency_type_id'] = $this->request->getGet('agency_type_id');
+        } else {
+            unset($filter['agency_type_id']);
+        }
         $cbs = $cbModel->where($filter)->findAll();
 
         $data['closing']['advance'] = 0;

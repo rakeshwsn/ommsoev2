@@ -102,11 +102,11 @@
                     <td>&nbsp;</td>
                 </tr>
                 <tr class="heading">
-                    <td colspan="5">Fund Receipt</td>
+                    <td colspan="5">Fund Receipt (Add)</td>
                 </tr>
                 <tr class="item-row">
                     <td>&nbsp;</td>
-                    <td><strong>Fund Receipt (Add)</strong></td>
+                    <td><strong>Fund Receipt</strong></td>
                     <td>&nbsp;</td>
                     <td><strong><?=$fund_receipt?></strong></td>
                     <td>&nbsp;</td>

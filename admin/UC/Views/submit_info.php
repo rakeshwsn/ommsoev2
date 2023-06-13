@@ -25,13 +25,14 @@
                                 <tr>
                                     <td><?=$allotment['year']?></td>
                                     <td><?=$allotment['allotment_date']?></td>
-                                    <td><?=$allotment['amount']?></td>
-                                    <td><?=$allotment['action']?></td>
+                                    <td><?=in_rupees($allotment['amount'])?></td>
+                                    <td></td>
                                 </tr>
                             <?php endforeach; ?>
                             <tr>
                                 <td colspan="2">Total</td>
-                                <td ><?=number_format($total_allotment,2)?></td>
+                                <td ><?=in_rupees($total_allotment)?></td>
+                                <td><?=$allotment['action']?></td>
                             </tr>
                         <?php else: ?>
                             <tr>
@@ -72,14 +73,14 @@
                                 <td><?=$uc['uc_date']?></td>
                                 <td><?=$uc['letter_no']?></td>
                                 <td><?=$uc['page_no']?></td>
-                                <td><?=$uc['uc_amount']?></td>
+                                <td><?=in_rupees($uc['uc_amount'])?></td>
                                 <td><?php if($uc['uc_document']) { ?><a href="<?=$uc['uc_document']?>" class="btn btn-outline-primary"><i class="fa fa-download"></i></a><?php } ?></td>
                                 <td><a href="<?=$uc['action']?>" class="btn btn-primary btn-edit"><i class="fa fa-edit"></i></a></td>
                             </tr>
                         <?php endforeach; ?>
                             <tr>
                                 <td colspan="3">Total</td>
-                                <td><?=number_format($total_uc_submitted,2)?></td>
+                                <td><?=in_rupees($total_uc_submitted)?></td>
                                 <td></td>
                                 <td></td>
                             </tr>

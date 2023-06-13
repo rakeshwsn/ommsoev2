@@ -149,15 +149,16 @@ class ClosingbalanceModel extends Model
     public function getOpeningBalanceBreakup($filter=[]) {
         $month = $filter['month'];
         $year = $filter['year'];
-        if($month-1==0 && $year-1==0){
-            $month = $month-1;
-            $year = $year-1;
-        } else if($year-1>0){
-            $month = 12;
-            $year = $year-1;
-        } else {
-            $month=$month-1;
-        }
+
+//        if($month-1!=0 && $year-1!=0){
+//            $month = $month-1;
+//            $year = $year-1;
+//        } else if($year-1==0){
+//            $month=$month-1;
+//        }
+        $lastMonth = ($month == 1) ? 12 : $month - 1;
+        $lastYear = ($month == 1) ? $year - 1 : $year;
+
         $sql = "SELECT
   SUM(advance) advance,
   SUM(bank) bank,
@@ -176,8 +177,8 @@ FROM (SELECT
             $ati = (array)$filter['agency_type_id'];
             $sql .= " AND scb.agency_type_id IN (".implode(',',$ati).")";
         }
-        $sql .= " AND scb.month = ".$month."
-    AND scb.year = ".$year.") cb";
+        $sql .= " AND scb.month = ".$lastMonth."
+    AND scb.year = ".$lastYear.") cb";
 //echo $sql; exit;
         return $this->db->query($sql)->getFirstRow();
     }
