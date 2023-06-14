@@ -19,7 +19,7 @@
                         <i class="si si-bag fa-2x text-primary-light"></i>
                     </div>
                     <div class="font-size-h3 font-w600 text-primary"> <span data-toggle="countTo" data-speed="1000" data-to="<?=$total_allotment?>">0</span></div>
-                    <div class="font-size-sm font-w600 text-uppercase text-muted">Allotment From SPMU</div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted"><?=$allotment_from_text?></div>
                 </div>
             </a>
         </div>

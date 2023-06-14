@@ -26,6 +26,7 @@
                        name="misc[<?=$head['id']?>]"
                        placeholder="<?=$head['name']?>"
                        value="<?=$head['value']?>"
+                       <?php if($approved){echo 'disabled="disabled"';}?>
                 >
             </div>
         </div>

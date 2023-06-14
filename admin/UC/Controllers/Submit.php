@@ -46,6 +46,12 @@ class Submit extends AdminController{
             $data['total_uc_balance'] += $allotment->balance;
         }
 
+        if($this->user->fund_agency_id==1){
+            $data['allotment_from_text'] = 'Allotment From SPMU';
+        } else {
+            $data['allotment_from_text'] = 'Allotment From DMF';
+        }
+
         $data['dmf'] = false;
         //if dmf district, can add allotment by self
         if($this->user->fund_agency_id!=1){

@@ -201,6 +201,7 @@
         });
     });
 
+    //modal form add btn click
     $(document).on('click','#btn-add',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
         month = $('#month').val()||'';
@@ -229,6 +230,7 @@
         })
     });
 
+    //modal form save btn click
     $(document).on('click','#btn-edit',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
 
@@ -256,6 +258,7 @@
         })
     });
 
+    //table edit btn click
     $(document).on('click','.btn-edit',function (e){
         e.preventDefault();
         url = $(this).attr('href')
