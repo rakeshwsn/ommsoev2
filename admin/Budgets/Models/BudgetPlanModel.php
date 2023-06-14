@@ -166,9 +166,9 @@ class BudgetPlanModel extends Model
         if($data['district_id']){
             $builder->where("sbp.district_id",$data['district_id']);
         }
-        if($data['block_id']){
-            $builder->where("sbp.block_id",$data['block_id']);
-        }
+       
+        $builder->where("sbp.block_id",$data['block_id']);
+        
         $builder->where("sbp.deleted_at",null);
         $res = $builder->get()->getRow();
         return $res;
