@@ -345,11 +345,10 @@ class OtherReceipt extends AdminController
             ->where($condition)
             ->find();
        
-        if( $cb){
+        if($cb){
             $this->error="Can not add other Receipt. Closing balance already exist" ;
         }else if($txn){
            $this->error="Can not add other Receipt. Other receipt already exist" ;
-            
         }
         else if(env('soe.uploadDateValidation')){
 

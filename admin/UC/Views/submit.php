@@ -29,7 +29,7 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-wallet fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><span data-toggle="countTo" data-speed="1000" data-to="<?=$total_uc_submitted?>">0</span></div>
+                    <div class="font-size-h3 font-w600 text-earth"><span data-toggle="countTo" data-speed="1000" data-to="<?=$total_uc_submitted?>">0</span> (<span data-toggle="countTo" data-speed="1000" data-to="<?=$total_uc_percentage?>">0</span> %)</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">UC Submitted</div>
                 </div>
             </a>
