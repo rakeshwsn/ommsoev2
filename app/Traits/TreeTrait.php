@@ -350,7 +350,7 @@ trait TreeTrait {
         //grand total
         $html .= '<tr class="subtotal bg-yellow">
                     <td>&nbsp;</td>
-                    <td colspan="3">Grand Total</td>
+                    <td colspan="2">Grand Total</td>
                     <td id="gt_mon_phy">'.$this->grand_phy.'</td>
                     <td id="gt_mon_fin">'.$this->grand_fin.'</td>
                     </tr>
@@ -375,7 +375,7 @@ trait TreeTrait {
                 $html .= '<tr class="heading" data-id="'.$item['id'].'">
                     <th>' . $item['number'] . '</th>
                     <th>' . $item['description'] . '</th>
-                    <th colspan="6"></th>
+                    <th colspan="5"></th>
                     </tr>
                 ';
             } else {
@@ -386,7 +386,6 @@ trait TreeTrait {
                     <input type="hidden" class="form-control" name="budget['.$item['component_id'].'][category]" value="'.$item['category'].'">
                     <label for="cb' . $item['id'] . '">' . $item['number'] . '</label></td>
                     <td><label for="cb' . $item['component_id'] . '">' . $item['description'] . '</label></td>
-                    <td><input type="text" class="form-control" name="budget['.$item['component_id'].'][units]" value="'.$item['units'].'"></td></td>
                     
                     <td><input type="text" class="form-control rate" name="budget['.$item['component_id'].'][unit_cost]" value="'.$item['unit_cost'].'"></td>
                     <td class="mon_phy"><input type="text" class="form-control physical" name="budget['.$item['component_id'].'][physical]" value="'.$item['physical'].'"></td>
@@ -396,7 +395,6 @@ trait TreeTrait {
                 $html .= '<tr data-id="'.$item['id'].'">
                     <td>' . $item['number'] . ' </td>
                     <td>' . $item['description'] . ' </td>
-                    <td>' . $item['units'] . ' </td>
                     <td>' . $item['unit_cost'] . ' </td>
                     <td>' . $item['physical'] . ' </td>
                     <td>' . in_lakh($item['financial']) . ' </td>
@@ -422,7 +420,7 @@ trait TreeTrait {
 
                 $html .= '<tr class="subtotal" data-parent="' . $item['id'] . '" data-ref="'.$item['id'].'">
                 <td>&nbsp</td>
-                <td colspan="3">Sub Total</td>
+                <td colspan="2">Sub Total</td>
                 <td class="sub_mon_phy">' . $this->total_phy . '</td>
                 <td class="sub_mon_fin">' . $this->total_fin . '</td>
                 </tr>
