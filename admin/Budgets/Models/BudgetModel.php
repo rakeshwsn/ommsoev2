@@ -53,7 +53,6 @@ class BudgetModel extends Model
             $budget_data[] = array(
                 "budget_plan_id" => $budget_plan_id,
                 "component_id" => $budget['component_id'],
-                "units" => $budget['units'],
                 "unit_cost" => (float)$budget['unit_cost'],
                 "physical" => (float)$budget['physical'],
                 "financial" => (float)$budget['financial'],
