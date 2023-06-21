@@ -37,7 +37,7 @@ $validation = \Config\Services::validation();
                             if ($active_district) {
                                 $select_attributes = array_merge($select_attributes, array('readonly' => 'readonly'));
                             }
-                            echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $active_district), $select_attributes); ?>
+                            echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $district_id), $select_attributes); ?>
 						
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
                         
@@ -55,37 +55,37 @@ $validation = \Config\Services::validation();
                 </div>
                 <?php if($details){?>
                 <hr/>
-                <?php foreach($components as $key=> $component){?>
-                    <table class="table table-striped" id="block-components">
-                        <thead>
-                        <tr>
-                            <th width="5%">Number</th>
-                            <th width="40%">Component</th>
-                            <th width="10%">Units</th>
-                            <th width="15%">Rate</th>
-                            <th width="5%">Physical</th>
-                            <th width="20%">Financial</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
-                        <input type="hidden" name="phase" value="<?=$component['phase']?>">
-                        <input type="hidden" name="year" value="<?=$component['year']?>">
+                <div class="tableFixHead">
+                    <?php foreach($components as $key=> $component){?>
+                        <table class="table table-striped custom-table" id="block-components">
+                            <thead>
+                            <tr>
+                                <th width="5%">Number</th>
+                                <th width="40%">Component</th>
+                                <th width="15%">Rate</th>
+                                <th width="5%">Physical</th>
+                                <th width="20%">Financial</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
+                            <input type="hidden" name="phase" value="<?=$component['phase']?>">
+                            <input type="hidden" name="year" value="<?=$component['year']?>">
 
-                        <?=$component['budgets']?>
-                        </tbody>
-                    </table>
-                
-                <?}?>
-                <div class="form-group text-right">
-                    <button id="submitButton" class="btn btn-alt-primary ">Submit</button>
-                </div>
-                <?}else{?>
+                            <?=$component['budgets']?>
+                            </tbody>
+                        </table>
+                    
+                    <?}?>
                     <div class="form-group text-right">
-                        <button id="nextButton" class="btn btn-alt-primary ">Next</button>
+                        <button id="submitButton" class="btn btn-alt-primary ">Submit</button>
                     </div>
-                <?}?>
-                
+                    <?}else{?>
+                        <div class="form-group text-right">
+                            <button id="nextButton" class="btn btn-alt-primary ">Next</button>
+                        </div>
+                    <?}?>
+                </div>
             </div>
            
             <?php echo form_close(); ?>

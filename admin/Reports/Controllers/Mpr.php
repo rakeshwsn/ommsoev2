@@ -501,6 +501,14 @@ class Mpr extends AdminController
             $data['month_id'] = $this->request->getGet('month');
         }
 
+        $data['fund_agency_id']=0;
+        if($this->request->getGet('fund_agency_id')){
+            $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+        }
+
+        $muModel = new MPRUploadModel();
+        $data['mpruploadstatus'] = $muModel->getMPRByDistricts($data);
+
         return $this->template->view('Admin\Reports\Views\mpr_upload_status', $data);
     }
 

@@ -96,14 +96,5 @@ class MprUpload extends AdminController
         return $this->response->setJSON($data);
     }
 
-    public function status() {
-
-        $year = getCurrentYearId();
-        $month = getCurrentMonthId();
-
-        $muModel = new MPRUploadModel();
-        $status = $muModel->getMPRByDistricts($year,$month);
-
-        return $this->template->view('Admin\Reports\Views\mpr_upload_status',$data);
-    }
+   
 }
