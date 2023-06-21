@@ -147,7 +147,6 @@ class Dashboard extends AdminController
                     'name' => $block->block,
                     'value' => round(($block->ex_total/$block->fr_total)*100,2)
                 ];
-
             }
         }
 
