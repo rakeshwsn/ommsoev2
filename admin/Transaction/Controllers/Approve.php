@@ -377,25 +377,11 @@ class Approve extends AdminController {
         $data = [];
         $cbModel = new ClosingbalanceModel();
 
-        $year = $this->request->getGet('year');
-        $month = $this->request->getGet('month');
-        $block_id = $this->request->getGet('block_id');
-        $agency_type_id = $this->request->getGet('agency_type_id');
         $id = $this->request->getGet('txn_id');
 
-        $filter = [
-            'block_id' => $block_id,
-            'year' => $year,
-            'agency_type_id' => $agency_type_id,
-        ];
+        $cb = $cbModel->find($id);
 
-        $filter['month'] = $month;
-
-        if($id){
-            $filter = ['id' => $id];
-        }
-
-        $cb = $cbModel->where($filter)->first();
+        $month = $cb->month;
 
         if($this->request->getMethod(1)=='POST'){
 

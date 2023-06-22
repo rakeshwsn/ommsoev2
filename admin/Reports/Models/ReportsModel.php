@@ -2589,7 +2589,7 @@ FROM (SELECT
     AND int_upto.district_id = ref_mon.district_id
     AND int_upto.agency_type_id = ref_mon.agency_type_id
     AND int_upto.fund_agency_id = ref_mon.fund_agency_id";
-//echo $sql;exit;
+
         return $this->db->query($sql)->getResult();
     }
 

@@ -1,3 +1,9 @@
+<?php
+$readonly = ' readonly';
+if($can_edit){
+    $readonly = '';
+}
+?>
 <div class="block">
     <div class="block-header block-header-default">
         <h3 class="block-title">Summary</h3>
@@ -51,7 +57,7 @@
                     <tbody>
                     <tr>
                         <td>Advance</td>
-                        <td><input class="form-control amount" value="<?=$advance?>" name="advance"></td>
+                        <td><input class="form-control amount" <?=$readonly?> value="<?=$advance?>" name="advance"></td>
                         <td class="dm-uploader">
                             <div role="button" class="btn btn-outline-primary mr-2">
                                 <i class="si si-paper-clip"></i>
@@ -67,7 +73,7 @@
                     </tr>
                     <tr>
                         <td>Bank</td>
-                        <td><input class="form-control amount" name="bank" value="<?=$bank?>"></td>
+                        <td><input class="form-control amount" <?=$readonly?> name="bank" value="<?=$bank?>"></td>
                         <td class="dm-uploader">
                             <div role="button" class="btn btn-outline-primary mr-2">
                                 <i class="si si-paper-clip"></i>
@@ -83,7 +89,7 @@
                     </tr>
                     <tr>
                         <td>Cash</td>
-                        <td><input class="form-control amount" name="cash" value="<?=$cash?>"></td>
+                        <td><input class="form-control amount" <?=$readonly?> name="cash" value="<?=$cash?>"></td>
                         <td class="dm-uploader">
                             <div role="button" class="btn btn-outline-primary mr-2">
                                 <i class="si si-paper-clip"></i>
