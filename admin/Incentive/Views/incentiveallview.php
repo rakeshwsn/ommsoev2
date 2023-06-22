@@ -24,16 +24,16 @@ $user  = service('user');
 
                             </tr>
                             <tr>
-                            <?php 
-                        if($user->district_id){
-                           $main = "disabled";
-                        } else{
-                            $main = "";
-                        }
-                        ?>
-                               <td>
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array("0"=>"select District")), set_value('district_id', $user->district_id),"id='district_id' class='form-control select2' $main"); ?>
-                            </td>
+                                <?php
+                                if ($user->district_id) {
+                                    $main = "disabled";
+                                } else {
+                                    $main = "";
+                                }
+                                ?>
+                                <td>
+                                    <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name', array("0" => "select District")), set_value('district_id', $user->district_id), "id='district_id' class='form-control select2' $main"); ?>
+                                </td>
 
 
                                 <td>
@@ -42,11 +42,12 @@ $user  = service('user');
 
                                 <td>
                                     <select class="form-control" id="year" name="year">
-                                        <option value="">select</option>
-                                        <option value="1">2017-18</option>
-                                        <option value="2">2018-19</option>
-                                        <option value="3">2020-21</option>
-                                        <option value="4">2021-22</option>
+                                            <option value="">select</option>
+                                            <option value="1">2017-18</option>
+                                            <option value="2">2018-19</option>
+                                            <option value="3">2019-20</option>
+                                            <option value="4">2020-21</option>
+                                            <option value="5">2021-22</option>
 
                                     </select>
                                 </td>
@@ -79,107 +80,108 @@ $user  = service('user');
     </form>
 </div>
 <div class="block">
-   <a href="<?php echo $mergedUrl; ?>"><button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</button>
-    <div class="block-header block-header-default"></a> 
-        <h3 class="block-title"><?php echo $heading_title; ?></h3>
-    </div>
-    <div class="block-content block-content-full" id="tableId">
-        <!-- DataTables functionality is initialized with .js-dataTable-full class in js/datatable/be_tables_datatables.min.js which was auto compiled from _es6/datatable/be_tables_datatables.js -->
-        <form action="" method="post" enctype="multipart/form-data" id="form-datatable" style="overflow-x: scroll;">
-            <table id="datatable_list" class="table table-bordered table-striped table-vcenter js-dataTable-full">
-                <thead>
-                    <tr>
-                        <th>SL No</th>
-                        <th>District</th>
-                        <th>Block</th>
-                        <th>Year</th>
-                        <th>Season</th>
-                        <th>GP</th>
-                        <th>Village</th>
-                        <th>Farmer</th>
-                        <th>Spouse Name</th>
-                        <th>Gender</th>
-                        <th>CASTE</th>
-                        <th>Mobile</th>
-                        <th>AADHAAR</th>
-                        <th>Year of Support</th>
-                        <th>Area in Hectare</th>
-                        <th>Bank Name</th>
-                        <th>Account Number</th>
-                        <th>IFSC Code</th>
-                        <th>Amount</th>
-                        <th>Phase</th>
-                        <!-- <th class="text-right no-sort">Actions</th> -->
-                    </tr>
-                </thead>
+    <a href="<?php echo $mergedUrl; ?>"><button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-download"></i> Download</button>
+        <div class="block-header block-header-default">
+    </a>
+    <h3 class="block-title"><?php echo $heading_title; ?></h3>
+</div>
+<div class="block-content block-content-full" id="tableId">
+    <!-- DataTables functionality is initialized with .js-dataTable-full class in js/datatable/be_tables_datatables.min.js which was auto compiled from _es6/datatable/be_tables_datatables.js -->
+    <form action="" method="post" enctype="multipart/form-data" id="form-datatable" style="overflow-x: scroll;">
+        <table id="datatable_list" class="table table-bordered table-striped table-vcenter js-dataTable-full">
+            <thead>
+                <tr>
+                    <th>SL No</th>
+                    <th>District</th>
+                    <th>Block</th>
+                    <th>Year</th>
+                    <th>Season</th>
+                    <th>GP</th>
+                    <th>Village</th>
+                    <th>Farmer</th>
+                    <th>Spouse Name</th>
+                    <th>Gender</th>
+                    <th>CASTE</th>
+                    <th>Mobile</th>
+                    <th>AADHAAR</th>
+                    <th>Year of Support</th>
+                    <th>Area in Hectare</th>
+                    <th>Bank Name</th>
+                    <th>Account Number</th>
+                    <th>IFSC Code</th>
+                    <th>Amount</th>
+                    <th>Phase</th>
+                    <!-- <th class="text-right no-sort">Actions</th> -->
+                </tr>
+            </thead>
 
-                <tbody>
-                    <?php
-                    $sl = 1;
-                    foreach ($datatable as $district => $phases) {
-                        foreach ($phases as $phase => $records) {
-                            foreach ($records as $key => $record) {
+            <tbody>
+                <?php
+                $sl = 1;
+                foreach ($datatable as $district => $phases) {
+                    foreach ($phases as $phase => $records) {
+                        foreach ($records as $key => $record) {
 
-                    ?>
-                                <tr>
-                                    <td><?php echo $sl; ?></td>
-                                    <td><?php echo $record['district_name']; ?></td>
-                                    <td><?php echo $record['block_name']; ?></td>
-                                    <td><?php echo $record['year']; ?></td>
-                                    <td><?php echo $record['season']; ?></td>
-                                    <td><?php echo $record['gp']; ?></td>
-                                    <td><?php echo $record['village']; ?></td>
-                                    <td><?php echo $record['name']; ?></td>
-                                    <td><?php echo $record['spouse_name']; ?></td>
-                                    <td><?php echo $record['gender']; ?></td>
-                                    <td><?php echo $record['caste']; ?></td>
-                                    <td><?php echo $record['phone_no']; ?></td>
-                                    <td><?php echo $record['aadhar_no']; ?></td>
-                                    <td><?php echo $record['year_support']; ?></td>
-                                    <td><?php echo $record['area_hectare']; ?></td>
-                                    <td><?php echo $record['bank_name']; ?></td>
-                                    <td><?php echo $record['account_no']; ?></td>
-                                    <td><?php echo $record['ifsc']; ?></td>
-                                    <td><?php echo $record['amount']; ?></td>
+                ?>
+                            <tr>
+                                <td><?php echo $sl; ?></td>
+                                <td><?php echo $record['district_name']; ?></td>
+                                <td><?php echo $record['block_name']; ?></td>
+                                <td><?php echo $record['year']; ?></td>
+                                <td><?php echo $record['season']; ?></td>
+                                <td><?php echo $record['gp']; ?></td>
+                                <td><?php echo $record['village']; ?></td>
+                                <td><?php echo $record['name']; ?></td>
+                                <td><?php echo $record['spouse_name']; ?></td>
+                                <td><?php echo $record['gender']; ?></td>
+                                <td><?php echo $record['caste']; ?></td>
+                                <td><?php echo $record['phone_no']; ?></td>
+                                <td><?php echo $record['aadhar_no']; ?></td>
+                                <td><?php echo $record['year_support']; ?></td>
+                                <td><?php echo $record['area_hectare']; ?></td>
+                                <td><?php echo $record['bank_name']; ?></td>
+                                <td><?php echo $record['account_no']; ?></td>
+                                <td><?php echo $record['ifsc']; ?></td>
+                                <td><?php echo $record['amount']; ?></td>
 
-                                    <?php if ($key == 0) { ?>
-                                        <td rowspan="<?php echo count($records) ?>">
-                                            <?php if (!empty($record['pdf'])) : ?>
-                                                <a target="__blank" href="<?php echo base_url() . '/uploads/farmerincentive/' . $record['pdf'] ?>">
-                                                    <i class="fa fa-file-pdf-o" style="font-size:48px;color:red"></i>
-                                                </a>
-                                            <?php else : ?>
-                                                No PDF
-                                            <?php endif; ?>
-                                        </td>
-                                    <? } ?>
+                                <?php if ($key == 0) { ?>
+                                    <td rowspan="<?php echo count($records) ?>">
+                                        <?php if (!empty($record['pdf'])) : ?>
+                                            <a target="__blank" href="<?php echo base_url() . '/uploads/farmerincentive/' . $record['pdf'] ?>">
+                                                <i class="fa fa-file-pdf-o" style="font-size:48px;color:red"></i>
+                                            </a>
+                                        <?php else : ?>
+                                            No PDF
+                                        <?php endif; ?>
+                                    </td>
+                                <? } ?>
 
 
-                                </tr>
-                    <?php
-                                $sl++;
-                            }
+                            </tr>
+                <?php
+                            $sl++;
                         }
-                    } ?>
-                </tbody>
-            </table>
-        </form>
-    </div>
+                    }
+                } ?>
+            </tbody>
+        </table>
+    </form>
+</div>
 </div>
 
 
 <?php js_start(); ?>
 
 
-<script type="text/javascript"><!--
+<script type="text/javascript">
+    <!--
     $(document).ready(function() {
         $('select[name=\'district_id\']').bind('change', function() {
             district_id = $(this).val()
             $.ajax({
                 url: '<?php echo admin_url("district/block"); ?>/' + district_id,
                 dataType: 'json',
-                beforeSend: function() {
-                },
+                beforeSend: function() {},
                 complete: function() {
                     //$('.wait').remove();
                 },
@@ -205,38 +207,40 @@ $user  = service('user');
             });
         });
         $('select[name=\'district_id\']').trigger('change');
-        Codebase.helpers([ 'select2']);
+        Codebase.helpers(['select2']);
     });
-    //--></script>
+    //
+    -->
+</script>
 
 
 <script>
     $('#btn-download').on('click', function(e) {
         var table = document.querySelector('#tableId'); // Replace 'tableId' with the actual ID of your table
-var rows = table.querySelectorAll('tr');
-var data = [];
+        var rows = table.querySelectorAll('tr');
+        var data = [];
 
-// Loop through rows
-for (var i = 0; i < rows.length; i++) {
-  var cells = rows[i].querySelectorAll('td, th');
-  var rowData = [];
+        // Loop through rows
+        for (var i = 0; i < rows.length; i++) {
+            var cells = rows[i].querySelectorAll('td, th');
+            var rowData = [];
 
-  // Loop through cells
-  for (var j = 0; j < cells.length; j++) {
-    rowData.push(cells[j].textContent.trim());
-  }
+            // Loop through cells
+            for (var j = 0; j < cells.length; j++) {
+                rowData.push(cells[j].textContent.trim());
+            }
 
-  data.push(rowData);
-}
+            data.push(rowData);
+        }
 
-var csvContent = data.map(row => row.join(',')).join('\n');
+        var csvContent = data.map(row => row.join(',')).join('\n');
 
-var link = document.createElement('a');
-link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
-link.setAttribute('download', 'tableData.csv');
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
+        var link = document.createElement('a');
+        link.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+        link.setAttribute('download', 'tableData.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
     });
 </script>
