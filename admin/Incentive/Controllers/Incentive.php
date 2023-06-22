@@ -304,13 +304,15 @@ class Incentive extends AdminController
 		$row = 2; // Start from row 2
 		foreach ($data as $result) {
 
-			if ($result['year'] == 1) {
+			if ($result->year == 1) {
 				$year = '2017-18';
-			} else if (['year'] == 2) {
+			} else if ($result->year == 2) {
 				$year = '2018-19';
-			} else if (['year'] == 3) {
+			} else if ($result->year == 3) {
+				$year = '2019-20';
+			} else if ($result->year == 4) {
 				$year = '2020-21';
-			} else if (['year'] == 4) {
+			} else if ($result->year == 5) {
 				$year = '2021-22';
 			}
 
@@ -386,8 +388,10 @@ class Incentive extends AdminController
 			} else if ($result->year == 2) {
 				$year = '2018-19';
 			} else if ($result->year == 3) {
-				$year = '2020-21';
+				$year = '2019-20';
 			} else if ($result->year == 4) {
+				$year = '2020-21';
+			} else if ($result->year == 5) {
 				$year = '2021-22';
 			}
 
@@ -766,12 +770,15 @@ class Incentive extends AdminController
 		foreach ($filteredData as $result) {
 			$error = 'false';
 			//validation rules
-			if (!preg_match('/^[0-9]{10}+$/', $result->phone_no) || empty($result->phone_no)) {
-				$error  = 'true';
-			} else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
+			// if (!preg_match('/^[0-9]{10}+$/', $result->phone_no) || empty($result->phone_no)) {
+			// 	$error  = 'true';
+			// } else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
+			// 	$error  = 'true';
+			// } 
+			if(empty($result->gp) || empty($result->village) || empty($result->name)){
 				$error  = 'true';
 			} else if ($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)) {
-				$area_hectare  = 'true';
+				$error  = 'true';
 			} else if (!preg_match('/^[0-9]{9,18}$/', $result->account_no) || empty($result->account_no)) {
 				$error  = 'true';
 			} else if (!preg_match('/^[A-Z]{4}0[A-Z0-9]{6}$/', $result->ifsc) || empty($result->ifsc)) {
@@ -897,12 +904,15 @@ class Incentive extends AdminController
 	{
 		$error = 'false';
 		//validation rules
-		if (!preg_match('/^[0-9]{10}+$/', $result->phone_no) || empty($result->phone_no)) {
-			$error  = 'true';
-		} else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
+		// if (!preg_match('/^[0-9]{10}+$/', $result->phone_no) || empty($result->phone_no)) {
+		// 	$error  = 'true';
+		// } else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
+		// 	$error  = 'true';
+		// }
+		if(empty($result->gp) || empty($result->village) || empty($result->name) || empty($result->gender) || empty($result->year_support)){
 			$error  = 'true';
 		} else if ($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)) {
-			$area_hectare  = 'true';
+			$error  = 'true';
 		} else if (!preg_match('/^[0-9]{9,18}$/', $result->account_no) || empty($result->account_no)) {
 			$error  = 'true';
 		} else if (!preg_match('/^[A-Z]{4}0[A-Z0-9]{6}$/', $result->ifsc) || empty($result->ifsc)) {
