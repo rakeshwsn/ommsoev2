@@ -29,17 +29,25 @@ $validation = \Config\Services::validation();
                 <div class="form-group row">
                     <label class="col-sm-2 control-label" for="input-status">District</label>
                     <div class="col-sm-10">
-                        <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $district_id), "id='district_id' class='form-control'")?>
+                    <?php 
+                        $select_attributes = array(
+                            'class' => 'form-control js-select2',
+                            'id' => 'district_id',
+                        );
+                        if ($active_district) {
+                            $select_attributes = array_merge($select_attributes, array('readonly' => 'readonly'));
+                        }
+                        echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',['0'=>'Select District']), set_value('district_id', $district_id), $select_attributes); ?>
                     </div>
                 </div>
-
+                <?php if($block_id){?>
                 <div class="form-group row">
                     <label class="col-sm-2 control-label" for="input-status">Block</label>
                     <div class="col-sm-10">
                         <?php echo form_dropdown('block_id', array(), set_value('block_id', $block_id), "id='block_id' class='form-control'")?>
                     </div>
                 </div>
-
+                <?}?>
             </div>
             <?php echo form_close(); ?>
         </div>
@@ -65,7 +73,6 @@ $validation = \Config\Services::validation();
 
                     if (json) {
                         $.each(json,function (i,v) {
-                            html += '<option value="' + v.id + '">' + v.name + '</option>';
                             html += '<option value="' + v.id + '"';
                             if (v.id == '<?php echo $block_id; ?>') {
                                 html += ' selected="selected"';
