@@ -74,8 +74,9 @@ $user  = service('user');
                                             <option value="">select</option>
                                             <option value="1">2017-18</option>
                                             <option value="2">2018-19</option>
-                                            <option value="3">2020-21</option>
-                                            <option value="4">2021-22</option>
+                                            <option value="3">2019-20</option>
+                                            <option value="4">2020-21</option>
+                                            <option value="5">2021-22</option>
                                         </select>
                                     </td>
 
@@ -91,7 +92,7 @@ $user  = service('user');
                             <table class="table table-bordered">
                                 <tr>
                                     <th style="width: 310px;">Excel(data) Upload</th>
-                                    <th style="width: 320px;">Pdf Upload</th>
+                                    <th style="width: 320px;">Pdf Upload(Document For verify)</th>
                                     <th>Upload</th>
                                 </tr>
                                 <tr>

@@ -2589,7 +2589,7 @@ FROM (SELECT
     AND int_upto.district_id = ref_mon.district_id
     AND int_upto.agency_type_id = ref_mon.agency_type_id
     AND int_upto.fund_agency_id = ref_mon.fund_agency_id";
-//echo $sql;exit;
+
         return $this->db->query($sql)->getResult();
     }
 
@@ -3227,11 +3227,11 @@ district_id=".(int)$filter['district_id']
     public function getPendingStatuses($filter = [])
     {
         $sql = "SELECT * FROM vw_pending_statuses st WHERE 1=1";
-        if(!empty($filter['year'])){
-            $sql .= " AND st.year = ".$filter['year'];
+        if(!empty($filter['year_id'])){
+            $sql .= " AND st.year_id = ".$filter['year_id'];
         }
-        if(!empty($filter['month'])){
-            $sql .= " AND st.month = ".$filter['month'];
+        if(!empty($filter['month_id'])){
+            $sql .= " AND st.month_id = ".$filter['month_id'];
         }
         if(!empty($filter['district_id'])){
             $sql .= " AND st.district_id = ".$filter['district_id'];
@@ -3241,7 +3241,7 @@ district_id=".(int)$filter['district_id']
         }
 
         $sql .= " ORDER BY transaction_id";
-//echo $sql;exit;
+// echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 

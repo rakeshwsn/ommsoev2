@@ -68,9 +68,7 @@ $validation = \Config\Services::validation();
                     //$('.wait').remove();
                 },
                 success: function(json) {
-
                     html = '<option value="0">Select Block</option>';
-
                     if (json) {
                         $.each(json,function (i,v) {
                             html += '<option value="' + v.id + '"';

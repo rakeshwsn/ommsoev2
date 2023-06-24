@@ -437,8 +437,8 @@ class Refund extends AdminController {
                     <td>' . $item['ob_phy'] . ' </td>
                     <td>' . $item['ob_fin'] . ' </td>';
                 if($action=='edit'){
-                    $html .= '<td class="mon_phy"><input class="w-50p" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['fr_mon_phy'] . '"> </td>
-                                  <td class="mon_fin"><input type="text" name="'.$item['component_id'].'[fin]" value="' . $item['fr_mon_fin'] . '"> </td>';
+                    $html .= '<td class="mon_phy"><input class="w-50p physical" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['fr_mon_phy'] . '"> </td>
+                                  <td class="mon_fin"><input class="financial" type="text" name="'.$item['component_id'].'[fin]" value="' . $item['fr_mon_fin'] . '"> </td>';
                 } else {
                     $html .= '<td class="mon_phy">' . $item['fr_mon_phy'] . ' </td>
                                   <td class="mon_fin">' . $item['fr_mon_fin'] . ' </td>';

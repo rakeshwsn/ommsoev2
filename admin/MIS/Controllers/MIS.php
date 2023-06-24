@@ -262,7 +262,7 @@ class MIS extends AdminController
                         $html .= '<td>' . $indicator->output_indicator . ' </td>';
                         if($action=='edit'){
                             if($indicator->input_type=='number'){
-                                $html .= '<td><input type="number" name="achievement['.$indicator->id.'][number]" value="'.$achievement.'" class="form-control" /></td>';
+                                $html .= '<td><input type="number" min="0" name="achievement['.$indicator->id.'][number]" value="'.$achievement.'" class="form-control physical" /></td>';
                             } else {
                                 $html .= '<td class="dm-uploader">
                                     <div role="button" class="btn btn-outline-primary mr-2">
