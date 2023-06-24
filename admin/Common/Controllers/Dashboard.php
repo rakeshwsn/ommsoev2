@@ -178,6 +178,14 @@ class Dashboard extends AdminController
             'fund_agency_id' => 1,
         ];
 
+        if($this->user->district_id){
+
+        }
+
+        if($this->user->block_id){
+
+        }
+
         $abstract = $this->reportModel->getAbstractTotal($filter);
 
         $ob_total = 0;
@@ -246,7 +254,7 @@ class Dashboard extends AdminController
         echo json_encode($data);
     }
 
-    public function abstract_data($data) {
+    private function abstract_data($data) {
 
         $filter = [
             'year' => $data['year_id'],
