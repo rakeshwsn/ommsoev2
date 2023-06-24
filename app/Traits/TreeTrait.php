@@ -236,7 +236,7 @@ trait TreeTrait {
             }
             if (!empty($item['children'])){
                 $html .= $this->generateTable($item['children'],$txn_type,$action);
-                $html .= '<tr class="subtotal" data-parent="'.$item['component_id'].'">
+                $html .= '<tr class="subtotal" data-parent="'.$item['scomponent_id'].'">
                     <td colspan="2">Sub Total</td>
                     <td>'.$this->ob_phy.'</td>
                     <td>'.$this->ob_fin.'</td>

@@ -100,7 +100,7 @@
 <script>
     $(function () {
 
-        $('.mon_phy').keyup(function (e) {
+        $('.physical').keyup(function (e) {
             var ctx = $(this);
             parent = $(ctx).closest('tr');
             parent_id = $(ctx).closest('tr').data('parent');
@@ -139,7 +139,7 @@
             $(parent).find('.cum_phy').text(cum_phy);
         });
 
-        $('.mon_fin').keyup(function (e) {
+        $('.financial').keyup(function (e) {
             var ctx = $(this);
             parent = $(ctx).closest('tr');
             parent_id = $(ctx).closest('tr').data('parent');
@@ -172,7 +172,7 @@
 
             //update cum_fin of the row
             upto_fin = parseFloat($(parent).find('.upto_fin').text()) || 0;
-            mon_fin = parseFloat($(this).find('input').val()) || 0;
+            mon_fin = parseFloat($(this).val()) || 0;
             cum_fin = upto_fin+mon_fin;
 
             $(parent).find('.cum_fin').text(cum_fin);

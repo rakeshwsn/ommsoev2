@@ -158,7 +158,7 @@ class Transaction extends AdminController {
 
             $action  = '<div class="btn-group">';
             $action .= '<a class="btn btn-sm btn-primary" href="' . Url::transactionEdit.'/'.$result->id . '"><i class="fa fa-pencil"></i></a>';
-            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::transactionDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
+//            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::transactionDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
             $action .= '</div>';
 
             if($result->status==0){
@@ -915,8 +915,9 @@ class Transaction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
 
+    //yet to be implemented
     public function getForm() {
-
+        $data = [];
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
