@@ -219,8 +219,7 @@ $validation = \Config\Services::validation();
             // Get the input field
             var input = $('.financial');
 
-            // Attach keypress event handler
-            input.keypress(function(event) {
+            $('.financial').on('keypress',function (e) {
                 // Get the key code of the pressed key
                 var keyCode = event.which;
 
@@ -231,7 +230,7 @@ $validation = \Config\Services::validation();
                 }
 
                 // Allow only one decimal point
-                if (keyCode === 46 && input.val().indexOf('.') !== -1) {
+                if (keyCode === 46 && $(this).val().indexOf('.') !== -1) {
                     // Prevent the input if there is already a decimal point
                     event.preventDefault();
                 }
