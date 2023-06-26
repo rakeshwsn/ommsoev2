@@ -247,8 +247,6 @@
             },
             complete:function () {
                 $("#main-container").LoadingOverlay("hide");
-                numOnly();
-                decimalOnly();
             }
         })
     });
@@ -282,6 +280,8 @@
             },
             complete:function () {
                 $("#main-container").LoadingOverlay("hide");
+                numOnly();
+                decimalOnly();
             }
         });
     });
