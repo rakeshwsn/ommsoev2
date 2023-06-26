@@ -261,7 +261,7 @@
     //table edit btn click
     $(document).on('click','.btn-edit',function (e){
         e.preventDefault();
-        url = $(this).attr('href')
+        url = $(this).attr('href');
         $.ajax({
             headers: {'X-Requested-With': 'XMLHttpRequest'},
             url:url,
