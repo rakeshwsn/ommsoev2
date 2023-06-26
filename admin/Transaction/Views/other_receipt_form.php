@@ -21,7 +21,7 @@
                         <i class="fa fa-rupee"></i>
                     </span>
                 </div>
-                <input type="text" class="form-control"
+                <input type="text" class="form-control financial"
                        id="head-<?=$head['id']?>"
                        name="misc[<?=$head['id']?>]"
                        placeholder="<?=$head['name']?>"

@@ -299,6 +299,7 @@
             $('[name="chart_type"]').trigger('change');
         });
 
+        //abstract expense vs funds available popup
         $('.abstract').click(function () {
             year = $('#year').val();
 

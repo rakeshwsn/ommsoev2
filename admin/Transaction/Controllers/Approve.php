@@ -88,11 +88,8 @@ class Approve extends AdminController {
         }
 
         $data['fund_agencies'] = [];
-        if($this->user->agency_type_id!=$this->settings->block_user){
-            if($this->user->district_id)
-                $data['fund_agencies'] = $block_model->getFundAgencies(['district_id'=>$this->user->district_id]);
-            else
-                $data['fund_agencies'] = $block_model->getFundAgencies();
+        if($this->user->agency_type_id!=$this->settings->district_user){
+            $data['fund_agencies'] = $block_model->getFundAgencies();
         }
 
         $filter = [
