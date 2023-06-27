@@ -92,18 +92,20 @@ class Incentive extends AdminController
 
 			if ($result->year == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result->year == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result->year == 3) {
+				$year = '2019-20';
+			} elseif ($result->year == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 4) {
+			} elseif ($result->year == 5) {
 				$year = '2021-22';
 			}
 
 
 			if ($result->season == 1) {
 				$season = 'kharif';
-			} else if ($result->season == 2) {
+			} elseif ($result->season == 2) {
 				$season = 'Rabi';
 			}
 
@@ -221,21 +223,26 @@ class Incentive extends AdminController
 
 		//printr($filteredData);
 		$data['datatable'] = array();
+		$year ='';
 		foreach ($filteredData as $result) {
-
 			if ($result['year'] == 1) {
 				$year = '2017-18';
-			} else if (['year'] == 2) {
+			} elseif ($result['year'] == 2) {
 				$year = '2018-19';
-			} else if (['year'] == 3) {
+			} elseif ($result['year'] == 3) {
+				$year = '2019-20';
+			} elseif ($result['year'] == 4) {
 				$year = '2020-21';
-			} else if (['year'] == 4) {
+			} elseif ($result['year'] == 5) {
 				$year = '2021-22';
 			}
 
+
+	
+
 			if ($result['season'] == 1) {
 				$season = 'kharif';
-			} else if ($result['season'] == 2) {
+			} elseif ($result['season'] == 2) {
 				$season = 'Rabi';
 			}
 
@@ -304,21 +311,21 @@ class Incentive extends AdminController
 		$row = 2; // Start from row 2
 		foreach ($data as $result) {
 
-			if ($result->year == 1) {
+			if ($result['year'] == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result['year'] == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result['year'] == 3) {
 				$year = '2019-20';
-			} else if ($result->year == 4) {
+			} elseif ($result['year'] == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 5) {
+			} elseif ($result['year'] == 5) {
 				$year = '2021-22';
 			}
 
 			if ($result['season'] == 1) {
 				$season = 'kharif';
-			} else if ($result['season'] == 2) {
+			} elseif ($result['season'] == 2) {
 				$season = 'Rabi';
 			}
 			$sheet->setCellValue('A' . $row, strtoupper($result['district_name']));
@@ -385,19 +392,19 @@ class Incentive extends AdminController
 
 			if ($result->year == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result->year == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result->year == 3) {
 				$year = '2019-20';
-			} else if ($result->year == 4) {
+			} elseif ($result->year == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 5) {
+			} elseif ($result->year == 5) {
 				$year = '2021-22';
 			}
 
 			if ($result->season == 1) {
 				$season = 'kharif';
-			} else if ($result->season == 2) {
+			} elseif ($result->season == 2) {
 				$season = 'Rabi';
 			}
 
