@@ -95,8 +95,10 @@ class Incentive extends AdminController
 			} else if ($result->year == 2) {
 				$year = '2018-19';
 			} else if ($result->year == 3) {
-				$year = '2020-21';
+				$year = '2019-20';
 			} else if ($result->year == 4) {
+				$year = '2020-21';
+			} else if ($result->year == 5) {
 				$year = '2021-22';
 			}
 
@@ -228,10 +230,15 @@ class Incentive extends AdminController
 			} else if (['year'] == 2) {
 				$year = '2018-19';
 			} else if (['year'] == 3) {
-				$year = '2020-21';
+				$year = '2019-20';
 			} else if (['year'] == 4) {
+				$year = '2020-21';
+			} else if (['year'] == 4){
 				$year = '2021-22';
 			}
+
+
+	
 
 			if ($result['season'] == 1) {
 				$season = 'kharif';
