@@ -175,4 +175,8 @@ class BudgetPlanModel extends Model
 
     }
 
+    public function getCumulativeBudget($data){
+        return [];
+    }
+
 }

@@ -44,7 +44,7 @@ $validation = \Config\Services::validation();
                         </div>
                         
                     </div>
-                   
+                   <?php if($block_id || !$fund_agency_id){?>
                     <div class="form-group row <?=$validation->hasError('block_id')?'is-invalid':''?>">
                         <label class="col-sm-2 control-label" for="input-status">Block</label>
                         <div class="col-sm-10">
@@ -52,6 +52,7 @@ $validation = \Config\Services::validation();
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
                         </div>
                     </div>
+                    <?}?>
                 </div>
                 <?php if($details){?>
                 <hr/>
