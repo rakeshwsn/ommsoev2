@@ -224,7 +224,7 @@ class Incentive extends AdminController
 		//printr($filteredData);
 		$data['datatable'] = array();
 		foreach ($filteredData as $result) {
-
+			$year = '';
 			if ($result['year'] == 1) {
 				$year = '2017-18';
 			} else if (['year'] == 2) {
