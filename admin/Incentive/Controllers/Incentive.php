@@ -311,15 +311,15 @@ class Incentive extends AdminController
 		$row = 2; // Start from row 2
 		foreach ($data as $result) {
 
-			if ($result->year == 1) {
+			if ($result['year'] == 1) {
 				$year = '2017-18';
-			} elseif ($result->year == 2) {
+			} elseif ($result['year'] == 2) {
 				$year = '2018-19';
-			} elseif ($result->year == 3) {
+			} elseif ($result['year'] == 3) {
 				$year = '2019-20';
-			} elseif ($result->year == 4) {
+			} elseif ($result['year'] == 4) {
 				$year = '2020-21';
-			} elseif ($result->year == 5) {
+			} elseif ($result['year'] == 5) {
 				$year = '2021-22';
 			}
 
