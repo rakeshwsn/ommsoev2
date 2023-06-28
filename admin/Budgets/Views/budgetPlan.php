@@ -124,7 +124,7 @@
                    $('select[name=\'district_id\']').trigger('change');
                },
                error:function () {
-                   alert('Unable to fetch districts');
+                   //alert('Unable to fetch districts');
                }
            });
         });
@@ -161,7 +161,7 @@
                     $('select[name=\'block_id\']').select2();
                 },
                 error: function(xhr, ajaxOptions, thrownError) {
-                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    //alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
                 }
             });
         });
