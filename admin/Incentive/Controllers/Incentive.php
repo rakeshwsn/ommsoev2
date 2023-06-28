@@ -92,18 +92,20 @@ class Incentive extends AdminController
 
 			if ($result->year == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result->year == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result->year == 3) {
+				$year = '2019-20';
+			} elseif ($result->year == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 4) {
+			} elseif ($result->year == 5) {
 				$year = '2021-22';
 			}
 
 
 			if ($result->season == 1) {
 				$season = 'kharif';
-			} else if ($result->season == 2) {
+			} elseif ($result->season == 2) {
 				$season = 'Rabi';
 			}
 
@@ -221,21 +223,26 @@ class Incentive extends AdminController
 
 		//printr($filteredData);
 		$data['datatable'] = array();
+		$year ='';
 		foreach ($filteredData as $result) {
-
 			if ($result['year'] == 1) {
 				$year = '2017-18';
-			} else if (['year'] == 2) {
+			} elseif ($result['year'] == 2) {
 				$year = '2018-19';
-			} else if (['year'] == 3) {
+			} elseif ($result['year'] == 3) {
+				$year = '2019-20';
+			} elseif ($result['year'] == 4) {
 				$year = '2020-21';
-			} else if (['year'] == 4) {
+			} elseif ($result['year'] == 5) {
 				$year = '2021-22';
 			}
 
+
+	
+
 			if ($result['season'] == 1) {
 				$season = 'kharif';
-			} else if ($result['season'] == 2) {
+			} elseif ($result['season'] == 2) {
 				$season = 'Rabi';
 			}
 
@@ -304,21 +311,21 @@ class Incentive extends AdminController
 		$row = 2; // Start from row 2
 		foreach ($data as $result) {
 
-			if ($result->year == 1) {
+			if ($result['year'] == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result['year'] == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result['year'] == 3) {
 				$year = '2019-20';
-			} else if ($result->year == 4) {
+			} elseif ($result['year'] == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 5) {
+			} elseif ($result['year'] == 5) {
 				$year = '2021-22';
 			}
 
 			if ($result['season'] == 1) {
 				$season = 'kharif';
-			} else if ($result['season'] == 2) {
+			} elseif ($result['season'] == 2) {
 				$season = 'Rabi';
 			}
 			$sheet->setCellValue('A' . $row, strtoupper($result['district_name']));
@@ -385,19 +392,19 @@ class Incentive extends AdminController
 
 			if ($result->year == 1) {
 				$year = '2017-18';
-			} else if ($result->year == 2) {
+			} elseif ($result->year == 2) {
 				$year = '2018-19';
-			} else if ($result->year == 3) {
+			} elseif ($result->year == 3) {
 				$year = '2019-20';
-			} else if ($result->year == 4) {
+			} elseif ($result->year == 4) {
 				$year = '2020-21';
-			} else if ($result->year == 5) {
+			} elseif ($result->year == 5) {
 				$year = '2021-22';
 			}
 
 			if ($result->season == 1) {
 				$season = 'kharif';
-			} else if ($result->season == 2) {
+			} elseif ($result->season == 2) {
 				$season = 'Rabi';
 			}
 
@@ -565,6 +572,7 @@ class Incentive extends AdminController
 				//for excel upload
 				$fileName = $_FILES["file"]["tmp_name"];
 				$reader = IOFactory::createReader('Xlsx');
+				$reader->setReadDataOnly(true);
 				$spreadsheet = $reader->load($fileName);
 				$sheet = $spreadsheet->getActiveSheet();
 
@@ -577,6 +585,7 @@ class Incentive extends AdminController
 				if ($checkColumn == $columnCount) {
 					$activesheet = $spreadsheet->getSheet(0);
 					$row_data = $activesheet->toArray();
+					// dd($row_data);
 					if (!empty($row_data[1])) {
 
 
@@ -609,7 +618,8 @@ class Incentive extends AdminController
 							foreach ($row_data  as $key => $column) {
 								$filteredColumn = array_filter($column);
 								if ($key >= 1) {
-
+									$aadhar_no = preg_replace("/[^0-9]/", "", $column[7]);
+									$account_no = preg_replace("/[^0-9]/", "", $column[11]);
 									$datacsv[] = array(
 										'incetive_id' => $result_main,
 										'gp' => $column[0],
@@ -619,18 +629,18 @@ class Incentive extends AdminController
 										'gender' => strtolower($column[4]),
 										'caste' => strtolower($column[5]),
 										'phone_no' => $column[6],
-										'aadhar_no' => $column[7],
+										'aadhar_no' => $aadhar_no,
 										'year_support' => $column[8],
 										'area_hectare' => $column[9],
 										'bank_name' => $column[10],
-										'account_no' => $column[11],
-										'ifsc' => $column[12],
+										'account_no' => trim($account_no),
+										'ifsc' =>  $column[12],
 										'amount' => $column[13],
 										'uploaded_by' => $user_upload
 									);
 								}
 							}
-
+							//dd($datacsv); 
 							$res = $this->incentiveModel->addInceitive($datacsv);
 							$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
 							$data['msgclass'] = 'bg-success';

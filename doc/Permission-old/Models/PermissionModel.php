@@ -26,10 +26,9 @@ class PermissionModel extends Model
     // Validation
     protected $validationRules      = [
         'name' => array(
-            'label' => 'Name',
-            'rules' => 'trim|required|max_length[100]|is_unique[permission.name,id,{id}]'
+            'label' => 'Subject',
+            'rules' => 'trim|required|max_length[100]'
         ),
-
 
     ];
     protected $validationMessages   = [];

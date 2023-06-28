@@ -54,7 +54,8 @@ class Budgets extends AdminController {
         }
 
         $data['districts']=(new DistrictModel())->getAll();
-        $data['years'] = getAllYears();
+        //$data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $f_filter=['fund_agency_id'=>$this->user->fund_agency_id];
         if($this->user->agency_type_id!=$this->settings->district_user) {
             $f_filter=[]; 
@@ -111,13 +112,21 @@ class Budgets extends AdminController {
             $ykey=array_search($result->year,array_column($years,'id'));
             if(getCurrentYearId() == $years[$ykey]['id']){
                 $action  = '<div class="btn-group btn-group-sm pull-right">';
-                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
-                $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
-                $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                if ($this->user->hasPermission('budgets/view')) {
+                    $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                }
+                if ($this->user->hasPermission('budgets/edit')) {
+                    $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
+                }
+                if ($this->user->hasPermission('budgets/delete')) {
+                    $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                }
                 $action .= '</div>';
             }else{
                 $action  = '<div class="btn-group btn-group-sm pull-right">';
-                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                if ($this->user->hasPermission('budgets/view')) {
+                    $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                }
                 $action .= '</div>';
             }
             $datatable[]=array(
