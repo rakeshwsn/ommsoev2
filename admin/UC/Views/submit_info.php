@@ -161,7 +161,7 @@
         //add new
         $('.add-new').click(function (e) {
             e.preventDefault();
-            url = $(this).attr('href');
+            url = '<?=$submit_url?>';
             $.ajax({
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 url : url, // json datasource
@@ -219,8 +219,7 @@
             });
         });
 
-        $(document).on('click','#btn-edit',function ()
-        {
+        $(document).on('click','#btn-edit',function () {
             formdata = $(this).closest('.modal-content').find('form').serialize();
 
             $.ajax({
