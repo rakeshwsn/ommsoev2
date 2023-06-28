@@ -572,6 +572,7 @@ class Incentive extends AdminController
 				//for excel upload
 				$fileName = $_FILES["file"]["tmp_name"];
 				$reader = IOFactory::createReader('Xlsx');
+				$reader->setReadDataOnly(true);
 				$spreadsheet = $reader->load($fileName);
 				$sheet = $spreadsheet->getActiveSheet();
 
@@ -584,6 +585,7 @@ class Incentive extends AdminController
 				if ($checkColumn == $columnCount) {
 					$activesheet = $spreadsheet->getSheet(0);
 					$row_data = $activesheet->toArray();
+					// dd($row_data);
 					if (!empty($row_data[1])) {
 
 
@@ -616,7 +618,8 @@ class Incentive extends AdminController
 							foreach ($row_data  as $key => $column) {
 								$filteredColumn = array_filter($column);
 								if ($key >= 1) {
-
+									$aadhar_no = preg_replace("/[^0-9]/", "", $column[7]);
+									$account_no = preg_replace("/[^0-9]/", "", $column[11]);
 									$datacsv[] = array(
 										'incetive_id' => $result_main,
 										'gp' => $column[0],
@@ -626,18 +629,18 @@ class Incentive extends AdminController
 										'gender' => strtolower($column[4]),
 										'caste' => strtolower($column[5]),
 										'phone_no' => $column[6],
-										'aadhar_no' => $column[7],
+										'aadhar_no' => $aadhar_no,
 										'year_support' => $column[8],
 										'area_hectare' => $column[9],
 										'bank_name' => $column[10],
-										'account_no' => $column[11],
-										'ifsc' => $column[12],
+										'account_no' => trim($account_no),
+										'ifsc' =>  $column[12],
 										'amount' => $column[13],
 										'uploaded_by' => $user_upload
 									);
 								}
 							}
-
+							//dd($datacsv); 
 							$res = $this->incentiveModel->addInceitive($datacsv);
 							$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
 							$data['msgclass'] = 'bg-success';
