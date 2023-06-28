@@ -20,5 +20,6 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->get('reports/mpr1','Reports\Controllers\Mpr3::index');
 
     $routes->add('budgets/bulkbudget','Budgets\Controllers\Budgets::bulkBudget');
+    $routes->add('budgets/approval','Budgets\Controllers\Budgets::approval');
 
 });

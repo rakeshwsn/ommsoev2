@@ -199,7 +199,8 @@ WHERE c2.id IS NOT NULL AND c1.updated = 0";
             AND sca.fund_agency_id = sc.fund_agency_id) t1
         
         ";
-       
+       //echo $sql;
+       //exit;
         return $this->db->query($sql)->getResultArray();
     }
 

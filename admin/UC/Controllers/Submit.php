@@ -75,7 +75,10 @@ class Submit extends AdminController{
 	    $allModel = new UCAllotmentModel();
 	    $subModel = new UCSubmitModel();
 
-	    $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
+        $recipient_id = 0;
+	    if($this->user->district_id) {
+            $recipient_id = $subModel->getRecipientId($this->user->district_id, $this->user->fund_agency_id);
+        }
 
 	    $allotments = $allModel->getAllotments(['year'=>$year,'recipient_id'=>$recipient_id]);
 

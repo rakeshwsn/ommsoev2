@@ -23,7 +23,7 @@ $user=service('user');
 		<!-- Fonts and Codebase framework -->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700&display=swap">
 		<link rel="stylesheet" id="css-main" href="<?php echo theme_url('assets/css/codebase.min.css');  ?>">
-		<link rel="stylesheet" id="css-main" href="<?php echo theme_url('assets/css/custom.css?v=2');  ?>">
+		<link rel="stylesheet" id="css-main" href="<?php echo theme_url('assets/css/custom.css?v=3');  ?>">
 		<!-- Controller Defined Stylesheets -->
 		<?php echo $template->stylesheets() ?>
         <script src="<?=theme_url('assets/js/codebase.core.min.js');?>"></script>

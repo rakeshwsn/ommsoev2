@@ -155,7 +155,9 @@ class BudgetPlanModel extends Model
         if (!empty($data['filter_search'])) {
             $builder->where("sb.name LIKE '%{$data['filter_search']}%'");
         }
+       
         $builder->where("sbp.deleted_at IS NULL");
+
 
     }
 
@@ -173,6 +175,10 @@ class BudgetPlanModel extends Model
         $res = $builder->get()->getRow();
         return $res;
 
+    }
+
+    public function getCumulativeBudget($data){
+        return [];
     }
 
 }
