@@ -135,7 +135,7 @@ class Allotment extends AdminController{
                 'allotment_date' => ymdToDmy($allotment->allotment_date),
                 'action' => '<a href="'.site_url(Url::allotmentEdit).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-info btn-edit">Edit</a>
                             <a href="'.site_url(Url::allotmentDelete).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-danger btn-delete">Delete</a>',
-                'submit' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success btn-submit">Submit</a>',
+                'submit' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success btn-submit">Submit UC</a>',
             ];
             $allotment_id = $allotment->allotment_id;
             $data['total_allotment'] += $allotment->amount;
