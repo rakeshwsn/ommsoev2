@@ -23,5 +23,6 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->post('incentive/ajaxverifyupdate','Incentive\Controllers\Incentive::ajaxverifyupdate');
     $routes->get('incentive/downloadexcel','Incentive\Controllers\Incentive::downloadExcelFile');
     $routes->get('incentive/countExcelHeaders','Incentive\Controllers\Incentive::countExcelHeaders');
+    $routes->get('incentive/uploadstatus','Incentive\Controllers\Incentive::uploadStatus');
 
 });
