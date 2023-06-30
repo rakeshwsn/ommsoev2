@@ -1,6 +1,7 @@
 <?php
 namespace Admin\MIS\Controllers;
 
+use Admin\Common\Models\YearModel;
 use Admin\Components\Models\ComponentsModel;
 use Admin\MIS\Models\MISComponentModel;
 use Admin\MIS\Models\MISDetailModel;
@@ -22,7 +23,7 @@ class MIS extends AdminController
 
         $data['upload_enabled'] = true;
 
-        $data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $data['months'] = getAllMonths();
 
         $data['year_id'] = getCurrentYearId();
