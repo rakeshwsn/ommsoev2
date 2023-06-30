@@ -223,7 +223,7 @@ class Incentive extends AdminController
 
 		//printr($filteredData);
 		$data['datatable'] = array();
-		$year ='';
+		$year = '';
 		foreach ($filteredData as $result) {
 			if ($result['year'] == 1) {
 				$year = '2017-18';
@@ -238,7 +238,7 @@ class Incentive extends AdminController
 			}
 
 
-	
+
 
 			if ($result['season'] == 1) {
 				$season = 'kharif';
@@ -785,7 +785,7 @@ class Incentive extends AdminController
 			// } else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
 			// 	$error  = 'true';
 			// } 
-			if(empty($result->gp) || empty($result->village) || empty($result->name)){
+			if (empty($result->gp) || empty($result->village) || empty($result->name)) {
 				$error  = 'true';
 			} else if ($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)) {
 				$error  = 'true';
@@ -919,7 +919,7 @@ class Incentive extends AdminController
 		// } else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
 		// 	$error  = 'true';
 		// }
-		if(empty($result->gp) || empty($result->village) || empty($result->name) || empty($result->gender) || empty($result->year_support)){
+		if (empty($result->gp) || empty($result->village) || empty($result->name) || empty($result->gender) || empty($result->year_support)) {
 			$error  = 'true';
 		} else if ($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)) {
 			$error  = 'true';
@@ -974,6 +974,93 @@ class Incentive extends AdminController
 		}
 		$this->template->add_package(array('datatable', 'select2'), true);
 		$data['filter_panel'] = view('Admin\Incentive\Views\filter', $data);
+	}
+
+	public function uploadStatus()
+	{
+		$data['districts'] = (new DistrictModel())->asArray()->findAll();
+		// Retrieve the districts from the DistrictModel and store them in $data['districts']
+
+		$data['selectedYear'] = 1;
+		// Set the default value for the selected year to 1
+
+		if ($this->request->getGet('year')) {
+			$data['selectedYear'] = $this->request->getGet('year');
+		}
+		// If the 'year' parameter is present in the request, update the selected year with its value
+
+		$data['year_id'] = 1;
+		// Set the default value for the year ID to 1
+
+		if ($this->request->getGet('year')) {
+			$data['year_id'] = $this->request->getGet('year');
+		}
+		// If the 'year' parameter is present in the request, update the year ID with its value
+
+		$filter = [
+			'year' => $data['year_id'],
+			'district_id' => 0
+		];
+		// Create a filter array with the year ID and default district ID as 0
+
+		if ($this->request->getGet('district_id')) {
+			$filter['district_id'] = $this->request->getGet('district_id');
+		}
+		// If the 'district_id' parameter is present in the request, update the district ID in the filter
+
+		$filteredData = $this->incentivemainModel->FarmerCheckstatus($filter);
+		// Retrieve filtered data by calling the FarmerCheckstatus() method on the incentivemainModel, passing the filter
+		$data['district_id'] = '';
+		// Set the initial value of district_id to an empty string
+		
+		if ($this->request->getGet('district_id')) {
+			$data['district_id'] = $this->request->getGet('district_id');
+		}
+		// If the 'district_id' parameter is present in the request, update the district_id value with its value
+		
+		$data['farmerData'] = [];
+		// Initialize an empty array to store the farmer data
+		
+		foreach ($filteredData as $filteredDatas) {
+			$year = 0;
+			// Initialize the year variable with a default value of 0
+		
+			if ($filteredDatas['year'] == 1) {
+				$year = '2017-18';
+			} elseif ($filteredDatas['year'] == 2) {
+				$year = '2018-19';
+			} elseif ($filteredDatas['year'] == 3) {
+				$year = '2019-20';
+			} elseif ($filteredDatas['year'] == 4) {
+				$year = '2020-21';
+			} elseif ($filteredDatas['year'] == 5) {
+				$year = '2021-22';
+			}
+			// Assign a specific string value to $year based on the value of the 'year' field in $filteredDatas
+		
+			$season = 0;
+			// Initialize the season variable with a default value of 0
+		
+			if ($filteredDatas['season'] == 1) {
+				$season = 'kharif';
+			} elseif ($filteredDatas['season'] == 2) {
+				$season = 'Rabi';
+			}
+			// Assign a specific string value to $season based on the value of the 'season' field in $filteredDatas
+		
+			$data['farmerData'][] = [
+				'district_id' => $filteredDatas['district_id'],
+				'district_name' => $filteredDatas['district'],
+				'block_id' => $filteredDatas['block_id'],
+				'block_name' => $filteredDatas['block_name'],
+				'incentiveid' => $filteredDatas['incentiveid'],
+				'year' => $year,
+				'season' => $season,
+			];
+			// Add an associative array with various fields and their corresponding values to the $data['farmerData'] array
+		}
+		;
+		return $this->template->view('Admin\Incentive\Views\upload_status', $data);
 	}
 }
 

@@ -779,7 +779,9 @@ FROM (SELECT
 FROM soe_budgets_plan bp
   LEFT JOIN soe_budgets b
     ON b.budget_plan_id = bp.ID
-WHERE fund_agency_id =  ".$filter['fund_agency_id']."
+WHERE 
+b.deleted_at IS NULL AND bp.deleted_at IS NULL and 
+bp.fund_agency_id =  ".$filter['fund_agency_id']."
 AND bp.year =  ".$filter['year_id'];
 if(!empty($filter['block_id'])){
     $sql .= " AND block_id =  ".$filter['block_id'];
@@ -929,7 +931,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
             }
         } else if(!empty($filter['agency_type_id'])){ //added by niranjan
             $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
-        }else if(empty($filter['block_id'])) {
+        } else if(empty($filter['block_id'])) {
             // exclude block fund receipt when user is not block user.
             $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
         }
@@ -1031,7 +1033,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-//echo $sql;exit;
+echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }

@@ -83,7 +83,7 @@ class Submit extends AdminController{
                 'year' => $allotment->year,
                 'allotment_date' => ymdToDmy($allotment->allotment_date),
                 'amount' => $allotment->amount,
-                'action' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success add-new">Submit UC</a>'
+                'action' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success btn-edit">Submit UC</a>'
             ];
 
             $data['total_allotment'] += $allotment->amount;
@@ -105,6 +105,7 @@ class Submit extends AdminController{
         }
 
         $data['upload_url'] = site_url(Url::ucSubmitUpload);
+        $data['submit_url'] = site_url(Url::ucSubmitAdd);
 
         return $this->template->view('Admin\UC\Views\submit_info', $data);
 	}
