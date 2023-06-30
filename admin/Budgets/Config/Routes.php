@@ -15,11 +15,11 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 
     $routes->add('budgets/tupdate','Budgets\Controllers\Budgets::updateTransaction');
 
-    $routes->add('budgets/details/(:num)','Budgets\Controllers\Budgets::details/$1');
     $routes->add('budgets/view/(:num)','Budgets\Controllers\Budgets::view/$1');
     $routes->get('reports/mpr1','Reports\Controllers\Mpr3::index');
 
     $routes->add('budgets/bulkbudget','Budgets\Controllers\Budgets::bulkBudget');
     $routes->add('budgets/approval','Budgets\Controllers\Budgets::approval');
+    $routes->get('budgets/details/(:num)','Budgets\Controllers\Budgets::details/$1');
 
 });
