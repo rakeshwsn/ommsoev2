@@ -2,6 +2,7 @@
 namespace Admin\Transaction\Controllers;
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
+use Admin\Common\Models\YearModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\MIS\Models\MISModel;
@@ -40,7 +41,7 @@ class Transaction extends AdminController {
         $this->template->add_package(['datatable','uploader','jquery_loading'],true);
         $data = [];
         $data['months'] = getMonths();
-        $data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $data['download_url'] = Url::transactionDownloadTemplate;
 
         //control validation from env file

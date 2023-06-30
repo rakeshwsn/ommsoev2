@@ -4,6 +4,7 @@ namespace Admin\Transaction\Controllers;
 
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
+use Admin\Common\Models\YearModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Transaction\Models\MisctransactionModel;
@@ -26,7 +27,7 @@ class OtherReceipt extends AdminController
 
         $this->template->add_package(['datatable','uploader','jquery_loading'],true);
         $data['months'] = getMonths();
-        $data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $data['year'] = getCurrentYearId();
         $data['month'] = getCurrentMonthId();
 
@@ -214,7 +215,7 @@ class OtherReceipt extends AdminController
                         'month'=>$txn->month,
                         'year'=>$txn->year,
                         'block_id' => $txn->block_id,
-                        'agency_type_id' => $this->request->getPost('agency_type_id'),
+                        'agency_type_id' => $txn->agency_type_id,
                         'fund_agency_id' => $txn->fund_agency_id,
                         'district_id' => $txn->district_id,
                         'user_id' => $txn->user_id,
@@ -365,9 +366,8 @@ class OtherReceipt extends AdminController
                 $months[] = $item['month'];
             }
 
-            if (!in_array(getCurrentMonthId(),$months)) {
+            if (!in_array($condition['month'],$months)) {
                 $this->error='Cannot add other receipt. Upload for the month is closed.';
-                
             }
         }
 
