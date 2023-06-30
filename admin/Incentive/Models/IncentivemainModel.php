@@ -140,8 +140,8 @@ class IncentivemainModel extends Model
 
     public function getAllCheckblockwise($data)
     {
-       
-        
+
+
         $builder = $this->db->table("{$this->table} im");
         $builder->select("im.id,im.block_id,im.district_id,im.verify");
         $this->filter($builder, $data);
@@ -152,9 +152,35 @@ class IncentivemainModel extends Model
     }
 
 
+    public function FarmerCheckstatus($filter=[])
+    {
+         
+        $sql = "SELECT
+        main_tbl.district_id,
+        main_tbl.district,
+        main_tbl.block_id,
+        main_tbl.block_name,
+        imd.id incentiveid,
+        imd.year,
+       imd.season season
+      FROM (SELECT
+          sd.id district_id,
+          sd.name district,
+          blo.id block_id,
+          blo.name block_name
+        FROM soe_districts sd
+          LEFT JOIN soe_blocks blo
+            ON blo.district_id = sd.id) main_tbl
+        LEFT JOIN (SELECT * FROM incetive_main_details d WHERE d.year=".$filter['year']." OR d.district_id=".$filter['district_id'].") imd
+          ON main_tbl.district_id = imd.district_id
+          AND main_tbl.block_id = imd.block_id
+      ORDER BY main_tbl.district";
+        return $this->db->query($sql)->getResultArray();
+    }
+
     private function filter($builder, $data)
     {
-        
+
 
         if (!empty($data['filter_district'])) {
             $builder->where(

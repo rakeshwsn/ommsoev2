@@ -106,7 +106,7 @@ class Allotment extends AdminController{
 	}
 
     public function info() {
-        $this->template->add_package(['jquery_loading','datepicker'],true);
+        $this->template->add_package(['jquery_loading','datepicker','uploader'],true);
 
         $year = $this->request->getGet('year');
         $recipient_id = $this->request->getGet('recipient_id');
@@ -124,6 +124,7 @@ class Allotment extends AdminController{
         $ids = [];
         $data['allotments'] = [];
         $data['total_allotment'] = 0;
+        $allotment_id = 0;
         foreach ($allotments as $allotment) {
             $ids[] = $allotment->allotment_id;
 
@@ -134,8 +135,9 @@ class Allotment extends AdminController{
                 'allotment_date' => ymdToDmy($allotment->allotment_date),
                 'action' => '<a href="'.site_url(Url::allotmentEdit).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-info btn-edit">Edit</a>
                             <a href="'.site_url(Url::allotmentDelete).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-danger btn-delete">Delete</a>',
+                'submit' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success btn-submit">Submit</a>',
             ];
-
+            $allotment_id = $allotment->allotment_id;
             $data['total_allotment'] += $allotment->amount;
         }
 
@@ -157,7 +159,8 @@ class Allotment extends AdminController{
             $data['total_uc'] += $submission->amount;
         }
 
-        $data['add_url'] = site_url(Url::allotmentAdd).'?year='.$year;
+        $data['add_url'] = site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment_id;
+        $data['upload_url'] = site_url(Url::ucSubmitUpload);
 
         return $this->template->view('Admin\UC\Views\allotment_info', $data);
 	}
