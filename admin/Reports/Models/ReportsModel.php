@@ -931,7 +931,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
             }
         } else if(!empty($filter['agency_type_id'])){ //added by niranjan
             $sql .= " AND t.agency_type_id IN (".implode(',',(array)$filter['agency_type_id']).")";
-        }else if(empty($filter['block_id'])) {
+        } else if(empty($filter['block_id'])) {
             // exclude block fund receipt when user is not block user.
             $sql .= " AND t.agency_type_id NOT IN (" . implode(',',$filter['block_users']).")";
         }
@@ -1033,7 +1033,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
         }
         $sql .= " GROUP BY tc.component_id) exp_upto_cy
       ON comp.component_id = exp_upto_cy.component_id) res ORDER BY sort_order";
-//echo $sql;exit;
+echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
 
     }
