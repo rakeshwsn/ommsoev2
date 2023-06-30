@@ -178,7 +178,49 @@ class BudgetPlanModel extends Model
     }
 
     public function getCumulativeBudget($data){
-        return [];
+        $sql="SELECT
+        bud.budget_plan_id,
+        sd.district_id,
+        sd.district,
+        bud.fund_agency_id,
+        bud.fund_agency,
+        bud.year,
+        bud.phy,
+        bud.fin,
+        CASE WHEN bud.status IS NULL THEN 3 ELSE bud.status END AS status
+      FROM vw_district_fund_agency sd
+        LEFT JOIN (SELECT
+            b.budget_plan_id,
+            bp.district_id,
+            bp.fund_agency_id,
+            sfa.name fund_agency,
+            sy.id year_id,
+            sy.name year,
+            SUM(b.physical) phy,
+            SUM(financial) fin,
+            bp.status
+          FROM soe_budgets_plan bp
+            LEFT JOIN soe_budgets b
+              ON b.budget_plan_id = bp.id
+            LEFT JOIN soe_fund_agency sfa
+              ON bp.fund_agency_id = sfa.id
+            LEFT JOIN soe_years sy
+                ON bp.year=sy.id
+          WHERE bp.year = ".$data['filter_year']."
+          GROUP BY bp.district_id) bud
+          ON bud.district_id = sd.district_id
+          AND sd.fund_agency_id = bud.fund_agency_id where 1=1";
+
+        if(!empty($data['filter_fund_agency_id'])){
+            $sql .= " AND sd.fund_agency_id = ".$data['filter_fund_agency_id'];
+        }
+        if(!empty($data['filter_district_id'])){
+            $sql .= " AND bud.district_id = ".$data['filter_district_id'];
+        }
+        
+        return $this->db->query($sql)->getResultArray();
+        
+
     }
 
 }
