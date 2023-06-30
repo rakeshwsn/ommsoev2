@@ -30,7 +30,7 @@
                         <tr>
                             <td colspan="3">Total</td>
                             <td><?=in_rupees($total_allotment)?></td>
-                            <td></td>
+                            <td><?=$allotment['submit']?></td>
                         </tr>
                     <?php else: ?>
                         <tr>
@@ -153,37 +153,30 @@
     var url;
     $(function () {
         //add new
-        $('#add-new').click(function (e) {
+        $('.btn-submit').click(function (e) {
             e.preventDefault();
-            fai = $('#fund_agency_id').val() || '';
+            url = $(this).attr('href');
             $.ajax({
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
-                data: {year:$('#year_id').val(),fund_agency_id:fai},
-                url :"<?=$add_url?>", // json datasource
+                url : url, // json datasource
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-    //                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
-                    $('#res-message').text('');
                 },
                 success:function (json) {
-                    if(json.status==false){
-                        $('#res-message').text(json.message);
-                    } else {
-                        $('#modal-title').html(json.title);
-                        $('#modal-content').html(json.html);
-                        $("#modal-add-new").modal({
-                            backdrop: 'static',
-                        });
-                    }
+                    $('#modal-title').html(json.title);
+                    $('#modal-content').html(json.html);
+                    $("#modal-add-new").modal({
+                        backdrop: 'static',
+                    });
+                    bindUploader()
                 },
                 error: function(){  // error handling
-                    $("#main-container").LoadingOverlay("hide");
+                    $("#main-container").LoadingOverlay("hide",true);
                 },
                 complete:function () {
-    //                    $('#main-container').loading('stop');
-                    $("#main-container").LoadingOverlay("hide");
+                    $("#main-container").LoadingOverlay("hide",true);
                 }
             });
         });
@@ -198,19 +191,16 @@
                 type:'POST',
                 dataType:'JSON',
                 before:function () {
-//                $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                 },
                 success:function (json) {
                     location.reload();
                 },
                 error:function () {
-//                $('#main-container').loading('stop');
                     $("#main-container").LoadingOverlay("hide");
                 },
                 complete:function () {
                     $("#main-container").LoadingOverlay("hide");
-//                $('#main-container').loading('stop');
                 }
             })
         });
@@ -308,7 +298,74 @@
             }
         });
 
-
     });
+
+    function bindUploader() {
+        $('.dm-uploader').dmUploader({
+            dnd:false,
+            url: '<?=$upload_url?>',
+            dataType:'json',
+            maxFileSize: 12000000, // 12MB
+            multiple: false,
+            fieldName: 'document',
+            allowedTypes: 'application/pdf',
+            extFilter: ['pdf'],
+            onInit: function(){
+                // Plugin is ready to use
+//            console.log('initialized')
+            },
+            onComplete: function(){
+                $('.modal-dialog').LoadingOverlay("hide",true);
+            },
+            onNewFile: function(id, file){
+                // When a new file is added using the file selector or the DnD area
+                show_error(this,'')
+            },
+            onBeforeUpload: function(id){
+                // about tho start uploading a file
+
+            },
+            onUploadCanceled: function(id) {
+                // Happens when a file is directly canceled by the user.
+            },
+            onUploadProgress: function(id, percent){
+                // Updating file progress
+//            $('#closing-balance-breakup').loading();
+                $('.modal-dialog').LoadingOverlay("show");
+            },
+            onUploadSuccess: function(id, data){
+                // A file was successfully uploaded server response
+                if(data.status) {
+                    $(this).find('.status').html(data.message);
+                    $(this).find('.filepath').val(data.filepath)
+                    $(this).find('.document-name').val(data.filename)
+                } else {
+                    show_error(this,data.message);
+                }
+
+            },
+            onUploadError: function(id, xhr, status, message){
+                show_error(this,message)
+//            $('#closing-balance-breakup').loading('stop');
+                $('.modal-dialog').LoadingOverlay("hide",true);
+            },
+            onFileSizeError: function(file){
+                // file.name
+                show_error(this,'Invalid file size')
+            },
+            onFileExtError: function(file){
+                // file.name
+                show_error(this,'Invalid file type')
+            },
+            onFileTypeError: function(file){
+                // file.name
+                show_error(this,'Invalid file type')
+
+            }
+        });
+        function show_error(obj,msg){
+            $(obj).find('.status').addClass('text-danger').text(msg)
+        }
+    }
 </script>
 <?php js_end(); ?>
