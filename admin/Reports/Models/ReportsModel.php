@@ -779,7 +779,9 @@ FROM (SELECT
 FROM soe_budgets_plan bp
   LEFT JOIN soe_budgets b
     ON b.budget_plan_id = bp.ID
-WHERE fund_agency_id =  ".$filter['fund_agency_id']."
+WHERE 
+b.deleted_at IS NULL AND bp.deleted_at IS NULL and 
+bp.fund_agency_id =  ".$filter['fund_agency_id']."
 AND bp.year =  ".$filter['year_id'];
 if(!empty($filter['block_id'])){
     $sql .= " AND block_id =  ".$filter['block_id'];
