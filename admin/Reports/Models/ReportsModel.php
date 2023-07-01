@@ -925,6 +925,7 @@ $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
       AND tc.deleted_at IS NULL
       AND t.transaction_type = 'fund_receipt'";
         $sql .= " AND t.status = 1";
+
         if(isset($filter['block_user']) && $filter['block_user']){
             if(!empty($filter['user_id'])){
                 $sql .= " AND t.user_id = ".$filter['user_id'];
