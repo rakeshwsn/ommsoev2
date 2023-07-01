@@ -1,7 +1,6 @@
 <?php
 $validation = \Config\Services::validation();
 ?>
-
 <?= form_open_multipart('', 'id="form-grampanchayat"'); ?>
 <div class="row">
 	<div class="col-xl-12">
@@ -18,27 +17,15 @@ $validation = \Config\Services::validation();
 			<div class="block-content">
 				<div class="form-group <?=$validation->hasError('district')?'is-invalid':''?>">
                     <label for="code">District</label>
-                    <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name'), set_value('district_id', $district_id),"id='district_id' class='form-control js-select2'". ($district_id ? "disabled" : "")); ?>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
-
-                </div>
-                <div class="form-group <?=$validation->hasError('district')?'is-invalid':''?>"style="display: none;">
-                    
-                    <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name'), set_value('district_id', $district_id),"id='district_id' class='form-control js-select2'hidden". ($district_id ?  : "")); ?>
+                    <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name'), set_value('district_id', ''),"id='district_id' class='form-control js-select2'"); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
 
                 </div>
                 <div class="form-group <?=$validation->hasError('block_id')?'is-invalid':''?>">
-                <label for="code">Block</label>
-                    <?= form_dropdown('block_id', array(), set_value('block_id', $block_id),"id='filter_block' class='form-control js-select2'" . ($block_id ? " disabled" : "")); ?>
+                    <label for="code">Block</label>
+                    <?= form_dropdown('block_id', array(), set_value('block_id', $block_id),"id='block_id' class='form-control js-select2'"); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
                 </div>
-                <div class="form-group <?=$validation->hasError('block_id')?'is-invalid':''?>" style="display: none;">
-                   
-                   <?= form_dropdown('block_id', array(), set_value('block_id', $block_id),"id='filter_block' class='form-control js-select2'hidden" . ($block_id ?  : "")); ?>
-                   <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
-               </div>
-               
 				<div class="form-group <?=$validation->hasError('name')?'is-invalid':''?>">
 					<label for="name" >Name</label>
 					<?= form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name))); ?>
@@ -66,13 +53,13 @@ $validation = \Config\Services::validation();
 
                     html = '<option value="">Select Block</option>';
 
-                    if (json != '') {
-                        for (i = 0; i < json.length; i++) {
-                            html += '<option value="' + json[i]['id'] + '"';
-                            if (json[i]['id'] == '<?= $block_id; ?>') {
+                    if (json['block'] != '') {
+                        for (i = 0; i < json['block'].length; i++) {
+                            html += '<option value="' + json['block'][i]['id'] + '"';
+                            if (json['block'][i]['id'] == '<?= $block_id; ?>') {
                                 html += ' selected="selected"';
                             }
-                            html += '>' + json[i]['name'] + '</option>';
+                            html += '>' + json['block'][i]['name'] + '</option>';
                         }
                     } else {
                         html += '<option value="0" selected="selected">Select Block</option>';
