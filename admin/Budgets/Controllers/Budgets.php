@@ -9,6 +9,7 @@ use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use App\Controllers\AdminController;
 use App\Traits\TreeTrait;
+use Config\Url;
 
 class Budgets extends AdminController {
     use TreeTrait;
@@ -53,8 +54,20 @@ class Budgets extends AdminController {
         }
 
         $data['districts']=(new DistrictModel())->getAll();
-        $data['years'] = getAllYears();
-        $data['fundagencies'] = (new BlockModel())->getFundAgencies(['fund_agency_id'=>$this->user->fund_agency_id]);
+        //$data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
+        $f_filter=['fund_agency_id'=>$this->user->fund_agency_id];
+        if($this->user->agency_type_id!=$this->settings->district_user) {
+            $f_filter=[]; 
+            $data['active_fund_agency']="";
+        }else{
+            $data['active_fund_agency']=$this->user->fund_agency_id;
+            if($data['active_fund_agency']){
+                $data['fund_agency_id']=$data['active_fund_agency'];
+            }
+        }
+        
+        $data['fundagencies'] = (new BlockModel())->getFundAgencies($f_filter);
         
         $data['user_id']=$this->user->getId();
         $data['year']=getCurrentYearId();
@@ -68,7 +81,7 @@ class Budgets extends AdminController {
             $data['block_id']=$data['active_block'];
         }
         $data['fund_agency_id']=$this->user->fund_agency_id;
-
+        $data['get_district_url'] = Url::getDistricts;
         return $this->template->view('Admin\Budgets\Views\budgetPlan', $data);
     }
 
@@ -99,13 +112,21 @@ class Budgets extends AdminController {
             $ykey=array_search($result->year,array_column($years,'id'));
             if(getCurrentYearId() == $years[$ykey]['id']){
                 $action  = '<div class="btn-group btn-group-sm pull-right">';
-                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
-                $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
-                $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                if ($this->user->hasPermission('budgets/view')) {
+                    $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                }
+                if ($this->user->hasPermission('budgets/edit')) {
+                    $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
+                }
+                if ($this->user->hasPermission('budgets/delete')) {
+                    $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                }
                 $action .= '</div>';
             }else{
                 $action  = '<div class="btn-group btn-group-sm pull-right">';
-                $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                if ($this->user->hasPermission('budgets/view')) {
+                    $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
+                }
                 $action .= '</div>';
             }
             $datatable[]=array(
@@ -208,6 +229,11 @@ class Budgets extends AdminController {
         $data['years']=(new YearModel())->findAll();
         $data['districts']=(new DistrictModel())->findAll();
 
+        $data['active_district']=$this->user->district_id;
+        if($data['active_district']){
+            $data['district_id']=$data['active_district'];
+        }
+
         echo $this->template->view('Admin\Budgets\Views\budgetPlanForm',$data);
     }
 
@@ -286,7 +312,9 @@ class Budgets extends AdminController {
                 'phase'=>$phase,
                 'category'=>$category,
                 'agency_type_id' => $agency_type_id
-             ];
+            ];
+
+            
 
             $components = $this->budgetModel->getBulkBudgetDetails($filter);
             
@@ -318,6 +346,171 @@ class Budgets extends AdminController {
         }
 
         return $this->template->view('Admin\Budgets\Views\bulkBudgetForm', $data);
+    }
+
+    public function approval(){
+        $this->template->add_package(array('datatable','select2'),true);
+
+        $data['heading_title'] = 'Budgets Approval';
+
+        if(isset($this->error['warning'])){
+            $data['error'] 	= $this->error['warning'];
+        }
+
+        //$data['districts']=(new DistrictModel())->getAll();
+        $data['years'] = getAllYears();
+        //$data['fundagencies'] = (new BlockModel())->getFundAgencies(['fund_agency_id'=>$this->user->fund_agency_id]);
+        $data['fundagencies'] = (new BlockModel())->getFundAgencies();
+        $data['user_id']=$this->user->getId();
+        
+        $data['year']=getCurrentYearId();
+        if($this->request->getGet('year')){
+            $data['year'] = $this->request->getGet('year');
+        }
+        
+       
+        $data['district_id'] = '';
+        $data['active_district']=$this->user->block_id;
+        if($data['active_district']){
+            $data['district_id'] = $this->user->district_id;
+        }
+
+        if($this->request->getGet('district_id')){
+            $data['district_id'] = $this->request->getGet('district_id');
+        }
+
+		
+        $data['fund_agency_id'] = 1;
+        if($this->user->fund_agency_id){
+            $data['fund_agency_id'] = $this->user->fund_agency_id;
+        }
+        if($this->request->getGet('fund_agency_id')){
+            $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+        }
+
+        if($data['fund_agency_id']){
+           $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
+        }
+
+        $data['get_district_url'] = Url::getDistricts;
+
+
+        $filter_data = array(
+            'filter_year'       => $data['year'],
+            'filter_district_id'   => $data['district_id'],
+            'filter_fund_agency_id' => $data['fund_agency_id']
+        );
+       
+        $data['budgets'] = $this->budgetPlanModel->getCumulativeBudget($filter_data);
+       
+        foreach ($data['budgets'] as &$budget) {
+            if($budget['status']==0){
+                $budget['status'] = '<label class="badge badge-warning">'.$this->statuses[$budget['status']].'</label>';
+            }
+            if($budget['status']==1){
+                $budget['status'] = '<label class="badge badge-success">'.$this->statuses[$budget['status']].'</label>';
+            }
+            if($budget['status']==2){
+                $budget['status'] = '<label class="badge badge-danger">'.$this->statuses[$budget['status']].'</label>';
+            }
+            if($budget['status']==3){
+                $budget['status'] = '<label class="badge badge-info">'.$this->statuses[$budget['status']].'</label>';
+            }
+           
+
+            $budget['action'] = '';
+            
+            if($budget['budget_plan_id']){
+                $budget['action'] = admin_url('budgets/details/'.$budget['budget_plan_id']);
+            }
+            
+        }
+
+        return $this->template->view('Admin\Budgets\Views\budgetApproval', $data);
+    }
+
+    public function details(){
+        $data=[];
+        $data['heading_title'] 	= "Budgets Details";
+
+        if ($this->request->getMethod(1) === 'POST'){
+            /*$budget_plan_id=$this->uri->getSegment(3);
+            
+            $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
+            $this->session->setFlashdata('message', 'Budget Updated Successfully.');
+
+            return redirect()->to(admin_url('budgets/view/'.$budget_plan_id));*/
+
+        }
+
+        if(isset($this->error['warning'])){
+            $data['error'] 	= $this->error['warning'];
+        }
+
+        if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
+            $budgetplan_info = $this->budgetPlanModel->getBudgetPlan($this->uri->getSegment(4));
+           // $agencyphase=(new BlockModel())->getTotalPhaseByAgency($budgetplan_info->fund_agency_id);
+           
+            $data['text_form'] = "Budget Details for ".$budgetplan_info->fund_agency."-".$budgetplan_info->yname."-".$budgetplan_info->district;
+
+        }
+        
+        if($budgetplan_info){
+            if($budgetplan_info->block_id){
+                $phase=1;
+                $category=['program'];
+            }else if($budgetplan_info->district_id){
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }else{
+                $phase=0;
+                $category=['pmu', 'addl', 'procurement','iyom'];
+            }
+                
+            
+            $agency_type_id = 0;
+            if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
+                $agency_type_id = 8;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
+                $agency_type_id = 7;
+            } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
+                $agency_type_id = 5;
+            }
+            $filter=[
+                'budget_plan_id'=>$budgetplan_info->id,
+                'fund_agency_id'=>$budgetplan_info->fund_agency_id,
+                'year'=>$budgetplan_info->year,
+                'district_id'=>$budgetplan_info->district_id,
+                'block_id'=>$budgetplan_info->block_id,
+                'phase'=>$phase,
+                'category'=>$category,
+                'agency_type_id' => $agency_type_id
+             ];
+
+            $components = $this->budgetModel->getBudgetDetails($filter);
+            //$components=[];
+            if(getCurrentYearId() == $budgetplan_info->year){
+                $data['view']=$view="edit";
+            }else{
+                $data['view']=$view="show";
+            }
+            if($components) {
+                $components = $this->buildTree($components);
+                $data['components'][0]['year'] = $budgetplan_info->year;
+                $data['components'][0]['phase'] = 0;
+                $data['components'][0]['fund_agency_id'] = $budgetplan_info->fund_agency_id;
+                $data['components'][0]['district_id'] = $budgetplan_info->district_id;
+                $data['components'][0]['block_id'] = $budgetplan_info->block_id;
+                //$data['components'][$key]['budgets']=$components;
+                $data['components'][0]['budgets'] = $this->getBTable($components,$view);
+            }
+            
+
+            return $this->template->view('Admin\Budgets\Views\budgetDetailsForm', $data);
+
+        }else{
+           
+        }
     }
 
     protected function validateForm() {

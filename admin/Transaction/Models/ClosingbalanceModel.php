@@ -150,12 +150,6 @@ class ClosingbalanceModel extends Model
         $month = $filter['month'];
         $year = $filter['year'];
 
-//        if($month-1!=0 && $year-1!=0){
-//            $month = $month-1;
-//            $year = $year-1;
-//        } else if($year-1==0){
-//            $month=$month-1;
-//        }
         $lastMonth = ($month == 1) ? 12 : $month - 1;
         $lastYear = ($month == 1) ? $year - 1 : $year;
 

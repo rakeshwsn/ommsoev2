@@ -2,6 +2,7 @@
 namespace Admin\Transaction\Controllers;
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
+use Admin\Common\Models\YearModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\MIS\Models\MISModel;
@@ -40,7 +41,7 @@ class Transaction extends AdminController {
         $this->template->add_package(['datatable','uploader','jquery_loading'],true);
         $data = [];
         $data['months'] = getMonths();
-        $data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $data['download_url'] = Url::transactionDownloadTemplate;
 
         //control validation from env file
@@ -158,7 +159,7 @@ class Transaction extends AdminController {
 
             $action  = '<div class="btn-group">';
             $action .= '<a class="btn btn-sm btn-primary" href="' . Url::transactionEdit.'/'.$result->id . '"><i class="fa fa-pencil"></i></a>';
-            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::transactionDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
+//            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::transactionDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
             $action .= '</div>';
 
             if($result->status==0){
@@ -915,8 +916,9 @@ class Transaction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
 
+    //yet to be implemented
     public function getForm() {
-
+        $data = [];
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }

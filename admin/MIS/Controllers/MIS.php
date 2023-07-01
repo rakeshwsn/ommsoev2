@@ -1,6 +1,7 @@
 <?php
 namespace Admin\MIS\Controllers;
 
+use Admin\Common\Models\YearModel;
 use Admin\Components\Models\ComponentsModel;
 use Admin\MIS\Models\MISComponentModel;
 use Admin\MIS\Models\MISDetailModel;
@@ -22,7 +23,7 @@ class MIS extends AdminController
 
         $data['upload_enabled'] = true;
 
-        $data['years'] = getAllYears();
+        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
         $data['months'] = getAllMonths();
 
         $data['year_id'] = getCurrentYearId();
@@ -262,7 +263,7 @@ class MIS extends AdminController
                         $html .= '<td>' . $indicator->output_indicator . ' </td>';
                         if($action=='edit'){
                             if($indicator->input_type=='number'){
-                                $html .= '<td><input type="number" name="achievement['.$indicator->id.'][number]" value="'.$achievement.'" class="form-control" /></td>';
+                                $html .= '<td><input type="number" min="0" name="achievement['.$indicator->id.'][number]" value="'.$achievement.'" class="form-control physical" /></td>';
                             } else {
                                 $html .= '<td class="dm-uploader">
                                     <div role="button" class="btn btn-outline-primary mr-2">

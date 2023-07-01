@@ -13,4 +13,3 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->post('permission/delete','Permission\Controllers\Permission::delete');
 
 });
-    

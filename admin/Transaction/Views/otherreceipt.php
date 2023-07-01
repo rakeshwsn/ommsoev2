@@ -133,7 +133,6 @@
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-//                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                 },
                 error: function(){  // error handling
@@ -143,8 +142,6 @@
 
                 },
                 complete:function () {
-//                    $('#main-container').loading('stop');
-
                     $("#main-container").LoadingOverlay("hide");
                 }
             }
@@ -168,7 +165,6 @@
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-//                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                     $('#res-message').text('');
                 },
@@ -194,13 +190,15 @@
                     $("#main-container").LoadingOverlay("hide");
                 },
                 complete:function () {
-//                    $('#main-container').loading('stop');
                     $("#main-container").LoadingOverlay("hide");
+                    numOnly();
+                    decimalOnly();
                 }
             });
         });
     });
 
+    //submit new form
     $(document).on('click','#btn-add',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
         month = $('#month').val()||'';
@@ -214,7 +212,6 @@
             type:'POST',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -229,6 +226,7 @@
         })
     });
 
+    //submit edit
     $(document).on('click','#btn-edit',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
 
@@ -239,7 +237,6 @@
             type:'POST',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -247,15 +244,16 @@
             },
             error:function () {
                 $("#main-container").LoadingOverlay("hide");
-//                $('#main-container').loading('stop');
             },
             complete:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
+                numOnly();
+                decimalOnly();
             }
         })
     });
 
+    //get edit form
     $(document).on('click','.btn-edit',function (e){
         e.preventDefault();
         url = $(this).attr('href')
@@ -266,7 +264,6 @@
             type:'GET',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -281,14 +278,58 @@
                 }
             },
             error:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
             },
             complete:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
             }
         });
     });
+
+    //rakesh
+    function numOnly() {
+        //input type text to number
+        // Get the input field
+        var input = $('.physical');
+
+        // Attach keypress event handler
+        input.keypress(function(event) {
+            // Get the key code of the pressed key
+            var keyCode = event.which;
+
+            // Check if the key is a number
+            if (keyCode < 48 || keyCode > 57) {
+                // Prevent the input if the key is not a number
+                event.preventDefault();
+            }
+        });
+    }
+
+    function decimalOnly() {
+        // Get the input field
+        var input = $('.financial');
+
+        $('.financial').on('keypress',function (e) {
+            // Get the key code of the pressed key
+            var keyCode = event.which;
+
+            // Allow decimal point (.) and numbers (48-57) only
+            if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
+                // Prevent the input if the key is not a number or decimal point
+                event.preventDefault();
+            }
+
+            // Allow only one decimal point
+            if (keyCode === 46 && $(this).val().indexOf('.') !== -1) {
+                // Prevent the input if there is already a decimal point
+                event.preventDefault();
+            }
+            // Disallow comma (,)
+            if (keyCode === 44) {
+                // Prevent the input if the key is a comma
+                event.preventDefault();
+            }
+        });
+    }
 </script>
 <?php js_end(); ?>

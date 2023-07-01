@@ -2,7 +2,10 @@
 <!-- Main content -->
 <section class="content1">
     <div class="block" id="upload-controls">
-            <div class="block-content block-content-full">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Add Transaction</h3>
+        </div>
+        <div class="block-content block-content-full">
                 <div class="row">
                     <div class="col-md-3">
                         <select class="form-control" id="year" name="year" required>
@@ -105,7 +108,9 @@
         </div>
 
     <div class="block">
-
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Transaction History</h3>
+        </div>
         <div class="block-content block-content-full">
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
                 <thead>

@@ -44,7 +44,7 @@ $validation = \Config\Services::validation();
                         </div>
                         
                     </div>
-                   
+                   <?php if($block_id || !$fund_agency_id){?>
                     <div class="form-group row <?=$validation->hasError('block_id')?'is-invalid':''?>">
                         <label class="col-sm-2 control-label" for="input-status">Block</label>
                         <div class="col-sm-10">
@@ -52,6 +52,7 @@ $validation = \Config\Services::validation();
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
                         </div>
                     </div>
+                    <?}?>
                 </div>
                 <?php if($details){?>
                 <hr/>
@@ -134,6 +135,9 @@ $validation = \Config\Services::validation();
                 });
             });
             $('select[name=\'district_id\']').trigger('change');
+
+            numOnly();
+            decimalOnly();
         });
        
         $('#nextButton').click(function() {
@@ -194,6 +198,50 @@ $validation = \Config\Services::validation();
             financial.val(financial_val);
         }
 
+        function numOnly() {
+            //input type text to number
+            // Get the input field
+            var input = $('.rate,.physical');
+
+            // Attach keypress event handler
+            input.keypress(function(event) {
+                // Get the key code of the pressed key
+                var keyCode = event.which;
+
+                // Check if the key is a number
+                if (keyCode < 48 || keyCode > 57) {
+                    // Prevent the input if the key is not a number
+                    event.preventDefault();
+                }
+            });
+        }
+
+        function decimalOnly() {
+            // Get the input field
+            var input = $('.financial');
+
+            $('.financial').on('keypress',function (e) {
+                // Get the key code of the pressed key
+                var keyCode = event.which;
+
+                // Allow decimal point (.) and numbers (48-57) only
+                if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
+                    // Prevent the input if the key is not a number or decimal point
+                    event.preventDefault();
+                }
+
+                // Allow only one decimal point
+                if (keyCode === 46 && $(this).val().indexOf('.') !== -1) {
+                    // Prevent the input if there is already a decimal point
+                    event.preventDefault();
+                }
+                // Disallow comma (,)
+                if (keyCode === 44) {
+                    // Prevent the input if the key is a comma
+                    event.preventDefault();
+                }
+            });
+        }
         //--></script>
 <?php js_end(); ?>
 

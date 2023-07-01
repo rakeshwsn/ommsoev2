@@ -7,6 +7,7 @@ if(!isset($routes))
 
 $routes->group(env('app.adminRoute'), ['namespace' => 'Admin'], function ($routes) {
     $routes->get('pendingstatus', 'Reports\Controllers\Reports::pendingStatus');
+    $routes->get('reports/mis','Reports\Controllers\MIS::index');
 });
 
 $routes->group('api', ['namespace' => 'Admin'],function($routes){
