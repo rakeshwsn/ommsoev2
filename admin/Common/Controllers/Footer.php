@@ -17,7 +17,7 @@ class Footer extends AdminController
             $districtModel = new DistrictModel();
 
             $new_blocks = $blockModel->asArray()->where(['year' => 6])->findAll();
-            $new_dists = $districtModel->getNewDistricts();
+            $new_dists = $districtModel->getAll();
 
             if($this->user->district_id && array_search($this->user->district_id, array_column($new_dists, 'district_id')) !== false) {
                 $data['show_old_portal'] = false;
