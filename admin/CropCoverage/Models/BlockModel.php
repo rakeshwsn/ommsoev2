@@ -1,6 +1,5 @@
 <?php
-
-namespace Admin\Localisation\Models;
+namespace Admin\CropCoverage\Models;
 
 use CodeIgniter\Model;
 
@@ -42,7 +41,7 @@ class BlockModel extends Model
 
 	// Callbacks
 	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
+	protected $beforeInsert         = ['getBlockCode'];
 	protected $afterInsert          = [];
 	protected $beforeUpdate         = [];
 	protected $afterUpdate          = [];
@@ -53,15 +52,16 @@ class BlockModel extends Model
 	
 	
 	public function getAll($data = array()){
-		$builder=$this->db->table("{$this->table} sb");
+		//printr($data);
+		$builder=$this->db->table("{$this->table} b");
 		$this->filter($builder,$data);
 		
-		$builder->select("sb.*,sd.name as district");
+		$builder->select("s.*,d.name as soe_districts,d.code as dcode");
 		
 		if (isset($data['sort']) && $data['sort']) {
 			$sort = $data['sort'];
 		} else {
-			$sort = "sb.name";
+			$sort = "s.name";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'desc')) {
@@ -81,6 +81,7 @@ class BlockModel extends Model
 			}
 			$builder->limit((int)$data['limit'],(int)$data['start']);
 		}
+		//$builder->where($this->deletedField, null);
 
 		$res = $builder->get()->getResult();
 
@@ -88,33 +89,36 @@ class BlockModel extends Model
 	}
 	
 	public function getTotals($data = array()) {
-		$builder=$this->db->table("{$this->table} sb");
+		$builder=$this->db->table("{$this->table} s");
 		$this->filter($builder,$data);
 		$count = $builder->countAllResults();
 		return $count;
 	}
 	
 	private function filter($builder,$data){
-		$builder->join('soe_districts sd', 'sb.district_id = sd.id');
+		$builder->join('soe_districts d', 's.district_id = d.id');
         
 		if(!empty($data['filter_district'])){
-            $builder->where("sb.district_id  = '".$data['filter_district']."'");
+            $builder->where("s.district_id  = '".$data['filter_district']."'");
         }
-
+		
+		/*if(!empty($data['filter_block'])){
+            $builder->where("b.name  LIKE '%{$data['filter_block']}%'");
+        }*/
 		if (!empty($data['filter_search'])) {
 			$builder->where("
-				sb.name LIKE '%{$data['filter_search']}%' OR
-				sb.id = '{$data['filter_search']}'
-			");
+				s.name LIKE '%{$data['filter_search']}%'	
+				OR b.code LIKE '%{$data['filter_search']}%'"
+			);
 		}
     }
 
 	protected  function getBlockCode(array $data){
-
-		$builder=$this->db->table("{$this->table} sb");
-		$builder->select("sb.code");
-		$builder->where("sb.district_id  = '".$data['data']['district_id']."'");
-		$builder->orderBy('sb.code', 'desc');
+		//printr($data);
+		$builder=$this->db->table("{$this->table} s");
+		$builder->select("s.code");
+		$builder->where("s.district_id  = '".$data['data']['district_id']."'");
+		$builder->orderBy('s.code', 'desc');
 		$builder->limit(1);
 		$res = $builder->get()->getRow();
 		
@@ -130,53 +134,22 @@ class BlockModel extends Model
 
             $data['data']['code']=$district->code."B01";
 		}
-
+		//printr($data);
+		//exit;
 		return $data;
 	}
 
 	public function getBlocksByDistrict($district) {
-		$builder=$this->db->table("{$this->table} sb");
+		$builder=$this->db->table("{$this->table} s");
 		$builder->where("district_id",$district);
 		$res = $builder->get()->getResult();
 		return $res;
 	}
-
-    public function getFundAgencies($filter=[]) {
-        $sql = "SELECT
-  sd.name district,
-  sfa.id fund_agency_id,
-  CONCAT(sfa.name, CONCAT(' (', COUNT(sb.id), ')')) fund_agency,
-  COUNT(sb.id) total_blocks
-FROM soe_blocks sb
-  LEFT JOIN soe_districts sd
-    ON sb.district_id = sd.id
-  LEFT JOIN soe_fund_agency sfa
-    ON sb.fund_agency_id = sfa.id
-WHERE 1=1";
-        if(!empty($filter['district_id'])){
-            $sql .= " AND sd.id = ".$filter['district_id'];
-        }
-        if(!empty($filter['fund_agency_id'])){
-            $sql .= " AND sfa.id = ".$filter['fund_agency_id'];
-        }
-        $sql .= " GROUP BY sb.fund_agency_id";
-
-        if(!empty($filter['asObject'])){
-            return $this->db->query($sql)->getResult();
-        }
-        return $this->db->query($sql)->getResultArray();
-    }
-	
-	public function getTotalPhaseByAgency($agency_id=""){
-        $sql="SELECT
-  sb.phase phase_no,
-  CONCAT('Phase ', sb.phase, CONCAT(' (', COUNT(sb.id), ' block)')) name
-FROM soe_blocks sb
-WHERE 1 = 1";
-        if(!empty($agency_id)){
-            $sql .= " AND sb.fund_agency_id = ".$agency_id;
-        }
-        $sql .= " GROUP BY sb.phase";
-        return $this->db->query($sql)->getResultArray();
+    public function getBlockByCode($code) {
+        $builder=$this->db->table("{$this->table} s");
+        $builder->where("code",$code);
+        $res = $builder->get()->getRowArray();
+        return $res;
     }
 }
+?>

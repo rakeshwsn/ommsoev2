@@ -72,6 +72,19 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->get('block/delete/(:segment)',   'Localisation\Controllers\Block::delete/$1');
     $routes->post('block/delete','Localisation\Controllers\Block::delete');
 
+    //Hemant Routs For Crop Coverage
+
+    $routes->match(['get','post'],'cropcoverage/crops', 'CropCoverage\Controllers\AreaCoverageCrops::Index');
+    $routes->add('grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
+    $routes->match(['get','post'],'grampanchayat/add', 'Localisation\Controllers\Grampanchayat::add');
+    $routes->get('grampanchayat/delete/(:segment)',   'Localisation\Controllers\Grampanchayat::delete/$1');
+    $routes->post('grampanchayat/delete','Localisation\Controllers\Grampanchayat::delete');
+    $routes->match(['get','post'],'grampanchayat/edit/(:segment)', 'Localisation\Controllers\Grampanchayat::edit/$1');
+    $routes->post('grampanchayat/search','Localisation\Controllers\Grampanchayat::search');
+    
+    $routes->add('areacoverage/grampanchayat','Localisation\Controllers\Grampanchayat::index');
+
+    //areacoverage_grampanchayat
     $routes->add('users', 'Users\Controllers\Users::index');
     $routes->post('users/search','Users\Controllers\Users::search');
     $routes->match(['get','post'],'users/add', 'Users\Controllers\Users::add');
@@ -196,6 +209,14 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 
     $routes->get('dashboard/chart','Common\Controllers\Dashboard::chart');
     $routes->get('dashboard/getabstractdetails','Common\Controllers\Dashboard::getabstractdetails');
+   
+
+    $routes->match(['get','post'],'cropcoverage/gp/add', 'CropCoverage\Controllers\Grampanchayat::add');
+    $routes->match(['get','post'],'areacoverage', 'CropCoverage\Controllers\AreaCoverage::Index');
+    $routes->post('areacoverage/search','CropCoverage\Controllers\AreaCoverage::search');
+    $routes->add('district/block/','Localisation\Controllers\District::block/');
+    $routes->get('district/block/(:segment)','Localisation\Controllers\District::block/$1');
+    
 });
 $routes->group('/', ['namespace' => 'Admin'], function($routes){
     $routes->add('profile','Users\Controllers\Profile::index');

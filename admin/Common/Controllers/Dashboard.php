@@ -109,6 +109,10 @@ class Dashboard extends AdminController
             //pie chart
             $data['piechart'] = [];
             foreach ($abstractDists as $abstractDist) {
+                $fr_total = $abstractDist->fr_total;
+                if(!$fr_total){
+                    continue;
+                }
                 $data['piechart'][] = [
                     'name' => $abstractDist->district,
                     'value' => round(($abstractDist->ex_total/$abstractDist->fr_total)*100,2)
