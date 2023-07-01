@@ -25,6 +25,7 @@ class PermissionModel extends Model
 
     // Validation
     protected $validationRules      = [
+        'id'    => 'permit_empty|integer|greater_than[0]',
         'name' => array(
             'label' => 'Name',
             'rules' => 'trim|required|max_length[100]|is_unique[permission.name,id,{id}]'
