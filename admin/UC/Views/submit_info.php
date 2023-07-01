@@ -229,7 +229,6 @@
                 type:'POST',
                 dataType:'JSON',
                 before:function () {
-//                $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                 },
                 success:function (json) {

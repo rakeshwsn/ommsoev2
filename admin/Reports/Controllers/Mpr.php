@@ -424,8 +424,6 @@ class Mpr extends AdminController
         return $this->template->view('Admin\Reports\Views\abstract_mpr', $data);
     }
 
-    
-
     protected function filterPanel(&$data) {
         $data['years'] = getAllYears();
         $data['months'] = getAllMonths();

@@ -1,9 +1,9 @@
 <div class="block">
 	<div class="block-header block-header-default">
-		<h3 class="block-title"><?= $heading_title; ?></h3>
+		<h3 class="block-title"><?php echo $heading_title; ?></h3>
 		<div class="block-options">
-			<a href="<?= $add; ?>" data-toggle="tooltip" title="<?= $button_add; ?>" class="btn btn-primary ajaxaction"><i class="fa fa-plus"></i></a>
-			<button type="button" data-toggle="tooltip" title="<?= $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?= $text_confirm; ?>') ? $('#form-grampanchayat').submit() : false;"><i class="fa fa-trash-o"></i></button>
+			<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+			<button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm; ?>') ? $('#form-district').submit() : false;"><i class="fa fa-trash-o"></i></button>
 		</div>
 	</div>
 	<div class="block-content block-content-full">
@@ -13,16 +13,15 @@
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
-							<?= form_dropdown('district_id', option_array_value($districts, 'id', 'name',array('0'=>'Select Districts')), set_value('district_id', $district_id),"id='filter_district' class='form-control js-select2'" . ($district_id ? " disabled" : "")); ?>
+							<?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array('0'=>'Select Districts')), set_value('district_id', ''),"id='filter_district' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Block: <span class="tx-danger">*</span></label>
-							<?= form_dropdown('block_id', array(), set_value('block_id', $block_id),"id='filter_block' class='form-control js-select2'" . ($block_id ? " disabled" : "")); ?>
+							<?php echo form_dropdown('block_id', array(), set_value('block_id', ''),"id='filter_block' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
-					
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Grampanchayat: <span class="tx-danger">*</span></label>
@@ -42,11 +41,12 @@
 		</form>
 		<hr/>
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/district/be_tables_datatables.min.js which was auto compiled from _es6/district/be_tables_datatables.js -->
-		<form action="<?= $delete; ?>" method="post" enctype="multipart/form-data" id="form-grampanchayat">
+		<form action="<?php echo $delete; ?>" method="post" enctype="multipart/form-data" id="form-grampanchayat">
 			<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 				<thead>
 					<tr>
 						<th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
+						<th>GP Code</th>
 						<th>GP Name</th>
 						<th>District</th>
 						<th>Block</th>
@@ -60,10 +60,9 @@
 <?php js_start(); ?>
 <script type="text/javascript"><!--
 $(document).ready(function() {
-	var blockId = "<?= $block_id; ?>"
 	$('select[name=\'district_id\']').bind('change', function() {
 		$.ajax({
-			url: '<?= admin_url("district/block"); ?>/' + this.value,
+			url: '<?php echo admin_url("district/block"); ?>/' + this.value,
 			dataType: 'json',
 			beforeSend: function() {
 				//$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
@@ -72,24 +71,16 @@ $(document).ready(function() {
 				//$('.wait').remove();
 			},			
 			success: function(json) {
-				//console.log(blockId);
 				
 				html = '<option value="">Select Block</option>';
 		
-				if (json != '') {
-					for (var i = 0; i < json.length; i++) {
-						
-							html += '<option value="' + json[i]['id'] + '"';
-							
-							if (blockId == json[i]['id']) {
-								html += ' selected';
-							}
-							
-							html += '>' + json[i]['name'] + '</option>';
-						
+				if (json['block'] != '') {
+					for (i = 0; i < json.length; i++) {
+						html += '<option value="' + json['block'][i]['id'] + '"';
+
+						html += '>' + json[i]['name'] + '</option>';
 					}
-				}
- 				else {
+				} else {
 					html += '<option value="0" selected="selected">Select Block</option>';
 				}
 				
@@ -111,7 +102,7 @@ $(function(){
 			{ targets: 'no-sort', orderable: false }
 		],
 		"ajax":{
-			url :"<?= $datatable_url; ?>", // json datasource
+			url :"<?=$datatable_url?>", // json datasource
 			type: "post",  // method  , by default get
 			data: function ( data ) {
 				data.district = $('#filter_district').val();
@@ -150,7 +141,7 @@ function delete_district(title,id){
 		content: '<h2>Delete Manager</h2>Are you sure you want to delete this Manager?<br><b>'+title,
 		buttons: {
 			'Yes': function() {
-				$.post('<?= admin_url('members.delete');?>',{user_id:id}, function(data) {
+				$.post('<?php echo admin_url('members.delete');?>',{user_id:id}, function(data) {
 					if (data.success) {
 						gbox.hide();
 						$('#member_list').DataTable().ajax.reload();
