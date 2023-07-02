@@ -54,24 +54,20 @@ class Mpr extends AdminController
             $data['district_id'] = $this->request->getGet('district_id');
         }
 
+        if($this->user->agency_type_id==$this->settings->district_user){
+            $data['district_id'] = $this->user->district_id;
+        }
+
         $data['block_id'] = '';
         if($this->request->getGet('block_id')){
             $data['block_id'] = $this->request->getGet('block_id');
-        }
-
-        $data['agency_type_id'] = '';
-        if($this->request->getGet('agency_type_id')){
-            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
         }
 
         if($this->user->agency_type_id==$this->settings->block_user){
             $data['block_id'] = $this->user->block_id;
         }
 
-        if($this->user->agency_type_id==$this->settings->district_user){
-            $data['district_id'] = $this->user->district_id;
-        }
-
+    
         if($data['block_id']){
             $where = ['block_id'=>$data['block_id'],'user_group_id'=>$this->settings->block_user];
             $user = (new UserModel())->where($where)->first();
@@ -84,12 +80,6 @@ class Mpr extends AdminController
             $data['district_user_id'] = $user->id;
         }
 
-        $data['agency_types'] = [];
-        // only ps and rs in state login where user dont belongs to any district
-        if(!$this->user->district_id) {
-            $data['agency_types'] = (new UserGroupModel())->whereIn('id', [8, 9])
-                ->orderBy('name')->asArray()->findAll();
-        }
 
         $data['districts'] = [];
 
@@ -106,6 +96,7 @@ class Mpr extends AdminController
             'user_id' => $this->user->id,
         ];
         $filter['component_agency_type_id'] = $this->user->agency_type_id;
+        
         if($this->user->agency_type_id==11){ //spmu
             $filter['component_agency_type_id'] = NULL;
         }
@@ -118,7 +109,7 @@ class Mpr extends AdminController
 
             //in case of dmf angul/keunjhar (district id 7) all agency_type
             if($data['district_id']==7 || $data['district_id']==15){
-                $filter['agency_type_id'] = [5,6,7,8,9];
+                $filter['agency_type_id'] = [5,6,7,8,9]; //only expense
                 $filter['district_id'] = null;
             }
             $filter['component_agency_type_id'] = 7;
@@ -229,7 +220,7 @@ class Mpr extends AdminController
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
     }
 
-    //created by Niranjan
+    //created by Niranjan code
     public function abstractMpr($action='') {
         $data = [];
 
@@ -467,7 +458,7 @@ class Mpr extends AdminController
 
             $data['filter_panel'] = view('Admin\Reports\Views\ps_filter_panel',$data);
         }
-        if($this->user->agency_type_id==11){
+        if($this->user->agency_type_id==11){ // spmu user
 
             $data['fund_agency_id'] = 1;
             if($this->request->getGet('fund_agency_id')){
@@ -475,6 +466,8 @@ class Mpr extends AdminController
             }
 
             $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['asObject'=>true]);
+
+            $data['agency_types'] = [''=>'All','8'=>'WASSAN','9'=>'NCDS'];
 
             $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
 

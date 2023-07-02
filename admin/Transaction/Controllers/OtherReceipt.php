@@ -344,9 +344,10 @@ class OtherReceipt extends AdminController
 
         $cb = $this->cbModel
             ->where($condition)
-            ->find();
-       
-        if($cb){
+            ->first();
+
+        //check if cb is rejected
+        if($cb && $cb->status!=2){
             $this->error="Can not add other Receipt. Closing balance already exist" ;
         }else if($txn){
            $this->error="Can not add other Receipt. Other receipt already exist" ;

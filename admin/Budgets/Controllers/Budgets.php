@@ -679,7 +679,7 @@ class Budgets extends AdminController {
 
     public function delete($id) {
         $this->budgetPlanModel->delete($id);
-
+        $this->budgetModel->where('budget_plan_id',$id)->delete();
         return redirect()->to(admin_url('budgets'))->with('message','Budget deleted successfully');
     }
 }
