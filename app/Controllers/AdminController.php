@@ -36,7 +36,6 @@ class AdminController extends Controller
         'danger',
         'primary',
     ];
-	
 
 	protected $template;
 
