@@ -135,6 +135,8 @@ class Grampanchayat extends AdminController{
 			'start' 			 => $requestData['start'],
 			'limit' 			 => $requestData['length']
 		);
+
+		
 		$totalFiltered = $this->grampanchayatModel->getTotals($filter_data);
 			
 		$filteredData = $this->grampanchayatModel->getAll($filter_data);
@@ -144,7 +146,7 @@ class Grampanchayat extends AdminController{
 
 			$action  = '<div class="btn-group btn-group-sm pull-right">';
 			$action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('grampanchayat/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
-			$action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('grampanchayat/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+			// $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('grampanchayat/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
 			$action .= '</div>';
 			
 			$datatable[]=array(
