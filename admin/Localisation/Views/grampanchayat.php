@@ -3,7 +3,7 @@
 		<h3 class="block-title"><?= $heading_title; ?></h3>
 		<div class="block-options">
 			<a href="<?= $add; ?>" data-toggle="tooltip" title="<?= $button_add; ?>" class="btn btn-primary ajaxaction"><i class="fa fa-plus"></i></a>
-			<button type="button" data-toggle="tooltip" title="<?= $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?= $text_confirm; ?>') ? $('#form-grampanchayat').submit() : false;"><i class="fa fa-trash-o"></i></button>
+			<!-- <button type="button" data-toggle="tooltip" title="<?= $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?= $text_confirm; ?>') ? $('#form-grampanchayat').submit() : false;"><i class="fa fa-trash-o"></i></button> -->
 		</div>
 	</div>
 	<div class="block-content block-content-full">
