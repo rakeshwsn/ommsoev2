@@ -22,7 +22,10 @@
                     <label>Fund Agency</label>
                     <?php echo form_dropdown('fund_agency_id', option_array_value($fund_agencies, 'fund_agency_id', 'fund_agency'), set_value('fund_agency_id', $fund_agency_id),"id='fund_agency_id' class='form-control js-select2'"); ?>
                 </div>
-
+                <div class="col-md-2">
+                    <label>Agency Type</label>
+                    <?php echo form_dropdown('agency_type_id',$agency_types, set_value('agency_type_id', $agency_type_id),"id='agency_type_id' class='form-control js-select2'"); ?>
+                </div>
                 <?php if($districts): ?>
                     <div class="col-md-2">
                         <label>District</label>
