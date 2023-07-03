@@ -100,7 +100,7 @@ class IncentivemainModel extends Model
     public function getTotal($data = array())
     {
         // print_r($data); exit;
-        $builder = $this->db->table($this->table);
+        $builder = $this->db->table("{$this->table} im");
         $this->filter($builder, $data);
         $count = $builder->countAllResults();
         return $count;
@@ -174,13 +174,12 @@ class IncentivemainModel extends Model
         LEFT JOIN (SELECT * FROM incetive_main_details d WHERE d.year=".$filter['year']." OR d.district_id=".$filter['district_id'].") imd
           ON main_tbl.district_id = imd.district_id
           AND main_tbl.block_id = imd.block_id
-      ORDER BY main_tbl.district";
+      ORDER BY main_tbl.district,main_tbl.block_name";
         return $this->db->query($sql)->getResultArray();
     }
 
     private function filter($builder, $data)
     {
-
 
         if (!empty($data['filter_district'])) {
             $builder->where(
@@ -203,5 +202,7 @@ class IncentivemainModel extends Model
                 "im.season = '{$data['filter_season']}'"
             );
         }
+
+        
     }
 }

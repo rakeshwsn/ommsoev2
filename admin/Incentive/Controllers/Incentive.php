@@ -69,7 +69,7 @@ class Incentive extends AdminController
 	public function searchMain()
 	{
 		$requestData = $_REQUEST;
-		$totalData = $this->incentiveModel->getTotal();
+		$totalData = $this->incentivemainModel->getTotal();
 		$totalFiltered = $totalData;
 		$filter_data = array(
 			'filter_district'	=> $requestData['searchBydistrictId'],
@@ -83,10 +83,10 @@ class Incentive extends AdminController
 			'limit' 		    =>	$requestData['length']
 		);
 
-		$totalFiltered = $this->incentiveModel->getTotal($filter_data);
+		$totalFiltered = $this->incentivemainModel->getTotal($filter_data);
 		$filteredData = $this->incentivemainModel->getAll($filter_data);
 
-		// printr($filteredData); exit;
+		//  printr($filteredData); exit;
 		$datatable = array();
 		foreach ($filteredData as $result) {
 
@@ -138,13 +138,19 @@ class Incentive extends AdminController
 				$action
 			);
 		}
-		$json_data = array(
-			"draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
-			"recordsTotal"    => intval($totalData),
-			"recordsFiltered" => intval($totalFiltered),
-			"data"            => $datatable
-		);
+		// Calculate the correct pagination count
+	$recordsTotal = intval($totalData);
+	$recordsFiltered = intval($totalFiltered);
 
+	$json_data = array(
+		"draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+		"recordsTotal"    => $recordsTotal,
+		"recordsFiltered" => $recordsFiltered,
+		"data"            => $datatable
+	);
+
+// 	print_r($json_data);
+// exit;
 		return $this->response->setContentType('application/json')
 			->setJSON($json_data);
 	}
@@ -152,8 +158,6 @@ class Incentive extends AdminController
 
 	public function incentivesearch()
 	{
-
-
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
@@ -185,16 +189,23 @@ class Incentive extends AdminController
 		$requestData = $_REQUEST;
 		$totalData = $this->incentiveModel->getTotal();
 		$totalFiltered = $totalData;
+		$data['selectedYear'] = 1;
+		// Set the default value for the selected year to 1
+
+		if ($this->request->getGet('year')) {
+			$data['selectedYear'] = $this->request->getGet('year');
+		}
 		$filter_data = array(
 
 			'filter_district' => $userDis ? $userDis : $this->request->getGet('district_id'),
 			'filter_block' => $this->request->getGet('block_id'),
-			'filter_year' => $this->request->getGet('year'),
+			'filter_year' => $this->request->getGet('year') ? $this->request->getGet('year') : 1,
 			'filter_season' => $this->request->getGet('season'),
 		);
-
+		//print_r($filter_data); exit;
 		//$totalFiltered = $this->incentiveModel->getTotal($filter_data);
 		$filteredData = $this->incentivemainModel->getAllsearch($filter_data);
+	
 
 		$currentUrl = admin_url('incentive/incentivesearch');
 		$url = [
