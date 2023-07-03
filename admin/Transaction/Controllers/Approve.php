@@ -402,7 +402,12 @@ class Approve extends AdminController {
         $filter['month'] = $cb->month;
         $filter['agency_type_id'] = $cb->agency_type_id;
         $filter['block_id'] = $cb->block_id;
-        $filter['fund_agency_id'] = (new BlockModel())->find($cb->block_id)->fund_agency_id;
+        $filter['district_id'] = $cb->district_id;
+        if($cb->block_id){
+            $filter['fund_agency_id'] = (new BlockModel())->find($cb->block_id)->fund_agency_id;
+        } else if($cb->district_id) {
+            $filter['fund_agency_id'] = $cb->fund_agency_id;
+        }
 
         $ledger =  $cbModel->getLedgerReport($filter,'array');
 
