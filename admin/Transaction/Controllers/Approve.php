@@ -386,7 +386,7 @@ class Approve extends AdminController {
             $data = [
                 'status' => (int)$this->request->getPost('status'),
                 'status_user' => (int)$this->user->user_id,
-                'remarks' => (int)$this->request->getPost('remarks'),
+                'remarks' => $this->request->getPost('remarks'),
             ];
 
             $cbModel->update($cb->id,$data);

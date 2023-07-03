@@ -33,7 +33,7 @@ $validation = \Config\Services::validation();
                 <td></td>
                 <td></td>
                 <td style="display: flex;">
-                    <div class="col-md-6"><i class="fa fa-download"style="font-size:24px;color:blue;"><a href="https:///uploads/files/" class="" data-title="Download"></a></i></div>
+                    <div class="col-md-6"><a href="http://ommsoev2.local//uploads/files/" class="" data-title="Download"><i class="fa fa-download"style="font-size:24px;color:blue;"></i></a></div>
                     <div class="col-md-6"><i class="fa fa-upload"style="font-size:24px;color:red;"><a href="https:///uploads/files/" class="" data-title="Upload"></a></i></div>
                 </td>
               </tr>
