@@ -1,9 +1,9 @@
 <div class="block">
 	<div class="block-header block-header-default">
-		<h3 class="block-title"><?php echo $heading_title; ?></h3>
+		<h3 class="block-title"><?= $heading_title; ?></h3>
 		<div class="block-options">
-			<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-			<button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm; ?>') ? $('#form-district').submit() : false;"><i class="fa fa-trash-o"></i></button>
+			<a href="<?= $add; ?>" data-toggle="tooltip" title="<?= $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+			<button type="button" data-toggle="tooltip" title="<?= $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?= $text_confirm; ?>') ? $('#form-district').submit() : false;"><i class="fa fa-trash-o"></i></button>
 		</div>
 	</div>
 	<div class="block-content block-content-full">
@@ -13,13 +13,13 @@
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
-							<?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name',array('0'=>'Select Districts')), set_value('district_id', ''),"id='filter_district' class='form-control js-select2'"); ?>
+							<?= form_dropdown('district_id', option_array_value($districts, 'id', 'name',array('0'=>'Select Districts')), set_value('district_id', ''),"id='filter_district' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Block: <span class="tx-danger">*</span></label>
-							<?php echo form_dropdown('block_id', array(), set_value('block_id', ''),"id='filter_block' class='form-control js-select2'"); ?>
+							<?= form_dropdown('block_id', array(), set_value('block_id', ''),"id='filter_block' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
 					<div class="col-lg-3">
@@ -41,7 +41,7 @@
 		</form>
 		<hr/>
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/district/be_tables_datatables.min.js which was auto compiled from _es6/district/be_tables_datatables.js -->
-		<form action="<?php echo $delete; ?>" method="post" enctype="multipart/form-data" id="form-grampanchayat">
+		<form action="<?= $delete; ?>" method="post" enctype="multipart/form-data" id="form-grampanchayat">
 			<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 				<thead>
 					<tr>
@@ -62,7 +62,7 @@
 $(document).ready(function() {
 	$('select[name=\'district_id\']').bind('change', function() {
 		$.ajax({
-			url: '<?php echo admin_url("district/block"); ?>/' + this.value,
+			url: '<?= admin_url("district/block"); ?>/' + this.value,
 			dataType: 'json',
 			beforeSend: function() {
 				//$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
@@ -141,7 +141,7 @@ function delete_district(title,id){
 		content: '<h2>Delete Manager</h2>Are you sure you want to delete this Manager?<br><b>'+title,
 		buttons: {
 			'Yes': function() {
-				$.post('<?php echo admin_url('members.delete');?>',{user_id:id}, function(data) {
+				$.post('<?= admin_url('members.delete');?>',{user_id:id}, function(data) {
 					if (data.success) {
 						gbox.hide();
 						$('#member_list').DataTable().ajax.reload();
