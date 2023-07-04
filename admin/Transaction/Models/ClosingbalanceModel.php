@@ -116,10 +116,8 @@ class ClosingbalanceModel extends Model
         if($block_id){
             
             $sql = "CALL proc_get_ledger_statement($block_id,$year,$agency_type_id,$user_id,$fund_agency_id)";
-           
-        }
-
-        if($district_id){
+//           echo $sql;exit;
+        } else if($district_id){
             $sql = "CALL proc_get_ledger_statement_district($district_id,$year,$agency_type_id,$user_id,$fund_agency_id)";
         }
 
