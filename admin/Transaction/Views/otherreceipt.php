@@ -133,7 +133,6 @@
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-//                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                 },
                 error: function(){  // error handling
@@ -143,8 +142,6 @@
 
                 },
                 complete:function () {
-//                    $('#main-container').loading('stop');
-
                     $("#main-container").LoadingOverlay("hide");
                 }
             }
@@ -168,7 +165,6 @@
                 type: "get",  // method  , by default get
                 dataType:'json',
                 beforeSend:function () {
-//                    $('#main-container').loading();
                     $("#main-container").LoadingOverlay('show');
                     $('#res-message').text('');
                 },
@@ -194,14 +190,16 @@
                     $("#main-container").LoadingOverlay("hide");
                 },
                 complete:function () {
-//                    $('#main-container').loading('stop');
                     $("#main-container").LoadingOverlay("hide");
+                    numOnly();
+                    decimalOnly();
+                    cleanupInput();
                 }
             });
         });
     });
 
-    //modal form add btn click
+    //submit new form
     $(document).on('click','#btn-add',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
         month = $('#month').val()||'';
@@ -215,7 +213,6 @@
             type:'POST',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -230,7 +227,7 @@
         })
     });
 
-    //modal form save btn click
+    //submit edit
     $(document).on('click','#btn-edit',function () {
         formdata = $(this).closest('.modal-content').find('form').serialize();
 
@@ -241,7 +238,6 @@
             type:'POST',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -249,16 +245,14 @@
             },
             error:function () {
                 $("#main-container").LoadingOverlay("hide");
-//                $('#main-container').loading('stop');
             },
             complete:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
             }
         })
     });
 
-    //table edit btn click
+    //get edit form
     $(document).on('click','.btn-edit',function (e){
         e.preventDefault();
         url = $(this).attr('href');
@@ -269,7 +263,6 @@
             type:'GET',
             dataType:'JSON',
             before:function () {
-//                $('#main-container').loading();
                 $("#main-container").LoadingOverlay('show');
             },
             success:function (json) {
@@ -284,12 +277,13 @@
                 }
             },
             error:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
             },
             complete:function () {
-//                $('#main-container').loading('stop');
                 $("#main-container").LoadingOverlay("hide");
+                numOnly();
+                decimalOnly();
+                cleanupInput();
             }
         });
     });
