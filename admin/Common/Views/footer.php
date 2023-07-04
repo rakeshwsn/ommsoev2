@@ -11,7 +11,7 @@ $user=service('user');
 </footer>
 </div>
 <script src="<?=theme_url('assets/js/codebase.app.js');?>"></script>
-<script src="<?=theme_url('assets/js/common.js');?>"></script>
+<script src="<?=theme_url('assets/js/common.js?v=1');?>"></script>
 <script src="//cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
 <?php echo $template->footer_javascript() ?>
 
