@@ -74,7 +74,7 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 
     //Hemant Routs For Crop Coverage
 
-    $routes->match(['get','post'],'cropcoverage/crops', 'CropCoverage\Controllers\AreaCoverageCrops::Index');
+    $routes->match(['get','post'],'cropcoverage/crops', 'CropCoverage\Controllers\AreaCoverageCrops::index');
     $routes->add('grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
     $routes->match(['get','post'],'grampanchayat/add', 'Localisation\Controllers\Grampanchayat::add');
     $routes->get('grampanchayat/delete/(:segment)',   'Localisation\Controllers\Grampanchayat::delete/$1');
@@ -82,9 +82,11 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->match(['get','post'],'grampanchayat/edit/(:segment)', 'Localisation\Controllers\Grampanchayat::edit/$1');
     $routes->post('grampanchayat/search','Localisation\Controllers\Grampanchayat::search');
     
+    //areacoverage_grampanchayat
     $routes->add('areacoverage/grampanchayat','Localisation\Controllers\Grampanchayat::index');
 
-    //areacoverage_grampanchayat
+    $routes->add('areacoverage/download','CropCoverage\Controllers\AreaCoverage::download');
+
     $routes->add('users', 'Users\Controllers\Users::index');
     $routes->post('users/search','Users\Controllers\Users::search');
     $routes->match(['get','post'],'users/add', 'Users\Controllers\Users::add');
