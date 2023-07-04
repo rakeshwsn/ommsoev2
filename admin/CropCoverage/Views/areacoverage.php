@@ -7,42 +7,36 @@ $validation = \Config\Services::validation();
         <div class="block">
             <div class="block-header block-header-default">
                 <h3 class="block-title"><?= $heading_title; ?></h3>
-               
             </div>
-           
- <div class="block">
-       
-        <div class="block-content">
-            <table class="table table-vcenter text-center">
-                <thead>
-                    <tr>
-                        <th>Week</th>
-                        <th>Total Farmer</th>
-                        <th>Total Area</th>
-                        <th>Upload Status</th>
-                        <th>Date Added</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-             
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style="display: flex;">
-                    <div class="col-md-6"><a href="http://ommsoev2.local//uploads/files/" class="" data-title="Download"><i class="fa fa-download"style="font-size:24px;color:blue;"></i></a></div>
-                    <div class="col-md-6"><i class="fa fa-upload"style="font-size:24px;color:red;"><a href="https:///uploads/files/" class="" data-title="Upload"></a></i></div>
-                </td>
-              </tr>
-         
-                </tbody>
-            </table>
+            <div class="block-content">
+                <table class="table table-vcenter text-center">
+                    <thead>
+                        <tr>
+                            <th>Week</th>
+                            <th>Total Farmer</th>
+                            <th>Total Area</th>
+                            <th>Upload Status</th>
+                            <th>Date Added</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="display: flex;">
+                               
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
+</div>	
 <?php js_start(); ?>
 
 <script type="text/javascript">
