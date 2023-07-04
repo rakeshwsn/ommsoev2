@@ -1,5 +1,4 @@
 <?php
-
 namespace Admin\Localisation\Models;
 
 use CodeIgniter\Model;
