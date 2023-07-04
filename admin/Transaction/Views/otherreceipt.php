@@ -193,6 +193,7 @@
                     $("#main-container").LoadingOverlay("hide");
                     numOnly();
                     decimalOnly();
+                    cleanupInput();
                 }
             });
         });
@@ -254,7 +255,7 @@
     //get edit form
     $(document).on('click','.btn-edit',function (e){
         e.preventDefault();
-        url = $(this).attr('href')
+        url = $(this).attr('href');
         $.ajax({
             headers: {'X-Requested-With': 'XMLHttpRequest'},
             url:url,
@@ -282,54 +283,11 @@
                 $("#main-container").LoadingOverlay("hide");
                 numOnly();
                 decimalOnly();
+                cleanupInput();
             }
         });
     });
 
-    //rakesh
-    function numOnly() {
-        //input type text to number
-        // Get the input field
-        var input = $('.physical');
 
-        // Attach keypress event handler
-        input.keypress(function(event) {
-            // Get the key code of the pressed key
-            var keyCode = event.which;
-
-            // Check if the key is a number
-            if (keyCode < 48 || keyCode > 57) {
-                // Prevent the input if the key is not a number
-                event.preventDefault();
-            }
-        });
-    }
-
-    function decimalOnly() {
-        // Get the input field
-        var input = $('.financial');
-
-        $('.financial').on('keypress',function (e) {
-            // Get the key code of the pressed key
-            var keyCode = event.which;
-
-            // Allow decimal point (.) and numbers (48-57) only
-            if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
-                // Prevent the input if the key is not a number or decimal point
-                event.preventDefault();
-            }
-
-            // Allow only one decimal point
-            if (keyCode === 46 && $(this).val().indexOf('.') !== -1) {
-                // Prevent the input if there is already a decimal point
-                event.preventDefault();
-            }
-            // Disallow comma (,)
-            if (keyCode === 44) {
-                // Prevent the input if the key is a comma
-                event.preventDefault();
-            }
-        });
-    }
 </script>
 <?php js_end(); ?>
