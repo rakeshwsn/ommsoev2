@@ -114,12 +114,8 @@ class ClosingbalanceModel extends Model
         $fund_agency_id = $filter['fund_agency_id'];
 
         if($block_id){
-            
             $sql = "CALL proc_get_ledger_statement($block_id,$year,$agency_type_id,$user_id,$fund_agency_id)";
-           
-        }
-
-        if($district_id){
+        } else if($district_id){
             $sql = "CALL proc_get_ledger_statement_district($district_id,$year,$agency_type_id,$user_id,$fund_agency_id)";
         }
 
@@ -174,28 +170,6 @@ FROM (SELECT
         $sql .= " AND scb.month = ".$lastMonth."
     AND scb.year = ".$lastYear.") cb";
 //echo $sql; exit;
-        return $this->db->query($sql)->getFirstRow();
-    }
-
-    public function getOpeningBalanceBreakupOld($filter=[]) {
-        $ati = [];
-        $sql = "SELECT SUM(advance) advance,SUM(bank) bank,SUM(cash) cash FROM 
-(SELECT
-  *
-FROM soe_closing_balances scb
-WHERE scb.deleted_at IS NULL";
-        if(!empty($filter['block_id'])){
-            $sql .= " AND scb.block_id = ".$filter['block_id'];
-        }
-        if(!empty($filter['agency_type_id'])){
-            $ati = (array)$filter['agency_type_id'];
-            $sql .= " AND scb.agency_type_id IN (".implode(',',$ati).")";
-        }
-        $sql .= " 
-AND scb.month != ".$filter['month']."
-AND scb.year != ".$filter['year']."
-ORDER BY id DESC LIMIT ".count($ati).") cb";
-//echo $sql;exit;
         return $this->db->query($sql)->getFirstRow();
     }
 

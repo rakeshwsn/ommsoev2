@@ -129,3 +129,4 @@ nb-configuration.xml
 public/
 *.zip
 !public/themes/admin/assets/css/custom.css
+!public/themes/admin/assets/js/common.js
