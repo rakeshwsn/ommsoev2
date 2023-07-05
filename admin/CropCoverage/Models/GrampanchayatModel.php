@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 class GrampanchayatModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'grampanchayat';
+	protected $table                = 'soe_grampanchayat';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
