@@ -20,6 +20,6 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 
     $routes->add('budgets/bulkbudget','Budgets\Controllers\Budgets::bulkBudget');
     $routes->add('budgets/approval','Budgets\Controllers\Budgets::approval');
-    $routes->get('budgets/details/(:num)','Budgets\Controllers\Budgets::details/$1');
+    $routes->add('budgets/details/(:num)','Budgets\Controllers\Budgets::details/$1');
 
 });

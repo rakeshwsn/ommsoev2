@@ -4,7 +4,13 @@
             <div class="block-header block-header-default">
                 <h3 class="block-title">Summery of <?=$text_form?></h3>
                 <div class="block-options">
-                    <a href="" data-toggle="tooltip" title="" class="btn btn-primary">Approve</a>
+                    <?php if($approve==0){?>
+                        <button class="btn btn-primary" id="btn-action">Approve</button>
+                    <?}else if($approve==1){?>
+                        <button class="btn btn-success" id="btn-action">Approved</button>    
+                    <?}else if($approve==2){?>
+                        <button class="btn btn-warning" id="btn-action">Rejected</button>    
+                    <?}?>
                 </div>
             </div>
 
@@ -15,47 +21,27 @@
                         <th>District/Block</th>
                         <th>Total Physical</th>
                         <th>Total Financial</th>
-                       
                     </tr>
                     </thead>
                     <tbody>
+                        <?php foreach($budget_summery as $summery){
+                            $agency=$summery['block_id']==0?'ATMA':'Block';
+                        ?>
                         <tr>
-                            <td>Bargarh</td>
-                            <td>1000</td>
-                            <td>1000</td>
+                            <td><?=$summery['block_name']."(".$agency.")"?></td>
+                            <td><?=$summery['phy']?></td>
+                            <td><?=$summery['fin']?></td>
                           
                         </tr>
-                        <tr>
-                            <td>Block1</td>
-                            <td>1000</td>
-                            <td>1000</td>
-                            
-                        </tr>
-                        <tr>
-                            <td>Block1</td>
-                            <td>1000</td>
-                            <td>1000</td>
-                            
-                        </tr>
-                        <tr>
-                            <td>Block1</td>
-                            <td>1000</td>
-                            <td>1000</td>
-                            
-                        </tr>
+                        <?}?>
+                        
                         <tr>
                             <td>Total </td>
-                            <td>₹0.00</td>
-                            <td>₹0.00</td>
+                            <td><?=$budget_summery_total['total_phy']?></td>
+                            <td><?=$budget_summery_total['total_fin']?></td>
                             
                         </tr>
-                        <tr>
-                            <td>Total Cumulative District </td>
-                            <td>₹0.00</td>
-                            <td>₹0.00</td>
-                           
-                        </tr>
-                    
+                        
                     </tbody>
                 </table>
             </div>
@@ -73,104 +59,36 @@
             <div class="block-content ">
                 <div class="block">
                     <ul class="nav nav-tabs nav-tabs-alt" data-toggle="tabs" role="tablist">
+                        <?php foreach($block_budgets['tabs'] as $key=> $tab){?>
                         <li class="nav-item">
-                            <a class="nav-link active" href="#btabs-alt-static-home">Bargarh(cumulative)</a>
+                            <a class="nav-link <?=$key==0?'active':''?>" href="#block-<?=$key?>"><?=$tab['name']?></a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#btabs-alt-static-profile">Bargarh</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#btabs-alt-static-profile">Block1</a>
-                        </li>
+                        <?}?>
+                       
                     </ul>
                     <div class="block-content tab-content">
-                        <div class="tab-pane active" id="btabs-alt-static-home" role="tabpanel">
+                        <?php foreach($block_budgets['details'] as $key=> $detail){?>
+                        
+                        <div class="tab-pane <?=$key==0?'active':''?>" id="block-<?=$key?>" role="tabpanel">
                             <div class="tableFixHead">
-                                <?php foreach($components as $key=> $component){?>
-                                    <table class="table table-striped custom-table" id="block-components">
-                                        <thead>
-                                        <tr>
-                                            <th width="5%">Number</th>
-                                            <th width="40%">Component</th>
-                                            <th width="15%">Rate</th>
-                                            <th width="5%">Physical</th>
-                                            <th width="20%">Financial</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
-                                        <input type="hidden" name="phase" value="<?=$component['phase']?>">
-                                        <input type="hidden" name="year" value="<?=$component['year']?>">
-
-                                        <?=$component['budgets']?>
-                                        </tbody>
-                                    </table>
-                                <?}?>
-                                <?php if($view=="edit"){?>
-                                <div class="text-right my-3">
-                                    <button type="submit" class="btn btn-primary" id="btn-save-menu">Save</button>
-                                </div>
-                                <?}?>
+                                <table class="table table-striped custom-table" id="block-components">
+                                    <thead>
+                                    <tr>
+                                        <th width="5%">Number</th>
+                                        <th width="40%">Component</th>
+                                        <th width="15%">Rate</th>
+                                        <th width="5%">Physical</th>
+                                        <th width="20%">Financial</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?=$detail?>
+                                    </tbody>
+                                </table>
+                               
                             </div>
                         </div>
-                        <div class="tab-pane" id="btabs-alt-static-profile" role="tabpanel">
-                            <div class="tableFixHead">
-                                <?php foreach($components as $key=> $component){?>
-                                    <table class="table table-striped custom-table" id="block-components">
-                                        <thead>
-                                        <tr>
-                                            <th width="5%">Number</th>
-                                            <th width="40%">Component</th>
-                                            <th width="15%">Rate</th>
-                                            <th width="5%">Physical</th>
-                                            <th width="20%">Financial</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
-                                        <input type="hidden" name="phase" value="<?=$component['phase']?>">
-                                        <input type="hidden" name="year" value="<?=$component['year']?>">
-
-                                        <?=$component['budgets']?>
-                                        </tbody>
-                                    </table>
-                                <?}?>
-                                <?php if($view=="edit"){?>
-                                <div class="text-right my-3">
-                                    <button type="submit" class="btn btn-primary" id="btn-save-menu">Save</button>
-                                </div>
-                                <?}?>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="btabs-alt-static-settings" role="tabpanel">
-                            <div class="tableFixHead">
-                                <?php foreach($components as $key=> $component){?>
-                                    <table class="table table-striped custom-table" id="block-components">
-                                        <thead>
-                                        <tr>
-                                            <th width="5%">Number</th>
-                                            <th width="40%">Component</th>
-                                            <th width="15%">Rate</th>
-                                            <th width="5%">Physical</th>
-                                            <th width="20%">Financial</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <input type="hidden" name="fund_agency_id" value="<?=$component['fund_agency_id']?>">
-                                        <input type="hidden" name="phase" value="<?=$component['phase']?>">
-                                        <input type="hidden" name="year" value="<?=$component['year']?>">
-
-                                        <?=$component['budgets']?>
-                                        </tbody>
-                                    </table>
-                                <?}?>
-                                <?php if($view=="edit"){?>
-                                <div class="text-right my-3">
-                                    <button type="submit" class="btn btn-primary" id="btn-save-menu">Save</button>
-                                </div>
-                                <?}?>
-                            </div>
-                        </div>
+                        <?}?>
                     </div>
                 </div> 
             </div>
@@ -312,5 +230,9 @@
             });
         }
         //--></script>
+
+<?php 
+    echo $approve_form;
+ ?>
 <?php js_end(); ?>
 
