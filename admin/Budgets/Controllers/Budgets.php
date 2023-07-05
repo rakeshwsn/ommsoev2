@@ -433,15 +433,29 @@ class Budgets extends AdminController {
         $data=[];
         $data['heading_title'] 	= "Budgets Details";
 
-        if ($this->request->getMethod(1) === 'POST'){
-            /*$budget_plan_id=$this->uri->getSegment(3);
+        $plan_id = $this->uri->getSegment(4);
+
+        if($this->request->getMethod(1)=='POST'){
+
+            $budgetplan_info = $this->budgetPlanModel->getBudgetPlan($this->uri->getSegment(4));
+        
+            $plan_data = [
+                'status' => $this->request->getPost('status'),
+                'status_user' => $this->user->user_id,
+                'remarks' => $this->request->getPost('remarks')
+            ];
+            $conditions=[
+                'year'=>$budgetplan_info->year,
+                'fund_agency_id'=>$budgetplan_info->fund_agency_id,
+                'district_id'=>$budgetplan_info->district_id
+            ];
             
-            $this->budgetModel->editBudget($budget_plan_id,$this->request->getPost());
-            $this->session->setFlashdata('message', 'Budget Updated Successfully.');
+            $this->budgetPlanModel->approveBudget($plan_data,$conditions);
 
-            return redirect()->to(admin_url('budgets/view/'.$budget_plan_id));*/
-
+            $this->session->setFlashdata('message','Your changes have been saved.');
+            return redirect()->to(current_url());
         }
+
 
         if(isset($this->error['warning'])){
             $data['error'] 	= $this->error['warning'];
@@ -454,6 +468,7 @@ class Budgets extends AdminController {
             $data['text_form'] = "Budget Details for ".$budgetplan_info->fund_agency."-".$budgetplan_info->yname."-".$budgetplan_info->district;
 
         }
+
         
         if($budgetplan_info){
             if($budgetplan_info->block_id){
@@ -487,30 +502,92 @@ class Budgets extends AdminController {
                 'agency_type_id' => $agency_type_id
              ];
 
-            $components = $this->budgetModel->getBudgetDetails($filter);
-            //$components=[];
-            if(getCurrentYearId() == $budgetplan_info->year){
-                $data['view']=$view="edit";
-            }else{
-                $data['view']=$view="show";
-            }
-            if($components) {
-                $components = $this->buildTree($components);
-                $data['components'][0]['year'] = $budgetplan_info->year;
-                $data['components'][0]['phase'] = 0;
-                $data['components'][0]['fund_agency_id'] = $budgetplan_info->fund_agency_id;
-                $data['components'][0]['district_id'] = $budgetplan_info->district_id;
-                $data['components'][0]['block_id'] = $budgetplan_info->block_id;
-                //$data['components'][$key]['budgets']=$components;
-                $data['components'][0]['budgets'] = $this->getBTable($components,$view);
-            }
+            $data['budget_summery']=$budget_summery=$this->budgetModel->getBudgetSummeryByBlock($filter);
             
+            
+            /* total phy and fin */
+            $totalPhy = 0;
+            $totalFin = 0.00;
 
+            foreach ($budget_summery as $item) {
+                $totalPhy += $item['phy'];
+                $totalFin += $item['fin'];
+            }
+
+            $data['budget_summery_total'] = [
+                "total_phy" => $totalPhy,
+                "total_fin" => $totalFin
+            ];
+            $data['block_budgets']=[];
+            foreach($budget_summery as $summery){
+                $agency_type_id = 0;
+                if($summery['district_id']==0 && $summery['block_id']==0){
+                    $agency_type_id = 8;
+                } else if($summery['district_id']!=0 && $summery['block_id']==0){
+                    $agency_type_id = 7;
+                } else if($summery['district_id']!=0 && $summery['block_id']!=0){
+                    $agency_type_id = 5;
+                }
+                $bfilter=[
+                    'budget_plan_id'=>$summery['budget_plan_id'],
+                    'fund_agency_id'=>$summery['fund_agency_id'],
+                    'year'=>$summery['year_id'],
+                    'district_id'=>$summery['district_id'],
+                    'block_id'=>$summery['block_id'],
+                    'agency_type_id' => $agency_type_id,
+                ];
+                $agency=$summery['block_id']==0?'ATMA':'Block';
+                
+                
+                $data['block_budgets']['tabs'][]=[
+                    'district_id'=>$summery['district_id'],
+                    'block_id'=>$summery['block_id'],
+                    'name'=>$summery['block_name']."(".$agency.")",
+                ];
+                
+                $components=$this->budgetModel->getBudgetDetails($bfilter);
+                $components = $this->buildTree($components);
+                $data['block_budgets']['details'][] = $this->getBTable($components,'show');
+
+            }
+            $cum_tab=[
+                'district_id'=>$budgetplan_info->district_id,
+                'block_id'=>$budgetplan_info->block_id,
+                'name'=>"All",
+            ];
+            array_unshift( $data['block_budgets']['tabs'],$cum_tab);
+
+            $cum_component=$this->budgetModel->getCumulativeBudgetDetails($filter);
+            $cum_component = $this->buildTree($cum_component);
+            $cumulative_details = $this->getBTable($cum_component,'show');
+            array_unshift($data['block_budgets']['details'],$cumulative_details);
+            $data['approve']=$budgetplan_info->status;
+            $data['approve_form']=$this->getApproveForm($budgetplan_info);
             return $this->template->view('Admin\Budgets\Views\budgetDetailsForm', $data);
 
         }else{
            
         }
+    }
+
+    private function getApproveForm($budgetplan_info){
+        
+        $data['title']='Budget Approve';
+        $data['statuses'] = [     
+            [
+                'id' => 1,
+                'name' => 'Approved',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Rejected',
+            ],
+        ];
+
+        $data['status_id'] = $budgetplan_info->status;
+        $data['remarks'] = $budgetplan_info->remarks;
+        return view('\Admin\Transaction\Views\approve_form',$data);
+
     }
 
     protected function validateForm() {
@@ -619,6 +696,7 @@ class Budgets extends AdminController {
              ];
 
             $components = $this->budgetModel->getBudgetDetails($filter);
+            dd($components);
             //$components=[];
             if(getCurrentYearId() == $budgetplan_info->year){
                 $data['view']=$view="edit";
