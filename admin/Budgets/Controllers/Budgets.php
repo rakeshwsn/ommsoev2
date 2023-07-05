@@ -696,7 +696,7 @@ class Budgets extends AdminController {
              ];
 
             $components = $this->budgetModel->getBudgetDetails($filter);
-            dd($components);
+            //dd($components);
             //$components=[];
             if(getCurrentYearId() == $budgetplan_info->year){
                 $data['view']=$view="edit";
