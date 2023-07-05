@@ -714,7 +714,8 @@ class Incentive extends AdminController
 		if ($this->request->getMethod(1) === 'POST') {
 			$id = $this->uri->getSegment(4);
 			// echo "<pre>";
-			// print_r($_POST); exit;
+			// echo $id; exit;
+			//print_r($this->request->getPost()); exit;
 			$this->incentiveModel->update($id, $this->request->getPost());
 			$this->session->setFlashdata('message', 'Incentive Updated Successfully.');
 

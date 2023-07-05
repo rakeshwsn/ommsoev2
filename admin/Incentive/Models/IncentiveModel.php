@@ -25,10 +25,10 @@ class IncentiveModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'name' => array(
-            'label' => 'Name',
-            'rules' => 'trim|required|max_length[100]|is_unique[module.name,id,{id}]'
-        ),
+        // 'name' => array(
+        //     'label' => 'Name',
+        //     'rules' => 'trim|required|max_length[100]|is_unique[module.name,id,{id}]'
+        // ),
 
     ];
     protected $validationMessages   = [];
