@@ -33,14 +33,14 @@ class AreaCoverage extends AdminController
 	}
 	protected function getList()
 	{
-
-		$this->template->add_package(array('datatable', 'select2'), true);
+		
+		$this->template->add_package(array('datatable', 'select2','uploader'), true);
 
 		$data['add'] = admin_url('areacoverage/gp/add');
 		$data['delete'] = admin_url('grampanchayat/delete');
 		$data['datatable_url'] = admin_url('areacoverage/search');
 
-		$data['heading_title'] = lang('Area Coverage');
+		$data['heading_title'] = lang('Add Area Coverage');
 
 		$data['text_list'] = lang('Grampanchayat.text_list');
 		$data['text_no_results'] = lang('Grampanchayat.text_no_results');
@@ -61,19 +61,7 @@ class AreaCoverage extends AdminController
 		}
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
-		// printr  ($data['weeks']);
-		//exit;
-		// $data['date_range']=[];
-		// foreach ($data['weeks'] as $week) {
-		//     $start_date = $week['start_date'];
-		//     $end_date = $week['end_date'];
-		//     $date_range = '(' . $start_date.')' . '-'.'-' . '('. $end_date .')';
-		//     $data['date_range'][] = $date_range;
-		// }
-
-		// printr  ($data['date_range']);
-		// exit;
-		// $data['seasons']= $this->areacoveragemodel->GetSeasons();
+		
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage', $data);
 	}
@@ -128,6 +116,10 @@ class AreaCoverage extends AdminController
 	}
 	public function download()
 	{
+		$season = getCurrentSeason();
+		echo $season;exit;
+		$start_month = $this->settings->kharif_start_month;
+		$end_month = $this->settings->kharif_end_month;
 		$start_date = '2023-07-01';
 		$end_date = '2023-12-31';
 

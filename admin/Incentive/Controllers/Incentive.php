@@ -991,7 +991,7 @@ class Incentive extends AdminController
 	{
 		$data['districts'] = (new DistrictModel())->asArray()->findAll();
 		// Retrieve the districts from the DistrictModel and store them in $data['districts']
-
+		
 		$data['selectedYear'] = 1;
 		// Set the default value for the selected year to 1
 
@@ -1029,6 +1029,28 @@ class Incentive extends AdminController
 		}
 		// If the 'district_id' parameter is present in the request, update the district_id value with its value
 		
+		$currentUrl = admin_url('incentive/uploadstatus');
+	$url = [
+        'district_id' => $this->request->getGet('district_id'),
+        'year'       =>  $this->request->getGet('year'),
+        'download' => 'excel'
+    ];
+		$queryString = http_build_query($url);
+
+
+
+		if (!isset($url['district_id']) || !isset($url['year'])) {
+			$mergedUrl = $currentUrl . '?' . $queryString;
+		} else {
+			$mergedUrl = $currentUrl . '?'  . $queryString;
+		}
+		$data['mergedUrl'] = $mergedUrl;
+		$download = $this->request->getGet('download');
+
+	
+		if ($download) {
+			$this->dataToExcelStatus($filteredData);
+		};
 		$data['farmerData'] = [];
 		// Initialize an empty array to store the farmer data
 		
@@ -1072,6 +1094,57 @@ class Incentive extends AdminController
 		}
 		;
 		return $this->template->view('Admin\Incentive\Views\upload_status', $data);
+	}
+
+	protected function dataToExcelStatus($data)
+	{
+
+		// printr($data); exit;
+		$spreadsheet = new Spreadsheet();
+
+		// Create a new sheet
+		$sheet = $spreadsheet->getActiveSheet();
+
+		// Set some sample data
+
+
+		$sheet->setCellValue('A1', 'District');
+		$sheet->setCellValue('B1', 'Block');
+		$sheet->setCellValue('C1', 'Season');
+		$sheet->setCellValue('D1', 'Farmer Incentive upload');
+
+		// ... Add more data as needed ...
+		$row = 2; // Start from row 2
+		foreach ($data as $result) {
+
+			$season = 0;
+			if ($result['season'] == 1) {
+				$season = 'kharif';
+			} elseif ($result['season'] == 2) {
+				$season = 'Rabi';
+			}
+			$sheet->setCellValue('A' . $row, strtoupper($result['district']));
+			$sheet->setCellValue('B' . $row, strtoupper($result['block_name']));
+			$sheet->setCellValue('C' . $row, strtoupper($season === 0 ? 'Not Uploaded' : $season));
+			$sheet->setCellValue('D' . $row, $result['incentiveid'] == null ? 'Not Uploaded' : 'Uploaded');
+			$row++;
+		}
+		// Create a new Xlsx Writer instance
+		$writer = new Xlsx($spreadsheet);
+
+		// Set the file name for the downloaded Excel file
+		$filename = 'Farmer_incentiveStatus.xlsx';
+
+		// Set the appropriate headers for the HTTP response
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		// Write the Spreadsheet data to the response body
+		$writer->save('php://output');
+
+		// Stop the script execution
+		exit();
 	}
 }
 
