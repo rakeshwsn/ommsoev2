@@ -1,13 +1,42 @@
-
 <?php
 $validation = \Config\Services::validation();
 ?>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
-            <div class="block-header block-header-default">
+            <div class="block-header block-header-default bg-success">
                 <h3 class="block-title"><?= $heading_title; ?></h3>
             </div>
+			<div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
+				<div class="col-md-3">
+                <label>From Date</label>
+				<input type="text"  class="form-control" value="31.07.23" readonly>
+				</div>
+				<div class="col-md-3">
+				<label>To Date</label>
+				<input type="text" readonly value="31.07.23" class="form-control">
+				</div>
+				<div class="col-md-2 mt-4">
+					<a href="http://ommsoev2.local//templates/area_coverage_template.xlsx" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>
+				</div>
+				<div class="col-md-2 mt-4">
+					<form class="dm-uploader" id="uploader">
+						<div role="button" class="btn btn-outline btn-warning">
+							<i class="fa fa-folder-o fa-fw"></i> Upload Excel
+							<input type="file" title="Click to add Files">
+						</div>
+					</form>	
+				</div>		
+			</div>
+           
+        </div>
+    </div>
+    <div class="col-xl-12">
+        <div class="block">
+            <div class="block-header block-header-default  bg-primary">
+                <h3 class="block-title"> Area Coverage History</h3>
+            </div>
+			
             <div class="block-content">
                 <table class="table table-vcenter text-center">
                     <thead>
