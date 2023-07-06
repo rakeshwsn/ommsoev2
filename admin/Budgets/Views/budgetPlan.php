@@ -79,7 +79,7 @@
         <div class="block-options">
             <a href="<?php echo $bulkbudegt; ?>" data-toggle="tooltip" title="" class="btn btn-primary">Bulk Budget</a>
             <!--<a href="<?php echo $add; ?>" data-toggle="tooltip" title="" class="btn btn-primary"><i class="fa fa-plus"></i></a>-->
-            <button type="button" data-toggle="tooltip" title="" class="btn btn-danger" onclick="confirm('Are you sure to delete !') ? $('#form-budget').submit() : false;"><i class="fa fa-trash-o"></i></button>
+            <!--<button type="button" data-toggle="tooltip" title="" class="btn btn-danger" onclick="confirm('Are you sure to delete !') ? $('#form-budget').submit() : false;"><i class="fa fa-trash-o"></i></button>-->
         </div>
     </div>
     <div class="block-content block-content-full">
