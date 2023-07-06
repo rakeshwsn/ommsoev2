@@ -112,6 +112,11 @@ class BudgetPlanModel extends Model
 
     }
 
+    public function approveBudget($data,$condition){
+        $builder=$this->db->table($this->table);
+        $builder->update($data, $condition);
+    }
+
     public function getBudgetPhase($budget_plan_id){
         $builder=$this->db->table("soe_budgets_phase sbp");
         $builder->select("sbp.*");
