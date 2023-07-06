@@ -39,4 +39,12 @@ class YearModel extends Model
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
+
+    public function getCurrentYear() {
+        $date = date('Y-m-d');
+
+        $sql = "SELECT * FROM ".$this->table." WHERE DATE('$date') BETWEEN DATE(start_date) AND DATE(end_date)";
+
+        return $this->db->query($sql)->getFirstRow();
+	}
 }
