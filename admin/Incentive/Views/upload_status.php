@@ -30,18 +30,24 @@
                     <div class="col-md-2">
                         <button class="btn btn-primary"><i class="si si-magnifier"></i> Submit</button>
                     </div>
+                  
                 </div>
             </form>
+
+            
         </div>
     </div>
     <div class="block">
+    <div class="float-right">
+                    <a href="<?php echo $mergedUrl; ?>"><button id="btn-filter" class="btn  btn-primary"><i class="fa fa-download"></i> Download</button>
+                     </a>
+            </div>
         <div class="block-content block-content-full">
             <table class="table table-striped table-vcenter">
                 <thead>
                 <tr>
                     <th class="text-center">District</th>
                     <th class="text-center">Block</th>
-                    <th class="text-center">Year</th>
                     <th class="text-center">Season</th>
                     <th class="text-center">Farmer Incentive Upload</th>
                 </tr>
@@ -51,7 +57,6 @@
                     <tr>
                         <td class="text-center"><?=$farmerDatas['district_name']?></td>
                         <td class="text-center"><?=$farmerDatas['block_name']?></td>
-                        <td class="text-center"><label class="<?php echo $farmerDatas['year'] === 0 ? 'badge badge-danger' : 'text-center'; ?>"><?php echo $farmerDatas['year'] === 0 ? 'Not Uploaded' : $farmerDatas['year']; ?></label></td>
                         <td class="text-center"><label class="<?php echo $farmerDatas['season'] === 0 ? 'badge badge-danger' : 'text-center'; ?>"><?php echo $farmerDatas['season'] === 0 ? 'Not Uploaded' : $farmerDatas['season']; ?></label></td>
                         <td class="text-center"><label class="text-center <?php echo $farmerDatas['incentiveid'] == null ? 'badge badge-danger' : 'badge badge-success'; ?>"><?php echo $farmerDatas['incentiveid'] == null ? 'Not Uploaded' : 'Uploaded'; ?></label></td>
                         

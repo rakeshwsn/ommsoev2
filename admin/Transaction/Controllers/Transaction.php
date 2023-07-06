@@ -388,10 +388,10 @@ class Transaction extends AdminController {
         }
 
         //editing override for atma
-        if($this->user->agency_type_id != $this->settings->block_user){
+        /*if($this->user->agency_type_id != $this->settings->block_user){
             $action = 'edit';
             $data['show_form'] = true;
-        }
+        }*/
 
         $data['block'] = $txn->block;
         $data['district'] = $txn->district;
@@ -417,10 +417,15 @@ class Transaction extends AdminController {
             'year' => $txn->year,
             'agency_type_id' => $txn->agency_type_id,
             'user_group' => $txn->agency_type_id,
-            'fund_agency_id' => $txn->agency_type_id,
         ];
+
         $user = (new UserModel())->find($txn->user_id);
         $filter['fund_agency_id'] = $user->fund_agency_id;
+
+        //for wassan --rakesh
+        if($txn->agency_type_id == $this->settings->ps_user){
+            $filter['fund_agency_id'] = $txn->fund_agency_id;
+        }
 
         if($txn->agency_type_id == $this->settings->block_user
             || $txn->agency_type_id == $this->settings->cbo_user){

@@ -274,6 +274,7 @@
                     $("#modal-edit").modal({
                         backdrop: 'static',
                     });
+
                 }
             },
             error:function () {
