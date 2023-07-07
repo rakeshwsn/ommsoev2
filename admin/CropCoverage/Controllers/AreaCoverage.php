@@ -118,60 +118,7 @@ class AreaCoverage extends AdminController
 
 	public function download()
 	{
-		$start_month = (int)$this->settings->kharif_start_month;
-		$end_month = (int)$this->settings->kharif_end_month;
-
-        $current_month = getMonthById(getCurrentMonthId());
-        $current_month_id = $current_month['id'];
-
-        //kharif
-        if ($current_month_id >= $start_month && $current_month_id <= $end_month) {
-            $start_month = getMonthById($start_month);
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,$year);
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-
-            $end_date = date('Y-m-d',$date);
-        } else {
-            $start_month = (int)$this->settings->rabi_start_month;
-            $end_month = (int)$this->settings->rabi_end_month;
-
-            $start_month = getMonthById($start_month);
-            $date = mktime(0,0,0,$start_month['number'],01,date('Y'));
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,($year+1));
-
-            $end_date = date('Y-m-d',$date);
-        }
-
-		$week_start = $this->settings->end_week;
-		$start = new \DateTime($start_date);
-		$end = new \DateTime($end_date);
-		$week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
-
-		$output = array();
-
-		while ($start <= $end) {
-			$day_of_week = (int) $start->format('w');
-			if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
-				$output[] = array(
-					$start->format('Y-m-d'),
-					min($start->modify('+6 days'), $end)->format('Y-m-d')
-				);
-			}
-			$start->modify('+1 day');
-		}
-
-		printr($output);
+        $this->getWeekDates();
 	}
 
 	public function getCurrentYearDates() {
@@ -182,7 +129,7 @@ class AreaCoverage extends AdminController
         $rabi_start_month = getMonthById((int)$this->settings->rabi_start_month);
         $rabi_end_month = getMonthById((int)$this->settings->rabi_end_month);
 
-        $given_date = DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
+        $given_date = \DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
 
         $kharif_start_month_number = $kharif_start_month['number'];
         $kharif_end_month_number = $kharif_end_month['number'];
@@ -191,20 +138,50 @@ class AreaCoverage extends AdminController
         if ($given_date->format('n') >= $kharif_start_month_number
             && $given_date->format('n') <= $kharif_end_month_number) {
             $current_season = 'Kharif';
-            $season_start_date = DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_start_month_number.'-01');
+            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_start_month_number.'-01');
+            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_end_month_number.'-30');
         } elseif ($given_date->format('n') >= $rabi_start_month_number
             || $given_date->format('n') <= $rabi_end_month_number) {
             $current_season = 'Rabi';
-            $season_start_date = DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_start_month_number.'-01');
+            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_start_month_number.'-01');
+            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_end_month_number.'-01');
             if ($given_date->format('n') <= 3) {
                 $season_start_date->modify('-1 year');
+                $season_end_date->modify('-1 year');
             }
         }
 
-
+        return [
+            'current_season'=>$current_season,
+            'start_date'=>$season_start_date,
+            'end_date'=>$season_end_date,
+        ];
 
     }
 
+    private function getWeekDates(){
 
+	    $dates = $this->getCurrentYearDates();
+
+        $start = $dates['start_date'];
+        $end = $dates['end_date'];
+        $week_start = $this->settings->start_week;
+        $week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
+
+        $output = array();
+
+        while ($start <= $end) {
+            $day_of_week = (int) $start->format('w');
+            if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
+                $output[] = array(
+                    $start->format('Y-m-d'),
+                    min($start->modify('+6 days'), $end)->format('Y-m-d')
+                );
+            }
+            $start->modify('+1 day');
+        }
+
+        printr($output);
+    }
 
 }
