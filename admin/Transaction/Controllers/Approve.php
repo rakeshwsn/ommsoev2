@@ -226,7 +226,7 @@ class Approve extends AdminController {
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
-        $data['approval'] = true;
+        $data['approval'] = $txn->status!=1;
 
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
@@ -361,7 +361,7 @@ class Approve extends AdminController {
 
         $data['txn_type_text'] = 'Other Receipt';
 
-        $data['approval'] = true;
+        $data['approval'] = $txn->status!=1;
 
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
@@ -438,7 +438,7 @@ class Approve extends AdminController {
             $data['cash_file_url'] = anchor(base_url('uploads/cb/'.$cb->cash_file),$cb->cash_file,'target="_blank"');
         }
 
-        $data['approval'] = true;
+        $data['approval'] = $cb->status!=1;
 
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
@@ -524,7 +524,8 @@ class Approve extends AdminController {
         $data['status'] = $this->statuses[$txn->status];
         $data['upload_url'] = Url::MISUpload;
 
-        $data['approval'] = true;
+        $data['approval'] = $txn->status!=1;
+
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 

@@ -241,7 +241,6 @@ class OtherReceipt extends AdminController
                 //getform
                 $json_data = [
                     'status' => true,
-                    'approved' => (isset($txn)&&$txn->status==1),
                     'title' => 'Other receipt for ' . getMonthById($txn->month)['name'] . ' ' . getYear($txn->year),
                     'html' => $this->getForm($id)
                 ];
@@ -261,6 +260,13 @@ class OtherReceipt extends AdminController
             $agency_type_id = $this->request->getGet('agency_type_id');
         }
 
+        if($txn_id){
+            $txn = $this->txnModel->find($txn_id);
+            $agency_type_id = $txn->agency_type_id;
+        }
+
+        $heads = $txnModel->getHeads($agency_type_id);
+
         $data['agency_types'] = [];
         $amts = [];
 
@@ -271,6 +277,7 @@ class OtherReceipt extends AdminController
             $data['fund_agency_id'] = $block->fund_agency_id;
         }
 
+        $data['agency_type_id'] = $agency_type_id;
         if ($txn_id) {
             $txnAmtModel = new MisctxnamtModel();
             $_amts = $txnAmtModel->where(['txn_id' => $txn_id])->asArray()->findAll();
@@ -280,7 +287,6 @@ class OtherReceipt extends AdminController
             $txn = $txnModel->find($txn_id);
             $data['agency_type_id'] = $txn->agency_type_id;
             $data['fund_agency_id'] = $txn->fund_agency_id;
-            $agency_type_id = $txn->agency_type_id;
         } else {
 
             $month = $this->request->getGet('month');
@@ -311,17 +317,16 @@ class OtherReceipt extends AdminController
 
             $data['agency_type_id'] = $agency_type_id;
         }
-        $heads = $txnModel->getHeads($agency_type_id);
 
         $data['heads'] = [];
         foreach ($heads as $head) {
             $data['heads'][] = [
                 'id' => $head->id,
                 'name' => $head->name,
-                'value' => isset($amts[$head->id]) ? $amts[$head->id] : ''
+                'value' => isset($amts[$head->id]) ? $amts[$head->id] : '',
             ];
         }
-        $data['approved'] = (isset($txn)&&$txn->status==1);
+        $data['can_edit'] = $txn->status!==1;
 
         return view('\Admin\Transaction\Views\other_receipt_form', $data);
     }
@@ -346,8 +351,8 @@ class OtherReceipt extends AdminController
             ->where($condition)
             ->first();
 
-        //check if cb is rejected
-        if($cb && $cb->status!=2){
+        //check if cb is not approved
+        if($cb && $cb->status!=1){
             $this->error="Can not add other Receipt. Closing balance already exist" ;
         }else if($txn){
            $this->error="Can not add other Receipt. Other receipt already exist" ;
