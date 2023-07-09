@@ -32,14 +32,11 @@ class AreaCoverage extends AdminController
 		return $this->getList();
 
 	}
-	protected function getList()
-	{
-		
+	protected function getList() {
 		$this->template->add_package(array('datatable', 'select2','uploader'), true);
 
 		$data['add'] = admin_url('areacoverage/gp/add');
 		$data['delete'] = admin_url('grampanchayat/delete');
-		$data['datatable_url'] = admin_url('areacoverage/search');
 
 		$data['heading_title'] = lang('Add Area Coverage');
 
@@ -62,63 +59,17 @@ class AreaCoverage extends AdminController
 		}
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
-		
+
+        $dates = $this->getWeekDates();
+
+        $data['from_date'] = $dates[0];
+        $data['to_date'] = $dates[1];
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage', $data);
 	}
-	public function search()
-	{
-		$requestData = $_REQUEST;
-		$totalData = $this->grampanchayatModel->getTotals();
-		$totalFiltered = $totalData;
 
-		$filter_data = array(
-			'filter_search' => $requestData['search']['value'],
-			'filter_district' => $requestData['district'],
-			'filter_block' => $requestData['block'],
-			'filter_grampanchayat' => $requestData['grampanchayat'],
-			'order' => $requestData['order'][0]['dir'],
-			'sort' => $requestData['order'][0]['column'],
-			'start' => $requestData['start'],
-			'limit' => $requestData['length']
-		);
-		$totalFiltered = $this->grampanchayatModel->getTotals($filter_data);
-
-		$filteredData = $this->grampanchayatModel->getAll($filter_data);
-
-		$datatable = array();
-		foreach ($filteredData as $result) {
-
-			$action = '<div class="btn-group btn-group-sm pull-right">';
-			$action .= '<a class="btn btn-sm btn-primary" href="' . admin_url('grampanchayat/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
-			$action .= '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('grampanchayat/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
-			$action .= '</div>';
-
-			$datatable[] = array(
-				'<input type="checkbox" name="selected[]" value="' . $result->id . '" />',
-				$result->name,
-				$result->district,
-				$result->block,
-				$action
-			);
-
-		}
-		//printr($datatable);
-		$json_data = array(
-			"draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
-			"recordsTotal" => intval($totalData),
-			"recordsFiltered" => intval($totalFiltered),
-			"data" => $datatable
-		);
-
-		return $this->response->setContentType('application/json')
-			->setJSON($json_data);
-
-	}
-
-	public function download()
-	{
-        $this->getWeekDates();
+	public function download() {
+	    
 	}
 
 	public function getCurrentYearDates() {
@@ -181,7 +132,14 @@ class AreaCoverage extends AdminController
             $start->modify('+1 day');
         }
 
-        printr($output);
+        foreach ($output as $dates) {
+            $today = strtotime('today');
+            if($today >= strtotime($dates[0]) && $today <= strtotime($dates[1])){
+                return $dates;
+            }
+        }
+
+        return false;
     }
 
 }
