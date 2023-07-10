@@ -145,9 +145,10 @@ class Dashboard extends AdminController
             //pie chart
             $data['piechart'] = [];
             foreach ($abstractBlocks as $block) {
+                $fr_total = (float)$block->fr_total;
                 $data['piechart'][] = [
                     'name' => $block->block,
-                    'value' => round(($block->ex_total/$block->fr_total)*100,2)
+                    'value' => $fr_total ? round(($block->ex_total/$fr_total)*100,2):0
                 ];
             }
         }

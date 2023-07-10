@@ -66,12 +66,9 @@ class Transaction extends AdminController {
         
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
-
         $data['year_id'] = getCurrentYearId();
-
         
         $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies():[];
-        
 
         $data['mis_uploaded'] = false;
         $misModel = new MISModel();
@@ -942,8 +939,9 @@ class Transaction extends AdminController {
 
     public function misIsUploaded() {
 
+        //allow for ps user
         $upload_allowed = true;
-        if(env('soe.uploadDateValidation')) {
+        if(env('soe.uploadDateValidation') && $this->user->agency_type_id != $this->settings->ps_user) {
             $upload_model = new AllowuploadModel();
 
             $upload_allowed = $upload_model->uploadAllowed([

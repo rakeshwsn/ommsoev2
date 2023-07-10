@@ -10,11 +10,11 @@ $validation = \Config\Services::validation();
 			<div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
 				<div class="col-md-3">
                 <label>From Date</label>
-				<input type="text"  class="form-control" value="31.07.23" readonly>
+				<input type="text"  class="form-control" value="<?=$from_date?>" readonly>
 				</div>
 				<div class="col-md-3">
 				<label>To Date</label>
-				<input type="text" readonly value="31.07.23" class="form-control">
+				<input type="text" readonly value="<?=$to_date?>" class="form-control">
 				</div>
 				<div class="col-md-2 mt-4">
 					<a href="http://ommsoev2.local//templates/area_coverage_template.xlsx" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>

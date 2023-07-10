@@ -32,14 +32,11 @@ class AreaCoverage extends AdminController
 		return $this->getList();
 
 	}
-	protected function getList()
-	{
-		
+	protected function getList() {
 		$this->template->add_package(array('datatable', 'select2','uploader'), true);
 
 		$data['add'] = admin_url('areacoverage/gp/add');
 		$data['delete'] = admin_url('grampanchayat/delete');
-		$data['datatable_url'] = admin_url('areacoverage/search');
 
 		$data['heading_title'] = lang('Add Area Coverage');
 
@@ -62,161 +59,87 @@ class AreaCoverage extends AdminController
 		}
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
-		
+
+        $dates = $this->getWeekDates();
+
+        $data['from_date'] = $dates[0];
+        $data['to_date'] = $dates[1];
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage', $data);
 	}
-	public function search()
-	{
-		$requestData = $_REQUEST;
-		$totalData = $this->grampanchayatModel->getTotals();
-		$totalFiltered = $totalData;
 
-		$filter_data = array(
-			'filter_search' => $requestData['search']['value'],
-			'filter_district' => $requestData['district'],
-			'filter_block' => $requestData['block'],
-			'filter_grampanchayat' => $requestData['grampanchayat'],
-			'order' => $requestData['order'][0]['dir'],
-			'sort' => $requestData['order'][0]['column'],
-			'start' => $requestData['start'],
-			'limit' => $requestData['length']
-		);
-		$totalFiltered = $this->grampanchayatModel->getTotals($filter_data);
-
-		$filteredData = $this->grampanchayatModel->getAll($filter_data);
-
-		$datatable = array();
-		foreach ($filteredData as $result) {
-
-			$action = '<div class="btn-group btn-group-sm pull-right">';
-			$action .= '<a class="btn btn-sm btn-primary" href="' . admin_url('grampanchayat/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
-			$action .= '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('grampanchayat/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
-			$action .= '</div>';
-
-			$datatable[] = array(
-				'<input type="checkbox" name="selected[]" value="' . $result->id . '" />',
-				$result->name,
-				$result->district,
-				$result->block,
-				$action
-			);
-
-		}
-		//printr($datatable);
-		$json_data = array(
-			"draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
-			"recordsTotal" => intval($totalData),
-			"recordsFiltered" => intval($totalFiltered),
-			"data" => $datatable
-		);
-
-		return $this->response->setContentType('application/json')
-			->setJSON($json_data);
-
-	}
-
-	public function download()
-	{
-		$start_month = (int)$this->settings->kharif_start_month;
-		$end_month = (int)$this->settings->kharif_end_month;
-
-        $current_month = getMonthById(getCurrentMonthId());
-        $current_month_id = $current_month['id'];
-
-        //kharif
-        if ($current_month_id >= $start_month && $current_month_id <= $end_month) {
-            $start_month = getMonthById($start_month);
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,$year);
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-
-            $end_date = date('Y-m-d',$date);
-        } else {
-            $start_month = (int)$this->settings->rabi_start_month;
-            $end_month = (int)$this->settings->rabi_end_month;
-
-            $start_month = getMonthById($start_month);
-            $date = mktime(0,0,0,$start_month['number'],01,date('Y'));
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,($year+1));
-
-            $end_date = date('Y-m-d',$date);
-        }
-
-		$week_start = $this->settings->end_week;
-		$start = new \DateTime($start_date);
-		$end = new \DateTime($end_date);
-		$week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
-
-		$output = array();
-
-		while ($start <= $end) {
-			$day_of_week = (int) $start->format('w');
-			if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
-				$output[] = array(
-					$start->format('Y-m-d'),
-					min($start->modify('+6 days'), $end)->format('Y-m-d')
-				);
-			}
-			$start->modify('+1 day');
-		}
-
-		printr($output);
+	public function download() {
+	    
 	}
 
 	public function getCurrentYearDates() {
 
-		$kharif_start_month = (int)$this->settings->kharif_start_month;
-		$kharif_end_month = (int)$this->settings->kharif_end_month;
+		$kharif_start_month = getMonthById((int)$this->settings->kharif_start_month);
+        $kharif_end_month = getMonthById((int)$this->settings->kharif_end_month);
 
-		$rabi_start_month = (int)$this->settings->rabi_start_month;
-		$rabi_end_month = (int)$this->settings->rabi_end_month;
+        $rabi_start_month = getMonthById((int)$this->settings->rabi_start_month);
+        $rabi_end_month = getMonthById((int)$this->settings->rabi_end_month);
 
-		$year = (new YearModel())->getCurrentYear();
-        $current_month = getMonthById(getCurrentMonthId());
-        $current_month_id = $current_month['id'];
+        $given_date = \DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
 
-        //kharif
-        if ($current_month_id >= $start_month && $current_month_id <= $end_month) {
-            $start_month = getMonthById($start_month);
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,$year);
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-
-            $end_date = date('Y-m-d',$date);
-        } else {
-            $start_month = (int)$this->settings->rabi_start_month;
-            $end_month = (int)$this->settings->rabi_end_month;
-
-            $start_month = getMonthById($start_month);
-            $date = mktime(0,0,0,$start_month['number'],01,date('Y'));
-
-            $start_date = date('Y-m-d',$date);
-
-            $end_month = getMonthById($end_month);
-            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
-            $year = date('Y');
-            $date = mktime(0,0,0,$start_month['number'],01,($year+1));
-
-            $end_date = date('Y-m-d',$date);
+        $kharif_start_month_number = $kharif_start_month['number'];
+        $kharif_end_month_number = $kharif_end_month['number'];
+        $rabi_start_month_number = $rabi_start_month['number'];
+        $rabi_end_month_number = $rabi_end_month['number'];
+        if ($given_date->format('n') >= $kharif_start_month_number
+            && $given_date->format('n') <= $kharif_end_month_number) {
+            $current_season = 'Kharif';
+            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_start_month_number.'-01');
+            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_end_month_number.'-30');
+        } elseif ($given_date->format('n') >= $rabi_start_month_number
+            || $given_date->format('n') <= $rabi_end_month_number) {
+            $current_season = 'Rabi';
+            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_start_month_number.'-01');
+            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_end_month_number.'-01');
+            if ($given_date->format('n') <= 3) {
+                $season_start_date->modify('-1 year');
+                $season_end_date->modify('-1 year');
+            }
         }
 
-	}
+        return [
+            'current_season'=>$current_season,
+            'start_date'=>$season_start_date,
+            'end_date'=>$season_end_date,
+        ];
 
+    }
 
+    private function getWeekDates(){
+
+	    $dates = $this->getCurrentYearDates();
+
+        $start = $dates['start_date'];
+        $end = $dates['end_date'];
+        $week_start = $this->settings->start_week;
+        $week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
+
+        $output = array();
+
+        while ($start <= $end) {
+            $day_of_week = (int) $start->format('w');
+            if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
+                $output[] = array(
+                    $start->format('Y-m-d'),
+                    min($start->modify('+6 days'), $end)->format('Y-m-d')
+                );
+            }
+            $start->modify('+1 day');
+        }
+
+        foreach ($output as $dates) {
+            $today = strtotime('today');
+            if($today >= strtotime($dates[0]) && $today <= strtotime($dates[1])){
+                return $dates;
+            }
+        }
+
+        return false;
+    }
 
 }

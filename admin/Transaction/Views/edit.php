@@ -180,6 +180,19 @@
 
         numOnly();
         decimalOnly();
+
+        $('input').on('input',function (e) {
+            var maxVal = parseFloat($(this).attr('max'));
+
+            // Get the input value as a number
+            var val = parseFloat($(this).val());
+
+            // Check if the input value is greater than the maximum allowed value
+            if (!isNaN(val) && val > maxVal) {
+                // Set the input value to the maximum allowed value
+                $(this).val(maxVal);
+            }
+        });
     });
     //rakesh
     function numOnly() {

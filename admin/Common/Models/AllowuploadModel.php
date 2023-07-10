@@ -144,6 +144,22 @@ class AllowuploadModel extends Model
         if($filter['modulecode']=='closing_balance'){
             $builder = $db->table('soe_closing_balances');
         }
+        $row = $builder->where('id',$filter['upload_id'])->get()->getFirstRow();
+
+        if($row->block_id > 0 && in_array($row->agency_type_id,[5,6])){
+            $where = [
+                'block_id'=>$row->block_id,
+                'year'=>$row->year,
+                'user_id'=>$row->user_id,
+                'month'=>$row->month,
+                'deleted_at' => null
+            ];
+            if(isset($row->transaction_type)){
+                $where['transaction_type'] = $row->transaction_type;
+            }
+
+            return $builder->where($where)->update(['status'=>$filter['status']]);
+        }
 
         return $builder->where('id',$filter['upload_id'])
             ->update(['status'=>$filter['status']]);

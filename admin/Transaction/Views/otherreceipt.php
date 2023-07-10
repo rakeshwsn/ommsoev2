@@ -248,9 +248,6 @@
             },
             complete:function () {
                 $("#main-container").LoadingOverlay("hide");
-                numOnly();
-                decimalOnly();
-                cleanupInput();
             }
         })
     });
@@ -291,7 +288,5 @@
             }
         });
     });
-
-
 </script>
 <?php js_end(); ?>
