@@ -329,10 +329,10 @@ trait ReportTrait {
         }
 
         $blocks = $reportModel->getUploadStatus($filter);
-
+        //dd($blocks);
         foreach ($blocks as $block) {
 
-            $fr_sts = 3;
+            $fr_sts = $or_sts =3;
             if($block->frc_status==null || $block->frc_status==0){
                 $fr_sts = 4;
             }
@@ -340,8 +340,16 @@ trait ReportTrait {
                 $fr_sts = $block->fr_status;
             }
 
+            if($block->orc_status==null || $block->orc_status==0){
+                $or_sts = 4;
+            }
+
+            if($block->or_status != null){
+                $or_sts = $block->or_status;
+            }
+
             $ex_sts = $block->ex_status!==null?$block->ex_status:3;
-            $or_sts = $block->or_status!==null?$block->or_status:3;
+            //$or_sts = $block->or_status!==null?$block->or_status:3;
             $cb_sts = $block->cb_status!==null?$block->cb_status:3;
             $mis_sts = $block->mis_status!==null?$block->mis_status:3;
             $data['blocks'][] = [

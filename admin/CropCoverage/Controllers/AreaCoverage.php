@@ -1,6 +1,7 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
+use Admin\CropCoverage\Models\YearModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
 use Admin\CropCoverage\Models\DistrictModel;
@@ -114,16 +115,45 @@ class AreaCoverage extends AdminController
 			->setJSON($json_data);
 
 	}
+
 	public function download()
 	{
-		$season = getCurrentSeason();
-		echo $season;exit;
-		$start_month = $this->settings->kharif_start_month;
-		$end_month = $this->settings->kharif_end_month;
-		$start_date = '2023-07-01';
-		$end_date = '2023-12-31';
+		$start_month = (int)$this->settings->kharif_start_month;
+		$end_month = (int)$this->settings->kharif_end_month;
 
-		$week_start = "Fri";
+        $current_month = getMonthById(getCurrentMonthId());
+        $current_month_id = $current_month['id'];
+
+        //kharif
+        if ($current_month_id >= $start_month && $current_month_id <= $end_month) {
+            $start_month = getMonthById($start_month);
+            $year = date('Y');
+            $date = mktime(0,0,0,$start_month['number'],01,$year);
+
+            $start_date = date('Y-m-d',$date);
+
+            $end_month = getMonthById($end_month);
+            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
+
+            $end_date = date('Y-m-d',$date);
+        } else {
+            $start_month = (int)$this->settings->rabi_start_month;
+            $end_month = (int)$this->settings->rabi_end_month;
+
+            $start_month = getMonthById($start_month);
+            $date = mktime(0,0,0,$start_month['number'],01,date('Y'));
+
+            $start_date = date('Y-m-d',$date);
+
+            $end_month = getMonthById($end_month);
+            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
+            $year = date('Y');
+            $date = mktime(0,0,0,$start_month['number'],01,($year+1));
+
+            $end_date = date('Y-m-d',$date);
+        }
+
+		$week_start = $this->settings->end_week;
 		$start = new \DateTime($start_date);
 		$end = new \DateTime($end_date);
 		$week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
@@ -143,5 +173,50 @@ class AreaCoverage extends AdminController
 
 		printr($output);
 	}
+
+	public function getCurrentYearDates() {
+
+		$kharif_start_month = (int)$this->settings->kharif_start_month;
+		$kharif_end_month = (int)$this->settings->kharif_end_month;
+
+		$rabi_start_month = (int)$this->settings->rabi_start_month;
+		$rabi_end_month = (int)$this->settings->rabi_end_month;
+
+		$year = (new YearModel())->getCurrentYear();
+        $current_month = getMonthById(getCurrentMonthId());
+        $current_month_id = $current_month['id'];
+
+        //kharif
+        if ($current_month_id >= $start_month && $current_month_id <= $end_month) {
+            $start_month = getMonthById($start_month);
+            $year = date('Y');
+            $date = mktime(0,0,0,$start_month['number'],01,$year);
+
+            $start_date = date('Y-m-d',$date);
+
+            $end_month = getMonthById($end_month);
+            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
+
+            $end_date = date('Y-m-d',$date);
+        } else {
+            $start_month = (int)$this->settings->rabi_start_month;
+            $end_month = (int)$this->settings->rabi_end_month;
+
+            $start_month = getMonthById($start_month);
+            $date = mktime(0,0,0,$start_month['number'],01,date('Y'));
+
+            $start_date = date('Y-m-d',$date);
+
+            $end_month = getMonthById($end_month);
+            $date = mktime(0,0,0,$end_month['number'],01,date('Y'));
+            $year = date('Y');
+            $date = mktime(0,0,0,$start_month['number'],01,($year+1));
+
+            $end_date = date('Y-m-d',$date);
+        }
+
+	}
+
+
 
 }

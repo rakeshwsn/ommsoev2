@@ -326,6 +326,7 @@ class OtherReceipt extends AdminController
                 'value' => isset($amts[$head->id]) ? $amts[$head->id] : '',
             ];
         }
+        $data['can_edit'] = $txn->status!==1;
 
         return view('\Admin\Transaction\Views\other_receipt_form', $data);
     }
@@ -350,8 +351,8 @@ class OtherReceipt extends AdminController
             ->where($condition)
             ->first();
 
-        //check if cb is rejected
-        if($cb && $cb->status!=2){
+        //check if cb is not approved
+        if($cb && $cb->status!=1){
             $this->error="Can not add other Receipt. Closing balance already exist" ;
         }else if($txn){
            $this->error="Can not add other Receipt. Other receipt already exist" ;

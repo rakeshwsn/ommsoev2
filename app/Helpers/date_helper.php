@@ -192,18 +192,9 @@ function getLastYear(){
 }
 
 function getCurrentYearId(){
-    $years = getAllYears();
+    global $yearModel;
 
-    $currentyr = date('Y').'-'.(date('y')+1);
-    $lastyr = (date('Y')-1).'-'.(date('y'));
-    $year = date('Y');
-    if(strtotime('now')<strtotime($year.'-04-01')){
-        $year = array_search($lastyr,array_column($years,'name'));
-    } else{
-        $year = array_search($currentyr,array_column($years,'name'));
-    }
-
-    return $years[$year]['id'];
+    return $yearModel->getCurrentYear()->id;
 }
 
 function getCurrentMonthId(){
