@@ -4,18 +4,25 @@ use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
 use Admin\CropCoverage\Models\CropsModel;
 use Admin\CropCoverage\Models\PracticesModel;
-use Admin\CropCoverage\Models\BlockModel;
-
-
+use Admin\Localisation\Models\BlockModel;
+use Admin\Localisation\Models\DistrictModel;
 
 class AreaCoverageTarget extends AdminController {
-
     private $error = array();
-
+	private $targetModel;
+	private $blockModel;
+	private $districtModel;
+	private $cropsModel;
+	private $practicesModel;
+    
     function __construct(){
-         $this->targetModel=new TargetModel();
+        $this->targetModel= new TargetModel();
+		$this->blockModel = new BlockModel();
+		$this->districtModel = new DistrictModel();
+		$this->cropsModel = new CropsModel;
+		$this->practicesModel = new PracticesModel;
     }
-    public function Index(){
+	public function Index(){
 
         $this->template->set_meta_title(lang('Grampanchayat.heading_title'));
 		return $this->getList(); 
@@ -48,13 +55,29 @@ class AreaCoverageTarget extends AdminController {
 			$data['error'] 	= $this->error['warning'];
 		}
 
-		if ($this->request->getPost('selected')) {
-			$data['selected'] = (array)$this->request->getPost('selected');
+		if ($this->request->getGet('district_id')) {
+			$data['district_id'] = (array)$this->request->getGet('district_id');
 		} else {
-			$data['selected'] = array();
+			$data['district_id'] = $this->user->district_id;
 		}
-        $targetmodel = new TargetModel();
-        $croppractices = $targetmodel->getPractices();
+
+        $croppractices = $this->targetModel->getPractices();
+		
+		$practicedata=   $this->targetModel->getAll([
+			'district_id'=>$data['district_id']
+		]);
+		
+		$data['practicedata'] = $practicedata;
+		$data['year_id'] = date('Y');
+        $currentMonth = date('n');
+        if ($currentMonth >= 6 && $currentMonth <= 10) {
+            $season = 'Kharif';
+        } elseif ($currentMonth >= 11 && $currentMonth <= 4) {
+            $season = 'Rabi';
+        }
+		$data['season'] = $season; 
+		// printr($practicedata);
+		// exit;
 
         //for heading
         $crops = [];
@@ -69,38 +92,23 @@ class AreaCoverageTarget extends AdminController {
         }
         
         $data['heading'] = $crops;
-        
-
-
-		// $districtModel=new DistrictModel();
-		// $data['districts'] = $districtModel->getAll();
-		// print_r($data);
-		// exit;
 		
-	
-
 		return $this->template->view('Admin\CropCoverage\Views\areacoveragetarget', $data);
 	}
     public function add(){
 		
-		
 		if ($this->request->getMethod(1) === 'POST'){
            
-           // printr	($this->request->getPost());
-           // exit;
 			$id=$this->targetModel->AddTargets($this->request->getPost());
            
-			
 			$this->session->setFlashdata('message', 'Target Saved Successfully.');
 			
 			return redirect()->to(base_url('admin//areacoverage/target'));
 		}
 		$this->getForm();
 	}
+	
     protected function getForm(){
-		
-		$this->template->add_package(array('select2'),true);
-		
 		$_SESSION['isLoggedIn'] = true;
 		
 		$data['cancel'] = admin_url('areacoverage/target');
@@ -108,21 +116,45 @@ class AreaCoverageTarget extends AdminController {
 		if(isset($this->error['warning'])){
 			$data['error'] 	= $this->error['warning'];
 		}
-         $cropsModel=new CropsModel();
-		 $data['crops'] = $cropsModel->GetCrops();
-        //  print_r($data);
-		//  exit;
-         $practicesModel= new practicesModel();
-		 $data['practics'] = $practicesModel->GetPractices();
-         $data['district_id']=$this->user->district_id;
+        $data['crops'] = $this->cropsModel->GetCrops();
+		$data['practics'] = $this->practicesModel->GetPractices();
+        $data['district_id']=$this->user->district_id;
+		if (empty($this->user->district_id)) {
+			$data['missingDistrictId'] = true;
+		} else {
+			$data['missingDistrictId'] = false;
+			$data['district_id'] = $this->user->district_id;
+		}
+		$data['districts'] = $this->districtModel->getAll();
+
+		// dd($data['districts']);
+
 		$data['blocks']=(new BlockModel())->getBlocksByDistrict($data['district_id']);
-       $data['block_id']=$this->user->block_id;
-        //   echo "<pre>";
-		//   print_r($data['blocks']);
-		//   exit;
+        $data['block_id']=$this->user->block_id;
+        
 		echo $this->template->view('Admin\CropCoverage\Views\targetForm',$data);
 	}
-   
-   
+	public function fetchBlocks()
+    {
+        if ($this->request->isAJAX()) {
+            $districtId = $this->request->getPost('districtId');
+            
+            // Fetch blocks from the BlockModel based on district ID
+      
+            $blocks = $blockModel->where('district_id', $districtId)->findAll();
+
+            // Prepare options array for the block dropdown
+            $blockOptions = [];
+            foreach ($blocks as $block) {
+                $blockOptions[$block->id] = $block->name;
+            }
+
+            // Return blocks as JSON response
+            return $this->response->setJSON(['success' => true, 'blocks' => $blockOptions]);
+        } else {
+            // Invalid request
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
+        }
+    }
 }
 ?>

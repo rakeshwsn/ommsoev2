@@ -4,29 +4,26 @@ use App\Controllers\AdminController;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\GrampanchayatModel;
-use Admin\Localisation\Models\VillageModel;
 
 class Grampanchayat extends AdminController{
 	private $error = array();
 	private $grampanchayatModel;
-	
+	private $districtModel;
+	private $blockModel;
 	public function __construct(){
 		$this->grampanchayatModel=new GrampanchayatModel();
 		$this->blockModel=new BlockModel();
-
+		$this->districtModel = new DistrictModel();
 	}
-	
 	public function index(){
 		$this->template->set_meta_title(lang('Grampanchayat.heading_title'));
 		return $this->getList();  
 	}
-	
 	public function add(){
 		
 		$this->template->set_meta_title(lang('Grampanchayat Add'));
 		
 		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()){	
-			
 			
 			$id=$this->grampanchayatModel->insert($this->request->getPost());
 			
@@ -34,18 +31,14 @@ class Grampanchayat extends AdminController{
 			
 			return redirect()->to(base_url('admin/grampanchayat'));
 		}
-		
-
 		$this->getForm();
 	}
-	
 	public function edit(){
 		
 		$this->template->set_meta_title(lang('Grampanchayat.heading_title'));
 		
 		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()){	
 			$id=$this->uri->getSegment(4);
-			
 			
 			$this->grampanchayatModel->update($id,$this->request->getPost());
 			
@@ -68,7 +61,6 @@ class Grampanchayat extends AdminController{
 		$this->session->setFlashdata('message', 'Grampanchayat deleted Successfully.');
 		return redirect()->to(base_url('admin/grampanchayat'));
 	}
-	
 	protected function getList() {
 		
 		$data['breadcrumbs'] = array();
@@ -102,12 +94,9 @@ class Grampanchayat extends AdminController{
 		} else {
 			$data['selected'] = array();
 		}
-		
-		$districtModel=new DistrictModel();
-		$data['districts'] = $districtModel->getAll();
-		
-		$data['district_id']=$this->user->district_id;
-		$data['block_id']=$this->user->block_id;
+		$data['districts'] = $this->districtModel->getAll();
+		$data['district_id']= $this->user->district_id;
+		$data['block_id']= $this->user->block_id;
 
 		return $this->template->view('Admin\Localisation\Views\grampanchayat', $data);
 	}
@@ -136,7 +125,6 @@ class Grampanchayat extends AdminController{
 			'limit' 			 => $requestData['length']
 		);
 
-		
 		$totalFiltered = $this->grampanchayatModel->getTotals($filter_data);
 			
 		$filteredData = $this->grampanchayatModel->getAll($filter_data);
@@ -168,8 +156,7 @@ class Grampanchayat extends AdminController{
 		
 		return $this->response->setContentType('application/json')
 								->setJSON($json_data);
-		
-	}
+		}
 	
 	protected function getForm(){
 		
@@ -180,11 +167,9 @@ class Grampanchayat extends AdminController{
 			'text' => lang('Grampanchayat.heading_title'),
 			'href' => admin_url('grampanchayat')
 		);
-		
 		//printr($_SESSION);
 		$_SESSION['isLoggedIn'] = true;
-        
-		$data['heading_title'] 	= lang('Grampanchayat.heading_title');
+        $data['heading_title'] 	= lang('Grampanchayat.heading_title');
 		$data['text_form'] = $this->uri->getSegment(4) ? "Grampanchayat Edit" : "Grampanchayat Add";
 		$data['cancel'] = admin_url('grampanchayat');
 		
@@ -206,15 +191,12 @@ class Grampanchayat extends AdminController{
 			}
 		}
 		
-		$districtModel=new DistrictModel();
-		$data['districts'] = $districtModel->getAll();
-		$blockModel=new BlockModel();
-		$data['blocks'] = $districtModel->getAll();
-		$data['district_id']=$this->user->district_id;
-		$data['block_id']=$this->user->block_id;
+		$data['districts'] = $this->districtModel->getAll();
+		$data['blocks'] = $this->districtModel->getAll();
+		$data['district_id']= $this->user->district_id;
+		$data['block_id']= $this->user->block_id;
 
-		
-	    if($this->request->isAJAX()){
+		if($this->request->isAJAX()){
 
             echo $this->template->view('Admin\Localisation\Views\grampanchayatForm',$data,true);
 
@@ -222,7 +204,6 @@ class Grampanchayat extends AdminController{
             echo $this->template->view('Admin\Localisation\Views\grampanchayatForm',$data);
         }
     }
-	
 	protected function validateForm() {
 		//printr($_POST);
 		$validation =  \Config\Services::validation();
@@ -232,8 +213,6 @@ class Grampanchayat extends AdminController{
 		$regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor 
 
 		$rules = $this->grampanchayatModel->validationRules;
-		
-		
 		
 		if ($this->validate($rules)){
 			return true;
@@ -245,25 +224,6 @@ class Grampanchayat extends AdminController{
     	}
 		return !$this->error;
 	}
-
-    public function village($gp=''){
-        if (is_ajax()){
-            $villageModel=new VillageModel();
-            if(!is_numeric($gp)){
-                $gprow=$this->grampanchayatModel->where('code', $gp)->first();
-
-                $gp=$gprow->id;
-            }
-            $json = array(
-                'grampanchayat'  	=> $gp,
-                'village'   => $villageModel->getVillageByGP($gp)
-            );
-            echo json_encode($json);
-        }else{
-            return show_404();
-        }
-    }
-	
 }
 
 /* End of file hmvc.php */

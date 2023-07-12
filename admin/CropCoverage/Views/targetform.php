@@ -10,6 +10,15 @@
     <?= form_open('', 'id="form-target"'); ?>			
         <div class="form-layout">
                 <div class="row">
+                    <?php if (!$district_id): ?>
+                    <div class="col-lg-3">
+                        <div class="form-group mg-b-10-force">
+                            <label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
+                            <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id'), "id='filter_district' class='form-control js-select2'") ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
                         <label class="form-control-label">Block: <span class="tx-danger">*</span></label>
@@ -77,4 +86,38 @@
         document.getElementById('total-lt').value = totalLT;
         document.getElementById('total-ls').value = totalLS;
     }
+</script>
+<script>
+$(document).ready(function() {
+    $('#district').change(function() {
+        var districtId = $(this).val();
+
+        // Clear block dropdown
+        $('#block').html('');
+
+        // Make AJAX request to fetch blocks
+        $.ajax({
+            url: '<?= admin_url("/areacoverage/fetch-blocks"); ?>/', // Replace with the URL for fetching blocks
+            method: 'POST',
+            data: { districtId: districtId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Populate block dropdown with options
+                    var blocks = response.blocks;
+                    $.each(blocks, function(key, block) {
+                        $('#block').append('<option value="' + block.id + '">' + block.name + '</option>');
+                    });
+                } else {
+                    // Handle error case
+                    console.error(response.message);
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                // Handle error case
+                console.error(textStatus + ': ' + errorThrown);
+            }
+        });
+    });
+});
 </script>

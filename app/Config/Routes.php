@@ -81,7 +81,9 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->post('grampanchayat/delete','Localisation\Controllers\Grampanchayat::delete');
     $routes->match(['get','post'],'grampanchayat/edit/(:segment)', 'Localisation\Controllers\Grampanchayat::edit/$1');
     $routes->post('grampanchayat/search','Localisation\Controllers\Grampanchayat::search');
-    
+    $routes->match(['get','post'],'areacoverage/target', 'CropCoverage\Controllers\AreaCoverageTarget::index');
+    $routes->match(['get','post'],'areacoverage/target/add', 'CropCoverage\Controllers\AreaCoverageTarget::add');
+    $routes->post('areacoverage/fetch-blocks', 'CropCoverage\Controllers\AreaCoverageTarget::fetchBlocks');
     //areacoverage_grampanchayat
     $routes->add('areacoverage/grampanchayat','Localisation\Controllers\Grampanchayat::index');
 
@@ -98,7 +100,7 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->add('users/allowupload/update','Users\Controllers\AllowUpload::update');
     $routes->get('users/uploadstatus','Users\Controllers\UploadStatus::index');
     $routes->add('users/uploadstatus/update','Users\Controllers\UploadStatus::update');
-
+    
 // Rakesh Route
 	$routes->get('spmu/chart', 'Common\Controllers\Dashboard::spmu_dashboard_chart');
 
