@@ -305,6 +305,11 @@ class User
 		return $this->user;
 	}
 
+	public function isAdmin()
+    {
+        return in_array($this->user_group_id,[1,2]);
+    }
+
 	public function isLogged()
     {
         return $this->user_id;

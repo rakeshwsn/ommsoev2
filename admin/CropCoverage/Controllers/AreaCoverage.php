@@ -2,9 +2,9 @@
 namespace Admin\CropCoverage\Controllers;
 
 use Admin\CropCoverage\Models\YearModel;
+use Admin\Localisation\Models\DistrictModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
-use Admin\CropCoverage\Models\DistrictModel;
 
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
