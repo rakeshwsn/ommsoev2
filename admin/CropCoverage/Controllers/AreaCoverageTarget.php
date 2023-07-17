@@ -193,7 +193,7 @@ class AreaCoverageTarget extends AdminController
 		// printr($data['practicedata']);
 		// exit;
 
-		echo $this->template->view('Admin\CropCoverage\Views\targetForm', $data);
+		echo $this->template->view('Admin\CropCoverage\Views\targetform', $data);
 	}
 
 	public function fetchBlocks()
