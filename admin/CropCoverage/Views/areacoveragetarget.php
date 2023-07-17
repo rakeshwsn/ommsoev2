@@ -28,8 +28,7 @@
                                     echo $pd['season'] . '<br>';
                                     $seasonPrinted = true;
                                 }
-                                // Rest of your code
-                                // ...
+
                             }
                             ?>
                         </span></label>

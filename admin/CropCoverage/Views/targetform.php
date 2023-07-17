@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <table id="datatable" class="table table-bordered table-striped table-vcenter ">
+        <table id="datatable" class="table table-bordered table-striped table-vcenter">
             <thead>
                 <tr>
                     <th>Crop Name</th>
@@ -40,18 +40,38 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($crops as $crop): ?>
+                <?php foreach ($crops as $index => $crop): ?>
                     <tr>
                         <td>
                             <?= $crop['crops']; ?>
                         </td>
-                        <?php //printr($practicedata);
-                            foreach ($practices as $practice): ?>
+                        <?php foreach ($practices as $practice): ?>
+                            <?php
+                            $inputValue = '';
+                            if ($practice['practices'] === 'SMI') {
+                                if ($crop['crops'] === 'Ragi') {
+                                    $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                                } else {
+                                    $inputValue = '';
+                                }
+                            } else {
+                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                            }
+                            ?>
                             <td>
-                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                    name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                    value="<?= (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '' ?>"
-                                    oninput="calculateTotals()">
+                                <?php if ($practice['practices'] === 'SMI'): ?>
+                                    <?php if ($crop['crops'] === 'Ragi'): ?>
+                                        <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                            name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
+                                            value="<?= $inputValue ?>" oninput="calculateTotals()">
+                                    <?php else: ?>
+                                        <input type="number" disabled>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                        name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
+                                        value="<?= $inputValue ?>" oninput="calculateTotals()">
+                                <?php endif; ?>
                             </td>
                         <?php endforeach; ?>
                     </tr>
@@ -64,6 +84,10 @@
                 </tr>
             </tbody>
         </table>
+
+
+
+
         <?= form_close(); ?>
     </div>
 </div>

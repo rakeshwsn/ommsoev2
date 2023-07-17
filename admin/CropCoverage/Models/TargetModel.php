@@ -48,7 +48,7 @@ class TargetModel extends Model
 
 	public function addTargets($data)
 	{
-		//crop master  table
+		// Crop master table
 		$masterdata = array(
 			"block_id" => $data['block_id'],
 			"year_id" => getCurrentYearId(),
@@ -57,20 +57,22 @@ class TargetModel extends Model
 
 		$target_id = $this->insert($masterdata);
 
-		//crop coverage target table
+		// Crop coverage target table
 		foreach ($data['crop_data'] as $crop_id => $area) {
 			$targetdata = array(
 				"target_id" => $target_id,
 				"crop_id" => $crop_id,
-				// Add other columns and values from $values array as needed
-				"smi" => $area['SMI'],
-				"lt" => $area['LT'],
-				"ls" => $area['LS']
+				"smi" => isset($area['SMI']) ? $area['SMI'] : 0,
+				// Check if 'SMI' key exists
+				"lt" => isset($area['LT']) ? $area['LT'] : 0,
+				// Check if 'LT' key exists
+				"ls" => isset($area['LS']) ? $area['LS'] : 0, // Check if 'LS' key exists
 			);
 
 			$this->db->table('ac_target_area')->insert($targetdata);
 		}
 	}
+
 	public function getAll($filter = array())
 	{
 
