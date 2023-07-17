@@ -1,73 +1,84 @@
 <?php
 namespace Admin\CropCoverage\Models;
+
 use CodeIgniter\Model;
+
 class TargetModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'ac_target_master';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
-	protected $useSoftDelete        = false;
-	protected $protectFields        = true;
-	protected $allowedFields        = [];
+	protected $DBGroup = 'default';
+	protected $table = 'ac_target_master';
+	protected $primaryKey = 'id';
+	protected $useAutoIncrement = true;
+	protected $insertID = 0;
+	protected $returnType = 'object';
+	protected $useSoftDeletes = true;
+	protected $protectFields = false;
+	// protected $allowedFields = [
+	// 	'block_id',
+	// 	'year_id',
+	// 	'season',
+	// 	'ragi_smi',
+	// 	'ragi_lt',
+	// 	'ragi_ls',
+	// ];
 
 	// Dates
-	protected $useTimestamps        = false;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+	protected $useTimestamps = true;
+	protected $dateFormat = 'datetime';
+	protected $createdField = 'created_at';
+	protected $updatedField = 'updated_at';
+	protected $deletedField = 'deleted_at';
 
 	// Validation
-	protected $validationRules      = [];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
+	protected $validationRules = [];
+	protected $validationMessages = [];
+	protected $skipValidation = false;
 	protected $cleanValidationRules = true;
 
 	// Callbacks
-	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = [];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = [];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+	protected $allowCallbacks = true;
+	protected $beforeInsert = [];
+	protected $afterInsert = [];
+	protected $beforeUpdate = [];
+	protected $afterUpdate = [];
+	protected $beforeFind = [];
+	protected $afterFind = [];
+	protected $beforeDelete = [];
+	protected $afterDelete = [];
 
-	public function AddTargets($data) {
-    //crop master  table
-        $masterdata=array(
-            "block_id"=>$data['block_id'],
-            "year_id" =>  getCurrentYearId(),
-            "season" => getCurrentSeason(),
-     
-       );
-        $target_id=$this->db->table('ac_target_master')->insert($masterdata);
-        //crop coverage target table
-        foreach ($data['crop'] as $crop_id=>$area) {
-       
-            $targetdata = array(
-                "target_id" => $target_id,
-                "crop_id" => $crop_id,
-                // Add other columns and values from $values array as needed
-                "smi" => $area['SMI'],
-                "lt" => $area['LT'],
-                "ls" => $area['LS']
-            );
-            
-            $this->db->table('ac_target_area')->insert($targetdata);
-        }
-    }
-	public function getAll($filter = array()){
+	public function addTargets($data)
+	{
+		//crop master  table
+		$masterdata = array(
+			"block_id" => $data['block_id'],
+			"year_id" => getCurrentYearId(),
+			"season" => getCurrentSeason(),
+		);
+
+		$target_id = $this->insert($masterdata);
+
+		//crop coverage target table
+		foreach ($data['crop_data'] as $crop_id => $area) {
+			$targetdata = array(
+				"target_id" => $target_id,
+				"crop_id" => $crop_id,
+				// Add other columns and values from $values array as needed
+				"smi" => $area['SMI'],
+				"lt" => $area['LT'],
+				"ls" => $area['LS']
+			);
+
+			$this->db->table('ac_target_area')->insert($targetdata);
+		}
+	}
+	public function getAll($filter = array())
+	{
 
 		$district_id = 0;
-		if(!empty($filter['district_id'])){
+		if (!empty($filter['district_id'])) {
 			$district_id = $filter['district_id'];
 		}
-		
+
 		$sql = "SELECT
 		sb.name block,
 		sb.id block_id,
@@ -123,13 +134,13 @@ class TargetModel extends Model
 		  FROM ac_target_master tm
 			LEFT JOIN ac_target_area ta
 			  ON tm.id = ta.target_id";
-			  if(!empty($filter['year_id'])){
-				$sql .= " AND tm.year_id=".$filter['year_id'];
-			  }
-			  if(!empty($filter['season'])){
-				$sql .= " AND tm.season=".$filter['season'];
-			  }
-			  $sql .= " LEFT JOIN (SELECT
+		if (!empty($filter['year_id'])) {
+			$sql .= " AND tm.year_id=" . $filter['year_id'];
+		}
+		if (!empty($filter['season'])) {
+			$sql .= " AND tm.season=" . $filter['season'];
+		}
+		$sql .= " LEFT JOIN (SELECT
 				*,
 				id AS crop_id
 			  FROM ac_crops) c
@@ -141,18 +152,40 @@ class TargetModel extends Model
 		return $this->db->query($sql)->getResultArray();
 
 	}
-	
-    public function getPractices(){
-        
-        $builder = $this->db->table('ac_crop_practices cp');
-        $builder->select('cp.crop_id, cp.practice_id, ac.crops, p.name as practice');
-        $builder->join('ac_crops ac', 'ac.id = cp.crop_id', 'left');
-        $builder->join('ac_practices p', 'cp.practice_id = p.id', 'left');
-        $builder->orderBy('ac.id');
-        $query = $builder->get();
-        
-        return $query->getResultArray();
-      
-    } 
+
+	public function getBlockTargets($filter = [])
+	{
+		$sql = "SELECT
+  ata.crop_id,ata.smi,ata.lt,ata.ls
+FROM ac_target_master atm
+  LEFT JOIN ac_target_area ata
+    ON atm.id = ata.target_id
+WHERE deleted_at is null";
+		if (!empty($filter['block_id'])) {
+			$sql .= " and atm.block_id = " . $filter['block_id'];
+		}
+		if (!empty($filter['year_id'])) {
+			$sql .= " and atm.year_id = " . $filter['year_id'];
+		}
+		if (!empty($filter['season'])) {
+			$sql .= " and atm.season = '" . $filter['season'] . "'";
+		}
+
+		return $this->db->query($sql)->getResultArray();
+	}
+
+	public function getPractices()
+	{
+
+		$builder = $this->db->table('ac_crop_practices cp');
+		$builder->select('cp.crop_id, cp.practice_id, ac.crops, p.name as practice');
+		$builder->join('ac_crops ac', 'ac.id = cp.crop_id', 'left');
+		$builder->join('ac_practices p', 'cp.practice_id = p.id', 'left');
+		$builder->orderBy('ac.id');
+		$query = $builder->get();
+
+		return $query->getResultArray();
+
+	}
 }
 ?>
