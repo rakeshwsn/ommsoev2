@@ -1,5 +1,5 @@
 <?php
-namespace Admin\Budgets\Config;
+namespace Admin\Pages\Config;
 if(!isset($routes))
 {
     $routes = \Config\Services::routes(true);

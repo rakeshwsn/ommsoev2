@@ -139,9 +139,10 @@ class User
         if($data=="#"){
             $other_permission=false;
         }
-        //printr($this->permission);
-        //echo $data;
-        //exit;
+        
+       // printr($this->permission);
+       // echo $data;
+       // exit;
         if ($this->user_group_id == 1) {
             return true;
         }else if(isset($this->permission[$data]) && $this->permission[$data] == 'yes') {
@@ -362,13 +363,16 @@ class User
         if($testUser){
             return $testUser[$field];
         }*/
+        if($this->isLogged()){
+            $this->user->agency_type_id = $this->user->user_group_id;
+            $this->user->user_id = $this->user_id;
 
-        $this->user->agency_type_id = $this->user->user_group_id;
-        $this->user->user_id = $this->user_id;
-
-        if(!isset($this->user->{$field})){
+            if(!isset($this->user->{$field})){
+                return false;
+            }
+            return $this->user->{$field};
+        }else{
             return false;
         }
-        return $this->user->{$field};
     }
 }

@@ -86,12 +86,10 @@ class AdminController extends Controller
         //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
         //Checks if it's a 404 or not
         if(!$this->user->checkPermission()){
-
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }else if (method_exists($this, $method)) {
 			return call_user_func_array(array($this, $method),$params);
         } else {
-
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 		

@@ -5,7 +5,7 @@ if(!isset($routes))
     $routes = \Config\Services::routes(true);
 }
 
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login'], function($routes)
+$routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
     $routes->add('components','Components\Controllers\Components::index');
     $routes->post('components/search','Components\Controllers\Components::search');
@@ -24,5 +24,6 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
     $routes->add('components/agencyassign','Components\Controllers\AgencyAssign::index');
     $routes->add('components/agencyassign/(:num)','Components\Controllers\AgencyAssign::index/$1');
 
+   
 
 });

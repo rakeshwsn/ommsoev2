@@ -214,11 +214,27 @@ class District extends AdminController{
             'district_id' => $district,
         ];
         
-       
+        if($this->request->getGet('fund_agency_id')){
+            $fund_agency_id = $this->request->getGet('fund_agency_id');
+            $filter['fund_agency_id'] = $fund_agency_id;
+        }
 
         $blocks = $blockModel->where($filter)->findAll();
 
         return $this->respond($blocks);
 	}
 
+	public function fundAgency($fund_agency_id=''){
+
+        if($this->request->getGet('fund_agency_id')){
+            $fund_agency_id = $this->request->getGet('fund_agency_id');
+        }
+
+        $districts = $this->districtModel->getDistrictsByFundAgency($fund_agency_id);
+
+        return $this->respond($districts);
+	}
 }
+
+/* End of file hmvc.php */
+/* Location: ./application/widgets/hmvc/controllers/hmvc.php */
