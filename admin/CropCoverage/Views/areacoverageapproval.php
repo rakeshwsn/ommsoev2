@@ -30,12 +30,32 @@
                             class="table table-bordered table-striped table-vcenter table-responsive">
                             <thead>
                                 <tr>
-                                    <th rowspan="2">Block</th>
+                                    <th rowspan="3">Block</th>
+                                    <th rowspan="3">No of GP</th>
+                                    <th rowspan="3">No of Villages</th>
+                                    <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
+                                    <th rowspan="3">SMI - Balance Nursery Raised (for coverage of area in Ha.) (Please
+                                        write figure post transplantation and damage)</th>
+                                    <th rowspan="3">LT - Balance Nursery Raised (for coverage of area in Ha.) (Please
+                                        write figure post transplantation and damage)
+                                    </th>
+
+                                    <th colspan="9">Achievement under demonstration (Area in Hectare)</th>
+
                                     <?php foreach ($heading as $crop => $practices): ?>
-                                        <th colspan="<?= count($practices) ?>"><?= $crop ?></th>
+                                        <th colspan="<?= count($practices) ?>" rowspan="1"><?= $crop ?></th>
                                     <?php endforeach; ?>
+
                                     <th class="text-right no-sort colspan-2">Actions</th>
                                 </tr>
+
+                                <tr>
+                                    <?php foreach ($heading as $crop => $practices): ?>
+                                        <th colspan="<?= count($practices) + 1 ?>" rowspan="1">Achievement under
+                                            demonstration (Area in Hectare)</th>
+                                    <?php endforeach; ?>
+                                </tr>
+
                                 <tr>
                                     <?php foreach ($heading as $crop => $practices): ?>
                                         <?php foreach ($practices as $practice): ?>
@@ -46,6 +66,7 @@
                                     <?php endforeach; ?>
                                 </tr>
                             </thead>
+
                             <tbody>
                                 <?php foreach ($practicedata as $data) { ?>
                                     <tr>
