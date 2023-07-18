@@ -33,6 +33,8 @@ class LoginFilter implements FilterInterface
 		$template = service('template');
 		$uri = service('uri');
 		//printr($user->getId());
+		//echo "om";
+		//exit;
         //$session->set('redirect',current_url());
 		$route=uri_string();
 		$ignore = array(

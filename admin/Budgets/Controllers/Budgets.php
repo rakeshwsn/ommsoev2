@@ -678,7 +678,7 @@ class Budgets extends AdminController {
             //exit;*/
             $agency_type_id = 0;
             if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
-                $agency_type_id = 8;
+                $agency_type_id = '';
             } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
                 $agency_type_id = 7;
             } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
@@ -696,7 +696,7 @@ class Budgets extends AdminController {
              ];
 
             $components = $this->budgetModel->getBudgetDetails($filter);
-           // dd($budgetplan_info);
+           //dd($components);
             //dd($components);
             //$components=[];
             if(getCurrentYearId() == $budgetplan_info->year && !$budgetplan_info->status){

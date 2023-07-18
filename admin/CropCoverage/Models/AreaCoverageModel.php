@@ -95,12 +95,6 @@ class AreaCoverageModel extends Model
     
     }
 
-	// public function insertData($data){
-	// 	$builder=$this->db->table('crop_coverage');
-	// 	$builder->insert($data);
-	// 	echo $this->db->getLastQuery();
-	// 	exit;
-	// }
 	
 	
 	

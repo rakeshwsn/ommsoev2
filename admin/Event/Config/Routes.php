@@ -5,7 +5,7 @@ if(!isset($routes))
     $routes = \Config\Services::routes(true);
 }
 
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login'], function($routes)
+$routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
     $routes->add('event', 'Event\Controllers\Event::index');
     $routes->post('event/search','Event\Controllers\Event::search');
