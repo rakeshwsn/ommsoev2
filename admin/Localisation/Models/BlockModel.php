@@ -53,15 +53,15 @@ class BlockModel extends Model
 	
 	
 	public function getAll($data = array()){
-		$builder=$this->db->table("{$this->table} sb");
+		$builder=$this->db->table("{$this->table} b");
 		$this->filter($builder,$data);
 		
-		$builder->select("sb.*,sd.name as district");
+		$builder->select("b.*,d.name as district");
 		
 		if (isset($data['sort']) && $data['sort']) {
 			$sort = $data['sort'];
 		} else {
-			$sort = "sb.name";
+			$sort = "b.name";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'desc')) {
@@ -88,33 +88,33 @@ class BlockModel extends Model
 	}
 	
 	public function getTotals($data = array()) {
-		$builder=$this->db->table("{$this->table} sb");
+		$builder=$this->db->table("{$this->table} b");
 		$this->filter($builder,$data);
 		$count = $builder->countAllResults();
 		return $count;
 	}
 	
 	private function filter($builder,$data){
-		$builder->join('soe_districts sd', 'sb.district_id = sd.id');
+		$builder->join('soe_districts d', 'b.district_id = d.id');
         
 		if(!empty($data['filter_district'])){
-            $builder->where("sb.district_id  = '".$data['filter_district']."'");
+            $builder->where("b.district_id  = '".$data['filter_district']."'");
         }
 
 		if (!empty($data['filter_search'])) {
 			$builder->where("
-				sb.name LIKE '%{$data['filter_search']}%' OR
-				sb.id = '{$data['filter_search']}'
+				b.name LIKE '%{$data['filter_search']}%' OR
+				b.id = '{$data['filter_search']}'
 			");
 		}
     }
 
 	protected  function getBlockCode(array $data){
 
-		$builder=$this->db->table("{$this->table} sb");
-		$builder->select("sb.code");
-		$builder->where("sb.district_id  = '".$data['data']['district_id']."'");
-		$builder->orderBy('sb.code', 'desc');
+		$builder=$this->db->table("{$this->table} b");
+		$builder->select("b.code");
+		$builder->where("b.district_id  = '".$data['data']['district_id']."'");
+		$builder->orderBy('b.code', 'desc');
 		$builder->limit(1);
 		$res = $builder->get()->getRow();
 		
@@ -135,7 +135,7 @@ class BlockModel extends Model
 	}
 
 	public function getBlocksByDistrict($district) {
-		$builder=$this->db->table("{$this->table} sb");
+		$builder=$this->db->table("{$this->table} b");
 		$builder->where("district_id",$district);
 		$res = $builder->get()->getResult();
 		return $res;

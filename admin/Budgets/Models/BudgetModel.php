@@ -137,11 +137,17 @@ class BudgetModel extends Model
             FROM soe_components_agency a
             LEFT JOIN soe_components c
                 ON component_id = c.ID
-            WHERE a.agency_type_id = ".$filter['agency_type_id']."
-            AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
+            WHERE 1=1";
+            if(!empty($filter['agency_type_id'])){
+                $sql .= " AND a.agency_type_id = ".$filter['agency_type_id'];
+            } else {
+                //$sql .= " AND a.agency_type_id IS NULL ";
+            }
+            
+            $sql .= " AND a.fund_agency_id = ".$filter['fund_agency_id'].") sc
             LEFT JOIN soe_components_assign sca
             ON sca.component_id = sc.ID
-            AND sca.fund_agency_id = sc.fund_agency_id) t1
+            AND sca.fund_agency_id = sc.fund_agency_id GROUP BY sca.component_id,sca.number) t1
         LEFT JOIN (SELECT
         bc.component_id,
         bc.agency_type_id,
@@ -158,7 +164,7 @@ class BudgetModel extends Model
             ON t1.component_id = t2.component_id
         ";
 
-       // echo $sql."<br>";
+        //echo $sql."<br>";
 
         return $this->db->query($sql)->getResultArray();
     }
@@ -301,9 +307,11 @@ class BudgetModel extends Model
         WHERE bp.year = ".$filter['year']."
         AND bp.fund_agency_id = ".$filter['fund_agency_id']."
         AND bp.district_id = ".$filter['district_id']."
+        AND b.deleted_at IS NULL
+        AND bp.deleted_at IS NULL
         GROUP BY bp.block_id
         ORDER BY bp.block_id";
-        //echo $sql;
+       // echo $sql;
         return $this->db->query($sql)->getResultArray();
 
     }
