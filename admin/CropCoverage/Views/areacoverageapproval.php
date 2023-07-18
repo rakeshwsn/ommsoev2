@@ -51,15 +51,15 @@
 
                                 <tr>
                                     <?php foreach ($heading as $crop => $practices): ?>
-                                        <th colspan="<?= count($practices) + 1 ?>" rowspan="1">Achievement under
-                                            demonstration (Area in Hectare)</th>
+                                        <?php $colspan = count($practices) * 3; ?>
+                                        <th colspan="<?= $colspan ?>" rowspan="1"><?= $crop ?></th>
                                     <?php endforeach; ?>
                                 </tr>
 
                                 <tr>
                                     <?php foreach ($heading as $crop => $practices): ?>
                                         <?php foreach ($practices as $practice): ?>
-                                            <th>
+                                            <th colspan="3">
                                                 <?= $practice ?>
                                             </th>
                                         <?php endforeach; ?>

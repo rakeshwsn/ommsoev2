@@ -1,5 +1,4 @@
 <?php
-
 namespace Config;
 
 // Create a new instance of our RouteCollection class.
@@ -38,9 +37,8 @@ $routes->setAutoRoute(true);
 
 //$routes->get('/', 'Auth::login');
 
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login'], function($routes)
-{
-    
+$routes->group(env('app.adminRoute'), ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
+
 });
 $routes->group('/', ['namespace' => 'Admin'], function ($routes) {
     $routes->add('profile', 'Users\Controllers\Profile::index');
