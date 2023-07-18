@@ -10,9 +10,8 @@ $routes = Services::routes();
 
 // Load the system's routing file first, so that the app and ENVIRONMENT
 // can override as needed.
-if (file_exists(SYSTEMPATH . 'Config/Routes.php'))
-{
-	require SYSTEMPATH . 'Config/Routes.php';
+if (file_exists(SYSTEMPATH . 'Config/Routes.php')) {
+    require SYSTEMPATH . 'Config/Routes.php';
 }
 
 /**
@@ -43,20 +42,20 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login
 {
     
 });
-$routes->group('/', ['namespace' => 'Admin'], function($routes){
-    $routes->add('profile','Users\Controllers\Profile::index');
-    $routes->post('profile/upload','Users\Controllers\Profile::upload');
+$routes->group('/', ['namespace' => 'Admin'], function ($routes) {
+    $routes->add('profile', 'Users\Controllers\Profile::index');
+    $routes->post('profile/upload', 'Users\Controllers\Profile::upload');
 });
 /*
 {
     $routes->get('/', 'Pages\Controllers\Home::index');
     $routes->get('page/info/(:segment)',      'Pages\Controllers\Page::info/$1');
 */
-    /**
-     * ------------------------------------------------------
-     * DATABASE ROUTING
-     * ------------------------------------------------------
-     */
+/**
+ * ------------------------------------------------------
+ * DATABASE ROUTING
+ * ------------------------------------------------------
+ */
 /*
     $db = \Config\Database::connect();
     $builder = $db->table('seo_url');
@@ -69,7 +68,7 @@ $routes->group('/', ['namespace' => 'Admin'], function($routes){
     }
 });
 */
-$routes->get('api','Api::index');
+$routes->get('api', 'Api::index');
 
 //$routes->get('/', 'Admin\Common\Controllers\Dashboard::index',['filter' => 'login']);
 
@@ -91,7 +90,6 @@ $routes->get('api','Api::index');
  * You will have access to the $routes object within that file without
  * needing to reload it.
  */
-if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php'))
-{
-	require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';
+if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php')) {
+    require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';
 }
