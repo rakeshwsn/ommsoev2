@@ -17,7 +17,7 @@ $validation = \Config\Services::validation();
 				<input type="text" readonly value="<?=$to_date?>" class="form-control">
 				</div>
 				<div class="col-md-2 mt-4">
-					<a href="http://ommsoev2.local//templates/area_coverage_template.xlsx" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>
+					<a href="<?=$download_url?>" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>
 				</div>
 				<div class="col-md-2 mt-4">
 					<form class="dm-uploader" id="uploader">
@@ -65,91 +65,91 @@ $validation = \Config\Services::validation();
             </div>
         </div>
     </div>
-</div>	
+</div>
+<div id="loading-overlay">
+    <div class="progress" style="width: 80%">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" style="width:0%">
+            <span id="progress-percent">0</span>
+        </div>
+    </div>
+</div>
 <?php js_start(); ?>
 
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('select[name=\'district_id\']').bind('change', function() {
-            $.ajax({
-                url: '<?= admin_url("district/block"); ?>/' + this.value,
-                dataType: 'json',
-                beforeSend: function() {
-                    //$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
-                },
-                complete: function() {
-                    //$('.wait').remove();
-                },
-                success: function(json) {
-
-                    html = '<option value="">Select Block</option>';
-
-                    if (json['block'] != '') {
-                        for (i = 0; i < json['block'].length; i++) {
-                            html += '<option value="' + json['block'][i]['id'] + '"';
-
-                            html += '>' + json['block'][i]['name'] + '</option>';
-                        }
-                    } else {
-                        html += '<option value="0" selected="selected">Select Block</option>';
-                    }
-
-                    $('select[name=\'block_id\']').html(html);
-                    $('select[name=\'block_id\']').select2();
-                },
-                error: function(xhr, ajaxOptions, thrownError) {
-                    alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-                }
-            });
-        });
-        $('select[name=\'district_id\']').trigger('change');
-    });
-    $(function(){
-        $('#area_coverage_form').on('shown.bs.modal', function() {
-            $("#year_id").select2();
-        });
-    });
-    $(function(){
-        table=$('#datatable').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "columnDefs": [
-                { targets: 'no-sort', orderable: false }
-            ],
-            "ajax":{
-                url :"<?=$datatable_url?>", // json datasource
-                type: "post",  // method  , by default get
-                data: function ( data ) {
-                    data.district = $('#filter_district').val();
-                    data.block = $('#filter_block').val();
-                    data.grampanchayat = $('#filter_gp').val();
-                },
-                beforeSend: function(){
-                    $('.alert-dismissible, .text-danger').remove();
-                    $("#datatable_wrapper").LoadingOverlay("show");
-                },
-                complete: function(){
-                    $("#datatable_wrapper").LoadingOverlay("hide");
-                },
-                error: function(){  // error handling
-                    $(".datatable_error").html("");
-                    $("#datatable").append('<tbody class="datatable_error"><tr><th colspan="5">No data found.</th></tr></tbody>');
-                    $("#datatable_processing").css("display","none");
-
-                },
-                dataType:'json'
+    $('#uploader').dmUploader({
+        dnd:false,
+        url: '<?=$upload_url?>',
+        dataType:'json',
+        maxFileSize: 1000000, // 1MB
+        multiple: false,
+        allowedTypes: 'application/*',
+        extFilter: ['xls'],
+        onInit: function(){
+            // Plugin is ready to use
+//            console.log('initialized')
+        },
+        onComplete: function(){
+            // All files in the queue are processed (success or error)
+            $('#upload-controls').loading('stop');
+        },
+        onNewFile: function(id, file){
+            // When a new file is added using the file selector or the DnD area
+            show_error('')
+        },
+        onBeforeUpload: function(id){
+            // about tho start uploading a file
+            setProgress(0)
+            if(typeof(loading)=='undefined') {
+                loading = $('#upload-controls').loading({
+                    overlay: $('#loading-overlay')
+                });
+            } else {
+                $('#upload-controls').loading();
             }
-        });
-        $('#btn-filter').click(function(){ //button filter event click
-            table.ajax.reload();  //just reload table
-        });
-        $('#btn-reset').click(function(){ //button reset event click
-            $('#form-filter')[0].reset();
-            table.ajax.reload();  //just reload table
-        });
-
-        Codebase.helpers([ 'select2']);
+        },
+        onUploadCanceled: function(id) {
+            // Happens when a file is directly canceled by the user.
+        },
+        onUploadProgress: function(id, percent){
+            // Updating file progress
+            setProgress(percent)
+        },
+        onUploadSuccess: function(id, data){
+            // A file was successfully uploaded server response
+            if(data.status) {
+                show_error('File uploaded successfully');
+                $('.dm-uploader .status').addClass('text-success')
+            } else {
+                show_error(data.message)
+            }
+            $('#datatable').DataTable().ajax.reload();
+        },
+        onUploadError: function(id, xhr, status, message){
+            console.log(message);
+            show_error(message);
+            $('#upload-controls').loading('stop');
+        },
+        onFileSizeError: function(file){
+            // file.name
+            show_error('Invalid file size')
+        },
+        onFileExtError: function(file){
+            // file.name
+            show_error('Invalid file type')
+        },
+        onFileTypeError: function(file){
+            // file.name
+            show_error('Invalid file type')
+        }
     });
+
+    function show_error(msg){
+        $('.dm-uploader .status').addClass('text-danger').text(msg)
+    }
+    function setProgress(percent) {
+        $('#progress-bar').width(percent+'%')
+        $('#progress-percent').text(percent+'%')
+    }
 </script>
 <?php js_end(); ?>    
 
