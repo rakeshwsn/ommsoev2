@@ -25,6 +25,7 @@ $validation = \Config\Services::validation();
 							<i class="fa fa-folder-o fa-fw"></i> Upload Excel
 							<input type="file" title="Click to add Files">
 						</div>
+                        <div class="status"></div>
 					</form>	
 				</div>		
 			</div>
@@ -41,21 +42,18 @@ $validation = \Config\Services::validation();
                 <table class="table table-vcenter text-center">
                     <thead>
                         <tr>
-                            <th>Week</th>
+                            <th class="text-left">Week</th>
                             <th>Total Farmer</th>
                             <th>Total Area</th>
-                            <th>Upload Status</th>
-                            <th>Date Added</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
+                    <?php foreach ($blocks as $block) ?>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="text-left"><?=$block['week']?></td>
+                            <td><?=$block['farmers_covered']?></td>
+                            <td><?=$block['total_area']?></td>
                             <td style="display: flex;">
                                
                             </td>
@@ -67,12 +65,22 @@ $validation = \Config\Services::validation();
     </div>
 </div>
 <div id="loading-overlay">
-    <div class="progress" style="width: 80%">
+    <div class="progress" style="width: 100%">
         <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" style="width:0%">
             <span id="progress-percent">0</span>
         </div>
     </div>
 </div>
+<style>
+    #loading-overlay {
+        background: rgb(255 255 255 / 80%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 9999;
+    }
+</style>
 <?php js_start(); ?>
 
 <script type="text/javascript">
@@ -83,7 +91,7 @@ $validation = \Config\Services::validation();
         maxFileSize: 1000000, // 1MB
         multiple: false,
         allowedTypes: 'application/*',
-        extFilter: ['xls'],
+        extFilter: ['xlsx'],
         onInit: function(){
             // Plugin is ready to use
 //            console.log('initialized')
@@ -118,11 +126,11 @@ $validation = \Config\Services::validation();
             // A file was successfully uploaded server response
             if(data.status) {
                 show_error('File uploaded successfully');
-                $('.dm-uploader .status').addClass('text-success')
+                $('.dm-uploader .status').addClass('text-success');
             } else {
                 show_error(data.message)
             }
-            $('#datatable').DataTable().ajax.reload();
+            $('#progress-bar').width(0+'%');
         },
         onUploadError: function(id, xhr, status, message){
             console.log(message);
@@ -131,15 +139,15 @@ $validation = \Config\Services::validation();
         },
         onFileSizeError: function(file){
             // file.name
-            show_error('Invalid file size')
+            show_error('Invalid file size');
         },
         onFileExtError: function(file){
             // file.name
-            show_error('Invalid file type')
+            show_error('Invalid file type');
         },
         onFileTypeError: function(file){
             // file.name
-            show_error('Invalid file type')
+            show_error('Invalid file type');
         }
     });
 

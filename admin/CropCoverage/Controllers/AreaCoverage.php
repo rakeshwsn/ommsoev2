@@ -1,6 +1,7 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
+use Admin\CropCoverage\Models\AreaCoverageModel;
 use Admin\CropCoverage\Models\YearModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\GrampanchayatModel;
@@ -15,24 +16,14 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class AreaCoverage extends AdminController
 {
 	private $error = array();
-	function __construct()
-	{
-		$this->cropsmodel = new CropsModel();
-		$this->districtModel = new DistrictModel();
-		// $this->areacoveragemodel=new AreaCoverageModel();
-	}
+	function __construct() {
+        $this->cropsmodel = new CropsModel();
+        $this->districtModel = new DistrictModel();
+        $this->areacoveragemodel = new AreaCoverageModel();
+    }
 	public function index()
 	{
 		$this->template->set_meta_title(lang('Seasons Data.heading_title'));
-		// printr ($_POST);
-		// exit;
-		if ($this->request->getMethod(1) === 'POST') {
-
-			$this->areacoveragemodel->addAC($this->request->getPost());
-
-			$this->session->setFlashdata('message', 'Area Coverage Saved Successfully.');
-
-		}
 
 		return $this->getList();
 
@@ -58,11 +49,6 @@ class AreaCoverage extends AdminController
 			$data['error'] = $this->error['warning'];
 		}
 
-		if ($this->request->getPost('selected')) {
-			$data['selected'] = (array) $this->request->getPost('selected');
-		} else {
-			$data['selected'] = array();
-		}
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
 
@@ -72,7 +58,39 @@ class AreaCoverage extends AdminController
         $data['to_date'] = $dates[1];
         $data['upload_url'] = Url::areaCoverageUpload;
 
-		return $this->template->view('Admin\CropCoverage\Views\areacoverage', $data);
+        $view = 'areacoverage_block';
+        if($this->user->block_id){
+            $filter = [
+                'block_id' => $this->user->block_id,
+                'year_id' => getCurrentYearId(),
+                'season' => getCurrentSeason()
+            ];
+
+            $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+
+            $data['blocks'] = [];
+            foreach ($blocks as $block) {
+                $data['blocks'][] = [
+                    'week' => date('d F',strtotime($block->start_date)).'-'.date('d F',strtotime($block->end_date)) ,
+                    'farmers_covered' => $block->farmers_covered,
+                    'total_area' => $block->smi+$block->lt+$block->ls+$block->fc_area,
+                    'action' => '',
+                ];
+            }
+
+            $view = 'areacoverage_block';
+        } else if($this->user->district_id){
+            $filter = [
+                'district_id' => $this->user->district_id,
+                'year_id' => getCurrentYearId(),
+                'season' => getCurrentSeason()
+            ];
+
+            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
+            $view = 'areacoverage_district';
+        }
+
+		return $this->template->view('Admin\CropCoverage\Views\\'.$view, $data);
 	}
 
 	public function download() {
@@ -100,8 +118,9 @@ class AreaCoverage extends AdminController
 
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
-        $row = 5;
+        $row = 4;
         foreach ($gps as $key => $gp) {
+            $row++;
             $sheet->setCellValue("A$row",$gp->block_id);
             $sheet->setCellValue("B$row",$gp->gp_id);
             $sheet->setCellValue("C$row",($key+1));
@@ -112,37 +131,29 @@ class AreaCoverage extends AdminController
             $sheet->setCellValue("U$row","=SUM(M$row:S$row)");
             $sheet->setCellValue("AC$row","=SUM(V$row:AB$row)");
             $sheet->setCellValue("AD$row","=SUM(T$row:AB$row)");
-
-            $row++;
         }
 
         // Set read-only mode to prevent adding new rows when reading
-        $sheet->getProtection()->setSheet(true);
-        // Set the protection password (optional but recommended for enhanced security)
-        $sheet->getProtection()->setPassword('12345');
+        $protection = $spreadsheet->getActiveSheet()->getProtection();
+        $protection->setAlgorithm(Protection::ALGORITHM_SHA_512);
+        $protection->setPassword('PhpSpreadsheet');
+        $protection->setSheet(true);
+        $protection->setSort(false);
+        $protection->setInsertRows(false);
+        $protection->setFormatCells(false);
 
-        // Lock first 5 columns (A to E) by setting the format for the range to 'text'
-        $lockRange = 'A:E';
-        $spreadsheet->getDefaultStyle()->getProtection()->setLocked(false);
-        $sheet->getStyle($lockRange)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
-        $sheet->getStyle($lockRange)->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+        $sheet->getStyle("F5:S$row")
+            ->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        $sheet->getStyle("V5:AB$row")
+            ->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
-        // Lock auto calculate fields
-        $lockRange = 'T:U';
-        $spreadsheet->getDefaultStyle()->getProtection()->setLocked(false);
-        $sheet->getStyle($lockRange)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
-        $sheet->getStyle($lockRange)->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
-
-        // Lock auto calculate fields
-        $lockRange = 'AC:AD';
-        $spreadsheet->getDefaultStyle()->getProtection()->setLocked(false);
-        $sheet->getStyle($lockRange)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_PROTECTED);
-        $sheet->getStyle($lockRange)->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
-
-        $writer = new Xlsx($spreadsheet);
+//        $writer = new Xlsx($spreadsheet);
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, "Xlsx");
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="area_coverage_' . $this->user->username . '_' . $current_season . '_' . $fin_year . '_' . date('Y-m-d_His') . '.xlsx');
+        header('Content-Disposition: attachment; filename="area_coverage_' . $this->user->username . '_' . $current_season . '_' . $fin_year . '_' . date('Y_m_d_His') . '.xlsx');
 
         $writer->save("php://output");
         exit;
@@ -152,7 +163,7 @@ class AreaCoverage extends AdminController
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
-                'mime_in[file,application/vnd.ms-excel]',
+                'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
                 'max_size[file,1024]',
                 'ext_in[file,xlsx]',
             ]
@@ -165,70 +176,112 @@ class AreaCoverage extends AdminController
                 'errors'=>$this->validator->getErrors()
             ]);
         } else {
+            $acModel = new AreaCoverageModel();
             $file = $this->request->getFile('file');
-
-            $filename = strtolower($file->getName());
-
-            //validate file name
-
-            if(strpos($filename,'soe')===false && strpos($filename,'fund')===false){
-                $invalid_filename = [
-                    'status'=>false,
-                    'message'=>'This is not a valid file',
-                    'errors'=> []
-                ];
-                return $this->response->setJSON($invalid_filename);
-            }
-
-            $_file = $this->request->getFileName('file');
 
             $reader = IOFactory::createReader('Xlsx');
 
-            $spreadsheet = $reader->load($_file);
+            $spreadsheet = $reader->load($file);
 
             $activesheet = $spreadsheet->getSheet(0);
 
             $row_data = $activesheet->toArray();
 
-            dd($row_data);
+            $dates = $this->getWeekDates();
+            $current = $this->getCurrentYearDates();
+
+            $from_date = $dates[0];
+            $to_date = $dates[1];
+
+            $exists = $acModel
+                ->where('start_date',$from_date)
+                ->where('block_id',$this->user->block_id)
+                ->where('season',$current['season'])
+                ->where('year_id',getCurrentYearId())
+                ->first();
+//            $exists = false;
+
+            if(strtotime($from_date)!=strtotime($row_data[0][22])){
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'Invalid week dates. Please download the latest file and upload again.'
+                ]);
+            } else if($exists){
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'This week data is already uploaded.'
+                ]);
+            } else {
+                $crops = (new CropsModel())->findAll();
+
+                foreach ($row_data as $gp) {
+                    //only rows with gp_id
+                    if(is_numeric($gp[0])){
+                        $master = [
+                            'start_date' => $from_date,
+                            'end_date' => $to_date,
+                            'district_id' => $this->user->district_id,
+                            'year_id' => getCurrentYearId(),
+                            'season' => $current['season'],
+                            'block_id' => $gp[0],
+                            'gp_id' => $gp[1],
+                            'farmers_covered' => $gp[5],
+                        ];
+
+//                        $ac_crop_coverage_id = 0;
+                        $ac_crop_coverage_id = $acModel->insert($master);
+
+                        $col=5;
+                        $nursery = [
+                            'crop_coverage_id' => $ac_crop_coverage_id,
+                            'nursery_raised' => $gp[++$col],
+                            'balance_smi' => $gp[++$col],
+                            'balance_lt' => $gp[++$col],
+                        ];
+
+                        $acModel->addNursery($nursery);
+
+                        $cropPractices = $acModel->getCropPractices();
+
+                        $areas = [];
+
+                        foreach ($cropPractices as $crop_id => $practices) {
+                            $_areas = [
+                                'crop_coverage_id' => $ac_crop_coverage_id,
+                                'crop_id' => $crop_id,
+                            ];
+                            foreach ($practices as $practice) {
+                                $_areas[$practice] = $gp[++$col];
+                            }
+                            $areas[] = $_areas;
+                        }
+
+                        $acModel->addArea($areas);
+
+                        //follow up crops
+
+                        $col+=2;
+                        $fCrop = [];
+                        foreach ($crops as $crop) {
+                            $fCrop[] = [
+                                'crop_coverage_id' => $ac_crop_coverage_id,
+                                'crop_id' => $crop->id,
+                                'area' => $gp[++$col],
+                            ];
+                        }
+                        $acModel->addFupCrops($fCrop);
+
+                    }
+                }
+            }
         }
+
+        return $this->response->setJSON(['status'=>true,'message'=>'Upload successful.']);
 	}
 
     private function getCurrentYearDates() {
 
-		$kharif_start_month = getMonthById((int)$this->settings->kharif_start_month);
-        $kharif_end_month = getMonthById((int)$this->settings->kharif_end_month);
-
-        $rabi_start_month = getMonthById((int)$this->settings->rabi_start_month);
-        $rabi_end_month = getMonthById((int)$this->settings->rabi_end_month);
-
-        $given_date = \DateTime::createFromFormat('Y-m-d', date('Y-m-d'));
-
-        $kharif_start_month_number = $kharif_start_month['number'];
-        $kharif_end_month_number = $kharif_end_month['number'];
-        $rabi_start_month_number = $rabi_start_month['number'];
-        $rabi_end_month_number = $rabi_end_month['number'];
-        if ($given_date->format('n') >= $kharif_start_month_number
-            && $given_date->format('n') <= $kharif_end_month_number) {
-            $current_season = 'Kharif';
-            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_start_month_number.'-01');
-            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$kharif_end_month_number.'-30');
-        } elseif ($given_date->format('n') >= $rabi_start_month_number
-            || $given_date->format('n') <= $rabi_end_month_number) {
-            $current_season = 'Rabi';
-            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_start_month_number.'-01');
-            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-'.$rabi_end_month_number.'-01');
-            if ($given_date->format('n') <= 3) {
-                $season_start_date->modify('-1 year');
-                $season_end_date->modify('-1 year');
-            }
-        }
-
-        return [
-            'season'=>$current_season,
-            'start_date'=>$season_start_date,
-            'end_date'=>$season_end_date,
-        ];
+		return $this->areacoveragemodel->getCurrentYearDates();
 
     }
 
@@ -263,5 +316,7 @@ class AreaCoverage extends AdminController
 
         return false;
     }
+
+
 
 }
