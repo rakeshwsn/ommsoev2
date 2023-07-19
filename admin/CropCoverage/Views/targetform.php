@@ -10,86 +10,94 @@
         <?= form_open('', 'id="form-target"'); ?>
         <div class="form-layout">
             <div class="row">
-                <?php if (!$district_id): ?>
-                    <div class="col-lg-3">
-                        <div class="form-group mg-b-10-force">
-                            <label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
-                            <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id'), "id='filter_district' class='form-control js-select2'") ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
                 <div class="col-lg-3">
                     <div class="form-group mg-b-10-force">
-                        <label class="form-control-label">Block: <span class="tx-danger">*</span></label>
+                        <label class="form-control-label">Block: </label>
                         <?= form_dropdown('block_id', option_array_value($blocks, 'id', 'name'), set_value('block_id', isset($_GET['block_id']) ? $_GET['block_id'] : $block_id), "id='filter_block' class='form-control js-select2' disabled"); ?>
+                    </div>
+                </div>
+
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <div class="form-group mg-b-10-force">
+                        <label class="form-control-label">Year:
+                            <?= $year_id; ?>
+                        </label>
 
                     </div>
                 </div>
+                <div class="col-lg-2" style="padding-top: 30px;">
+                    <div class="form-group mg-b-10-force">
+                        <label class="form-control-label">Season:
+                            <?= $season ?>
+                        </label>
+                    </div>
+                </div>
+
             </div>
         </div>
-        <table id="datatable" class="table table-bordered table-striped table-vcenter">
-            <thead>
+    </div>
+    <table id="datatable" class="table table-bordered table-striped table-vcenter">
+        <thead>
+            <tr>
+                <th>Crop Name</th>
+                <?php foreach ($practices as $practice): ?>
+                    <th>
+                        <?= $practice['practices']; ?>
+                    </th>
+                <?php endforeach; ?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($crops as $index => $crop): ?>
                 <tr>
-                    <th>Crop Name</th>
+                    <td>
+                        <?= $crop['crops']; ?>
+                    </td>
                     <?php foreach ($practices as $practice): ?>
-                        <th>
-                            <?= $practice['practices']; ?>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($crops as $index => $crop): ?>
-                    <tr>
-                        <td>
-                            <?= $crop['crops']; ?>
-                        </td>
-                        <?php foreach ($practices as $practice): ?>
-                            <?php
-                            $inputValue = '';
-                            if ($practice['practices'] === 'SMI') {
-                                if ($crop['crops'] === 'Ragi') {
-                                    $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
-                                } else {
-                                    $inputValue = '';
-                                }
+                        <?php
+                        $inputValue = '';
+                        if ($practice['practices'] === 'SMI') {
+                            if ($crop['crops'] === 'Ragi') {
+                                $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
                             } else {
-                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                                $inputValue = '';
                             }
-                            ?>
-                            <td>
-                                <?php if ($practice['practices'] === 'SMI'): ?>
-                                    <?php if ($crop['crops'] === 'Ragi'): ?>
-                                        <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                            name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                            value="<?= $inputValue ?>" oninput="calculateTotals()">
-                                    <?php else: ?>
-                                        <input type="number" disabled>
-                                    <?php endif; ?>
-                                <?php else: ?>
+                        } else {
+                            $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                        }
+                        ?>
+                        <td>
+                            <?php if ($practice['practices'] === 'SMI'): ?>
+                                <?php if ($crop['crops'] === 'Ragi'): ?>
                                     <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                         name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
                                         value="<?= $inputValue ?>" oninput="calculateTotals()">
+                                <?php else: ?>
+                                    <input type="number" disabled>
                                 <?php endif; ?>
-                            </td>
-                        <?php endforeach; ?>
-                    </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td>Total</td>
-                    <td><input type="number" id="total-smi" class="total-input" readonly></td>
-                    <td><input type="number" id="total-lt" class="total-input" readonly></td>
-                    <td><input type="number" id="total-ls" class="total-input" readonly></td>
+                            <?php else: ?>
+                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                    name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
+                                    value="<?= $inputValue ?>" oninput="calculateTotals()">
+                            <?php endif; ?>
+                        </td>
+                    <?php endforeach; ?>
                 </tr>
-            </tbody>
-        </table>
+            <?php endforeach; ?>
+            <tr>
+                <td>Total</td>
+                <td><input type="number" id="total-smi" class="total-input" readonly></td>
+                <td><input type="number" id="total-lt" class="total-input" readonly></td>
+                <td><input type="number" id="total-ls" class="total-input" readonly></td>
+            </tr>
+        </tbody>
+    </table>
 
 
 
 
-        <?= form_close(); ?>
-    </div>
+    <?= form_close(); ?>
+</div>
 </div>
 <script>
     function calculateTotals() {

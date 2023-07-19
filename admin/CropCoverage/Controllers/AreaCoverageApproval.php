@@ -66,15 +66,15 @@ class AreaCoverageApproval extends AdminController
         }
 
         $croppractices = $this->targetModel->getPractices();
-
+        // printr($croppractices);
+        // exit;
         $practicedata = $this->targetModel->getAll([
             'district_id' => $data['district_id']
         ]);
 
         $data['practicedata'] = $practicedata;
-        // printr($practicedata);
-        // exit;
-        echo "date('Y')";
+
+
         $data['year_id'] = date('Y');
         $currentMonth = date('n');
         if ($currentMonth >= 6 && $currentMonth <= 10) {
@@ -97,6 +97,7 @@ class AreaCoverageApproval extends AdminController
         }
 
         $data['heading'] = $crops;
+
 
         return $this->template->view('Admin\CropCoverage\Views\areacoverageapproval', $data);
     }
