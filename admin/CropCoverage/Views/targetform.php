@@ -56,22 +56,14 @@
                     <?php foreach ($practices as $practice): ?>
                         <?php
                         $inputValue = '';
-                        $isLTDisabled = true; // Initialize with default value (disabled).
                         if ($practice['practices'] === 'SMI') {
                             if ($crop['crops'] === 'Ragi') {
                                 $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
                             } else {
                                 $inputValue = '';
                             }
-                        } elseif ($practice['practices'] === 'lt') {
-                            if (in_array($crop['crops'], ['Ragi', 'Little Millet'])) {
-                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
-                                $isLTDisabled = false; // Enable the input field for 'lt' practice.
-                            } else {
-                                $inputValue = '';
-                            }
                         } else {
-                            $inputValue = '';
+                            $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
                         }
                         ?>
                         <td>
@@ -81,12 +73,8 @@
                                         name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
                                         value="<?= $inputValue ?>" oninput="calculateTotals()">
                                 <?php else: ?>
-                                    <!-- <input type="number" disabled> -->
+                                    <input type="number" disabled>
                                 <?php endif; ?>
-                            <?php elseif ($practice['practices'] === 'lt'): ?>
-                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                    name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                    value="<?= $inputValue ?>" <?= $isLTDisabled ? 'disabled' : '' ?> oninput="calculateTotals()">
                             <?php else: ?>
                                 <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                     name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
@@ -103,7 +91,6 @@
                 <td><input type="number" id="total-ls" class="total-input" readonly></td>
             </tr>
         </tbody>
-
     </table>
 
 
