@@ -56,25 +56,36 @@
                     <?php foreach ($practices as $practice): ?>
                         <?php
                         $inputValue = '';
+                        $isSMIDisabled = true;
+                        $isLTDisabled = true;
+
                         if ($practice['practices'] === 'SMI') {
                             if ($crop['crops'] === 'Ragi') {
-                                $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                                $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']]['SMI'] : '';
+                                $isSMIDisabled = false; // Enable "SMI" for "Ragi."
+                            } else {
+                                $inputValue = '';
+                            }
+                        } elseif ($practice['practices'] === 'LT') {
+                            if ($crop['crops'] === 'Ragi' || $crop['crops'] === 'Little Millet') {
+                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']]['LT'] : '';
+                                $isLTDisabled = false; // Enable "LT" for "Ragi" and "Little Millet."
                             } else {
                                 $inputValue = '';
                             }
                         } else {
-                            $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
+                            $inputValue = '';
                         }
                         ?>
                         <td>
                             <?php if ($practice['practices'] === 'SMI'): ?>
-                                <?php if ($crop['crops'] === 'Ragi'): ?>
-                                    <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                        name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                        value="<?= $inputValue ?>" oninput="calculateTotals()">
-                                <?php else: ?>
-                                    <input type="number" disabled>
-                                <?php endif; ?>
+                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                    name="crop[<?= $crop['id'] ?>][SMI]" class="crop-input" value="<?= $inputValue ?>"
+                                    <?= $isSMIDisabled ? 'disabled' : '' ?> oninput="calculateTotals()">
+                            <?php elseif ($practice['practices'] === 'LT'): ?>
+                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                    name="crop[<?= $crop['id'] ?>][LT]" class="crop-input" value="<?= $inputValue ?>"
+                                    <?= $isLTDisabled ? 'disabled' : '' ?> oninput="calculateTotals()">
                             <?php else: ?>
                                 <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                     name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
@@ -91,6 +102,7 @@
                 <td><input type="number" id="total-ls" class="total-input" readonly></td>
             </tr>
         </tbody>
+
     </table>
 
 
