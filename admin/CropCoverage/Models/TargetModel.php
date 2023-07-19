@@ -30,7 +30,11 @@ class TargetModel extends Model
 	protected $deletedField = 'deleted_at';
 
 	// Validation
-	protected $validationRules = [];
+	protected $validationRules = [
+
+	];
+
+
 	protected $validationMessages = [];
 	protected $skipValidation = false;
 	protected $cleanValidationRules = true;
@@ -46,27 +50,24 @@ class TargetModel extends Model
 	protected $beforeDelete = [];
 	protected $afterDelete = [];
 
-	public function addTargets($data)
+
+
+	public function addTargets($data, $target_id)
 	{
 		// Crop master table
-		$masterdata = array(
-			"block_id" => $data['block_id'],
-			"year_id" => getCurrentYearId(),
-			"season" => getCurrentSeason(),
-		);
 
-		$target_id = $this->insert($masterdata);
+		$this->db->table('ac_target_area')->where('target_id', $target_id)->delete();
 
 		// Crop coverage target table
 		foreach ($data['crop_data'] as $crop_id => $area) {
 			$targetdata = array(
 				"target_id" => $target_id,
 				"crop_id" => $crop_id,
-				"smi" => isset($area['SMI']) ? $area['SMI'] : 0,
+				"smi" => isset($area['smi']) ? $area['smi'] : 0,
 				// Check if 'SMI' key exists
-				"lt" => isset($area['LT']) ? $area['LT'] : 0,
+				"lt" => isset($area['lt']) ? $area['lt'] : 0,
 				// Check if 'LT' key exists
-				"ls" => isset($area['LS']) ? $area['LS'] : 0, // Check if 'LS' key exists
+				"ls" => isset($area['ls']) ? $area['ls'] : 0, // Check if 'LS' key exists
 			);
 
 			$this->db->table('ac_target_area')->insert($targetdata);
@@ -82,6 +83,7 @@ class TargetModel extends Model
 		}
 
 		$sql = "SELECT
+		block_target.target_id,
 		sb.name block,
 		sb.id block_id,
 		sb.district_id,
@@ -106,6 +108,7 @@ class TargetModel extends Model
 		block_target.PROSO_MILLET_LS
 	  FROM soe_blocks sb
 		LEFT JOIN (SELECT
+			tm.id target_id,
 			tm.block_id,
 			tm.year_id,
 			tm.season,
@@ -150,7 +153,8 @@ class TargetModel extends Model
 		  GROUP BY tm.block_id) block_target
 		  ON block_target.block_id = sb.id
 	  WHERE sb.district_id = $district_id";
-
+		//echo $sql;
+		//exit;
 		return $this->db->query($sql)->getResultArray();
 
 	}
@@ -158,11 +162,20 @@ class TargetModel extends Model
 	public function getBlockTargets($filter = [])
 	{
 		$sql = "SELECT
-  ata.crop_id,ata.smi,ata.lt,ata.ls
-FROM ac_target_master atm
-  LEFT JOIN ac_target_area ata
-    ON atm.id = ata.target_id
-WHERE deleted_at is null";
+			ac.id,
+			ac.crops,
+			cd.smi,
+			cd.ls,
+			cd.lt
+			FROM ac_crops ac
+			LEFT JOIN (SELECT
+				ata.crop_id,
+				ata.lt,
+				ata.ls,
+				ata.smi
+				FROM ac_target_area ata
+				LEFT JOIN ac_target_master atm
+					ON ata.target_id = atm.id where 1=1 ";
 		if (!empty($filter['block_id'])) {
 			$sql .= " and atm.block_id = " . $filter['block_id'];
 		}
@@ -173,6 +186,10 @@ WHERE deleted_at is null";
 			$sql .= " and atm.season = '" . $filter['season'] . "'";
 		}
 
+		$sql .= " AND atm.deleted_at IS NULL ) cd
+				ON ac.id = cd.crop_id
+			WHERE ac.crops IS NOT NULL";
+		//echo $sql;
 		return $this->db->query($sql)->getResultArray();
 	}
 
@@ -189,5 +206,7 @@ WHERE deleted_at is null";
 		return $query->getResultArray();
 
 	}
+
+
 }
 ?>
