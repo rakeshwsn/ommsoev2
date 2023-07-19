@@ -5,7 +5,7 @@ if(!isset($routes))
     $routes = \Config\Services::routes(true);
 }
 
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login'], function($routes)
+$routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
     $routes->add('budgets','Budgets\Controllers\Budgets::index');
     $routes->post('budgets/search','Budgets\Controllers\Budgets::search');

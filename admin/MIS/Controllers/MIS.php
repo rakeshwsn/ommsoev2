@@ -448,9 +448,7 @@ class MIS extends AdminController
 
     }
 
-    public function delete($id)
-    {
-
+    public function delete($id) {
         $misModel = new MISModel();
         $misDetailModel = new MISDetailModel();
 

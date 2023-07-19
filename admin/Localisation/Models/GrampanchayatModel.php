@@ -35,8 +35,8 @@ class GrampanchayatModel extends Model
 			
 		),
 		'name' => array(
-			'label' => 'Name', 
-			'rules' => "trim|required|max_length[255]|alpha"
+			'label' => 'Name',
+			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]"
 		)
 	];
 	protected $validationMessages   = [];
@@ -124,12 +124,18 @@ class GrampanchayatModel extends Model
 		$builder->where("sg.deleted_at",null);
     }
 
-	
-
-    public function getGPsByBlock($block) {
-        $builder=$this->db->table("{$this->table} sb");
-        $builder->where("block_id",$block);
-        $res = $builder->get()->getResult();
+    public function getGPsByBlock($block_id) {
+        $sql = "SELECT
+  sb.id block_id,
+  sb.name block,
+  sg.id gp_id,
+  sg.name gp
+FROM soe_grampanchayats sg
+  LEFT JOIN soe_blocks sb
+    ON sg.block_id = sb.id
+WHERE sg.deleted_at IS NULL
+AND sg.block_id = $block_id";
+	    $res = $this->db->query($sql)->getResult();
         return $res;
     }
 

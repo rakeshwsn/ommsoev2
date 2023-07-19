@@ -122,12 +122,21 @@ class UserGroupModel extends Model
     }
 
     /* Get agency types (created by Niranjan)*/
-    public function getAgencyTypes($filter=[]){
+    public function getAgencyTypeByFundAgecny($filter){
+        $builder=$this->db->table("fund_flow_chart");
+        $builder->where('fund_agency_id', $filter['fund_agency_id']);
+        if(isset($filter['agency_type_id'])){
+            
+            $builder->where("(parent_id IN (".implode(',',$filter['agency_type_id']).") or user_group_id in (".implode(',',$filter['agency_type_id'])."))");
+        }
+        $res=$builder->get()->getResult();
+       
+        return $res;
+    }
+
+    public function getAgencyTypes(){
         $builder=$this->db->table($this->table);
         $builder->where('agency', 1);
-        if(isset($filter['agency_type_id'])){
-            $builder->where("(parent_id = '".$filter['agency_type_id']."' or id = '".$filter['agency_type_id']."')");
-        }
         $res = $builder->get()->getResult();
         return $res;
     }

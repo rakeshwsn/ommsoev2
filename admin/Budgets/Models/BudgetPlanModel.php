@@ -107,7 +107,7 @@ class BudgetPlanModel extends Model
         }
        // $builder->groupBy("sbp.fund_agency_id");
         $res = $builder->get()->getResult();
-       // echo $this->db->getLastQuery();
+       //echo $this->db->getLastQuery();
         return $res;
 
     }

@@ -1,5 +1,6 @@
 <?php
-namespace Admin\CropCoverage\Models;
+
+namespace Admin\Localisation\Models;
 
 use CodeIgniter\Model;
 
@@ -102,6 +103,7 @@ class VillageModel extends Model
 		$count = $builder->countAllResults();
 		return $count;
 	}
+	
 	private function filter($builder,$data){
 		$builder->join('grampanchayat g', 'v.gp_id = g.id','left');
 		$builder->join('block b', 'g.block_id = b.id','left');
@@ -130,6 +132,7 @@ class VillageModel extends Model
 			);
 		}
     }
+
 	protected  function getVillageCode(array $data){
 		//printr($data);
 		$builder=$this->db->table("{$this->table} v");
@@ -155,11 +158,14 @@ class VillageModel extends Model
 
 		return $data;
 	}
+	
+	
+	
 	public function getVillageByGP($gp) {
 		$builder=$this->db->table("{$this->table} v");
         $builder->where("gp_id",$gp);
         $res = $builder->get()->getResult();
         return $res;
     }
+	
 }
-?>

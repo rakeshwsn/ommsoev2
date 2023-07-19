@@ -116,10 +116,10 @@ class Budgets extends AdminController {
                     $action .= 		'<a class="btn btn-sm btn-warning" href="'.admin_url('budgets/view/'.$result->id).'"><i class="fa fa-list"></i></a>';
                 }
                 if ($this->user->hasPermission('budgets/edit')) {
-                    $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
+                   // $action .= 		'<a class="btn btn-sm btn-primary ajaxaction" href="'.admin_url('budgets/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
                 }
                 if ($this->user->hasPermission('budgets/delete')) {
-                    $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+                   // $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('budgets/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
                 }
                 $action .= '</div>';
             }else{
@@ -678,7 +678,7 @@ class Budgets extends AdminController {
             //exit;*/
             $agency_type_id = 0;
             if($budgetplan_info->district_id==0 && $budgetplan_info->block_id==0){
-                $agency_type_id = 8;
+                $agency_type_id = '';
             } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id==0){
                 $agency_type_id = 7;
             } else if($budgetplan_info->district_id!=0 && $budgetplan_info->block_id!=0){
@@ -696,12 +696,13 @@ class Budgets extends AdminController {
              ];
 
             $components = $this->budgetModel->getBudgetDetails($filter);
+           //dd($components);
             //dd($components);
             //$components=[];
-            if(getCurrentYearId() == $budgetplan_info->year){
+            if(getCurrentYearId() == $budgetplan_info->year && !$budgetplan_info->status){
                 $data['view']=$view="edit";
             }else{
-                $data['view']=$view="show";
+                $data['view']=$view="view";
             }
             if($components) {
                 $components = $this->buildTree($components);

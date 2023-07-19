@@ -172,8 +172,8 @@ trait TreeTrait {
                     $html .= '<td class="upto_phy">' . $item['exp_upto_phy'] . ' </td>
                               <td class="upto_fin">' . $item['exp_upto_fin'] . ' </td>';
                     if($action=='edit'){
-                        $html .= '<td class="mon_phy"><input class="w-50p physical" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['exp_mon_phy'] . '"> </td>
-                                  <td class="mon_fin"><input type="text" class="financial" name="'.$item['component_id'].'[fin]" value="' . $item['exp_mon_fin'] . '"> </td>';
+                        $html .= '<td class="mon_phy"><input max="'.$item['ob_phy'].'" class="w-50p physical" name="'.$item['component_id'].'[phy]" type="text" value="' . $item['exp_mon_phy'] . '"> </td>
+                                  <td class="mon_fin"><input max="'.$item['ob_fin'].'" type="text" class="financial" name="'.$item['component_id'].'[fin]" value="' . $item['exp_mon_fin'] . '"> </td>';
                     } else {
                         $html .= '<td class="mon_phy">' . $item['exp_mon_phy'] . ' </td>
                                   <td class="mon_fin">' . $item['exp_mon_fin'] . ' </td>';

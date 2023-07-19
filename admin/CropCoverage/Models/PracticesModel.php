@@ -3,10 +3,10 @@ namespace Admin\CropCoverage\Models;
 
 use CodeIgniter\Model;
 
-class SeasonsModel extends Model
+class PracticesModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'ac_seasons';
+	protected $table                = 'ac_practices';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
@@ -39,53 +39,20 @@ class SeasonsModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 
-	public function AddSeasons($data) {
-    // dd($data);
-		$seasonsdata=array(
 
-			"year"=>$data['year_id'],
-			"season"=>$data['season'],
-			"districts"=>$data['districts_id'],
+    public function GetPractices() {
+        $builder = $this->db->table('ac_practices');
+        $practices   = $builder->get()->getResult();
 
-		
-		);
-		$this->db->table('ac_seasons')->insert($seasonsdata);
-	
-    }
-
-    public function GetSeasons() {
-
-		$builder=$this->db->table("{$this->table} a");
-    	$builder->join('years y', 'a.year = y.id','left');
-        $builder->join('district d', 'a.districts = d.id','left');
-        
-        $seasons   = $builder->get()->getResult();
-		// print_r($seasons);
-		// exit;
-		$seasons_data = [];
-        foreach($seasons as $season){
-            $seasons_data[] = [
-            	'year'=> $season->year,
-            	'season'=> $season->season,
-				'name'=> $season->name,
-				'date_added'=> $season->date_added,
+        $practice_data = [];
+        foreach($practices as $practice){
+            $practice_data[] = [
+            	'id'=> $practice->id,
+            	'practices' => $practice->name,
 
             ];
-			return $seasons_data;
         }
-		
-
-        // $season_data = [];
-        // foreach($seasons as $season){
-        //     $season_data[] = [
-        //     	'id'=> $season->id,
-        //     	'year' => $season->year,
-        //     	'season' => $season->season,
-        //     	'district' => $season->date_added,
-
-        //     ];
-        // }
-       return $season_data;
+       return $practice_data;
     
     }	
 	
