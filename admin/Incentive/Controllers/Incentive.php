@@ -139,18 +139,18 @@ class Incentive extends AdminController
 			);
 		}
 		// Calculate the correct pagination count
-	$recordsTotal = intval($totalData);
-	$recordsFiltered = intval($totalFiltered);
+		$recordsTotal = intval($totalData);
+		$recordsFiltered = intval($totalFiltered);
 
-	$json_data = array(
-		"draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
-		"recordsTotal"    => $recordsTotal,
-		"recordsFiltered" => $recordsFiltered,
-		"data"            => $datatable
-	);
+		$json_data = array(
+			"draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+			"recordsTotal"    => $recordsTotal,
+			"recordsFiltered" => $recordsFiltered,
+			"data"            => $datatable
+		);
 
-// 	print_r($json_data);
-// exit;
+		// 	print_r($json_data);
+		// exit;
 		return $this->response->setContentType('application/json')
 			->setJSON($json_data);
 	}
@@ -205,7 +205,7 @@ class Incentive extends AdminController
 		//print_r($filter_data); exit;
 		//$totalFiltered = $this->incentiveModel->getTotal($filter_data);
 		$filteredData = $this->incentivemainModel->getAllsearch($filter_data);
-	
+
 
 		$currentUrl = admin_url('incentive/incentivesearch');
 		$url = [
@@ -546,7 +546,11 @@ class Incentive extends AdminController
 			'kharif', 'rabi'
 		];
 		$data['msgclass'] = '';
-		if ($this->request->getMethod(1) === 'POST') {
+
+
+
+
+		if ($this->request->getMethod(1) === 'POST' && $this->validFile()) {
 
 			//printr($file_pdf); exit;
 			$check['district_id'] = $_POST['district_id'];
@@ -566,8 +570,10 @@ class Incentive extends AdminController
 			$checkk['filter_block'] = $_POST['block_id'];
 			$checkk['filter_year'] = $_POST['year'];
 			$checkk['filter_season'] = $_POST['season'];
+			//printr($checkk); exit;
 
 			$checkedDatablock = $this->validateForm($checkk);
+
 			if ($checkedDatablock) {
 				$this->session->setFlashdata('errorupload', 'Please Verify The Previous Phase Data');
 				$data['msgclass'] = 'bg-danger';
@@ -575,103 +581,126 @@ class Incentive extends AdminController
 			}
 
 
-			if (isset($_FILES["file"]["name"])) {
-
-				$file_pdf = $this->request->getFile('pdf');
-				$file_pdf->move(DIR_UPLOAD . 'farmerincentive', $file_pdf->getName());
-				//for pdf upload code
-				//for excel upload
-				$fileName = $_FILES["file"]["tmp_name"];
-				$reader = IOFactory::createReader('Xlsx');
-				$reader->setReadDataOnly(true);
-				$spreadsheet = $reader->load($fileName);
-				$sheet = $spreadsheet->getActiveSheet();
-
-				// Get the highest column index (e.g., 'A', 'B', 'C', etc.)
-				$highestColumn = $sheet->getHighestColumn();
-
-				// Convert the highest column index to a numeric value
-				$columnCount = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
-				$checkColumn = $this->countExcelHeaders();
-				if ($checkColumn == $columnCount) {
-					$activesheet = $spreadsheet->getSheet(0);
-					$row_data = $activesheet->toArray();
-					// dd($row_data);
-					if (!empty($row_data[1])) {
 
 
-						$result_main_phase = $this->incentiveModel->phaseDataCheck($checkk);
+			$file_pdf = $this->request->getFile('pdf');
+			$file_pdf->move(DIR_UPLOAD . 'farmerincentive', $file_pdf->getName());
+			//for pdf upload code
+			//for excel upload
+			$fileName = $_FILES["file"]["tmp_name"];
+			$reader = IOFactory::createReader('Xlsx');
+			$reader->setReadDataOnly(true);
+			$spreadsheet = $reader->load($fileName);
+			$sheet = $spreadsheet->getActiveSheet();
 
-						$phase = '';
-						if (empty($result_main_phase)) {
-							$phase = 1;
-						} else {
-							$result_main_phase_result = $result_main_phase->phase;
-							$phase = $result_main_phase_result + 1;
-						}
+			// Get the highest column index (e.g., 'A', 'B', 'C', etc.)
+			$highestColumn = $sheet->getHighestColumn();
 
-						$main_incetive_data = array(
-							'district_id' => $check['district_id'],
-							'block_id' => $check['block_id'],
-							'year' => $check['year'],
-							'season' => $check['season'],
-							'pdf' => $file_pdf->getName(),
-							'created_by' => $user_upload,
-							'phase' => $phase,
-
-						);
+			// Convert the highest column index to a numeric value
+			$columnCount = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+			$checkColumn = $this->countExcelHeaders();
+			if ($checkColumn == $columnCount) {
+				$activesheet = $spreadsheet->getSheet(0);
+				$row_data = $activesheet->toArray();
+				// dd($row_data);
+				if (!empty($row_data[1])) {
 
 
+					$result_main_phase = $this->incentiveModel->phaseDataCheck($checkk);
 
-						$result_main = $this->incentiveModel->addInceitive_main($main_incetive_data);
-						if ($_FILES["file"]["size"] > 0) {
-
-							foreach ($row_data  as $key => $column) {
-								$filteredColumn = array_filter($column);
-								if ($key >= 1) {
-									$aadhar_no = preg_replace("/[^0-9]/", "", $column[7]);
-									$account_no = preg_replace("/[^0-9]/", "", $column[11]);
-									$datacsv[] = array(
-										'incetive_id' => $result_main,
-										'gp' => $column[0],
-										'village' => $column[1],
-										'name' => $column[2],
-										'spouse_name' => $column[3],
-										'gender' => strtolower($column[4]),
-										'caste' => strtolower($column[5]),
-										'phone_no' => $column[6],
-										'aadhar_no' => $aadhar_no,
-										'year_support' => $column[8],
-										'area_hectare' => $column[9],
-										'bank_name' => $column[10],
-										'account_no' => trim($account_no),
-										'ifsc' =>  $column[12],
-										'amount' => $column[13],
-										'uploaded_by' => $user_upload
-									);
-								}
-							}
-							//dd($datacsv); 
-							$res = $this->incentiveModel->addInceitive($datacsv);
-							$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
-							$data['msgclass'] = 'bg-success';
-							return redirect()->to(base_url('admin/incentive'));
-						}
+					$phase = '';
+					if (empty($result_main_phase)) {
+						$phase = 1;
 					} else {
+						$result_main_phase_result = $result_main_phase->phase;
+						$phase = $result_main_phase_result + 1;
+					}
 
-						$this->session->setFlashdata('errorupload', 'Don\'t upload Blank Excel');
-						$data['msgclass'] = 'bg-danger';
-						return redirect()->to(base_url('admin/incentive/addform'));
+					$main_incetive_data = array(
+						'district_id' => $check['district_id'],
+						'block_id' => $check['block_id'],
+						'year' => $check['year'],
+						'season' => $check['season'],
+						'pdf' => $file_pdf->getName(),
+						'created_by' => $user_upload,
+						'phase' => $phase,
+
+					);
+
+
+
+					$result_main = $this->incentiveModel->addInceitive_main($main_incetive_data);
+					if ($_FILES["file"]["size"] > 0) {
+
+						foreach ($row_data  as $key => $column) {
+							$filteredColumn = array_filter($column);
+							if ($key >= 1) {
+								$aadhar_no = preg_replace("/[^0-9]/", "", $column[7]);
+								$account_no = preg_replace("/[^0-9]/", "", $column[11]);
+								$datacsv[] = array(
+									'incetive_id' => $result_main,
+									'gp' => $column[0],
+									'village' => $column[1],
+									'name' => $column[2],
+									'spouse_name' => $column[3],
+									'gender' => strtolower($column[4]),
+									'caste' => strtolower($column[5]),
+									'phone_no' => $column[6],
+									'aadhar_no' => $aadhar_no,
+									'year_support' => $column[8],
+									'area_hectare' => $column[9],
+									'bank_name' => $column[10],
+									'account_no' => trim($account_no),
+									'ifsc' =>  $column[12],
+									'amount' => $column[13],
+									'uploaded_by' => $user_upload
+								);
+							}
+						}
+						//dd($datacsv);
+						$res = $this->incentiveModel->addInceitive($datacsv);
+						$this->session->setFlashdata('errorupload', 'Data Uploaded successfully');
+						$data['msgclass'] = 'bg-success';
+						return redirect()->to(base_url('admin/incentive'));
 					}
 				} else {
-					$this->session->setFlashdata('errorupload', 'Invalid FIle Please Use the same File as You Downloaded');
+
+					$this->session->setFlashdata('errorupload', 'Don\'t upload Blank Excel');
 					$data['msgclass'] = 'bg-danger';
 					return redirect()->to(base_url('admin/incentive/addform'));
 				}
+			} else {
+				$this->session->setFlashdata('errorupload', 'Invalid FIle Please Use the same File as You Downloaded');
+				$data['msgclass'] = 'bg-danger';
+				return redirect()->to(base_url('admin/incentive/addform'));
 			}
 		}
 
-		return $this->template->view('Admin\Incentive\Views\form', $data);
+		if(isset($this->error['warning'])){
+			$data['error'] 	= $this->error['warning'];
+		}
+
+		echo $this->template->view('Admin\Incentive\Views\form', $data);
+	}
+
+	protected function validFile()
+	{
+		$validation =  \Config\Services::validation();
+		$valid = $this->validate([
+			'file' => 'uploaded[file]|max_size[file,40960]',
+			'pdf' => 'uploaded[pdf]|max_size[pdf,40960]',
+		]);
+
+
+
+		if ($valid) {
+			return true;
+		} else {
+			//printr($validation->getErrors());
+			$this->error['warning'] = "upload file more than 40 mb";
+			return false;
+		}
+		return !$this->error;
 	}
 
 	protected function countExcelHeaders()
@@ -726,7 +755,7 @@ class Incentive extends AdminController
 
 	public function delete()
 	{
-		//$deleteid=$this->uri->getSegment(4); 
+		//$deleteid=$this->uri->getSegment(4);
 		if ($this->request->getPost('selected')) {
 			$selected = $this->request->getPost('selected');
 		} else {
@@ -796,7 +825,7 @@ class Incentive extends AdminController
 			// 	$error  = 'true';
 			// } else if (!preg_match('/^[0-9]{12}+$/', $result->aadhar_no) || empty($result->aadhar_no)) {
 			// 	$error  = 'true';
-			// } 
+			// }
 			if (empty($result->gp) || empty($result->village) || empty($result->name)) {
 				$error  = 'true';
 			} else if ($result->area_hectare == 0 || $result->area_hectare > 9.99 || empty($result->area_hectare)) {
@@ -909,10 +938,10 @@ class Incentive extends AdminController
 	{
 		//printr($filter_data); exit;
 		$filteredData = $this->incentivemainModel->getAllCheckblockwise($filter_data);
-		// 
+		//
 
 		// $filtered_Data = $this->incentiveModel->getAll($filteredData->id);
-		// printr($filtered_Data); exit;
+		//  printr($filteredData); exit;
 
 
 		foreach ($filteredData as $result) {
@@ -920,6 +949,7 @@ class Incentive extends AdminController
 				return true;
 			}
 		}
+		return false;
 	}
 
 	protected function checkError($result)
@@ -992,7 +1022,7 @@ class Incentive extends AdminController
 	{
 		$data['districts'] = (new DistrictModel())->asArray()->findAll();
 		// Retrieve the districts from the DistrictModel and store them in $data['districts']
-		
+
 		$data['selectedYear'] = 1;
 		// Set the default value for the selected year to 1
 
@@ -1024,18 +1054,18 @@ class Incentive extends AdminController
 		// Retrieve filtered data by calling the FarmerCheckstatus() method on the incentivemainModel, passing the filter
 		$data['district_id'] = '';
 		// Set the initial value of district_id to an empty string
-		
+
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
 		}
 		// If the 'district_id' parameter is present in the request, update the district_id value with its value
-		
+
 		$currentUrl = admin_url('incentive/uploadstatus');
-	$url = [
-        'district_id' => $this->request->getGet('district_id'),
-        'year'       =>  $this->request->getGet('year'),
-        'download' => 'excel'
-    ];
+		$url = [
+			'district_id' => $this->request->getGet('district_id'),
+			'year'       =>  $this->request->getGet('year'),
+			'download' => 'excel'
+		];
 		$queryString = http_build_query($url);
 
 
@@ -1048,17 +1078,17 @@ class Incentive extends AdminController
 		$data['mergedUrl'] = $mergedUrl;
 		$download = $this->request->getGet('download');
 
-	
+
 		if ($download) {
 			$this->dataToExcelStatus($filteredData);
 		};
 		$data['farmerData'] = [];
 		// Initialize an empty array to store the farmer data
-		
+
 		foreach ($filteredData as $filteredDatas) {
 			$year = 0;
 			// Initialize the year variable with a default value of 0
-		
+
 			if ($filteredDatas['year'] == 1) {
 				$year = '2017-18';
 			} elseif ($filteredDatas['year'] == 2) {
@@ -1071,17 +1101,17 @@ class Incentive extends AdminController
 				$year = '2021-22';
 			}
 			// Assign a specific string value to $year based on the value of the 'year' field in $filteredDatas
-		
+
 			$season = 0;
 			// Initialize the season variable with a default value of 0
-		
+
 			if ($filteredDatas['season'] == 1) {
 				$season = 'kharif';
 			} elseif ($filteredDatas['season'] == 2) {
 				$season = 'Rabi';
 			}
 			// Assign a specific string value to $season based on the value of the 'season' field in $filteredDatas
-		
+
 			$data['farmerData'][] = [
 				'district_id' => $filteredDatas['district_id'],
 				'district_name' => $filteredDatas['district'],
@@ -1092,8 +1122,7 @@ class Incentive extends AdminController
 				'season' => $season,
 			];
 			// Add an associative array with various fields and their corresponding values to the $data['farmerData'] array
-		}
-		;
+		};
 		return $this->template->view('Admin\Incentive\Views\upload_status', $data);
 	}
 
