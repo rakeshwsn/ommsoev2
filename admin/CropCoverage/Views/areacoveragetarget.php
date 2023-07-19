@@ -9,9 +9,7 @@
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
                     <label class="form-control-label">Year: <span class="txt-danger">*
-                            <?php $currentYear = date('Y');
-                            echo $currentYear;
-                            ?>
+                            <?= $year_id; ?>
                         </span></label>
 
                 </div>
@@ -19,18 +17,8 @@
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
                     <label class="form-control-label">Season: <span class="txt-danger">*
-                            <?php
-                            $seasonPrinted = false;
+                            <?= $season ?>
 
-                            foreach ($practicedata as $pd) {
-
-                                if (!$seasonPrinted) {
-                                    echo $pd['season'] . '<br>';
-                                    $seasonPrinted = true;
-                                }
-
-                            }
-                            ?>
                         </span></label>
 
                 </div>
@@ -42,7 +30,7 @@
                         <?php foreach ($heading as $crop => $practices): ?>
                             <th colspan="<?= count($practices) ?>"><?= $crop ?></th>
                         <?php endforeach; ?>
-                        <th class="text-right no-sort colspan-2">Actions</th>
+                        <th class="text-right no-sort rowspan-2">Actions</th>
                     </tr>
                     <tr>
                         <?php foreach ($heading as $crop => $practices): ?>
@@ -104,12 +92,6 @@
                             </td>
                             <td>
                                 <?= $data["KODO_MILLET_LS"]; ?>
-                            </td>
-                            <td>
-                                <?= $data["PROSO_MILLET_LT"]; ?>
-                            </td>
-                            <td>
-                                <?= $data["PROSO_MILLET_LS"]; ?>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm pull-right">

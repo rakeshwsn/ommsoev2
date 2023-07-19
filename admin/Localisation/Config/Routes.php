@@ -28,7 +28,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->post('block/delete', 'Localisation\Controllers\Block::delete');
 
 
-    $routes->add('grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
+    $routes->add('areacoverage/grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
     $routes->match(['get', 'post'], 'grampanchayat/add', 'Localisation\Controllers\Grampanchayat::add');
     $routes->get('grampanchayat/delete/(:segment)', 'Localisation\Controllers\Grampanchayat::delete/$1');
     $routes->post('grampanchayat/delete', 'Localisation\Controllers\Grampanchayat::delete');

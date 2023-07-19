@@ -10,6 +10,7 @@ use Admin\Localisation\Models\DistrictModel;
 
 class AreaCoverageTarget extends AdminController
 {
+	private $data;
 	private $error = array();
 	private $targetModel;
 	private $blockModel;
@@ -44,18 +45,10 @@ class AreaCoverageTarget extends AdminController
 
 		// $data['add'] = admin_url('areacoverage/target/add');
 		$data['edit'] = admin_url('areacoverage/target/edit');
-		$data['delete'] = admin_url('grampanchayat/delete');
-		$data['datatable_url'] = admin_url('grampanchayat/search');
-
 		$data['heading_title'] = lang('Area Coverage Target');
-
-		$data['text_list'] = lang('Grampanchayat.text_list');
-		$data['text_no_results'] = lang('Grampanchayat.text_no_results');
-		$data['text_confirm'] = lang('Grampanchayat.text_confirm');
-
 		$data['button_add'] = lang('Add Target');
 		$data['button_edit'] = lang('Edit Target');
-		$data['button_delete'] = lang('Grampanchayat.button_delete');
+
 
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
@@ -74,10 +67,10 @@ class AreaCoverageTarget extends AdminController
 		]);
 
 		$data['practicedata'] = $practicedata;
-		// printr($practicedata);
-		// exit;
-		echo "date('Y')";
+
+
 		$data['year_id'] = date('Y');
+
 		$currentMonth = date('n');
 		if ($currentMonth >= 6 && $currentMonth <= 10) {
 			$season = 'Kharif';
@@ -104,7 +97,6 @@ class AreaCoverageTarget extends AdminController
 	}
 	public function add()
 	{
-
 		if ($this->request->getMethod(1) === 'POST') {
 
 			$data['block_id'] = $this->request->getGet('block_id');
@@ -120,7 +112,6 @@ class AreaCoverageTarget extends AdminController
 	}
 	public function edit()
 	{
-
 		if ($this->request->getMethod(1) === 'POST') {
 
 			//delete existing
@@ -139,13 +130,10 @@ class AreaCoverageTarget extends AdminController
 		}
 		$this->getForm();
 	}
-
-
 	protected function getForm()
 	{
 		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
-			printr($this->request->getMethod(1) === 'POST');
-			exit;
+
 			$id = $this->uri->getSegment(5);
 
 			$this->TargetModel->update($id, $this->request->getPost());
@@ -166,6 +154,15 @@ class AreaCoverageTarget extends AdminController
 		$data['practices'] = $this->practicesModel->GetPractices();
 		$data['district_id'] = $this->user->district_id;
 		$data['block_id'] = $this->request->getGet('block_id');
+		$data['year_id'] = date('Y');
+
+		$currentMonth = date('n');
+		if ($currentMonth >= 6 && $currentMonth <= 10) {
+			$season = 'Kharif';
+		} elseif ($currentMonth >= 11 && $currentMonth <= 4) {
+			$season = 'Rabi';
+		}
+		$data['season'] = $season;
 
 		// Pass the practice data to the view
 		$practicedata = $this->targetModel->getBlockTargets([
@@ -190,8 +187,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['blocks'] = (new BlockModel())->getBlocksByDistrict($data['district_id']);
 		$data['block_id'] = $this->user->block_id;
-		// printr($data['practicedata']);
-		// exit;
+
 
 		echo $this->template->view('Admin\CropCoverage\Views\targetform', $data);
 	}

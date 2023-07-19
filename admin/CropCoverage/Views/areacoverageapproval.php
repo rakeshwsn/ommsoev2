@@ -26,6 +26,9 @@
             <div class="block-content block-content-full">
                 <div class="row">
                     <div class="col-sm-12">
+
+
+
                         <table id="block-coverage"
                             class="table table-bordered table-striped table-vcenter table-responsive">
                             <thead>
@@ -39,34 +42,36 @@
                                     <th rowspan="3">LT - Balance Nursery Raised (for coverage of area in Ha.) (Please
                                         write figure post transplantation and damage)
                                     </th>
-
-                                    <th colspan="9">Achievement under demonstration (Area in Hectare)</th>
-
-                                    <?php foreach ($heading as $crop => $practices): ?>
-                                        <th colspan="<?= count($practices) ?>" rowspan="1"><?= $crop ?></th>
-                                    <?php endforeach; ?>
-
-                                    <th class="text-right no-sort colspan-2">Actions</th>
+                                    <th colspan="15">Achievement under demonstration (Area in Hectare)
+                                    </th>
+                                    <th colspan="2">Achievement (Cumulative) Area in hectare</th>
+                                    <th colspan="7">Follow Up Crops (with out incentive) (in Ha) </th>
+                                    <th colspan="3">Grand Total Crop Coverage (in Ha)</th>
+                                    <th class="text-right no-sort colspan-3">Actions</th>
                                 </tr>
-
                                 <tr>
                                     <?php foreach ($heading as $crop => $practices): ?>
-                                        <?php $colspan = count($practices) * 3; ?>
-                                        <th colspan="<?= $colspan ?>" rowspan="1"><?= $crop ?></th>
+                                        <th colspan="<?= count($practices) ?>"><?= $crop ?></th>
+                                    <?php endforeach; ?>
+                                    <th rowspan="2">Total Ragi</th>
+                                    <th rowspan="2">Total Non-Ragi </th>
+                                    <?php foreach ($heading as $crop => $practices): ?>
+                                        <th rowspan="2">
+                                            <?= $crop ?>
+                                        </th>
                                     <?php endforeach; ?>
                                 </tr>
 
                                 <tr>
                                     <?php foreach ($heading as $crop => $practices): ?>
                                         <?php foreach ($practices as $practice): ?>
-                                            <th colspan="3">
+                                            <th>
                                                 <?= $practice ?>
                                             </th>
                                         <?php endforeach; ?>
                                     <?php endforeach; ?>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 <?php foreach ($practicedata as $data) { ?>
                                     <tr>
