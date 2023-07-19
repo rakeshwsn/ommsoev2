@@ -153,6 +153,24 @@ FROM ac_crop_practices acp
         $builder->insertBatch($fCrop);
     }
 
+    public function deleteNursery($crop_coverage_id)
+    {
+        $builder = $this->db->table('ac_nursery');
+        $builder->where('crop_coverage_id',$crop_coverage_id)->delete();
+    }
+
+    public function deleteArea($crop_coverage_id)
+    {
+        $builder = $this->db->table('ac_area_practices');
+        $builder->where('crop_coverage_id',$crop_coverage_id)->delete();
+    }
+
+    public function deleteFupCrops($crop_coverage_id)
+    {
+        $builder = $this->db->table('ac_followup_crop');
+        $builder->where('crop_coverage_id',$crop_coverage_id)->delete();
+    }
+
     public function getCurrentYearDates()
     {
 
@@ -199,12 +217,77 @@ FROM ac_crop_practices acp
     public function getAreaCoverage($filter = [])
     {
         if (!empty($filter['block_id'])) {
-            $sql = "SELECT * FROM vw_area_coverage_blockwise 
-                    WHERE block_id=" . $filter['block_id'] .
-                ' AND year_id=' . $filter['year_id'] .
-                " AND season='" . $filter['season']."'";
+            $sql = "SELECT cc.*,gp.name gp FROM vw_area_coverage_gpwise cc 
+                    LEFT JOIN soe_grampanchayats gp ON cc.gp_id=gp.id 
+                    WHERE cc.block_id=" . $filter['block_id'] .
+                ' AND cc.year_id=' . $filter['year_id'] .
+                " AND cc.season='" . $filter['season']."'";
 
             return $this->db->query($sql)->getResult();
         }
+    }
+
+    public function getPracticeArea($crop_coverage_id=0) {
+        $sql = "WITH crop_practice
+AS
+(SELECT
+      crprt.crop_id,
+      crprt.crop,
+      crprt.practice_id,
+      crprt.practice,
+      CASE WHEN ISNULL(acp.id) THEN 0 ELSE 1 END status
+    FROM (SELECT
+        ac.id crop_id,
+        ac.crops crop,
+        ap.id practice_id,
+        ap.name practice
+      FROM ac_crops ac
+        CROSS JOIN ac_practices ap) crprt
+      LEFT JOIN ac_crop_practices acp
+        ON acp.crop_id = crprt.crop_id
+        AND acp.practice_id = crprt.practice_id),
+practice_area
+AS
+(SELECT
+      ac.id crop_id,
+      ac.crops,
+      aap.smi,
+      lt,
+      ls
+    FROM ac_area_practices aap
+      LEFT JOIN ac_crops ac
+        ON aap.crop_id = ac.id
+    WHERE aap.crop_coverage_id = $crop_coverage_id)
+
+SELECT
+  t1.crop_id,
+  t1.crop,
+  t1.practice_id,
+  t1.practice,
+  t1.status,
+  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls ELSE 0.0 END AS area
+FROM crop_practice AS t1
+  JOIN practice_area AS t2
+    ON t1.crop_id = t2.crop_id
+ORDER BY t1.crop_id, t1.practice_id";
+
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getNursery($crop_coverage_id=0){
+        $b = $this->db->table('ac_nursery');
+        return $b->where('crop_coverage_id',$crop_coverage_id)->get()->getFirstRow('array');
+    }
+
+    public function getFupCrops($crop_coverage_id=0){
+        $sql = "SELECT
+  afc.crop_id,
+  afc.area,
+  ac.crops crop
+FROM ac_followup_crop afc
+  LEFT JOIN ac_crops ac
+    ON afc.crop_id = ac.id WHERE afc.crop_coverage_id=".$crop_coverage_id;
+
+        return $this->db->query($sql)->getResultArray();
     }
 }
