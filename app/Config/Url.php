@@ -67,6 +67,7 @@ class Url {
     const misIsUploaded = 'admin/transaction/isuploaded';
     const userAllowUpload = 'admin/users/allowupload/update';
     const userUploadStatus = 'admin/users/uploadstatus/update';
+    const areaCoverageUpload = 'admin/areacoverage/upload';
 
 
 }
