@@ -10,106 +10,73 @@
         <?= form_open('', 'id="form-target"'); ?>
         <div class="form-layout">
             <div class="row">
+                <?php if (!$district_id): ?>
+                    <div class="col-lg-3">
+                        <div class="form-group mg-b-10-force">
+                            <label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
+                            <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id'), "id='filter_district' class='form-control js-select2'") ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <div class="col-lg-3">
                     <div class="form-group mg-b-10-force">
-                        <label class="form-control-label">Block: </label>
+                        <label class="form-control-label">Block: <span class="tx-danger">*</span></label>
                         <?= form_dropdown('block_id', option_array_value($blocks, 'id', 'name'), set_value('block_id', isset($_GET['block_id']) ? $_GET['block_id'] : $block_id), "id='filter_block' class='form-control js-select2' disabled"); ?>
-                    </div>
-                </div>
-
-                <div class="col-lg-2" style="padding-top: 30px;">
-                    <div class="form-group mg-b-10-force">
-                        <label class="form-control-label">Year:
-                            <?= $year_id; ?>
-                        </label>
 
                     </div>
                 </div>
-                <div class="col-lg-2" style="padding-top: 30px;">
-                    <div class="form-group mg-b-10-force">
-                        <label class="form-control-label">Season:
-                            <?= $season ?>
-                        </label>
-                    </div>
-                </div>
-
             </div>
         </div>
-    </div>
-    <table id="datatable" class="table table-bordered table-striped table-vcenter">
-        <thead>
-            <tr>
-                <th>Crop Name</th>
-                <?php foreach ($practices as $practice): ?>
-                    <th>
-                        <?= $practice['practices']; ?>
-                    </th>
-                <?php endforeach; ?>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($crops as $index => $crop): ?>
+        <table id="datatable" class="table table-bordered table-striped table-vcenter">
+            <thead>
                 <tr>
-                    <td>
-                        <?= $crop['crops']; ?>
-                    </td>
+                    <th>Crop Name</th>
                     <?php foreach ($practices as $practice): ?>
-                        <?php
-                        $inputValue = '';
-                        $isSMIDisabled = true;
-                        $isLTDisabled = true;
-
-                        if ($practice['practices'] === 'SMI') {
-                            if ($crop['crops'] === 'Ragi') {
-                                $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']]['SMI'] : '';
-                                $isSMIDisabled = false; // Enable "SMI" for "Ragi."
-                            } else {
-                                $inputValue = '';
-                            }
-                        } elseif ($practice['practices'] === 'LT') {
-                            if ($crop['crops'] === 'Ragi' || $crop['crops'] === 'Little Millet') {
-                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']]['LT'] : '';
-                                $isLTDisabled = false; // Enable "LT" for "Ragi" and "Little Millet."
-                            } else {
-                                $inputValue = '';
-                            }
-                        } else {
-                            $inputValue = '';
-                        }
-                        ?>
-                        <td>
-                            <?php if ($practice['practices'] === 'SMI'): ?>
-                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                    name="crop[<?= $crop['id'] ?>][SMI]" class="crop-input" value="<?= $inputValue ?>"
-                                    <?= $isSMIDisabled ? 'disabled' : '' ?> oninput="calculateTotals()">
-                            <?php elseif ($practice['practices'] === 'LT'): ?>
-                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                    name="crop[<?= $crop['id'] ?>][LT]" class="crop-input" value="<?= $inputValue ?>"
-                                    <?= $isLTDisabled ? 'disabled' : '' ?> oninput="calculateTotals()">
-                            <?php else: ?>
-                                <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                    name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                    value="<?= $inputValue ?>" oninput="calculateTotals()">
-                            <?php endif; ?>
-                        </td>
+                        <th>
+                            <?= $practice['practices']; ?>
+                        </th>
                     <?php endforeach; ?>
                 </tr>
-            <?php endforeach; ?>
-            <tr>
-                <td>Total</td>
-                <td><input type="number" id="total-smi" class="total-input" readonly></td>
-                <td><input type="number" id="total-lt" class="total-input" readonly></td>
-                <td><input type="number" id="total-ls" class="total-input" readonly></td>
-            </tr>
-        </tbody>
+            </thead>
+            <tbody>
+                <?php foreach ($practicedata as $index => $crop): ?>
+                    <tr>
+                        <td>
+                            <?= $crop['crops']; ?>
+                        </td>
+                        <td>
+                            <input type="number" data-practice="1"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][smi]" class="crop-input" value="<?= $crop['smi']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['smi']['status'] ? 'disabled' : '' ?>>
+                        </td>
+                        <td>
+                            <input type="number" data-practice="2"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][lt]" class="crop-input" value="<?= $crop['lt']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['lt']['status'] ? 'disabled' : '' ?>>
 
-    </table>
+                        </td>
+                        <td>
+                            <input type="number" data-practice="3"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][ls]" class="crop-input" value="<?= $crop['ls']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['ls']['status'] ? 'disabled' : '' ?>>
 
-
-
-
-    <?= form_close(); ?>
-</div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td>Total</td>
+                    <td><input type="number" id="total-smi" class="total-input" readonly></td>
+                    <td><input type="number" id="total-lt" class="total-input" readonly></td>
+                    <td><input type="number" id="total-ls" class="total-input" readonly></td>
+                </tr>
+            </tbody>
+        </table>
+        <?= form_close(); ?>
+    </div>
 </div>
 <script>
     function calculateTotals() {
@@ -121,10 +88,10 @@
 
         for (var i = 0; i < cropInputs.length; i++) {
             var inputValue = parseFloat(cropInputs[i].value);
-
             if (!isNaN(inputValue)) {
+                validateField(cropInputs[i]); // Validate the input field
                 var inputId = cropInputs[i].id;
-                var practice = inputId.split('_')[3];
+                var practice = cropInputs[i].getAttribute('data-practice');
 
                 if (practice === '1') {
                     totalSMI += inputValue;
@@ -133,14 +100,36 @@
                 } else if (practice === '3') {
                     totalLS += inputValue;
                 }
+            } else {
+                cropInputs[i].setCustomValidity('Please enter a valid number.');
             }
         }
 
-        document.getElementById('total-smi').value = totalSMI;
-        document.getElementById('total-lt').value = totalLT;
-        document.getElementById('total-ls').value = totalLS;
+        document.getElementById('total-smi').value = totalSMI.toFixed(2);
+        document.getElementById('total-lt').value = totalLT.toFixed(2);
+        document.getElementById('total-ls').value = totalLS.toFixed(2);
     }
+
     document.addEventListener('DOMContentLoaded', calculateTotals);
+
+    // Add event listeners to validate fields on input
+    var cropInputs = document.getElementsByClassName('crop-input');
+    for (var i = 0; i < cropInputs.length; i++) {
+        cropInputs[i].addEventListener('input', function () {
+            validateField(this);
+            calculateTotals();
+        });
+    }
+</script>
+<script>
+    function validateField(field) {
+        var inputValue = parseFloat(field.value);
+        if (isNaN(inputValue) || inputValue < 0 || inputValue > 9999.9999) {
+            field.setCustomValidity('Please enter a non-negative number with a maximum of 4 digits.');
+        } else {
+            field.setCustomValidity('');
+        }
+    }
 </script>
 <script>
     $(document).ready(function () {
