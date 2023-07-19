@@ -92,6 +92,8 @@ class AreaCoverageTarget extends AdminController
 		}
 
 		$data['heading'] = $crops;
+		// printr($crops);
+		// exit;
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoveragetarget', $data);
 	}

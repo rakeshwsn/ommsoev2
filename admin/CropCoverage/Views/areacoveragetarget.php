@@ -13,22 +13,21 @@
                         </span></label>
 
                 </div>
-            </div><!-- col-4 -->
+            </div>
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
-                    <label class="form-control-label">Season: <span class="txt-danger">*
-                            <?= $season ?>
-
-                        </span></label>
-
+                    <label class="form-control-label">Season:<span class="txt-danger">*
+                            <?= $season; ?>
+                        </span>
+                    </label>
                 </div>
-            </div><!-- col-4 -->
-            <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
+            </div>
+            <table id="block-coverage" class="table table-bordered table-striped table-vcenter">
                 <thead>
                     <tr>
                         <th rowspan="2">Block</th>
                         <?php foreach ($heading as $crop => $practices): ?>
-                            <th colspan="<?= count($practices) ?>"><?= $crop ?></th>
+                            <th colspan="<?= count($practices) ?>"><?= $crop; ?></th>
                         <?php endforeach; ?>
                         <th class="text-right no-sort rowspan-2">Actions</th>
                     </tr>
@@ -36,7 +35,7 @@
                         <?php foreach ($heading as $crop => $practices): ?>
                             <?php foreach ($practices as $practice): ?>
                                 <th>
-                                    <?= $practice ?>
+                                    <?= $practice; ?>
                                 </th>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
@@ -63,33 +62,23 @@
                             <td>
                                 <?= $data["LITTLE_MILLET_LS"]; ?>
                             </td>
-                            <td>
-                                <?= $data["FOXTAIL_MILLET_LT"]; ?>
-                            </td>
+
                             <td>
                                 <?= $data["FOXTAIL_MILLET_LS"]; ?>
                             </td>
-                            <td>
-                                <?= $data["SORGHUM_LT"]; ?>
-                            </td>
+
                             <td>
                                 <?= $data["SORGHUM_LS"]; ?>
                             </td>
-                            <td>
-                                <?= $data["PEARL_MILLET_LT"]; ?>
-                            </td>
+
                             <td>
                                 <?= $data["PEARL_MILLET_LS"]; ?>
                             </td>
-                            <td>
-                                <?= $data["BARNYARD_MILLET_LT"]; ?>
-                            </td>
+
                             <td>
                                 <?= $data["BARNYARD_MILLET_LS"]; ?>
                             </td>
-                            <td>
-                                <?= $data["KODO_MILLET_LT"]; ?>
-                            </td>
+
                             <td>
                                 <?= $data["KODO_MILLET_LS"]; ?>
                             </td>
@@ -106,3 +95,4 @@
             </table>
         </div>
     </div>
+</div>
