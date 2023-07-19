@@ -49,7 +49,8 @@ $validation = \Config\Services::validation();
                         </tr>
                     </thead>
                     <tbody>
-                    <?php foreach ($blocks as $block) ?>
+                    <?php if ($blocks) {?>
+                    <?php foreach ($blocks as $block) {?>
                         <tr>
                             <td class="text-left"><?=$block['week']?></td>
                             <td><?=$block['farmers_covered']?></td>
@@ -58,6 +59,12 @@ $validation = \Config\Services::validation();
                                
                             </td>
                         </tr>
+                    <?php } ?>
+                    <?php } else { ?>
+                        <tr>
+                            <td colspan="4">Data not available.</td>
+                        </tr>
+                    <?php } ?>
                     </tbody>
                 </table>
             </div>
