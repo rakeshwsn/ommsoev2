@@ -46,19 +46,20 @@
                             <?= $crop['crops']; ?>
                         </td>
                         <td>
-                            <input type="" data-practice="1" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                            <input type="number" step=".01" data-practice="1"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][smi]" class="crop-input" value="<?= $crop['smi']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['smi']['status'] ? 'disabled' : '' ?>>
                         </td>
                         <td>
-                            <input type="number" data-practice="2"
+                            <input type="number" step=".01" data-practice="2"
                                 id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][lt]" class="crop-input" value="<?= $crop['lt']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['lt']['status'] ? 'disabled' : '' ?>>
 
                         </td>
                         <td>
-                            <input type="number" data-practice="3"
+                            <input type="number" step=".01" data-practice="3"
                                 id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][ls]" class="crop-input" value="<?= $crop['ls']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['ls']['status'] ? 'disabled' : '' ?>>
@@ -80,10 +81,10 @@
 <script>
     function validateField(field) {
         var inputValue = field.value.trim();
-        var decimalRegex = /^\d{0,5}(\.\d{1,5})?$/;
+        var decimalRegex = /^(\d{0,5}(\.\d{0,5})?)?$/;
 
         if (inputValue !== '' && !decimalRegex.test(inputValue)) {
-            field.setCustomValidity('Please enter a valid non-negative number with a maximum of 5 digits.');
+            field.setCustomValidity('Please enter a valid positive decimal number with up to 5 decimal places.');
         } else {
             field.setCustomValidity('');
         }
@@ -129,6 +130,7 @@
         });
     }
 </script>
+
 
 
 
