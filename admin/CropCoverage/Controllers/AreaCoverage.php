@@ -1,8 +1,9 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
+use Admin\Common\Models\YearModel;
 use Admin\CropCoverage\Models\AreaCoverageModel;
-use Admin\CropCoverage\Models\YearModel;
+use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use App\Controllers\AdminController;
@@ -70,11 +71,16 @@ class AreaCoverage extends AdminController
 
             $data['blocks'] = [];
             foreach ($blocks as $block) {
+                $action = '';
+                if(true){
+                    $action = admin_url('areacoverage/edit?id='.$block->cc_id);
+                }
                 $data['blocks'][] = [
                     'week' => date('d F',strtotime($block->start_date)).'-'.date('d F',strtotime($block->end_date)) ,
+                    'gp' => $block->gp,
                     'farmers_covered' => $block->farmers_covered,
                     'total_area' => $block->smi+$block->lt+$block->ls+$block->fc_area,
-                    'action' => '',
+                    'action' => $action,
                 ];
             }
 
@@ -317,6 +323,153 @@ class AreaCoverage extends AdminController
         return false;
     }
 
+    public function edit() {
+        $cc_id = $this->request->getGet('id');
 
+        $dates = $this->getWeekDates();
+
+        $to_date = $dates[1];
+
+        $data['show_form'] = false;
+        if(strtotime($to_date)>=strtotime('today')){
+            $data['show_form'] = true;
+        }
+
+        if($this->request->getMethod(1)=='POST'){
+            $master = [
+                'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
+            ];
+            $this->areacoveragemodel->update($cc_id,$master);
+
+            $nursery = [
+                'crop_coverage_id' => $cc_id,
+                'nursery_raised' => $this->request->getPost('nursery')['nursery_raised'],
+                'balance_smi' => $this->request->getPost('nursery')['balance_smi'],
+                'balance_lt' => $this->request->getPost('nursery')['balance_lt'],
+            ];
+
+            $this->areacoveragemodel->deleteNursery($cc_id);
+            $this->areacoveragemodel->addNursery($nursery);
+
+            $cropPractices = $this->areacoveragemodel->getCropPractices();
+
+            $areas = [];
+
+            foreach ($cropPractices as $crop_id => $practices) {
+                $_areas = [
+                    'crop_coverage_id' => $cc_id,
+                    'crop_id' => $crop_id,
+                ];
+                foreach ($practices as $practice) {
+                    $_areas[$practice] = $this->request->getPost('area')[$crop_id][$practice];
+                }
+                $areas[] = $_areas;
+            }
+
+            $this->areacoveragemodel->deleteArea($cc_id);
+            $this->areacoveragemodel->addArea($areas);
+
+            //follow up crops
+
+            $crops = (new CropsModel())->findAll();
+            $fCrop = [];
+            foreach ($crops as $crop) {
+                $fCrop[] = [
+                    'crop_coverage_id' => $cc_id,
+                    'crop_id' => $crop->id,
+                    'area' => $this->request->getPost('fup')[$crop->id],
+                ];
+            }
+            $this->areacoveragemodel->deleteFupCrops($cc_id);
+            $this->areacoveragemodel->addFupCrops($fCrop);
+
+            return redirect()->to(admin_url('areacoverage'))->with('message','Area coverage data updated.');
+        }
+
+        return $this->getForm();
+    }
+
+    protected function getForm(){
+        $cc_id = $this->request->getGet('id');
+
+        $cc_info = $this->areacoveragemodel->find($cc_id);
+
+        $dates = $this->getWeekDates();
+
+        $to_date = $dates[1];
+
+        $data['show_form'] = false;
+        if(strtotime($to_date)>=strtotime('today')){
+            $data['show_form'] = true;
+        }
+
+        $data['district'] = (new DistrictModel())->find($cc_info->district_id)->name;
+        $data['block'] = (new BlockModel())->find($cc_info->block_id)->name;
+        $data['gp'] = (new GrampanchayatModel())->find($cc_info->gp_id)->name;
+        $data['year'] = (new YearModel())->find($cc_info->year_id)->name;
+        $data['season'] = $cc_info->season;
+        $data['date_added'] = ymdToDmy($cc_info->created_at);
+        $data['start_date'] = ymdToDmy($cc_info->start_date);
+        $data['end_date'] = ymdToDmy($cc_info->end_date);
+
+        $cropPrtcArea = $this->areacoveragemodel->getPracticeArea($cc_id);
+
+        $data['crop_coverage']['farmers_covered'] = $cc_info->farmers_covered;
+        $data['nursery_info'] = $this->areacoveragemodel->getNursery($cc_id);
+
+        $data['crops'] = [];
+        $smi = $lt = $ls = 0;
+        foreach ($cropPrtcArea as $area) {
+            $practices = [];
+            foreach ($cropPrtcArea as $p) {
+                if($area['crop_id']==$p['crop_id']){
+                    $practices[strtolower($p['practice'])] = [
+                        'area' => $p['area'],
+                        'status' => $p['status']
+                    ];
+                }
+            }
+
+            $data['crops'][$area['crop_id']] = [
+                'crop' => $area['crop'],
+                'crop_id' => $area['crop_id'],
+                'practices' => $practices,
+            ];
+        }
+        $practices = [];
+        foreach ($cropPrtcArea as $area) {
+            if(strtolower($area['practice'])=='smi'){
+                $smi += $area['area'];
+            }
+            if(strtolower($area['practice'])=='lt'){
+                $lt += $area['area'];
+            }
+            if(strtolower($area['practice'])=='ls'){
+                $ls += $area['area'];
+            }
+        }
+        //cacl total
+        foreach (['smi','lt','ls'] as $practice){
+            $practices[$practice] = [
+                'area' => $$practice,
+                'status' => 0
+            ];
+        }
+        $data['crops'][99] = [
+            'crop' => 'Total',
+            'crop_id' => 0,
+            'practices' => $practices,
+        ];
+
+        //fup
+        $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
+        $area = 0;
+        foreach ($data['fups'] as $fup) {
+            $area += $fup['area'];
+        }
+        $data['fups_total'] = $area;
+
+        return $this->template->view('Admin\CropCoverage\Views\areacoverage_edit', $data);
+    }
 
 }

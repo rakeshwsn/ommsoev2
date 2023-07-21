@@ -39,10 +39,11 @@ $validation = \Config\Services::validation();
             </div>
 			
             <div class="block-content">
-                <table class="table table-vcenter text-center">
+                <table class="table">
                     <thead>
                         <tr>
-                            <th class="text-left">Week</th>
+                            <th>Week</th>
+                            <th>GP</th>
                             <th>Total Farmer</th>
                             <th>Total Area</th>
                             <th>Action</th>
@@ -52,12 +53,14 @@ $validation = \Config\Services::validation();
                     <?php if ($blocks) {?>
                     <?php foreach ($blocks as $block) {?>
                         <tr>
-                            <td class="text-left"><?=$block['week']?></td>
+                            <td><?=$block['week']?></td>
+                            <td><?=$block['gp']?></td>
                             <td><?=$block['farmers_covered']?></td>
                             <td><?=$block['total_area']?></td>
-                            <td style="display: flex;">
-                               
-                            </td>
+                            <td style="display: flex;"><?php if($block['action']){ ?>
+                                <a href="<?=$block['action']?>" class="btn btn-info">
+                                    <i class="fa fa-pencil"></i></a>
+                                <?php } ?></td>
                         </tr>
                     <?php } ?>
                     <?php } else { ?>

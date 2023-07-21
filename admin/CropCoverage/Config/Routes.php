@@ -18,5 +18,6 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->post('areacoverage/fetch-blocks', 'CropCoverage\Controllers\AreaCoverageTarget::fetchBlocks');
     $routes->add('areacoverage/download', 'CropCoverage\Controllers\AreaCoverage::download');
     $routes->add('areacoverage/upload', 'CropCoverage\Controllers\AreaCoverage::upload');
+    $routes->add('areacoverage/edit', 'CropCoverage\Controllers\AreaCoverage::edit');
 
 });
