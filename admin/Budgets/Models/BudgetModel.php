@@ -271,11 +271,12 @@ class BudgetModel extends Model
                 LEFT JOIN soe_budgets b
                     ON b.budget_plan_id = bp.id
                 WHERE fund_agency_id = ".$filter['fund_agency_id']."
-                AND bp.year = ".$filter['year']."
+                AND b.deleted_at IS NULL AND bp.deleted_at IS NULL and bp.year = ".$filter['year']."
                 AND bp.district_id = ".$filter['district_id']."
                 GROUP BY b.component_id) bud
                 ON bud.component_id = comp.component_id) res
             ORDER BY sort_order";
+            //echo $sql;
             return $this->db->query($sql)->getResultArray();
     }
 
