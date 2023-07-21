@@ -247,14 +247,8 @@ function getYearIDByYear($year){
 }
 
 function getCurrentSeason() {
-    $month = date('m');
-    $kharif = [6,7,8,9,10];
-    if(in_array($month,$kharif)){
-        return 'kharif';
-    } else {
-        return 'rabi';
-    }
-
+    $cy = (new \Admin\CropCoverage\Models\AreaCoverageModel())->getCurrentYearDates();
+    return $cy['season'];
 }
 
 function getSeasons(){

@@ -40,40 +40,31 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($crops as $index => $crop): ?>
+                <?php foreach ($practicedata as $index => $crop): ?>
                     <tr>
                         <td>
                             <?= $crop['crops']; ?>
                         </td>
-                        <?php foreach ($practices as $practice): ?>
-                            <?php
-                            $inputValue = '';
-                            if ($practice['practices'] === 'SMI') {
-                                if ($crop['crops'] === 'Ragi') {
-                                    $inputValue = ($index === 0 && isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
-                                } else {
-                                    $inputValue = '';
-                                }
-                            } else {
-                                $inputValue = (isset($practicedata) && $practicedata) ? $practicedata[$crop['id']][strtolower($practice['practices'])] : '';
-                            }
-                            ?>
-                            <td>
-                                <?php if ($practice['practices'] === 'SMI'): ?>
-                                    <?php if ($crop['crops'] === 'Ragi'): ?>
-                                        <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                            name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                            value="<?= $inputValue ?>" oninput="calculateTotals()">
-                                    <?php else: ?>
-                                        <input type="number" disabled>
-                                    <?php endif; ?>
-                                <?php else: ?>
-                                    <input type="number" id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                        name="crop[<?= $crop['id'] ?>][<?= $practice['practices'] ?>]" class="crop-input"
-                                        value="<?= $inputValue ?>" oninput="calculateTotals()">
-                                <?php endif; ?>
-                            </td>
-                        <?php endforeach; ?>
+                        <td>
+                            <input type="number" step=".01" data-practice="1"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][smi]" class="crop-input" value="<?= $crop['smi']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['smi']['status'] ? 'disabled' : '' ?>>
+                        </td>
+                        <td>
+                            <input type="number" step=".01" data-practice="2"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][lt]" class="crop-input" value="<?= $crop['lt']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['lt']['status'] ? 'disabled' : '' ?>>
+
+                        </td>
+                        <td>
+                            <input type="number" step=".01" data-practice="3"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][ls]" class="crop-input" value="<?= $crop['ls']['value'] ?>"
+                                oninput="calculateTotals()" <?= !$crop['ls']['status'] ? 'disabled' : '' ?>>
+
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <tr>
@@ -84,44 +75,65 @@
                 </tr>
             </tbody>
         </table>
-
-
-
-
         <?= form_close(); ?>
     </div>
 </div>
 <script>
+    function validateField(field) {
+        var inputValue = field.value.trim();
+        var decimalRegex = /^(\d{0,5}(\.\d{0,5})?)?$/;
+
+        if (inputValue !== '' && !decimalRegex.test(inputValue)) {
+            field.setCustomValidity('Please enter a valid positive decimal number with up to 5 decimal places.');
+        } else {
+            field.setCustomValidity('');
+        }
+    }
+
     function calculateTotals() {
         var cropInputs = document.getElementsByClassName('crop-input');
-        var totalInputs = document.getElementsByClassName('total-input');
         var totalSMI = 0;
         var totalLT = 0;
         var totalLS = 0;
 
         for (var i = 0; i < cropInputs.length; i++) {
-            var inputValue = parseFloat(cropInputs[i].value);
+            validateField(cropInputs[i]); // Validate the input field
 
-            if (!isNaN(inputValue)) {
-                var inputId = cropInputs[i].id;
-                var practice = inputId.split('_')[3];
+            var inputValue = cropInputs[i].value.trim();
+            if (inputValue !== '') {
+                var practice = cropInputs[i].getAttribute('data-practice');
+                var value = parseFloat(inputValue);
 
                 if (practice === '1') {
-                    totalSMI += inputValue;
+                    totalSMI += value;
                 } else if (practice === '2') {
-                    totalLT += inputValue;
+                    totalLT += value;
                 } else if (practice === '3') {
-                    totalLS += inputValue;
+                    totalLS += value;
                 }
             }
         }
 
-        document.getElementById('total-smi').value = totalSMI;
-        document.getElementById('total-lt').value = totalLT;
-        document.getElementById('total-ls').value = totalLS;
+        document.getElementById('total-smi').value = totalSMI.toFixed(2);
+        document.getElementById('total-lt').value = totalLT.toFixed(2);
+        document.getElementById('total-ls').value = totalLS.toFixed(2);
     }
+
     document.addEventListener('DOMContentLoaded', calculateTotals);
+
+    // Add event listeners to validate fields on input
+    var cropInputs = document.getElementsByClassName('crop-input');
+    for (var i = 0; i < cropInputs.length; i++) {
+        cropInputs[i].addEventListener('input', function () {
+            validateField(this);
+            calculateTotals();
+        });
+    }
 </script>
+
+
+
+
 <script>
     $(document).ready(function () {
         $('#district').change(function () {

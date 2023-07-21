@@ -1,6 +1,7 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
+use Admin\CropCoverage\Models\AreaCoverageModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
 use Admin\CropCoverage\Models\CropsModel;
@@ -10,6 +11,7 @@ use Admin\Localisation\Models\DistrictModel;
 
 class AreaCoverageTarget extends AdminController
 {
+	private $data;
 	private $error = array();
 	private $targetModel;
 	private $blockModel;
@@ -44,18 +46,11 @@ class AreaCoverageTarget extends AdminController
 
 		// $data['add'] = admin_url('areacoverage/target/add');
 		$data['edit'] = admin_url('areacoverage/target/edit');
-		$data['delete'] = admin_url('grampanchayat/delete');
-		$data['datatable_url'] = admin_url('grampanchayat/search');
-
+		$data['add'] = admin_url('areacoverage/target/add');
 		$data['heading_title'] = lang('Area Coverage Target');
-
-		$data['text_list'] = lang('Grampanchayat.text_list');
-		$data['text_no_results'] = lang('Grampanchayat.text_no_results');
-		$data['text_confirm'] = lang('Grampanchayat.text_confirm');
-
 		$data['button_add'] = lang('Add Target');
 		$data['button_edit'] = lang('Edit Target');
-		$data['button_delete'] = lang('Grampanchayat.button_delete');
+
 
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
@@ -74,10 +69,10 @@ class AreaCoverageTarget extends AdminController
 		]);
 
 		$data['practicedata'] = $practicedata;
-		// printr($practicedata);
-		// exit;
-		echo "date('Y')";
+		//printr($practicedata);
+
 		$data['year_id'] = date('Y');
+
 		$currentMonth = date('n');
 		if ($currentMonth >= 6 && $currentMonth <= 10) {
 			$season = 'Kharif';
@@ -100,11 +95,11 @@ class AreaCoverageTarget extends AdminController
 
 		$data['heading'] = $crops;
 
+
 		return $this->template->view('Admin\CropCoverage\Views\areacoveragetarget', $data);
 	}
 	public function add()
 	{
-
 		if ($this->request->getMethod(1) === 'POST') {
 
 			$data['block_id'] = $this->request->getGet('block_id');
@@ -120,18 +115,30 @@ class AreaCoverageTarget extends AdminController
 	}
 	public function edit()
 	{
-
 		if ($this->request->getMethod(1) === 'POST') {
 
+			//printr($_POST);
+			//exit;
 			//delete existing
 			$block_id = $this->request->getGet('block_id');
-			$this->targetModel->where('block_id', $block_id)->where('season', getCurrentSeason())->where('year_id', getCurrentYearId())->delete();
+			$data['block_id'] = $block_id;
+			$masterdata = array(
+				"block_id" => $data['block_id'],
+				"year_id" => getCurrentYearId(),
+				"season" => getCurrentSeason(),
+			);
+			$master = $this->targetModel->where($masterdata)->first();
+			if ($master) {
+				$target_id = $master->id;
+			} else {
+				$target_id = $this->targetModel->insert($masterdata);
+			}
 
 			//insert new
 			$data['crop_data'] = $this->request->getPost('crop');
-			$data['block_id'] = $block_id;
 
-			$this->targetModel->addTargets($data);
+
+			$this->targetModel->addTargets($data, $target_id);
 
 			$this->session->setFlashdata('message', 'Target Updated Successfully.');
 
@@ -139,21 +146,9 @@ class AreaCoverageTarget extends AdminController
 		}
 		$this->getForm();
 	}
-
-
 	protected function getForm()
 	{
-		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
-			printr($this->request->getMethod(1) === 'POST');
-			exit;
-			$id = $this->uri->getSegment(5);
 
-			$this->TargetModel->update($id, $this->request->getPost());
-
-			$this->session->setFlashdata('message', 'Target Updated Successfully.');
-
-			return redirect()->to(base_url('admin/areacoverage/target'));
-		}
 
 		$_SESSION['isLoggedIn'] = true;
 
@@ -164,21 +159,64 @@ class AreaCoverageTarget extends AdminController
 		}
 		$data['crops'] = $this->cropsModel->GetCrops();
 		$data['practices'] = $this->practicesModel->GetPractices();
+
 		$data['district_id'] = $this->user->district_id;
 		$data['block_id'] = $this->request->getGet('block_id');
+		$data['year_id'] = date('Y');
+
+		$currentMonth = date('n');
+		if ($currentMonth >= 6 && $currentMonth <= 10) {
+			$season = 'Kharif';
+		} elseif ($currentMonth >= 11 && $currentMonth <= 4) {
+			$season = 'Rabi';
+		}
+		$data['season'] = $season;
+
+		$data['croppractices'] = (new AreaCoverageModel)->getCropPractices();
+
 
 		// Pass the practice data to the view
-		$practicedata = $this->targetModel->getBlockTargets([
+		$data['practicedata'] = $this->targetModel->getBlockTargets([
 			'block_id' => $data['block_id'],
 			'season' => getCurrentSeason(),
 			'year_id' => getCurrentYearId()
 		]);
+		//echo "<pre>";
+		//print_r($data['croppractices']);
 
-		$data['practicedata'] = [];
+		$output = array();
+		foreach ($data['practicedata'] as $practice) {
+			$crop_id = $practice['id'];
 
-		foreach ($practicedata as $pd) {
-			$data['practicedata'][$pd['crop_id']] = $pd;
+			// Check if the crop_id exists in $crop array
+			if (array_key_exists($crop_id, $data['croppractices'])) {
+				// If the crop_id exists, get the crop values from $crop array
+				$crop_values = $data['croppractices'][$crop_id];
+				// Define the fields to check
+				$fields = ['smi', 'lt', 'ls'];
+
+				// Initialize an empty array to store the values for 'smi', 'lt', and 'ls'
+				$values = array();
+
+				// Loop through the fields and set the values and statuses
+				foreach ($fields as $field) {
+					$status = in_array($field, $crop_values) ? 1 : 0;
+					$values[$field] = ['value' => $practice[$field], 'status' => $status];
+				}
+
+				// Assign the values to the corresponding keys in $practice array
+				$practice['smi'] = $values['smi'];
+				$practice['lt'] = $values['lt'];
+				$practice['ls'] = $values['ls'];
+
+				// Add the updated $practice array to the $output array
+				$output[] = $practice;
+			}
 		}
+
+		$data['practicedata'] = $output;
+
+
 
 		if (empty($this->user->district_id)) {
 			$data['missingDistrictId'] = true;
@@ -190,8 +228,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['blocks'] = (new BlockModel())->getBlocksByDistrict($data['district_id']);
 		$data['block_id'] = $this->user->block_id;
-		// printr($data['practicedata']);
-		// exit;
+
 
 		echo $this->template->view('Admin\CropCoverage\Views\targetform', $data);
 	}
@@ -218,5 +255,7 @@ class AreaCoverageTarget extends AdminController
 			return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
 		}
 	}
+
+
 }
 ?>

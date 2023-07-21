@@ -33,6 +33,7 @@ $user  = service('user');
         </div>
     </div> -->
                 <div class="block">
+
                     <div class="block-options d-flex justify-content-center pt-3">
                         <h5 class="text-muted fw-bold fs-5">Before Uploading Data Please Download the file and set Your data into downloadble File then upload it.</h5>
                     </div>
@@ -92,7 +93,7 @@ $user  = service('user');
                             <table class="table table-bordered">
                                 <tr>
                                     <th style="width: 310px;">Excel(data) Upload</th>
-                                    <th style="width: 320px;">Pdf Upload(Document For verify)</th>
+                                    <th style="width: 320px;">Pdf Upload(Document For verify)<p class="text-danger">40 Mb Upload size</p></th>
                                     <th>Upload</th>
                                 </tr>
                                 <tr>
