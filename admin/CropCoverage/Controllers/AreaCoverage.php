@@ -72,7 +72,7 @@ class AreaCoverage extends AdminController
             $data['blocks'] = [];
             foreach ($blocks as $block) {
                 $action = '';
-                if(true){
+                if(strtotime($data['to_date'])<=strtotime('today')){
                     $action = admin_url('areacoverage/edit?id='.$block->cc_id);
                 }
                 $data['blocks'][] = [
@@ -198,6 +198,7 @@ class AreaCoverage extends AdminController
 
             $from_date = $dates[0];
             $to_date = $dates[1];
+            $excel_from_date = $row_data[0][22];
 
             $exists = $acModel
                 ->where('start_date',$from_date)
@@ -207,7 +208,18 @@ class AreaCoverage extends AdminController
                 ->first();
 //            $exists = false;
 
-            if(strtotime($from_date)!=strtotime($row_data[0][22])){
+            //gp belongs to the block
+            $gp_cell = $row_data[4][1];
+            $gp = (new GrampanchayatModel())->find($gp_cell);
+            $gp_belongs = $gp->block_id==$this->user->block_id;
+
+            //validation
+            if(!isset($row_data[0][22])){
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'Invalid file. Please download the file from here and upload again.'
+                ]);
+            } else if(strtotime($from_date)!=strtotime($excel_from_date)){
                 return $this->response->setJSON([
                     'status'=>false,
                     'message'=>'Invalid week dates. Please download the latest file and upload again.'
@@ -216,6 +228,11 @@ class AreaCoverage extends AdminController
                 return $this->response->setJSON([
                     'status'=>false,
                     'message'=>'This week data is already uploaded.'
+                ]);
+            } else if(!$gp_belongs){
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'The GP dont belong to your block. Please download the file and try again.'
                 ]);
             } else {
                 $crops = (new CropsModel())->findAll();
@@ -282,7 +299,11 @@ class AreaCoverage extends AdminController
             }
         }
 
-        return $this->response->setJSON(['status'=>true,'message'=>'Upload successful.']);
+        return $this->response->setJSON([
+            'status'=>true,
+            'message'=>'Upload successful.',
+            'url' => admin_url('areacoverage')
+        ]);
 	}
 
     private function getCurrentYearDates() {
