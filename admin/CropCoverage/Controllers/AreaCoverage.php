@@ -9,6 +9,7 @@ use Admin\Localisation\Models\GrampanchayatModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
 use Config\Url;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Protection;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -148,12 +149,31 @@ class AreaCoverage extends AdminController
         $protection->setInsertRows(false);
         $protection->setFormatCells(false);
 
-        $sheet->getStyle("F5:S$row")
+        $validation = $sheet->getCell('F5')
+            ->getDataValidation();
+        $validation->setType(DataValidation::TYPE_DECIMAL );
+        $validation->setErrorStyle(DataValidation::STYLE_STOP );
+        $validation->setAllowBlank(true);
+        $validation->setShowInputMessage(true);
+        $validation->setShowErrorMessage(true);
+        $validation->setErrorTitle('Input error');
+        $validation->setError('Only numbers/decimals allowed!');
+        $validation->setPromptTitle('Allowed input');
+        $validation->setPrompt('Only numbers greater than or equal to 0 are allowed.');
+        $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
+        $validation->setFormula1("=0");
+        $validation->setSqref("F5:AB$row");
+
+        $cells = "F5:S$row";
+        $sheet->getStyle($cells)
             ->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-        $sheet->getStyle("V5:AB$row")
+
+        $cells = "V5:AB$row";
+        $sheet->getStyle($cells)
             ->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
 
 //        $writer = new Xlsx($spreadsheet);
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, "Xlsx");
