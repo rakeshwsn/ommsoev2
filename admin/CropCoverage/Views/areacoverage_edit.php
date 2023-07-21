@@ -116,7 +116,7 @@
                     <tfoot>
                     <tr>
                         <td>Total</td>
-                        <td><?=$fups_total?></td>
+                        <td id="total-fup"><?=$fups_total?></td>
                     </tr>
                     </tfoot>
                 </table>
@@ -154,16 +154,24 @@
         });
 
         $.each(['smi','lt','ls'],function (i,v) {
-            $('[name^="area['+v+']"]').keyup(function (e) {
+            $('[name$="['+v+']').keyup(function (e) {
                 var tot=0;
-                $('[name^="area['+v+']"]').each(function (i,element) {
+                $('[name$="['+v+']"]').each(function (i,element) {
                     if($(element).is(':disabled')){
                         return false;
                     }
                     tot += parseFloat($(element).val() || 0);
                 });
-                $('[name^="area['+v+'][0]"]').val(tot);
+                $('[name$="area[0]['+v+']"]').val(tot);
             });
+        });
+
+        $('[name^="fup"]').keyup(function (e) {
+            var tot=0;
+            $('[name^="fup"]').each(function (i,element) {
+                tot += parseFloat($(element).val() || 0);
+            });
+            $('#total-fup').text(tot);
         });
     });
     //rakesh
