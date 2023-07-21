@@ -1,6 +1,6 @@
 <?php
 
-namespace Admin\PhysicalComponents\Models;
+namespace Admin\Physicalcomponents\Models;
 
 use CodeIgniter\Model;
 

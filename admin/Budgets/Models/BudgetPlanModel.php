@@ -211,7 +211,7 @@ class BudgetPlanModel extends Model
               ON bp.fund_agency_id = sfa.id
             LEFT JOIN soe_years sy
                 ON bp.year=sy.id
-          WHERE bp.year = ".$data['filter_year']."
+          WHERE b.deleted_at IS NULL AND bp.deleted_at IS NULL and bp.year = ".$data['filter_year']."
           GROUP BY bp.district_id) bud
           ON bud.district_id = sd.district_id
           AND sd.fund_agency_id = bud.fund_agency_id where 1=1";
@@ -222,7 +222,7 @@ class BudgetPlanModel extends Model
         if(!empty($data['filter_district_id'])){
             $sql .= " AND bud.district_id = ".$data['filter_district_id'];
         }
-        
+        //echo $sql;
         return $this->db->query($sql)->getResultArray();
         
 

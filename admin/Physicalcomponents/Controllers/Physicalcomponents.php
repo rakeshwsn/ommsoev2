@@ -3,7 +3,7 @@
 namespace Admin\PhysicalComponents\Controllers;
 
 use Admin\Permission\Models\PermissionModel;
-use Admin\PhysicalComponents\Models\ComponentPhyModel;
+use Admin\Physicalcomponents\Models\ComponentPhyModel;
 use Admin\Components\Models\ComponentsModel;
 use App\Controllers\AdminController;
 use CodeIgniter\API\ResponseTrait;

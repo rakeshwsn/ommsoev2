@@ -3,7 +3,7 @@
 namespace Admin\Physicalachievement\Controllers;
 
 use Admin\Permission\Models\PermissionModel;
-use Admin\PhysicalComponents\Models\ComponentPhyModel;
+use Admin\Physicalcomponents\Models\ComponentPhyModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Physicalcomponentstarget\Models\PcmTargetModel;
 use Admin\Physicalachievement\Models\PhysicalachievementModel;
