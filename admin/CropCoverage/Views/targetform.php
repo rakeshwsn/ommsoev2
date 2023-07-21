@@ -46,20 +46,20 @@
                             <?= $crop['crops']; ?>
                         </td>
                         <td>
-                            <input type="number" data-practice="1"
+                            <input type="number" step=".01" data-practice="1"
                                 id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][smi]" class="crop-input" value="<?= $crop['smi']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['smi']['status'] ? 'disabled' : '' ?>>
                         </td>
                         <td>
-                            <input type="number" data-practice="2"
+                            <input type="number" step=".01" data-practice="2"
                                 id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][lt]" class="crop-input" value="<?= $crop['lt']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['lt']['status'] ? 'disabled' : '' ?>>
 
                         </td>
                         <td>
-                            <input type="number" data-practice="3"
+                            <input type="number" step=".01" data-practice="3"
                                 id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
                                 name="crop[<?= $crop['id'] ?>][ls]" class="crop-input" value="<?= $crop['ls']['value'] ?>"
                                 oninput="calculateTotals()" <?= !$crop['ls']['status'] ? 'disabled' : '' ?>>
@@ -79,29 +79,38 @@
     </div>
 </div>
 <script>
+    function validateField(field) {
+        var inputValue = field.value.trim();
+        var decimalRegex = /^(\d{0,5}(\.\d{0,5})?)?$/;
+
+        if (inputValue !== '' && !decimalRegex.test(inputValue)) {
+            field.setCustomValidity('Please enter a valid positive decimal number with up to 5 decimal places.');
+        } else {
+            field.setCustomValidity('');
+        }
+    }
+
     function calculateTotals() {
         var cropInputs = document.getElementsByClassName('crop-input');
-        var totalInputs = document.getElementsByClassName('total-input');
         var totalSMI = 0;
         var totalLT = 0;
         var totalLS = 0;
 
         for (var i = 0; i < cropInputs.length; i++) {
-            var inputValue = parseFloat(cropInputs[i].value);
-            if (!isNaN(inputValue)) {
-                validateField(cropInputs[i]); // Validate the input field
-                var inputId = cropInputs[i].id;
+            validateField(cropInputs[i]); // Validate the input field
+
+            var inputValue = cropInputs[i].value.trim();
+            if (inputValue !== '') {
                 var practice = cropInputs[i].getAttribute('data-practice');
+                var value = parseFloat(inputValue);
 
                 if (practice === '1') {
-                    totalSMI += inputValue;
+                    totalSMI += value;
                 } else if (practice === '2') {
-                    totalLT += inputValue;
+                    totalLT += value;
                 } else if (practice === '3') {
-                    totalLS += inputValue;
+                    totalLS += value;
                 }
-            } else {
-                cropInputs[i].setCustomValidity('Please enter a valid number.');
             }
         }
 
@@ -121,16 +130,10 @@
         });
     }
 </script>
-<script>
-    function validateField(field) {
-        var inputValue = parseFloat(field.value);
-        if (isNaN(inputValue) || inputValue < 0 || inputValue > 9999.9999) {
-            field.setCustomValidity('Please enter a non-negative number with a maximum of 4 digits.');
-        } else {
-            field.setCustomValidity('');
-        }
-    }
-</script>
+
+
+
+
 <script>
     $(document).ready(function () {
         $('#district').change(function () {
