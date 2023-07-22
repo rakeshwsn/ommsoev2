@@ -2,6 +2,8 @@
 
 namespace Config;
 
+use Admin\Localisation\Models\GrampanchayatModel;
+use App\Validation\CustomRules;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Validation\StrictRules\CreditCardRules;
 use CodeIgniter\Validation\StrictRules\FileRules;
@@ -20,11 +22,12 @@ class Validation extends BaseConfig
      *
      * @var string[]
      */
-    public array $ruleSets = [
+    public $ruleSets = [
         Rules::class,
         FormatRules::class,
         FileRules::class,
         CreditCardRules::class,
+        CustomRules::class
     ];
 
     /**
@@ -33,7 +36,7 @@ class Validation extends BaseConfig
      *
      * @var array<string, string>
      */
-    public array $templates = [
+    public $templates = [
         'list'   => 'CodeIgniter\Validation\Views\list',
         'single' => 'CodeIgniter\Validation\Views\single',
     ];
@@ -41,4 +44,5 @@ class Validation extends BaseConfig
     // --------------------------------------------------------------------
     // Rules
     // --------------------------------------------------------------------
+
 }
