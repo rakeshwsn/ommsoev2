@@ -200,7 +200,7 @@ class Enterprise extends AdminController
 
 		$data['enterprise_url'] = site_url('api/enterprise');
 
-		return $this->template->view('Admin\dashboard\Views\enterpriseChart', $data);
+		return $this->template->view('Admin\Dashboard\Views\enterpriseChart', $data);
 	}
 
 	

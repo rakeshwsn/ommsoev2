@@ -53,7 +53,7 @@ class Pds extends AdminController
 		}
 
 
-		return $this->template->view('Admin\dashboard\Views\pds', $data);
+		return $this->template->view('Admin\Dashboard\Views\pds', $data);
 	}
 
 	public function add()
@@ -162,13 +162,13 @@ class Pds extends AdminController
 				];
 			}
 		}
-		return $this->template->view('Admin\dashboard\Views\pdsForm', $data);
+		return $this->template->view('Admin\Dashboard\Views\pdsForm', $data);
 	}
 	public function chart()
 	{
 		
 		$data['pds_url'] = site_url('api/pds');
 
-		return $this->template->view('Admin\dashboard\Views\pdsChart', $data);
+		return $this->template->view('Admin\Dashboard\Views\pdsChart', $data);
 	}
 }

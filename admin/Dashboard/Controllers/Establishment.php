@@ -129,7 +129,7 @@ class Establishment extends AdminController
 	{
 		$data['establish_url'] = site_url('api/establishment');
 
-		return $this->template->view('Admin\dashboard\Views\establishmentChart', $data);
+		return $this->template->view('Admin\Dashboard\Views\establishmentChart', $data);
 	}
 	public function odishamap()
 	{
@@ -138,6 +138,6 @@ class Establishment extends AdminController
 		// printr($data);
 		
 
-		return $this->template->view('Admin\dashboard\Views\odishamap', $data);
+		return $this->template->view('Admin\Dashboard\Views\odishamap', $data);
 	}
 }

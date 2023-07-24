@@ -1,9 +1,9 @@
 <?php
 
 namespace Admin\Dashboard\Controllers;
-use Admin\Dashboard\Models\districtmodel;
+use Admin\Dashboard\Models\DistrictModel;
 
-use Admin\Dashboard\Models\procurementmodel;
+use Admin\Dashboard\Models\ProcurementModel;
 use App\Controllers\AdminController;
 use Admin\Dashboard\Models\YearModel;
 use phpDocumentor\Reflection\PseudoTypes\True_;
@@ -13,7 +13,7 @@ class Procurement extends AdminController
 	// private $error = array();
 	public function index()
 	{
-		$procurementmodel = new procurementmodel();
+		$procurementmodel = new ProcurementModel();
 
 		helper('form');
 
@@ -56,7 +56,7 @@ class Procurement extends AdminController
 		}
 		
 		
-		return $this->template->view('Admin\dashboard\Views\procurement', $data);
+		return $this->template->view('Admin\Dashboard\Views\procurement', $data);
 	}
 
 	public function add()
@@ -168,7 +168,7 @@ class Procurement extends AdminController
 		}
 		
 
-		return $this->template->view('Admin\dashboard\Views\procurementForm', $data);
+		return $this->template->view('Admin\Dashboard\Views\procurementForm', $data);
 	}
 	public function chart()
 	{
@@ -188,7 +188,7 @@ class Procurement extends AdminController
 
 		 $data['procurement_url'] = site_url('api/procurement');
 
-		return $this->template->view('Admin\dashboard\Views\procurementChart',$data);
+		return $this->template->view('Admin\Dashboard\Views\procurementChart',$data);
 
 	}
 
