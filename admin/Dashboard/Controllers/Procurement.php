@@ -56,7 +56,7 @@ class Procurement extends AdminController
 		}
 		
 		
-		return $this->template->view('Admin\dashboard\Views\procurement', $data);
+		return $this->template->view('Admin\Dashboard\Views\procurement', $data);
 	}
 
 	public function add()
@@ -168,7 +168,7 @@ class Procurement extends AdminController
 		}
 		
 
-		return $this->template->view('Admin\dashboard\Views\procurementForm', $data);
+		return $this->template->view('Admin\Dashboard\Views\procurementForm', $data);
 	}
 	public function chart()
 	{
@@ -188,7 +188,7 @@ class Procurement extends AdminController
 
 		 $data['procurement_url'] = site_url('api/procurement');
 
-		return $this->template->view('Admin\dashboard\Views\procurementChart',$data);
+		return $this->template->view('Admin\Dashboard\Views\procurementChart',$data);
 
 	}
 

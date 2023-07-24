@@ -186,6 +186,6 @@ class AreaCoverage extends AdminController
 			$data['districts'][$district->id] = $district->name;
 		}
 		$data['area_url'] = site_url('api/areacoverage');
-		return $this->template->view('Admin\dashboard\Views\areaCoverageChart', $data);
+		return $this->template->view('Admin\Dashboard\Views\areaCoverageChart', $data);
 	}
 }
