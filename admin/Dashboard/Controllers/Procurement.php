@@ -1,9 +1,9 @@
 <?php
 
 namespace Admin\Dashboard\Controllers;
-use Admin\Dashboard\Models\districtmodel;
+use Admin\Dashboard\Models\Districtmodel;
 
-use Admin\Dashboard\Models\procurementmodel;
+use Admin\Dashboard\Models\ProcurementModel;
 use App\Controllers\AdminController;
 use Admin\Dashboard\Models\YearModel;
 use phpDocumentor\Reflection\PseudoTypes\True_;
@@ -13,7 +13,7 @@ class Procurement extends AdminController
 	// private $error = array();
 	public function index()
 	{
-		$procurementmodel = new procurementmodel();
+		$procurementmodel = new ProcurementModel();
 
 		helper('form');
 

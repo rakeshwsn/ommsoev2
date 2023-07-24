@@ -53,7 +53,7 @@ class Pds extends AdminController
 		}
 
 
-		return $this->template->view('Admin\dashboard\Views\pds', $data);
+		return $this->template->view('Admin\Dashboard\Views\pds', $data);
 	}
 
 	public function add()
