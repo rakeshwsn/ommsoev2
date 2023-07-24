@@ -56,7 +56,6 @@ class CropsModel extends Model
             $season_data[] = [
             	'id'=> $crop->id,
             	'crops' => $crop->crops,
-
             ];
         }
        return $season_data;

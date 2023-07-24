@@ -54,10 +54,10 @@ class AreaCoverage extends AdminController
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
 
-        $dates = $this->getWeekDates();
+        $dates = $this->areacoveragemodel->getWeekDate();
 
-        $data['from_date'] = $dates[0];
-        $data['to_date'] = $dates[1];
+        $data['from_date'] = $dates['start_date'];
+        $data['to_date'] = $dates['end_date'];
         $data['upload_url'] = Url::areaCoverageUpload;
 
         $view = 'areacoverage_block';
@@ -70,20 +70,112 @@ class AreaCoverage extends AdminController
 
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
 
+            $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+
             $data['blocks'] = [];
             foreach ($blocks as $block) {
-                $action = '';
-                if(strtotime($data['to_date'])<=strtotime('today')){
-                    $action = admin_url('areacoverage/edit?id='.$block->cc_id);
+                $status = $block->status;
+                if (!isset($status)) {
+                    $status = 3;
                 }
+                $action = '';
+                $week = '';
+                if ($block->start_date) {
+                    $href = admin_url('areacoverage/edit?id=' . $block->cc_id );
+                    $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
+                                            <i class="fa fa-list"></i></a>';
+                    $week = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
+                }
+                $total_area = $block->fc_area +
+                    $block->ragi_smi +
+                    $block->ragi_lt +
+                    $block->ragi_ls +
+                    $block->little_millet_lt +
+                    $block->little_millet_ls +
+                    $block->foxtail_ls +
+                    $block->sorghum_ls +
+                    $block->kodo_ls +
+                    $block->barnyard_ls +
+                    $block->pearl_ls;
+                $total_ragi = $block->ragi_smi +
+                    $block->ragi_lt +
+                    $block->ragi_ls;
+                $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+
                 $data['blocks'][] = [
-                    'week' => date('d F',strtotime($block->start_date)).'-'.date('d F',strtotime($block->end_date)) ,
+                    'week' => $week ,
                     'gp' => $block->gp,
                     'farmers_covered' => $block->farmers_covered,
-                    'total_area' => $block->smi+$block->lt+$block->ls+$block->fc_area,
+                    'nursery_raised' => $block->nursery_raised,
+                    'balance_smi' => $block->balance_smi,
+                    'balance_lt' => $block->balance_lt,
+                    'ragi_smi' => $block->ragi_smi,
+                    'ragi_lt' => $block->ragi_lt,
+                    'ragi_ls' => $block->ragi_ls,
+                    'little_millet_lt' => $block->little_millet_lt,
+                    'little_millet_ls' => $block->little_millet_ls,
+                    'foxtail_ls' => $block->foxtail_ls,
+                    'sorghum_ls' => $block->sorghum_ls,
+                    'kodo_ls' => $block->kodo_ls,
+                    'barnyard_ls' => $block->barnyard_ls,
+                    'pearl_ls' => $block->pearl_ls,
+                    'total_ragi' => $total_ragi,
+                    'total_non_ragi' => $total_non_ragi,
+                    'total_fc' => $block->fc_area,
+                    'total_area' => $total_area,
+                    'status' => $this->statuses[$status],
                     'action' => $action,
                 ];
+
+                //calc total
+                $total_farmers_covered += $block->farmers_covered;
+                $total_nursery_raised += $block->nursery_raised;
+                $total_balance_smi += $block->balance_smi;
+                $total_balance_lt += $block->balance_lt;
+                $total_ragi_smi += $block->ragi_smi;
+                $total_ragi_lt += $block->ragi_lt;
+                $total_ragi_ls += $block->ragi_ls;
+                $total_little_millet_lt += $block->little_millet_lt;
+                $total_little_millet_ls += $block->little_millet_ls;
+                $total_foxtail_ls += $block->foxtail_ls;
+                $total_sorghum_ls += $block->sorghum_ls;
+                $total_kodo_ls += $block->kodo_ls;
+                $total_barnyard_ls += $block->barnyard_ls;
+                $total_pearl_ls += $block->pearl_ls;
+                $total_total_ragi += $total_ragi;
+                $total_total_non_ragi += $total_non_ragi;
+                $total_fc_area += $block->fc_area;
+                $total_total_area += $total_area;
             }
+
+            $data['blocks'][] = [
+                'week' => '',
+                'gp' => '<strong>Total</strong>',
+                'farmers_covered' => $total_farmers_covered,
+                'nursery_raised' => $total_nursery_raised,
+                'balance_smi' => $total_balance_smi,
+                'balance_lt' => $total_balance_lt,
+                'ragi_smi' => $total_ragi_smi,
+                'ragi_lt' => $total_ragi_lt,
+                'ragi_ls' => $total_ragi_ls,
+                'little_millet_lt' => $total_little_millet_lt,
+                'little_millet_ls' => $total_little_millet_ls,
+                'foxtail_ls' => $total_foxtail_ls,
+                'sorghum_ls' => $total_sorghum_ls,
+                'kodo_ls' => $total_kodo_ls,
+                'barnyard_ls' => $total_barnyard_ls,
+                'pearl_ls' => $total_pearl_ls,
+                'total_ragi' => $total_total_ragi,
+                'total_non_ragi' => $total_total_non_ragi,
+                'total_fc' => $total_fc_area,
+                'total_area' => $total_total_area,
+                'status' => '',
+                'action' => ''
+            ];
 
             $view = 'areacoverage_block';
         } else if($this->user->district_id){
@@ -102,10 +194,10 @@ class AreaCoverage extends AdminController
 
 	public function download() {
 
-        $dates = $this->getWeekDates();
+        $dates = $this->areacoveragemodel->getWeekDate();
 
-        $data['from_date'] = $dates[0];
-        $data['to_date'] = $dates[1];
+        $data['from_date'] = $dates['start_date'];
+        $data['to_date'] = $dates['end_date'];
 
         $reader = IOFactory::createReader('Xlsx');
         $template_file = DIR_TEMPLATE.'area_coverage.xlsx';
@@ -119,7 +211,7 @@ class AreaCoverage extends AdminController
         $year_text = getCurrentYear();
         $sheet->setCellValue('F1','District wise weekly Crop Progress under OMM during '.$year_text);
 
-        $current_season = $this->getCurrentYearDates()['season'];
+        $current_season = $this->areacoveragemodel->getCurrentYearDates()['season'];
         
         $fin_year = getCurrentYear();
 
@@ -213,11 +305,12 @@ class AreaCoverage extends AdminController
 
             $row_data = $activesheet->toArray();
 
-            $dates = $this->getWeekDates();
-            $current = $this->getCurrentYearDates();
+            $dates = $this->areacoveragemodel->getWeekDate();
 
-            $from_date = $dates[0];
-            $to_date = $dates[1];
+            $current = $this->areacoveragemodel->getCurrentYearDates();
+
+            $from_date = $dates['start_date'];
+            $to_date = $dates['end_date'];
             $excel_from_date = $row_data[0][22];
 
             $exists = $acModel
@@ -326,50 +419,12 @@ class AreaCoverage extends AdminController
         ]);
 	}
 
-    private function getCurrentYearDates() {
-
-		return $this->areacoveragemodel->getCurrentYearDates();
-
-    }
-
-    private function getWeekDates(){
-
-	    $dates = $this->getCurrentYearDates();
-
-        $start = $dates['start_date'];
-        $end = $dates['end_date'];
-        $week_start = $this->settings->start_week;
-        $week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
-
-        $output = array();
-
-        while ($start <= $end) {
-            $day_of_week = (int) $start->format('w');
-            if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
-                $output[] = array(
-                    $start->format('Y-m-d'),
-                    min($start->modify('+6 days'), $end)->format('Y-m-d')
-                );
-            }
-            $start->modify('+1 day');
-        }
-
-        foreach ($output as $dates) {
-            $today = strtotime('today');
-            if($today >= strtotime($dates[0]) && $today <= strtotime($dates[1])){
-                return $dates;
-            }
-        }
-
-        return false;
-    }
-
     public function edit() {
         $cc_id = $this->request->getGet('id');
 
-        $dates = $this->getWeekDates();
+        $dates = $this->areacoveragemodel->getWeekDate();
 
-        $to_date = $dates[1];
+        $to_date = $dates['end_date'];
 
         $data['show_form'] = false;
         if(strtotime($to_date)>=strtotime('today')){
@@ -430,17 +485,18 @@ class AreaCoverage extends AdminController
         return $this->getForm();
     }
 
-    protected function getForm(){
+    protected function getForm($return_data=false){
         $cc_id = $this->request->getGet('id');
 
         $cc_info = $this->areacoveragemodel->find($cc_id);
 
-        $dates = $this->getWeekDates();
-
-        $to_date = $dates[1];
+        if(!$cc_info){
+            return redirect()->to(admin_url('areacoverage'))->with('message','Could not find the data requested');
+        }
 
         $data['show_form'] = false;
-        if(strtotime($to_date)>=strtotime('today')){
+        if(strtotime('today') <= strtotime($cc_info->end_date)
+            && ($cc_info->status!=1) && ($cc_info->block_id==$this->user->block_id) ){
             $data['show_form'] = true;
         }
 
@@ -508,9 +564,20 @@ class AreaCoverage extends AdminController
         foreach ($data['fups'] as $fup) {
             $area += $fup['area'];
         }
+
         $data['fups_total'] = $area;
 
+        if($return_data){
+            return $data;
+        }
+
         return $this->template->view('Admin\CropCoverage\Views\areacoverage_edit', $data);
+    }
+
+    public function preview() {
+        $data = $this->getForm(true);
+
+        $html = view('Admin\CropCoverage\Views\areacoverage_detail_gp', $data);
     }
 
 }
