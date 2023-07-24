@@ -10,9 +10,9 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('areacoverage/download', 'CropCoverage\Controllers\AreaCoverage::download');
     $routes->match(['get', 'post'], 'areacoverage', 'CropCoverage\Controllers\AreaCoverage::Index');
     $routes->post('areacoverage/search', 'CropCoverage\Controllers\AreaCoverage::search');
-
-
     $routes->match(['get', 'post'], 'areacoverage/target', 'CropCoverage\Controllers\AreaCoverageTarget::index');
+    $routes->match(['get', 'post'], 'cropcoverage/reports', 'CropCoverage\Controllers\CropCoverageReports::index');
+    $routes->match(['get', 'post'], 'areacoverage/dashboard', 'CropCoverage\Controllers\AreaCoverageDashboard::index');
     $routes->match(['get', 'post'], 'areacoverage/approval', 'CropCoverage\Controllers\AreaCoverageApproval::index');
     $routes->match(['get', 'post'], 'areacoverage/target/edit', 'CropCoverage\Controllers\AreaCoverageTarget::edit');
     $routes->post('areacoverage/fetch-blocks', 'CropCoverage\Controllers\AreaCoverageTarget::fetchBlocks');

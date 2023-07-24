@@ -791,10 +791,11 @@ class ReportsModel extends Model
                 AND tc.deleted_at IS NULL
                 AND t.transaction_type = 'fund_receipt'
                 AND t.status = 1";
-                if ((!empty($filter['fagency_type_id'])  || $filter['block_id']) &&  !$filter['district_id']) {
-                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } else  {
-                  $sql .= " AND t.agency_type_id NOT IN (5, 6)";
+                
+                if(!empty($data['fund_receipt_not'])){
+                    $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
+                }else  {
+                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
                 }
                 if (!empty($filter['month_id'])) {
                   $sql .= " AND t.month = " . $filter['month_id'];
@@ -865,11 +866,13 @@ class ReportsModel extends Model
                 if (!empty($filter['district_id'])) {
                   $sql .= " AND t.district_id = " . $filter['district_id'];
                 }
-                if ((!empty($filter['fagency_type_id'])  || $filter['block_id']) &&  !$filter['district_id']) {
+
+                if(!empty($data['fund_receipt_not'])){
                   $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } else {
-                  $sql .= " AND t.agency_type_id NOT IN (5, 6)";
+                }else  {
+                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
                 }
+
                 if (!empty($filter['month_id']) && !empty($filter['year_id'])) {
                   $last_month = ($filter['month_id'] - 1);
                   $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
@@ -898,11 +901,13 @@ class ReportsModel extends Model
                 if (!empty($filter['district_id'])) {
                   $sql .= " AND t.district_id = " . $filter['district_id'];
                 }
-                if ((!empty($filter['fagency_type_id'])  || $filter['block_id']) &&  !$filter['district_id']) {
+
+                if(!empty($data['fund_receipt_not'])){
                   $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } else {
-                  $sql .= " AND t.agency_type_id NOT IN (5, 6)";
+                }else  {
+                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
                 }
+
                 if (!empty($filter['month_id']) && !empty($filter['year_id'])) {
                   $last_month = ($filter['month_id'] - 1);
                   $sql .= " AND (t.year = " . $filter['year_id'] . "
@@ -946,7 +951,7 @@ class ReportsModel extends Model
                 }
                 $sql .= " GROUP BY tc.component_id) exp_upto_cy ON comp.component_id = exp_upto_cy.component_id) res
           ORDER BY sort_order";
-   //echo $sql;exit;
+          //echo $sql;exit;
     return $this->db->query($sql)->getResultArray();
   }
 
