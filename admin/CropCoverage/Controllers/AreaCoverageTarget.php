@@ -150,8 +150,6 @@ class AreaCoverageTarget extends AdminController
 	}
 	protected function getForm()
 	{
-
-
 		$_SESSION['isLoggedIn'] = true;
 
 		$data['cancel'] = admin_url('areacoverage/target');

@@ -24,6 +24,8 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function (
     $routes->get('reports/mprtestfinal','Reports\Controllers\Mpr::mprtestfinal');
     $routes->get('reports/oldmpr','Reports\Controllers\Oldmpr::index');
 
+    $routes->get('reports/areacoverage','Reports\Controllers\AreaCoverage::index');
+
 });
 
 $routes->group('api', ['namespace' => 'Admin'],function($routes){
