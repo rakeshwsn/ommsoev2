@@ -1,6 +1,3 @@
-<?php
-$validation = \Config\Services::validation();
-?>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
@@ -45,7 +42,14 @@ $validation = \Config\Services::validation();
                             <th>Week</th>
                             <th>GP</th>
                             <th>Total Farmer</th>
+                            <th>Nursery Raised</th>
+                            <th>Balance SMI</th>
+                            <th>Balance LT</th>
+                            <th>Total Ragi</th>
+                            <th>Total Non Ragi</th>
+                            <th>Total Followup Crop</th>
                             <th>Total Area</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -56,11 +60,19 @@ $validation = \Config\Services::validation();
                             <td><?=$block['week']?></td>
                             <td><?=$block['gp']?></td>
                             <td><?=$block['farmers_covered']?></td>
+                            <td><?=$block['nursery_raised']?></td>
+                            <td><?=$block['balance_smi']?></td>
+                            <td><?=$block['balance_lt']?></td>
+                            <td><?=$block['total_ragi']?></td>
+                            <td><?=$block['total_non_ragi']?></td>
+                            <td><?=$block['total_fc']?></td>
                             <td><?=$block['total_area']?></td>
-                            <td style="display: flex;"><?php if($block['action']){ ?>
-                                <a href="<?=$block['action']?>" class="btn btn-info">
-                                    <i class="fa fa-pencil"></i></a>
-                                <?php } ?></td>
+                            <td><?=$block['status']?></td>
+                            <td style="display: flex;">
+                                <div class="btn-group btn-group-sm pull-right">
+                                <?=$block['action']?>
+                                </div>
+                            </td>
                         </tr>
                     <?php } ?>
                     <?php } else { ?>

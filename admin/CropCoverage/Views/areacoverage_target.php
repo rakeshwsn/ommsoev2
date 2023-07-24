@@ -26,9 +26,23 @@
                 <thead>
                     <tr>
                         <th rowspan="2">Block</th>
+                        <?php
+                        $totalRagi = 0;
+                        foreach ($heading as $crop => $practices) {
+                            if ($crop === 'RAGI') {
+                                $totalRagi = count($practices);
+                                ?>
+                                <th colspan="<?= $totalRagi ?>"><?= $crop; ?></th>
+                            <?php } ?>
+                        <?php } ?>
+
                         <?php foreach ($heading as $crop => $practices): ?>
-                            <th colspan="<?= count($practices) ?>"><?= $crop; ?></th>
+                            <?php if ($crop !== 'RAGI'): ?>
+                                <th colspan="<?= count($practices) ?>"><?= $crop; ?></th>
+                            <?php endif; ?>
                         <?php endforeach; ?>
+                        <th rowspan="2">Total Ragi</th>
+                        <th rowspan="2">Total Non-Ragi</th>
                         <th class="text-right no-sort rowspan-2">Actions</th>
                     </tr>
                     <tr>
@@ -56,32 +70,35 @@
                             <td>
                                 <?= $data["RAGI_LS"]; ?>
                             </td>
+
                             <td>
                                 <?= $data["LITTLE_MILLET_LT"]; ?>
                             </td>
                             <td>
                                 <?= $data["LITTLE_MILLET_LS"]; ?>
                             </td>
-
                             <td>
                                 <?= $data["FOXTAIL_MILLET_LS"]; ?>
                             </td>
-
                             <td>
                                 <?= $data["SORGHUM_LS"]; ?>
                             </td>
-
                             <td>
                                 <?= $data["PEARL_MILLET_LS"]; ?>
                             </td>
-
                             <td>
                                 <?= $data["BARNYARD_MILLET_LS"]; ?>
                             </td>
-
                             <td>
                                 <?= $data["KODO_MILLET_LS"]; ?>
                             </td>
+                            <td>
+                                <?= $data["RAGI_SMI"] + $data["RAGI_LT"] + $data["RAGI_LS"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["LITTLE_MILLET_LT"] + $data["LITTLE_MILLET_LS"] + $data["FOXTAIL_MILLET_LS"] + $data["SORGHUM_LS"] + $data["PEARL_MILLET_LS"] + $data["BARNYARD_MILLET_LS"] + $data["KODO_MILLET_LS"]; ?>
+                            </td>
+
                             <td>
                                 <div class="btn-group btn-group-sm pull-right">
                                     <a class="btn btn-sm btn-primary"
