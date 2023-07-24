@@ -1,7 +1,7 @@
 <?php
 
 namespace Admin\Dashboard\Controllers;
-use Admin\Dashboard\Models\Districtmodel;
+use Admin\Dashboard\Models\DistrictModel;
 
 use Admin\Dashboard\Models\ProcurementModel;
 use App\Controllers\AdminController;
