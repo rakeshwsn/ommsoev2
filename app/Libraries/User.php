@@ -38,6 +38,7 @@ class User
     }
 
     public function assignUserAttr($user){
+        
 
         $user_group_model = new UserGroupModel();
         $user_group = $user_group_model->find($user->user_group_id);

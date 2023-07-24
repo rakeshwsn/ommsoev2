@@ -225,6 +225,10 @@ FROM ac_crop_practices acp
 
             return $this->db->query($sql)->getResult();
         }
+
+        if (!empty($filter['district_id'])) {
+
+        }
     }
 
     public function getPracticeArea($crop_coverage_id=0) {

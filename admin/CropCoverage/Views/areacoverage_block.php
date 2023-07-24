@@ -137,6 +137,7 @@ $validation = \Config\Services::validation();
             if(data.status) {
                 show_error('File uploaded successfully');
                 $('.dm-uploader .status').addClass('text-success');
+                location.href=data.url;
             } else {
                 show_error(data.message)
             }

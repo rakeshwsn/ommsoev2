@@ -31,12 +31,12 @@ class GrampanchayatModel extends Model
 		),
 		'block_id' => array(
 			'label' => 'Block',
-			'rules' => 'trim|required|max_length[100]|'
+			'rules' => 'trim|required|max_length[100]'
 
 		),
 		'name' => array(
 			'label' => 'Name',
-			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]|is_unique[soe_grampanchayats.name,block_id,4]"
+			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]|is_unique_gp[soe_grampanchayats.name,id,{id}]"
 		)
 	];
 	protected $validationMessages = [];
