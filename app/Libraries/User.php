@@ -72,6 +72,7 @@ class User
 		$this->user->fullname=$user->firstname.' '.$user->lastname;
 		$this->user->position=$user_group->name;
 		$this->user->permission=$this->permission;
+        $this->user->agency=$user_group->agency;
 
     }
 
