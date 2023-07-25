@@ -88,7 +88,7 @@ $user  = service('user');
                     <td align="left" valign=middle><b>No. of Blocks</b></td>
                     <?php foreach ($componentsAll as $componentsAlls) { ?>
                         <td><b>Physical Target</b></td>
-                        <td colspan=><b>Ach.<br></b></td>
+                        <td colspan=3><b>Ach.<br></b></td>
                     <?php } ?>
                 </tr>
                 <tr>
