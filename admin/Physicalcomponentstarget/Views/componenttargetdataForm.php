@@ -1,49 +1,5 @@
 <style>
-    .block-content {
-        width: 100%;
-    }
 
-    .table-container {
-        overflow-y: scroll;
-    }
-
-    .table-header {
-        display: flex;
-        background-color: #f2f2f2;
-        font-weight: bold;
-        padding: 10px;
-    }
-
-    .header-cell {
-        flex: 1;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .table-body {
-        overflow: auto;
-    }
-
-    .table-row {
-        display: flex;
-        border-bottom: 1px solid #ccc;
-    }
-
-    .table-row:last-child {
-        border-bottom: none;
-    }
-
-    .table-cell {
-        flex: 1;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .table-cell a.btn {
-        display: inline-block;
-        padding: 5px;
-        text-decoration: none;
-    }
 
     #loadingWindow {
         display: none;
@@ -78,6 +34,47 @@
             transform: rotate(360deg);
         }
     }
+
+    .form-control {
+        height: 38px;
+        /* Adjust the height as needed */
+    }
+
+    .form-control {
+        height: 38px;
+        /* Adjust the height as needed */
+    }
+
+    #datatable {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    #datatable thead th {
+        background-color: #f9fafb;
+        color: #333;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    #datatable tbody td {
+        vertical-align: middle;
+    }
+
+    #datatable tbody tr:nth-child(even) {
+        background-color: #f4f4f4;
+    }
+
+    /* Styling the input fields inside the table */
+    .crop-input {
+        width: 140px; /* Set the width as desired */
+        text-align: center;
+    }
+
+    /* Styling the "Submit" button at the bottom */
+    .text-right #submitButton {
+        margin-top: 10px;
+    }
 </style>
 
 <?php
@@ -103,106 +100,93 @@ $validation = \Config\Services::validation();
                         <div class="col-sm-10">
                             <select class="form-control" id="year_id" name="year_id">
                                 <option value="">select</option>
-                                <option value="1" selected>2023-24</option>
+                                <?php foreach ($allYears as $allYear) { ?>
+                                    <option value="<?php echo $allYear->id; ?>" <?php if ($editYear == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name; ?></option>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div class="block-content block-content-full" style="overflow-y: scroll;">
-                    <table id="datatable" class="table table-bordered table-striped table-vcenter">
-                        <thead>
-                            <tr>
-                                <th>District</th>
-                                <?php foreach ($components as $component) : ?>
-                                    <th>
-                                        <?= $component['description']; ?>
-                                    </th>
-                                <?php endforeach; ?>
-                                <th>Total</th> <!-- Added the Total column header -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($districts_main as $districts_mains) : ?>
-                                <tr>
-                                    <td>
-                                        <?= $districts_mains->name; ?>
-                                    </td>
-                                    <?php foreach ($components as $component) : ?>
-                                        <td>
-                                            <?php
-                                            $value = '';
-                                            foreach ($main_master as $item) {
-                                                if ($item['district_id'] == $districts_mains->id && $item['mc_id'] == $component['id']) {
-                                                    $value = $item['total'];
-                                                    break;
-                                                }
-                                            }
-                                            ?>
-                                            <input type="number" name="component[<?= $districts_mains->id ?>][<?= $component['id'] ?>]" class="crop-input form-control" oninput="calculateTotals()" value="<?= $value ?>">
-                                        </td>
-                                    <?php endforeach; ?>
-                                    <td>
-                                        <span class="total-value"></span> <!-- Added the total-value span for displaying the total -->
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+                    <table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 
-                        </tbody>
                     </table>
                 </div>
-
-                <div class="form-group text-right">
+                <!-- <div class="form-group text-right">
                     <button id="submitButton" class="btn btn-alt-primary">Submit</button>
-                </div>
+                </div> -->
             </div>
-
             <?php echo form_close(); ?>
-
-
-
         </div>
     </div>
 </div>
 
-
-
 <?php js_start(); ?>
+
+<script>
+    $(document).ready(function() {
+        // Handle change event on district and year select elements
+        $('#year_id').change(function() {
+            var yearId = $('#year_id').val();
+            $.ajax({
+                url: '<?php echo admin_url("physicalcomponentstarget/searchtargetdata"); ?>',
+                method: 'POST',
+                data: {
+                    year_id: yearId,
+                },
+                success: function(response) {
+                    // console.log("hello");
+                    $('#datatable').html(response);
+
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+        $('#year_id').trigger('change');
+
+    });
+</script>
 <script type="text/javascript">
     $(document).ready(function() {
-        // Allow only numbers in the input field
-        $('.crop-input').on('input', function() {
+        function calculateTotals() {
+            $('tbody tr').each(function() {
+                var total = 0;
+                $(this).find('.crop-input').each(function() {
+                    var value = parseFloat($(this).val());
+                    if (!isNaN(value)) {
+                        total += value;
+                    }
+                });
+                $(this).find('.total-value').text(total);
+            });
+        }
+        $(document).on('input', '.crop-input', function() {
             var value = $(this).val();
             var sanitizedValue = value.replace(/[^0-9]/g, '');
             $(this).val(sanitizedValue);
             calculateTotals();
         });
 
-        $('.crop-input').each(function() {
-            $(this).trigger('input');
+        calculateTotals();
+
+        $(document).ajaxComplete(function() {
+            calculateTotals();
         });
 
-        function calculateTotals() {
-            $('.total-value').each(function() {
-                var total = 0;
-                var row = $(this).closest('tr');
-                row.find('.crop-input').each(function() {
-                    var value = parseFloat($(this).val());
-                    if (!isNaN(value)) {
-                        total += value;
-                    }
-                });
-                $(this).text(total);
-            });
-        }
+        $('#year_id').trigger('change');
     });
 </script>
 
 <script>
-   $(document).ready(function() {
-  $('#form-budget').on('submit', function() {
-    $('#loadingWindow').show();
-  });
-});
+    $(document).ready(function() {
+        $('#form-budget').on('submit', function() {
+            $('#loadingWindow').show();
+        });
+    });
 </script>
+
+
 <?php js_end(); ?>

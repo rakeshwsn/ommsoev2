@@ -81,16 +81,14 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
 
-
-
                 <div class="budgetplan">
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="input-category">Year</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="year_id" name="year_id">
-                                <option value="">select</option>
-                                <option value="1" selected>2023-24</option>
-                                <option value="2">2024-25</option>
+                            <?php foreach($allYears as $allYear){?>
+                                <option value="<?php echo $allYear->id;?>" <?php if ($editYear == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name;?></option>
+                                <?php } ?>
                             </select>
                         </div>
                     </div>
@@ -112,21 +110,12 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
 
+
+                <h6 class="text-center text-danger"><strong>Don't Put Wrong Month Data While Upload The Acheivements, Once You Upload No longer To be Edit that month data, For that You Have to ask admin edit that month Data<span>*</span></strong></h6>
+
                 <div class="block-content block-content-full" style="overflow-y: scroll;">
                     <table id="datatable" class="table table-bordered table-striped table-vcenter">
-                        <!-- <thead>
-                            <tr>
-                                <th>Components</th>
-                                <th>Target for 2023-24</th>
-                                <th>UP To This Month</th>
-                                <th>Fillup Data</th>
-                                <th>Cumulative</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-
-                        </tbody> -->
+                      <!-- ajax code append here -->
                     </table>
                 </div>
 
@@ -134,11 +123,7 @@ $validation = \Config\Services::validation();
                     <button id="submitButton" class="btn btn-alt-primary">Submit</button>
                 </div> -->
             </div>
-
             <?php echo form_close(); ?>
-
-
-
         </div>
     </div>
 </div>

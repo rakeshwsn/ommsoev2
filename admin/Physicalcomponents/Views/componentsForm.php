@@ -31,11 +31,10 @@ $validation = \Config\Services::validation();
                     <div class="col-lg-8">
                         <select class="search form-control" id="block_id<?php echo $image_row; ?>"></select>
                     </div>
-                    <?php if ($hasPlusbutton) { ?>
+
                         <div class="col-lg-2">
-                            <button type="button" onclick="addImage();" data-toggle="tooltip" title="Banner Add" class="btn btn-primary"><i class="fa fa-plus"></i></button>
+                            <button type="button" onclick="addImage();" data-toggle="tooltip" title="Components Add" class="btn btn-primary"><i class="fa fa-plus"></i></button>
                         </div>
-                    <?php } ?>
                     <input type="hidden" name="componentsdata[<?php echo $image_row; ?>][description]" id="block_id<?php echo $image_row; ?>_description" value="">
                     <input type="hidden" name="componentsdata[<?php echo $image_row; ?>][componentid]" id="block_id<?php echo $image_row; ?>_componentid" value="">
                 </div>

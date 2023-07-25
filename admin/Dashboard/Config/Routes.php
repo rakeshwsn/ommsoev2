@@ -33,19 +33,19 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('dashboard/establishment/edit', 'Dashboard\Controllers\Establishment::edit');
     $routes->get('dashboard/establishment/chart', 'Dashboard\Controllers\Establishment::chart');
     $routes->get('dashboard/odishamap/chart', 'Dashboard\Controllers\Establishment::odishamap');
-    //Dashboard Chart
-    $routes->get('dashboard/dashboard/chart', 'Dashboard\Controllers\Dashboard::index');
 
 });
 
-$routes->group('api', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
+$routes->group('api', ['namespace' => 'Admin'], function ($routes) {
     $routes->get('areacoverage', 'Dashboard\Controllers\Api::areacoverage');
     $routes->get('procurement', 'Dashboard\Controllers\Api::procurement');
     $routes->get('pds', 'Dashboard\Controllers\Api::pds');
     $routes->get('enterprise', 'Dashboard\Controllers\Api::enterprise');
     $routes->get('establishment', 'Dashboard\Controllers\Api::establishment');
+});
 
 
-
-
+$routes->group('admin', ['namespace' => 'Admin'], function ($routes) {
+    //Dashboard Chart
+    $routes->get('dashboard/chartnew', 'Dashboard\Controllers\Dashboard::index');
 });

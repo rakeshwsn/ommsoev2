@@ -574,10 +574,4 @@ class AreaCoverage extends AdminController
         return $this->template->view('Admin\CropCoverage\Views\areacoverage_edit', $data);
     }
 
-    public function preview() {
-        $data = $this->getForm(true);
-
-        $html = view('Admin\CropCoverage\Views\areacoverage_detail_gp', $data);
-    }
-
 }

@@ -67,7 +67,8 @@ class TargetModel extends Model
 				// Check if 'SMI' key exists
 				"lt" => isset($area['lt']) ? $area['lt'] : 0,
 				// Check if 'LT' key exists
-				"ls" => isset($area['ls']) ? $area['ls'] : 0, // Check if 'LS' key exists
+				"ls" => isset($area['ls']) ? $area['ls'] : 0,
+				"followup" => isset($area['followup']) ? $area['followup'] : 0, // Check if 'LS' key exists
 			);
 
 			$this->db->table('ac_target_area')->insert($targetdata);
@@ -104,8 +105,14 @@ class TargetModel extends Model
 		block_target.BARNYARD_MILLET_LS,
 		block_target.KODO_MILLET_LT,
 		block_target.KODO_MILLET_LS,
-		block_target.PROSO_MILLET_LT,
-		block_target.PROSO_MILLET_LS
+		block_target.RAGI_FOLLOWUP,
+        block_target.LITTLE_MILLET_FOLLOWUP,
+        block_target.FOXTAIL_MILLET_FOLLOWUP,
+        block_target.SORGHUM_FOLLOWUP,
+        block_target.PEARL_MILLET_FOLLOWUP,
+        block_target.BARNYARD_MILLET_FOLLOWUP,
+        block_target.KODO_MILLET_FOLLOWUP
+
 	  FROM soe_blocks sb
 		LEFT JOIN (SELECT
 			tm.id target_id,
@@ -115,27 +122,40 @@ class TargetModel extends Model
 			MAX(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
 			MAX(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
 			MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
+			MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_FOLLOWUP,
 			MAX(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
 			MAX(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
 			MAX(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
+			MAX(CASE WHEN c.crop_id = 2 THEN ta.followup END) AS LITTLE_MILLET_FOLLOWUP,
+
 			MAX(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
 			MAX(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
 			MAX(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
+			MAX(CASE WHEN c.crop_id = 3 THEN ta.followup END) AS FOXTAIL_MILLET_FOLLOWUP,
+
 			MAX(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
 			MAX(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
 			MAX(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
+			MAX(CASE WHEN c.crop_id = 4 THEN ta.followup END) AS SORGHUM_FOLLOWUP,
+
 			MAX(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
 			MAX(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
 			MAX(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
+			MAX(CASE WHEN c.crop_id = 5 THEN ta.followup END) AS PEARL_MILLET_FOLLOWUP,
+
+
 			MAX(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
 			MAX(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
 			MAX(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
+			MAX(CASE WHEN c.crop_id = 6 THEN ta.followup END) AS BARNYARD_MILLET_FOLLOWUP,
+
 			MAX(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
 			MAX(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
 			MAX(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 8 THEN ta.smi END) AS PROSO_MILLET,
-			MAX(CASE WHEN c.crop_id = 8 THEN ta.lt END) AS PROSO_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 8 THEN ta.ls END) AS PROSO_MILLET_LS
+			MAX(CASE WHEN c.crop_id = 7 THEN ta.followup END) AS KODO_MILLET_FOLLOWUP
+
+			
+			
 		  FROM ac_target_master tm
 			LEFT JOIN ac_target_area ta
 			  ON tm.id = ta.target_id";
@@ -166,13 +186,15 @@ class TargetModel extends Model
 			ac.crops,
 			cd.smi,
 			cd.ls,
-			cd.lt
+			cd.lt,
+				cd.followup
 			FROM ac_crops ac
 			LEFT JOIN (SELECT
 				ata.crop_id,
 				ata.lt,
 				ata.ls,
-				ata.smi
+				ata.smi,
+				ata.followup
 				FROM ac_target_area ata
 				LEFT JOIN ac_target_master atm
 					ON ata.target_id = atm.id where 1=1 ";

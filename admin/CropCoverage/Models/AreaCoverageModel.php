@@ -55,28 +55,15 @@ class AreaCoverageModel extends Model
         $this->db->table('ac_seasons')->insert($areadata);
     }
 
-    public function GetSeasons()
+    public function getSeasons()
     {
 
-        $builder = $this->db->table("ac_seasons a");
-        $builder->join('years y', 'a.year = y.id', 'left');
-        $builder->join('district d', 'a.districts = d.id', 'left');
+        $seasons = [
+            'rabi' => 'Rabi',
+            'kharif' => 'Kharif',
+        ];
 
-        $seasons = $builder->get()->getResult();
-        // print_r($seasons);
-        // exit;
-        $seasons_data = [];
-        foreach ($seasons as $season) {
-            $seasons_data[] = [
-                'year' => $season->year,
-                'season' => $season->season,
-                'name' => $season->name,
-                'week' => $season->week,
-                'date_added' => $season->date_added,
-
-            ];
-            return $seasons_data;
-        }
+        return $seasons;
     }
 
     public function getCropPractices()
@@ -250,9 +237,7 @@ FROM ac_crop_practices acp
             }
 
             return $this->db->query($sql)->getResult();
-        }
-
-        if (!empty($filter['district_id'])) {
+        } else if (!empty($filter['district_id'])) {
             $sql = "SELECT ac.*,
   b.name block,bgps.gps FROM soe_blocks b 
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
@@ -262,6 +247,33 @@ FROM ac_crop_practices acp
                 WHERE b.district_id=".$filter['district_id']." ORDER BY date(ac.start_date) DESC,b.name ASC";
 
             return $this->db->query($sql)->getResult();
+        } else {
+            $sql = "SELECT
+  sd.id district_id,
+  sd.name district,
+  ac.start_date,
+  ac.end_date,
+  ac.farmers_covered,
+  ac.nursery_raised,
+  ac.balance_smi,
+  ac.balance_lt,
+  ac.ragi_smi,
+  ac.ragi_lt,
+  ac.ragi_ls,
+  ac.little_millet_lt,
+  ac.little_millet_ls,
+  ac.foxtail_ls,
+  ac.sorghum_ls,
+  ac.kodo_ls,
+  ac.barnyard_ls,
+  ac.pearl_ls,
+  ac.fc_area
+FROM soe_districts sd
+  LEFT JOIN (SELECT
+      *
+    FROM vw_area_coverage_districtwise vacd
+    WHERE vacd.status = 1) ac
+    ON ac.district_id = sd.id";
         }
     }
 

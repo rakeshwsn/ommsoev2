@@ -138,6 +138,7 @@ class PhysicalachievementModel extends Model
           FROM mpr_components_achive_data mcad
           WHERE mcad.month_id = " . $filter['month_id'] . "
         ) cur_ach ON cur_ach.mpr_component_id = mc.id AND cur_ach.mprcomponents_master_id = target.mprcomponents_master_id
+        WHERE mc.year_id <= " . $filter['year_id'] . "
       GROUP BY mc.id, mc.description, target.no_total, cur_ach.cur_total";
         return $this->db->query($sql)->getResultArray();
     }
@@ -156,7 +157,7 @@ class PhysicalachievementModel extends Model
         dist.id AS district_id,
         dist.district,
         dist.total_block";
-        $componets=$this->getMprComponents();
+        $componets=$this->getMprComponents($data['year_id']);
         foreach($componets as $comp){
         $sql .= " , comp_target{$comp['id']}.target{$comp['id']},upto_ach{$comp['id']}.upto_ach{$comp['id']},curr_ach{$comp['id']}.cur_ach{$comp['id']} ";
         }
@@ -192,7 +193,7 @@ class PhysicalachievementModel extends Model
               ON mctm.id = mcad.mprcomponents_master_id
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mcad.mpr_component_id = {$comp['id']}
-          AND mcad.month_id BETWEEN 4 AND " . $data['month_id'] . "
+          AND mcad.month_id BETWEEN 4 AND " . $preMonth . "
           GROUP BY mctm.district_id) upto_ach{$comp['id']}
           ON upto_ach{$comp['id']}.district_id = dist.id
         LEFT JOIN (SELECT
@@ -212,13 +213,13 @@ class PhysicalachievementModel extends Model
         return $this->db->query($sql)->getResultArray();
     }
 
-    protected function getMprComponents(){
-        $sql="SELECT * FROM mpr_components ORDER BY id ASC";
+    protected function getMprComponents($data){
+        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data . " ORDER BY id ASC";
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getMprComponentsall(){
-        $sql="SELECT * FROM mpr_components ORDER BY id ASC";
+    public function getMprComponentsall($data = []){
+        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data['year_id'] . " ORDER BY id ASC";
         return $this->db->query($sql)->getResultArray();
     }
 
