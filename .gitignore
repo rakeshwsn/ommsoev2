@@ -118,6 +118,7 @@ nb-configuration.xml
 *.sublime-project
 .phpintel
 /api/
+doc/
 
 # Visual Studio Code
 .vscode/
@@ -131,3 +132,5 @@ public/
 !public/themes/admin/assets/css/custom.css
 !public/themes/admin/assets/js/common.js
 !public/templates/*.*
+!public/themes/admin/assets/js/snap.svg-min.js
+!public/uploads/files/ommodishamap.svg

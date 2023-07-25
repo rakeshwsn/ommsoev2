@@ -38,6 +38,7 @@ class User
     }
 
     public function assignUserAttr($user){
+        
 
         $user_group_model = new UserGroupModel();
         $user_group = $user_group_model->find($user->user_group_id);
@@ -71,6 +72,7 @@ class User
 		$this->user->fullname=$user->firstname.' '.$user->lastname;
 		$this->user->position=$user_group->name;
 		$this->user->permission=$this->permission;
+        $this->user->agency=$user_group->agency;
 
     }
 

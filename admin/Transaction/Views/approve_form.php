@@ -57,5 +57,5 @@
                 $('[name="remarks"]').removeAttr('required');
             }
         });
-    })
+    });
 </script>

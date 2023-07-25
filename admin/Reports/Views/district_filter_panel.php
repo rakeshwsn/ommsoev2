@@ -39,6 +39,7 @@
                             </td>
                             <?php endif; ?>
                             <td>
+                                
                                 <select class="form-control" id="agency_type_id" name="agency_type_id">
                                     <option value="">All Agency</option>
                                     <?php foreach ($agency_types as $agency_type): ?>

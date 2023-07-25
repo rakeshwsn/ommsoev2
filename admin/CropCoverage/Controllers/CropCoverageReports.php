@@ -8,7 +8,7 @@ use Admin\CropCoverage\Models\PracticesModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 
-class AreaCoverageApproval extends AdminController
+class CropCoverageReports extends AdminController
 {
     private $error = array();
     private $targetModel;
@@ -99,7 +99,7 @@ class AreaCoverageApproval extends AdminController
         $data['heading'] = $crops;
 
 
-        return $this->template->view('Admin\CropCoverage\Views\areacoverageapproval', $data);
+        return $this->template->view('Admin\CropCoverage\Views\cropcoverage_reports', $data);
     }
 }
 ?>
