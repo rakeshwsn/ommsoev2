@@ -140,8 +140,8 @@ class AreaCoverageTarget extends AdminController
 
 			//insert new
 			$data['crop_data'] = $this->request->getPost('crop');
-			printr($data['crop_data']);
-			exit;
+			// printr($data['crop_data']);
+			// exit;
 
 
 			$this->targetModel->addTargets($data, $target_id);
