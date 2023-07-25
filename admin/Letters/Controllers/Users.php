@@ -31,7 +31,7 @@ class Users extends AdminController{
 
 		 $this->session->setFlashdata('message', 'User Saved Successfully.');
 
-			return redirect()->to(site_url('letters/user'));
+			return redirect()->to(admin_url('letters/user'));
 		}
 		$this->getForm();
 	}
@@ -42,7 +42,7 @@ class Users extends AdminController{
 		$this->template->set_meta_title(lang('Letters.heading_title'));
 		
 		if ($this->request->getMethod(1) === 'POST'){	
-			$id=$this->uri->getSegment(4);
+			$id=$this->uri->getSegment(5);
 			$udata=array(
 				'user_name'=>$this->request->getPost('user_name'),
 				'user_email'=>$this->request->getPost('user_email'),
@@ -57,7 +57,7 @@ class Users extends AdminController{
 
 			$this->session->setFlashdata('message', 'User Updated Successfully.');
 		
-			return redirect()->to(site_url('letters/user'));
+			return redirect()->to(admin_url('letters/user'));
 		}
 		$this->getForm();
 	}
@@ -67,13 +67,13 @@ class Users extends AdminController{
 		if ($this->request->getPost('selected')){
 			$selected = $this->request->getPost('selected');
 		}else{
-			$selected = (array) $this->uri->getSegment(4);
+			$selected = (array) $this->uri->getSegment(5);
 		}
 			$this->letteruserModel->deleteLetterUser($selected);
 		
 		
 		$this->session->setFlashdata('message', 'User deleted Successfully.');
-		return redirect()->to(site_url('letters/user'));
+		return redirect()->to(admin_url('letters/user'));
 	}
 	
 	protected function getList() {
@@ -86,9 +86,9 @@ class Users extends AdminController{
 		
 		$this->template->add_package(array('datatable'),true);
 
-		$data['add'] = site_url('letters/user/add');
-		$data['delete'] = site_url('letters/user/delete');
-		$data['datatable_url'] = site_url('letters/user/search');
+		$data['add'] = admin_url('letters/user/add');
+		$data['delete'] = admin_url('letters/user/delete');
+		$data['datatable_url'] = admin_url('letters/user/search');
 
 		$data['heading_title'] = lang('Letters.heading_title');
 		
@@ -133,8 +133,8 @@ class Users extends AdminController{
         foreach($filteredData as $result) {
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-primary" href="'.site_url('letters/user/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
-            $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.site_url('letters/user/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+            $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('letters/user/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
+            $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('letters/user/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
 
             $datatable[]=array(
@@ -158,16 +158,6 @@ class Users extends AdminController{
 								->setJSON($json_data);
 		
 	}
-
-	public function login(){
-	    $id=$this->uri->getSegment(4);
-        $user = $this->userModel->find($id);
-
-        $this->session->set('temp_user',$this->user->getUser());
-        $this->session->set('user',$user);
-        $this->user->assignUserAttr($user);
-        return redirect()->to(base_url('admin'));
-    }
 	
 	protected function getForm(){
 		
@@ -176,7 +166,7 @@ class Users extends AdminController{
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			'text' => lang('Users.heading_title'),
-			'href' => site_url('letters/user')
+			'href' => admin_url('letters/user')
 		);
 		
 
@@ -185,14 +175,14 @@ class Users extends AdminController{
 		$data['text_image'] =lang('Users.text_image');
 		$data['text_none'] = lang('Users.text_none');
 		$data['text_clear'] = lang('Users.text_clear');
-		$data['cancel'] = site_url('letters/user');
+		$data['cancel'] = admin_url('letters/user');
 		
 		if(isset($this->error['warning'])){
 			$data['error'] 	= $this->error['warning'];
 		}
 		
-		if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-			$user_info = $this->letteruserModel->find($this->uri->getSegment(4));
+		if ($this->uri->getSegment(5) && ($this->request->getMethod(true) != 'POST')) {
+			$user_info = $this->letteruserModel->find($this->uri->getSegment(5));
 		}
 		
 		foreach($this->letteruserModel->getFieldNames('letter_users') as $field) {
@@ -215,7 +205,7 @@ class Users extends AdminController{
 	protected function validateForm() {
 		//printr($_POST);
 		$validation =  \Config\Services::validation();
-		$id=$this->uri->getSegment(4);
+		$id=$this->uri->getSegment(5);
 		$regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
 		$regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
 		$regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor 

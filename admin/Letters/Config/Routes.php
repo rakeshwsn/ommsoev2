@@ -5,20 +5,20 @@ if(!isset($routes))
     $routes = \Config\Services::routes(true);
 }
 
-$routes->group('admin/letters', ['namespace' => 'Admin','filter' => 'login'], function($routes)
+$routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
     //added by rakeshnayak
-    $routes->add('user', 'Letters\Controllers\Users::index');
-    $routes->post('user/search','Letters\Controllers\Users::search');
-    $routes->match(['get','post'],'user/add', 'Letters\Controllers\Users::add');
-    $routes->match(['get','post'],'user/edit/(:segment)', 'Letters\Controllers\Users::edit/$1');
-    $routes->get('user/delete/(:segment)',   'Letters\Controllers\Users::delete/$1');
-    $routes->post('user/delete','Letters\Controllers\Users::delete');
+    $routes->add('letters/user', 'Letters\Controllers\Users::index');
+    $routes->post('letters/user/search','Letters\Controllers\Users::search');
+    $routes->match(['get','post'],'letters/user/add', 'Letters\Controllers\Users::add');
+    $routes->match(['get','post'],'letters/user/edit/(:segment)', 'Letters\Controllers\Users::edit/$1');
+    $routes->get('letters/user/delete/(:segment)',   'Letters\Controllers\Users::delete/$1');
+    $routes->post('letters/user/delete','Letters\Controllers\Users::delete');
 
     //added by rakeshsahu
-    $routes->get('/','Letters\Controllers\Letter::index');
-    $routes->get('search','Letters\Controllers\Letter::search');
-    $routes->match(['get','post'],'add', 'Letters\Controllers\Letter::add');
-    $routes->match(['post'],'delete', 'Letters\Controllers\Letter::delete');
+    $routes->get('letters','Letters\Controllers\Letter::index');
+    $routes->get('letters/search','Letters\Controllers\Letter::search');
+    $routes->match(['get','post'],'letters/add', 'Letters\Controllers\Letter::add');
+    $routes->match(['post'],'letters/delete', 'Letters\Controllers\Letter::delete');
 });
     

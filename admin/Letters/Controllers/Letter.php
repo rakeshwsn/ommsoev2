@@ -23,11 +23,11 @@ class Letter extends AdminController{
 		$data['letter_no'] = $this->letterModel->getNewLetterNo();
 		$data['subject'] = '';
 		$data['user_id'] = '';
-		$data['users'] = (new LetteruserModel())->findAll();
+		$data['users'] = (new LetteruserModel())->orderBy('user_name','asc')->findAll();
 
-        $data['datatable_url'] = Url::lettersDatatable;
-        $data['add_url'] = Url::lettersAdd;
-        $data['delete_url'] = Url::lettersDelete;
+        $data['datatable_url'] = admin_url('letters/search');
+        $data['add_url'] = admin_url('letters/add');
+        $data['delete_url'] = admin_url('letters/delete');
         return $this->template->view('Admin\Letters\Views\letter', $data);
 	}
 
