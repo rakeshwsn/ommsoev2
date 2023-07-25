@@ -22,7 +22,7 @@
                     </label>
                 </div>
             </div>
-            <table id="block-coverage" class="table table-bordered table-striped table-vcenter">
+            <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                 <thead>
                     <tr>
                         <th rowspan="2">Block</th>
@@ -41,8 +41,11 @@
                                 <th colspan="<?= count($practices) ?>"><?= $crop; ?></th>
                             <?php endif; ?>
                         <?php endforeach; ?>
+                        <th colspan="7">Follow Up Crops (with out incentive)(in Ha)</th>
                         <th rowspan="2">Total Ragi</th>
                         <th rowspan="2">Total Non-Ragi</th>
+                        <th rowspan="2">Total Follow up Crops</th>
+
                         <th class="text-right no-sort rowspan-2">Actions</th>
                     </tr>
                     <tr>
@@ -53,6 +56,12 @@
                                 </th>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
+                        <?php foreach ($heading as $crop => $practices): ?>
+                            <th>
+                                <?= $crop; ?>
+                            </th>
+                        <?php endforeach; ?>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -93,12 +102,35 @@
                                 <?= $data["KODO_MILLET_LS"]; ?>
                             </td>
                             <td>
+                                <?= $data["RAGI_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["LITTLE_MILLET_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["FOXTAIL_MILLET_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["SORGHUM_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["PEARL_MILLET_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["BARNYARD_MILLET_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
+                                <?= $data["KODO_MILLET_FOLLOWUP"]; ?>
+                            </td>
+                            <td>
                                 <?= $data["RAGI_SMI"] + $data["RAGI_LT"] + $data["RAGI_LS"]; ?>
                             </td>
                             <td>
                                 <?= $data["LITTLE_MILLET_LT"] + $data["LITTLE_MILLET_LS"] + $data["FOXTAIL_MILLET_LS"] + $data["SORGHUM_LS"] + $data["PEARL_MILLET_LS"] + $data["BARNYARD_MILLET_LS"] + $data["KODO_MILLET_LS"]; ?>
                             </td>
-
+                            <td>
+                                <?= $data["RAGI_FOLLOWUP"] + $data["LITTLE_MILLET_FOLLOWUP"] + $data["FOXTAIL_MILLET_FOLLOWUP"] + $data["SORGHUM_FOLLOWUP"] + $data["PEARL_MILLET_FOLLOWUP"] + $data["BARNYARD_MILLET_FOLLOWUP"] + $data["KODO_MILLET_FOLLOWUP"]; ?>
+                            </td>
                             <td>
                                 <div class="btn-group btn-group-sm pull-right">
                                     <a class="btn btn-sm btn-primary"
@@ -106,6 +138,7 @@
                                         title="<?= $button_edit; ?>"><i class="fa fa-pencil"></i></a>
                                 </div>
                             </td>
+
                         </tr>
                     <?php } ?>
                 </tbody>

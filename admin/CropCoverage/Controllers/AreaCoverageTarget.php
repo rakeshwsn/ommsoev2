@@ -69,7 +69,8 @@ class AreaCoverageTarget extends AdminController
 		]);
 
 		$data['practicedata'] = $practicedata;
-		//printr($practicedata);
+		// printr($practicedata);
+		// exit;
 
 		$data['year_id'] = date('Y');
 
@@ -94,15 +95,16 @@ class AreaCoverageTarget extends AdminController
 		}
 
 		$data['heading'] = $crops;
+
 		// printr($crops);
-		// exit;
-
-
+// 		exit;
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
 	public function add()
 	{
 		if ($this->request->getMethod(1) === 'POST') {
+			printr($_POST);
+			exit;
 
 			$data['block_id'] = $this->request->getGet('block_id');
 			$data['crop_data'] = $this->request->getPost('crop');
@@ -119,8 +121,8 @@ class AreaCoverageTarget extends AdminController
 	{
 		if ($this->request->getMethod(1) === 'POST') {
 
-			//printr($_POST);
-			//exit;
+			// printr($_POST);
+			// exit;
 			//delete existing
 			$block_id = $this->request->getGet('block_id');
 			$data['block_id'] = $block_id;
@@ -138,6 +140,8 @@ class AreaCoverageTarget extends AdminController
 
 			//insert new
 			$data['crop_data'] = $this->request->getPost('crop');
+			printr($data['crop_data']);
+			exit;
 
 
 			$this->targetModel->addTargets($data, $target_id);
@@ -176,15 +180,13 @@ class AreaCoverageTarget extends AdminController
 
 		$data['croppractices'] = (new AreaCoverageModel)->getCropPractices();
 
-
 		// Pass the practice data to the view
 		$data['practicedata'] = $this->targetModel->getBlockTargets([
 			'block_id' => $data['block_id'],
 			'season' => getCurrentSeason(),
 			'year_id' => getCurrentYearId()
 		]);
-		//echo "<pre>";
-		//print_r($data['croppractices']);
+
 
 		$output = array();
 		foreach ($data['practicedata'] as $practice) {
@@ -194,8 +196,10 @@ class AreaCoverageTarget extends AdminController
 			if (array_key_exists($crop_id, $data['croppractices'])) {
 				// If the crop_id exists, get the crop values from $crop array
 				$crop_values = $data['croppractices'][$crop_id];
+				// printr($crop_values);
+				// exit;
 				// Define the fields to check
-				$fields = ['smi', 'lt', 'ls'];
+				$fields = ['smi', 'lt', 'ls', 'followup'];
 
 				// Initialize an empty array to store the values for 'smi', 'lt', and 'ls'
 				$values = array();
@@ -210,6 +214,7 @@ class AreaCoverageTarget extends AdminController
 				$practice['smi'] = $values['smi'];
 				$practice['lt'] = $values['lt'];
 				$practice['ls'] = $values['ls'];
+				$practice['followup'] = $values['followup'];
 
 				// Add the updated $practice array to the $output array
 				$output[] = $practice;
