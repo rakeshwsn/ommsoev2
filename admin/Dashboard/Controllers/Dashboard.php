@@ -17,8 +17,6 @@ use App\Controllers\AdminController;
 
 class Dashboard extends AdminController
 {
-
-
 	public function index()
 	{
 		$districtmodel = new DistrictModel();
