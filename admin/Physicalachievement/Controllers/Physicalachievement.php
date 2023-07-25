@@ -2,12 +2,14 @@
 
 namespace Admin\Physicalachievement\Controllers;
 
+use Admin\Common\Models\YearModel;
 use Admin\Permission\Models\PermissionModel;
 use Admin\Physicalcomponents\Models\ComponentPhyModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Physicalcomponentstarget\Models\PcmTargetModel;
 use Admin\Physicalachievement\Models\PhysicalachievementModel;
 use App\Controllers\AdminController;
+use DateTime;
 
 class Physicalachievement extends AdminController
 {
@@ -20,6 +22,7 @@ class Physicalachievement extends AdminController
         $this->physicalcomponents = new ComponentPhyModel();
         $this->pcmTarget = new PcmTargetModel();
         $this->pcmachieve = new PhysicalachievementModel();
+        $this->years = new YearModel();
     }
 
     public function index()
@@ -27,11 +30,20 @@ class Physicalachievement extends AdminController
 
         $data = [];
         $user  = service('user');
-        $data['year_id'] = 2;
+        $data['year_id'] = getCurrentYearId();
+        $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
         $data['get_months'] = getMonths();
         //$data['monthId'] = $this->request->getGet('month_id');
         $currentMonth = date('n') - 1;
         $data['monthId'] =  $currentMonth;
+
+
+        $data['getMonths'] = getMonthById(getMonthIdByMonth($currentMonth));
+        if ($this->request->getGet('month_id')) {
+        $data['getMonths'] = getMonthById(getMonthIdByMonth($this->request->getGet('month_id')));
+        }
+       // printr($getMonths['name']); exit;
+
         if ($this->request->getGet('month_id')) {
             $data['monthId'] = $this->request->getGet('month_id');
         }
@@ -57,13 +69,12 @@ class Physicalachievement extends AdminController
             'month_id' => $data['monthId'],
 
         ];
-        $data['selectedYear'] = 1;
+        $data['selectedYear'] = 2;
         if ($this->request->getGet('year_id')) {
             $data['selectedYear'] = $this->request->getGet('year_id');
         }
-        $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsall();
+        $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsall($filter);
         $this->getTableHeaders($data);
-        //printr($filter); exit;
         $data['results'] = $results = $this->pcmachieve->showTargetAchData($filter);
 
         $data['target_acv_data'] = array();
@@ -74,10 +85,12 @@ class Physicalachievement extends AdminController
                 $targetKey = 'target' . $compos['id'];
                 $uptoAchKey = 'upto_ach' . $compos['id'];
                 $curAchKey = 'cur_ach' . $compos['id'];
+                $totalAchKey = 'tota_ach' . $compos['id'];
 
                 $arraysecond[$targetKey] = isset($result[$targetKey]) ? $result[$targetKey] : 0;
-                $arraysecond[$uptoAchKey] = isset($result[$uptoAchKey]) ? $result[$uptoAchKey] : 0;
                 $arraysecond[$curAchKey] = isset($result[$curAchKey]) ? $result[$curAchKey] : 0;
+                $arraysecond[$uptoAchKey] = isset($result[$uptoAchKey]) ? $result[$uptoAchKey] : 0;
+                $arraysecond[$totalAchKey] = $result[$curAchKey] + $result[$uptoAchKey];
             }
 
             $data['target_acv_data'][] = array(
@@ -88,7 +101,6 @@ class Physicalachievement extends AdminController
             );
         }
         // printr($data['target_acv_data']);
-        // exit;
         return $this->template->view('Admin\Physicalachievement\Views\componentachievedata', $data);
     }
 
@@ -110,8 +122,6 @@ class Physicalachievement extends AdminController
         $this->template->set_meta_title('Physical Components Physicalcomponentachievement');
 
         if ($this->request->getMethod(1) === 'POST') {
-            // printr($this->request->getPost());
-            // exit;
             $this->pcmachieve->addPhysicalachData($this->request->getPost());
             $this->session->setFlashdata('message', 'Physical Targets added Successfully.');
 
@@ -176,14 +186,12 @@ class Physicalachievement extends AdminController
         $data['components'] = $this->physicalcomponents->getComponents();
         $districtModel = new DistrictModel();
         $data['districts_main'] = $districtModel->getAll();
+        $data['editYear'] = '';
+        $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             // $data['main_master'] =$components_info = $this->pcmTarget->getTargetcomponent($this->uri->getSegment(4));
 
         }
-
-        // printr($data);
-        //  exit;
-
         echo $this->template->view('Admin\Physicalachievement\Views\componentacvievedataForm', $data);
     }
 
@@ -199,7 +207,7 @@ class Physicalachievement extends AdminController
         $monthId = $_POST['month_id'];
         $monthName = $_POST['month_name'];
         $yearName = $_POST['year_name'];
-        $currentYearId = 1;
+        $currentYearId = getCurrentYearId();
 
         $filter = [
             'year_id' => $yearId,
@@ -209,9 +217,9 @@ class Physicalachievement extends AdminController
         ];
         $currentYearStartMonth = 4;
         $currentMonth = date('n');
-        $currentYear = 1;
+        $currentYear = getCurrentYearId();
 
-
+        $futureYear = $currentYear + 1 ;
         $nextYearAprilMonth = 4;
 
         $checkExistsmonthData = $this->pcmachieve->showGetExsistsMonthData($filter);
@@ -222,10 +230,13 @@ class Physicalachievement extends AdminController
         //     echo '<h3 style="text-align: center; margin-top: 20px;">Fill-up month date should be from 1 to 5.</h3>';
         //     exit;
         // }
-        if($currentYearId != $yearId){
-            echo '<h3 style="text-align: center; margin-top: 20px;">Selected year not valid.</h3>';
+
+
+        if ($yearId > $currentYear) {
+            echo '<h3 style="text-align: center; margin-top: 20px;">Selected year is not allowed.</h3>';
             exit;
-        } else {
+
+        }
         if (!empty($usercheck)) {
             if (!empty($checkExistsmonthData) && $checkExistsmonthData->month_id == $monthId) {
                 echo '<h3 style="text-align: center; margin-top: 20px;">Selected month already Has Data.</h3>';
@@ -245,15 +256,14 @@ class Physicalachievement extends AdminController
             }
         }
         $checkExistsData = $this->pcmTarget->showGetExsistsData($filter);
-        // printr($checkExistsData); exit;
         $components = $this->physicalcomponents->getComponents();
         $componentsData = $this->pcmachieve->getComponentsAllData($filter);
         // printr($componentsData); exit;
         $tableHeaderHtml = '<thead><tr>
                         <th>Components</th>
-                        <th>Target for '. $yearName .'</th>
+                        <th>Target for ' . $yearName . '</th>
                         <th>UP To This Month</th>
-                        <th>'. $monthName .'</th>
+                        <th>' . $monthName . '</th>
                         <th>Cumulative</th>
                     </tr></thead>';
         $tableBodyHtml = '';
@@ -271,9 +281,7 @@ class Physicalachievement extends AdminController
         }
         $tableBodyHtml .= '<tr class="text-right"><td colspan="5"><button id="submitButton" class="btn btn-alt-primary">Submit</button></td></tr>';
         $tableBodyHtmlfinal = $tableHeaderHtml . '<tbody>' . $tableBodyHtml . '</tbody>';
-        // Echo the updated table body HTML
         echo $tableBodyHtmlfinal;
-    }
     }
 }
 /* End of file hmvc.php */

@@ -93,11 +93,21 @@ class ComponentPhyModel extends Model
                 $target_data = array(
                     "componentid" => $componentsdatas['componentid'],
                     "description" => $componentsdatas['description'],
-                    "year_id" => 1,
+                    "year_id" => $data['year_id'],
                 );
                 $this->db->table("mpr_components")->insert($target_data);
             }
         }
+    }
+
+    public function getAllComponentData($data = []){
+        $sql = "SELECT * FROM mpr_components";
+        if (!empty($data['year_id'])) {
+            $sql .= " WHERE year_id <= {$data['year_id']}";
+        }
+
+        $sql .= " ORDER BY id ASC";
+        return $this->db->query($sql)->getResultArray();
     }
 
     public function updateComponentData($id, $data)
@@ -126,7 +136,6 @@ class ComponentPhyModel extends Model
 
     private function filter($builder, $data)
     {
-
         if (!empty($data['filter_search'])) {
             $builder->where(
                 "
@@ -141,7 +150,6 @@ class ComponentPhyModel extends Model
         $builder->whereIn("id", $selected)->delete();
     }
 
-
     public function getComponentsSearch($data = array())
     {
 
@@ -155,14 +163,10 @@ class ComponentPhyModel extends Model
 
     private function filtercomponent($builder, $data)
     {
-
-        if (!empty($data)) {
+         if (!empty($data)) {
             $builder->where('soe_components.description LIKE', "%{$data}%");
         }
     }
-
-
-
 
     public function getComponents()
     {

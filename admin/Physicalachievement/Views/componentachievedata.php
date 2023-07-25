@@ -13,9 +13,9 @@ $user  = service('user');
                     <div class="col-md-3">
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id">
-                            <option value="">select</option>
-                            <option value="2" selected>2023-24</option>
-                            <!-- <option value="2">2024-25</option> -->
+                        <?php foreach($allYears as $allYear){?>
+                                <option value="<?php echo $allYear->id;?>" <?php if ($year_id == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name;?></option>
+                                <?php } ?>
                         </select>
                     </div>
 
@@ -24,7 +24,7 @@ $user  = service('user');
                         <select class="form-control" id="month_id" name="month_id">
                             <option value="">select</option>
                             <?php foreach ($get_months as $get_month) { ?>
-                                <option value="<?= $get_month['number'] ?>" <?php if (date('n') - 1 == $get_month['number']) echo 'selected'; ?>>
+                                <option value="<?= $get_month['number'] ?>" <?php if ($monthId == $get_month['number']) echo 'selected'; ?>>
                                     <?= $get_month['name'] ?>
                                 </option>
                             <?php } ?>
@@ -48,11 +48,12 @@ $user  = service('user');
             <?php if (!$user->district_id) { ?>
                 <button id="btnExport"><i class="fa fa-download" aria-hidden="true"></i>
                 </button>
+                <?php } ?>
                 <div class="block-options float-right">
                     <a href="<?php echo $addach; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
                 </div>
 
-            <?php } ?>
+
         </div>
 
         <div class="block-content block-content-full" style="overflow-y: scroll;">
@@ -71,7 +72,7 @@ $user  = service('user');
                 </tr>
                 <tr>
                     <td colspan=4 height="46"><b>
-                            <font face="Arial" size=3 color="#000000">Month- May-2023
+                            <font face="Arial" size=3 color="#000000">Month- <?php echo $getMonths['name'] ?>-2023
                         </b></td>
 
                 </tr>
@@ -85,16 +86,10 @@ $user  = service('user');
                     <td height="35" align="left" valign=middle><b>SN</b></td>
                     <td align="left" valign=middle><b>Name of the District</b></td>
                     <td align="left" valign=middle><b>No. of Blocks</b></td>
-                    <td><b>Physical Target</b></td>
-                    <td colspan=2><b>Ach.<br></b></td>
-                    <td><b>Physical Target</b></td>
-                    <td colspan=2><b>Ach.<br></b></td>
-                    <td><b>Physical Target</b></td>
-                    <td colspan=2><b>Ach.<br></b></td>
-                    <td><b>Physical Target</b></td>
-                    <td colspan=2><b>Ach.<br></b></td>
-                    <td><b>Physical Target</b></td>
-                    <td colspan=2><b>Ach.<br></b></td>
+                    <?php foreach ($componentsAll as $componentsAlls) { ?>
+                        <td><b>Physical Target</b></td>
+                        <td colspan=><b>Ach.<br></b></td>
+                    <?php } ?>
                 </tr>
                 <tr>
                     <td height="19"><b><br></b></td>
@@ -102,8 +97,10 @@ $user  = service('user');
                     <td><b><br></b></td>
                     <td><b><br></b></td>
                     <?php foreach ($componentsAll as $componentsAlls) { ?>
+                        <td sdval="45069" sdnum="1033;0;MMMM-D"><b><?php echo $getMonths['name'] ?></b></td>
+                        <td sdval="45039" sdnum="1033;0;MMMM-D"><b>Up to</b></td>
                         <td sdval="45039" sdnum="1033;0;MMMM-D"><b>Cumulative</b></td>
-                        <td sdval="45069" sdnum="1033;0;MMMM-D"><b>May-23</b></td>
+
                         <td><b><br></b></td>
                     <?php } ?>
 
@@ -122,10 +119,6 @@ $user  = service('user');
                         <?php } ?>
                     </tr>
                 <?php } ?>
-                <?php
-                // printr(array_map(null, ...array_column($target_acv_data, 'arraysecond')));
-                //exit;
-                ?>
                 <tr>
                     <td colspan="2" height="21"><b>Total</b></td>
                     <td sdval="<?php echo array_sum(array_column($target_acv_data, 'total_block')); ?>" sdnum="1033;"><b><?php echo array_sum(array_column($target_acv_data, 'total_block')); ?></b></td>

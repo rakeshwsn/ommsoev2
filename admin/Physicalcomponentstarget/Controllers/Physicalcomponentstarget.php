@@ -6,6 +6,7 @@ use Admin\Permission\Models\PermissionModel;
 use Admin\Physicalcomponents\Models\ComponentPhyModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Physicalcomponentstarget\Models\PcmTargetModel;
+use Admin\Common\Models\YearModel;
 use App\Controllers\AdminController;
 
 class Physicalcomponentstarget extends AdminController
@@ -18,15 +19,15 @@ class Physicalcomponentstarget extends AdminController
     {
         $this->physicalcomponents = new ComponentPhyModel();
         $this->pcmTarget = new PcmTargetModel();
+        $this->years = new YearModel();
     }
 
     public function index()
     {
         $data = [];
         $user  = service('user');
-        // echo $user->district_id; exit;
-        $data['year_id'] = 1;
-
+        $data['year_id'] = getCurrentYearId();
+        $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
         // $data['year_id'] = '';
         if ($this->request->getGet('year_id')) {
             $data['year_id'] = $this->request->getGet('year_id');
@@ -36,7 +37,6 @@ class Physicalcomponentstarget extends AdminController
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
-        // fetch data for form dropdown
         $data['years'] = getAllYears();
         $districtModel = new DistrictModel();
         $data['districts_main'] = $districtModel->getAll();
@@ -55,7 +55,8 @@ class Physicalcomponentstarget extends AdminController
         }
 
         $data['checkExists'] = $this->pcmTarget->showCheckExistsData($filter);
-        $data['componentsAll'] = $this->physicalcomponents->getAll();
+        $data['componentsAll'] = $this->physicalcomponents->getAllComponentData($filter);
+        //printr($data['componentsAll']); exit;
         $this->getTableHeaders($data);
         $results = $this->pcmTarget->showTargetComponents($filter);
         // printr($results); exit;
@@ -69,8 +70,6 @@ class Physicalcomponentstarget extends AdminController
             ];
         }
 
-        //printr($data['target_data']); exit;
-
         return $this->template->view('Admin\Physicalcomponentstarget\Views\componenttargetdata', $data);
     }
 
@@ -83,17 +82,14 @@ class Physicalcomponentstarget extends AdminController
                 $headers[] = $components_name;
             }
         }
+        $headers[] = 'Total';
         $data['headers'] = $headers;
     }
 
     public function add()
     {
-
         $this->template->set_meta_title('Physical Components Target');
-
         if ($this->request->getMethod(1) === 'POST') {
-            // printr($this->request->getPost());
-            // exit;
             $this->pcmTarget->addPhysicaltargetdata($this->request->getPost());
             $this->session->setFlashdata('message', 'Physical Targets added Successfully.');
 
@@ -104,16 +100,11 @@ class Physicalcomponentstarget extends AdminController
 
     public function edit()
     {
-
         $this->template->set_meta_title('Components');
 
         if ($this->request->getMethod(1) === 'POST') {
-            // $id = $this->uri->getSegment(4);
-            // printr($this->request->getPost());
-            // exit;
             $this->pcmTarget->updateMasterData($this->request->getPost());
             $this->session->setFlashdata('message', 'Physicalcomponents Updated Successfully.');
-
             return redirect()->to(base_url('admin/physicalcomponentstarget'));
         }
         $this->getForm();
@@ -152,23 +143,70 @@ class Physicalcomponentstarget extends AdminController
 
         if (isset($this->error['warning'])) {
             $data['error']     = $this->error['warning'];
+        };
+        $filter = [
+            'year_id' => 2,
+        ];
+
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
         }
-        $data['components'] = $this->physicalcomponents->getComponents();
+        $data['components'] = $this->physicalcomponents->getAllComponentData($filter);
         $districtModel = new DistrictModel();
         $data['districts_main'] = $districtModel->getAll();
         $data['main_master'] = [];
+        $data['editYear'] = '';
+        $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-            $data['main_master'] = $components_info = $this->pcmTarget->getTargetcomponent();
+            $masterInfo =  $this->pcmTarget->find($this->uri->getSegment(4));
+
+            $data['editYear'] = $masterInfo->year_id;
+
+            //printr($data['editYear']); exit;
         }
-
-        // printr($data['main_master']);mprcomponents_master_id
-        //  exit;
-
         echo $this->template->view('Admin\Physicalcomponentstarget\Views\componenttargetdataForm', $data);
     }
 
 
+    public function searchtargetdata()
+    {
+        $yearId = $_POST['year_id'];
+        $filter = [
+            'year_id' => $yearId,
+        ];
 
+        $components = $this->physicalcomponents->getAllComponentData($filter);
+        $districtModel = new DistrictModel();
+        $districts_main = $districtModel->getAll();
+        $main_master  = $this->pcmTarget->getTargetcomponent($filter);
+        // printr($main_master); exit;
+        $tableHeaderHtml = '<thead><tr>
+        <td>District</td>';
+        foreach ($components as $component) {
+            $tableHeaderHtml .= '<td height="101">' . $component['description'] . '</td>';
+        }
+        $tableHeaderHtml .= '<td height="101">Total</td></tr></thead>';
+        $tableBodyHtml = '';
+        foreach ($districts_main as $districts_mains) {
+            $tableBodyHtml .= '<tr>';
+            $tableBodyHtml .= '<td>' . $districts_mains->name . '</td>';
+            foreach ($components as $component) {
+                $value = '';
+                foreach ($main_master as $item) {
+                    if ($item['district_id'] == $districts_mains->id && $item['mc_id'] == $component['id']) {
+                        $value = $item['total'];
+                        break;
+                    }
+                }
+                $tableBodyHtml .= '<td><input type="number" name="component[' . $districts_mains->id . '][' . $component['id'] . ']" class="crop-input form-control" oninput="calculateTotals()" value="' . $value . '"></td>';
+            }
+            $tableBodyHtml .= '<td><span class="total-value"></span></td>';
+            $tableBodyHtml .= '</tr>';
+        }
+        $tableBodyHtml .= '<tr class="text-right"><td colspan="' . (count($components) + 1) . '"><button id="submitButton" class="btn btn-alt-primary">Submit</button></td></tr>';
+        $tableBodyHtmlfinal = $tableHeaderHtml . '<tbody>' . $tableBodyHtml . '</tbody>';
+        echo $tableBodyHtmlfinal;
+    }
 
 
     protected function validateForm()
