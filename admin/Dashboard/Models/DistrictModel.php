@@ -1,18 +1,17 @@
 <?php
-namespace Admin\CropCoverage\Models;
-
+namespace Admin\Dashboard\Models;
 use CodeIgniter\Model;
 
-class CropsModel extends Model
+class DistrictModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'ac_crops';
+	protected $table                = 'soe_districts';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
 	protected $returnType           = 'object';
-	protected $useSoftDelete        = false;
-	protected $protectFields        = true;
+	protected $useSoftDeletes       = false;
+	protected $protectFields        = false;
 	protected $allowedFields        = [];
 
 	// Dates
@@ -38,29 +37,10 @@ class CropsModel extends Model
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
+	protected $bulider;
+	
 
-	public function AddCrops($data) {
-    
-    $cropsdata=array(
-        "crops"=>$data['crops'],
-     
-    );
-    $this->db->table('ac_crops')->insert($cropsdata);
-}
-    public function GetCrops() {
-        $builder = $this->db->table('ac_crops');
-        $crops   = $builder->get()->getResult();
+	
 
-        $season_data = [];
-        foreach($crops as $crop){
-            $season_data[] = [
-            	'id'=> $crop->id,
-            	'crops' => $crop->crops,
-            ];
-        }
-       return $season_data;
-    
-    }	
 	
 }
-?>

@@ -21,7 +21,10 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function (
     $routes->add('reports/abstractmpr','Reports\Controllers\Mpr::abstractMpr');
     $routes->add('reports/abstractmpr/download','Reports\Controllers\Mpr::abstractMpr/download');
     $routes->get('reports/mprtest','Reports\Controllers\Mpr::mprtest');
+    $routes->get('reports/mprtestfinal','Reports\Controllers\Mpr::mprtestfinal');
     $routes->get('reports/oldmpr','Reports\Controllers\Oldmpr::index');
+
+    $routes->get('reports/areacoverage','Reports\Controllers\AreaCoverage::index');
 
 });
 
