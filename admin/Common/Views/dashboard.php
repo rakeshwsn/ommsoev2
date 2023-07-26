@@ -1,4 +1,3 @@
-
 <div class="content">
 
 </div>
@@ -10,6 +9,3 @@
 
 </script>
 <?php js_end(); ?>
-
-
-                
