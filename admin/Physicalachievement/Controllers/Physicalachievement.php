@@ -73,6 +73,7 @@ class Physicalachievement extends AdminController
         if ($this->request->getGet('year_id')) {
             $data['selectedYear'] = $this->request->getGet('year_id');
         }
+        $data['checkExists'] = $this->pcmTarget->showCheckExistsData($filter);
         $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsall($filter);
         $this->getTableHeaders($data);
         $data['results'] = $results = $this->pcmachieve->showTargetAchData($filter);
@@ -88,8 +89,8 @@ class Physicalachievement extends AdminController
                 $totalAchKey = 'tota_ach' . $compos['id'];
 
                 $arraysecond[$targetKey] = isset($result[$targetKey]) ? $result[$targetKey] : 0;
-                $arraysecond[$curAchKey] = isset($result[$curAchKey]) ? $result[$curAchKey] : 0;
                 $arraysecond[$uptoAchKey] = isset($result[$uptoAchKey]) ? $result[$uptoAchKey] : 0;
+                $arraysecond[$curAchKey] = isset($result[$curAchKey]) ? $result[$curAchKey] : 0;
                 $arraysecond[$totalAchKey] = $result[$curAchKey] + $result[$uptoAchKey];
             }
 
@@ -100,7 +101,7 @@ class Physicalachievement extends AdminController
                 'arraysecond' => $arraysecond,
             );
         }
-        // printr($data['target_acv_data']);
+         //printr($data['target_acv_data']); exit;
         return $this->template->view('Admin\Physicalachievement\Views\componentachievedata', $data);
     }
 
