@@ -389,6 +389,50 @@ class Leftbar extends AdminController{
             );
         }
 
+
+        $mprcomponent = array();
+
+        if ($this->user->hasPermission('physicalcomponents')) {
+            $mprcomponent[] = array(
+                'name' => 'Physical Component',
+                'href' => admin_url('physicalcomponents'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        
+		if ($this->user->hasPermission('physicalcomponentstarget')) {
+            $mprcomponent[] = array(
+                'name' => 'MPR Target',
+                'href' => admin_url('physicalcomponentstarget'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('physicalachievement')) {
+            $mprcomponent[] = array(
+                'name' => 'MPR Achievements',
+                'href' => admin_url('physicalachievement'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+      
+		if ($mprcomponent) {
+            $data['menus'][] = array(
+                'id' => 'menu-mprcomponent',
+                'icon' => 'md-account-child',
+                'name' => 'MPR Components',
+                'heading' => 0,
+                'href' => '',
+                'children' => $mprcomponent
+            );
+        }
+
+
+        
+
         if ($this->user->hasPermission('letter')) {
             $data['menus'][] = array(
                 'id' => 'menu-letter',
@@ -484,10 +528,10 @@ class Leftbar extends AdminController{
 			);	
 		}
 
-        if ($this->user->hasPermission('permissions')) {
+        if ($this->user->hasPermission('permission')) {
             $user[] = array(
                 'name'	  => lang('Leftbar.text_permission'),
-                'href'     => admin_url('permissions'),
+                'href'     => admin_url('permission'),
                 'children' => array()
             );
         }

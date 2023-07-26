@@ -28,12 +28,12 @@ class Header extends AdminController
 		$data['name']=$this->user->getFirstName();
 		if($this->user->isLogged()){
 			$leftbar = new Leftbar(); // Create an instance
-			$data['menu']=$leftbar->index();
-            /*$menu = new \App\Libraries\Menu(); // Create an instance
+			//$data['menu']=$leftbar->index();
+            $menu = new \App\Libraries\Menu(); // Create an instance
             $data['menu']=$menu->nav_menu([
                 'theme_location'=>'admin',
                 'menu_class'     => 'nav-main'
-            ]);*/
+            ]);
 		}
 
 

@@ -119,7 +119,7 @@ class Usergroup extends AdminController {
         foreach($filteredData as $result) {
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-info" href="'.admin_url('permission/assign/'.$result->id).'"><i class="fa fa-list-alt"></i></a>';
+            $action .= 		'<a class="btn btn-sm btn-info" href="'.admin_url('usergroup/permission/'.$result->id).'"><i class="fa fa-list-alt"></i></a>';
             $action .= 		'<a class="btn btn-sm btn-primary" href="'.admin_url('usergroup/edit/'.$result->id).'"><i class="fa fa-pencil"></i></a>';
             $action .=		'<a class="btn-sm btn btn-danger btn-remove" href="'.admin_url('usergroup/delete/'.$result->id).'" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
