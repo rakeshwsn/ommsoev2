@@ -98,22 +98,7 @@ class UserGroupModel extends Model
         }
     }
 
-    public function addUserGroupPermission($id,$data){
-        $builder=$this->db->table("user_group_permission");
-        $builder->where("user_group_id",$id);
-        $builder->delete();
-
-        if (isset($data)) {
-            foreach ($data as $key => $value) {
-                $array = array(
-                    'permission_id'=>$value,
-                    'user_group_id'=>$id
-                );
-                $builder->insert($array);
-            }
-        }
-        return "success";
-    }
+   
 
     public function getBlockUsers() {
         $this->settings = new \Config\Settings();
