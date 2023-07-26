@@ -460,13 +460,14 @@ class AreaCoverage extends AdminController
                     $_areas[$practice] = $this->request->getPost('area')[$crop_id][$practice];
                 }
                 $areas[] = $_areas;
+
             }
 
             $this->areacoveragemodel->deleteArea($cc_id);
             $this->areacoveragemodel->addArea($areas);
 
             //follow up crops
-
+/*
             $crops = (new CropsModel())->findAll();
             $fCrop = [];
             foreach ($crops as $crop) {
@@ -478,7 +479,7 @@ class AreaCoverage extends AdminController
             }
             $this->areacoveragemodel->deleteFupCrops($cc_id);
             $this->areacoveragemodel->addFupCrops($fCrop);
-
+*/
             return redirect()->to(admin_url('areacoverage'))->with('message','Area coverage data updated.');
         }
 
@@ -515,7 +516,7 @@ class AreaCoverage extends AdminController
         $data['nursery_info'] = $this->areacoveragemodel->getNursery($cc_id);
 
         $data['crops'] = [];
-        $smi = $lt = $ls = 0;
+        $smi = $lt = $ls = $followup = 0;
         foreach ($cropPrtcArea as $area) {
             $practices = [];
             foreach ($cropPrtcArea as $p) {
@@ -533,20 +534,18 @@ class AreaCoverage extends AdminController
                 'practices' => $practices,
             ];
         }
+
         $practices = [];
+        $_practices = ['smi','lt','ls','followup'];
         foreach ($cropPrtcArea as $area) {
-            if(strtolower($area['practice'])=='smi'){
-                $smi += $area['area'];
-            }
-            if(strtolower($area['practice'])=='lt'){
-                $lt += $area['area'];
-            }
-            if(strtolower($area['practice'])=='ls'){
-                $ls += $area['area'];
+            foreach ($_practices as $_practice) {
+                if(strtolower($area['practice'])==$_practice){
+                    $$_practice += $area['area'];
+                }
             }
         }
         //cacl total
-        foreach (['smi','lt','ls'] as $practice){
+        foreach ($_practices as $practice){
             $practices[$practice] = [
                 'area' => $$practice,
                 'status' => 0
@@ -557,15 +556,7 @@ class AreaCoverage extends AdminController
             'crop_id' => 0,
             'practices' => $practices,
         ];
-
-        //fup
-        $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
-        $area = 0;
-        foreach ($data['fups'] as $fup) {
-            $area += $fup['area'];
-        }
-
-        $data['fups_total'] = $area;
+        $data['practices'] = $_practices;
 
         if($return_data){
             return $data;

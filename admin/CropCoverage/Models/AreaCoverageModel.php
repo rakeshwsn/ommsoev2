@@ -303,19 +303,19 @@ AS
       ac.crops,
       aap.smi,
       lt,
-      ls
+      ls,
+      follow_up
     FROM ac_area_practices aap
       LEFT JOIN ac_crops ac
         ON aap.crop_id = ac.id
     WHERE aap.crop_coverage_id = $crop_coverage_id)
-
 SELECT
   t1.crop_id,
   t1.crop,
   t1.practice_id,
   t1.practice,
   t1.status,
-  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls ELSE 0.0 END AS area
+  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls WHEN 4 THEN t3.follow_up ELSE 0.0 END AS area
 FROM crop_practice AS t1
   JOIN practice_area AS t2
     ON t1.crop_id = t2.crop_id

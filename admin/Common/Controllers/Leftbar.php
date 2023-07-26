@@ -377,9 +377,6 @@ class Leftbar extends AdminController{
                 'children' => array()
             );
         }
-
-        
-
       
 		if ($areacoverage) {
             $data['menus'][] = array(

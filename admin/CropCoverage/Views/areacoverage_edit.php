@@ -73,6 +73,7 @@
                     <tr>
                         <th rowspan="2">Crop</th>
                         <th colspan="3">Practice</th>
+                        <th rowspan="2">Follow Up</th>
                     </tr>
                     <tr>
                         <th>SMI</th>
@@ -93,32 +94,6 @@
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
-                </table>
-                <table class="table custom-table " id="fuc-table">
-                    <thead>
-                    <tr>
-                        <th>Follow Up Crop</th>
-                        <th>Area</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($fups as $fup) { ?>
-                    <tr>
-                        <td>
-                            <?php echo $fup['crop'] ?>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control financial" name="fup[<?=$fup['crop_id']?>]" value="<?php echo $fup['area'] ?>">
-                        </td>
-                    </tr>
-                    <?php } ?>
-                    </tbody>
-                    <tfoot>
-                    <tr>
-                        <td>Total</td>
-                        <td id="total-fup"><?=$fups_total?></td>
-                    </tr>
-                    </tfoot>
                 </table>
             </div>
             <?php if($show_form): ?>
@@ -153,7 +128,7 @@
             }
         });
 
-        $.each(['smi','lt','ls'],function (i,v) {
+        $.each(<?=json_encode($practices)?>,function (i,v) {
             $('[name$="['+v+']').keyup(function (e) {
                 var tot=0;
                 $('[name$="['+v+']"]').each(function (i,element) {
@@ -164,14 +139,6 @@
                 });
                 $('[name$="area[0]['+v+']"]').val(tot);
             });
-        });
-
-        $('[name^="fup"]').keyup(function (e) {
-            var tot=0;
-            $('[name^="fup"]').each(function (i,element) {
-                tot += parseFloat($(element).val() || 0);
-            });
-            $('#total-fup').text(tot);
         });
     });
     //rakesh
