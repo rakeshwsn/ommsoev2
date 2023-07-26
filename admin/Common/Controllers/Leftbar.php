@@ -22,206 +22,401 @@ class Leftbar extends AdminController{
 			'children' => array()
 		);
 		
-		
-		// Pages
-		$pages = array();
-		
-		if ($this->user->hasPermission('access', 'pages/index')) {
-			$pages[] = array(
-				'name'	  => lang('Leftbar.text_list_page'),
-				'href'     => admin_url('pages'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($this->user->hasPermission('access', 'pages/add')) {
-			$pages[] = array(
-				'name'	  => lang('Leftbar.text_add_page'),
-				'href'     => admin_url('pages/add'),
-				'children' => array()		
-			);	
-		}
-		
-		
-		if ($pages) {
-			$data['menus'][] = array(
-				'id'       => 'menu-pages',
-				'icon'	   => 'md-pages', 
-				'name'	   => lang('Leftbar.text_page'),
-				'href'     => '',
-				'children' => $pages
-			);
-		}
-		
-		
-		// Pages
-		/*$posts = array();
-		
-		if ($this->user->hasPermission('access', 'posts/index')) {
-			$posts[] = array(
-				'name'	  => lang('Leftbar.text_list_post'),
-				'href'     => admin_url('posts'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($this->user->hasPermission('access', 'posts/add')) {
-			$posts[] = array(
-				'name'	  => lang('Leftbar.text_add_post'),
-				'href'     => admin_url('posts/add'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($this->user->hasPermission('access', 'posts/category/index')) {
-			$posts[] = array(
-				'name'	  => lang('Leftbar.text_category'),
-				'href'     => admin_url('posts/category'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($this->user->hasPermission('access', 'posts/tag/index')) {
-			$posts[] = array(
-				'name'	  => lang('Leftbar.text_tag'),
-				'href'     => admin_url('posts/tag'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($this->user->hasPermission('access', 'posts/comment/index')) {
-			$posts[] = array(
-				'name'	  => lang('Leftbar.text_comment'),
-				'href'     => admin_url('posts/comment'),
-				'children' => array()		
-			);	
-		}
-		
-		if ($posts) {
-			$data['menus'][] = array(
-				'id'       => 'menu-posts',
-				'icon'	   => 'md-pages', 
-				'name'	   => lang('Leftbar.text_post'),
-				'href'     => '',
-				'children' => $posts
-			);
-		}*/
+		$data['menus'][] = array(
+            'id'       => 'menu-navigation',
+            'icon'	  => '',
+            'name'	  => lang('Leftbar.text_soe'),
+            'heading' => 1,
+            'children'=> array()
+        );
 
-        // Forms
-        $forms = array();
 
-        if ($this->user->hasPermission('access', 'household/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_household'),
-                'href'     => admin_url('household'),
+		// Component
+        $components = array();
+
+        if ($this->user->hasPermission('component')) {
+            $components[] = array(
+                'name' => lang('Leftbar.text_component'),
+                'href' => admin_url('components'),
+                'heading' => 0,
                 'children' => array()
             );
         }
-
-        if ($this->user->hasPermission('access', 'aggriculture/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_aggriculture'),
-                'href'     => admin_url('aggriculture'),
+        if ($this->user->hasPermission('component/assign')) {
+            $components[] = array(
+                'name' => lang('Leftbar.text_component_assign'),
+                'href' => admin_url('components/assign'),
+                'heading' => 0,
                 'children' => array()
             );
         }
-
-        if ($this->user->hasPermission('access', 'horticulture/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_horticulture'),
-                'href'     => admin_url('horticulture'),
+        if ($this->user->hasPermission('component/agencyassign')) {
+            $components[] = array(
+                'name' => lang('Leftbar.text_component_agency_assign'),
+                'href' => admin_url('component/agencyassign'),
+                'heading' => 0,
                 'children' => array()
             );
         }
+       
 
-
-        if ($this->user->hasPermission('access', 'livestock/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_livestock'),
-                'href'     => admin_url('livestock'),
-                'children' => array()
-            );
-        }
-
-        if ($this->user->hasPermission('access', 'fishery/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_fishery'),
-                'href'     => admin_url('fishery'),
-                'children' => array()
-            );
-        }
-
-		if ($this->user->hasPermission('access', 'institution/index')) {
-            $forms[] = array(
-                'name'	  => lang('Leftbar.text_institution'),
-                'href'     => admin_url('institution'),
-                'children' => array()
-            );
-        }
-
-        if ($forms) {
+        if ($components) {
             $data['menus'][] = array(
-                'id'       => 'menu-forms',
-                'icon'	   => 'md-forms',
-                'name'	   => lang('Leftbar.text_form'),
-                'href'     => '',
-                'children' => $forms
+                'id' => 'menu-component',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_components'),
+                'heading' => 0,
+                'href' => '',
+                'children' => $components
             );
         }
 
-        // Banners
-        $banner = array();
+		$budgets = array();
 
-        if ($this->user->hasPermission('access', 'banner/index')) {
-            $banner[] = array(
-                'name'	  => lang('Leftbar.text_all_banner'),
-                'href'     => admin_url('banner'),
+        if ($this->user->hasPermission('budgets')) {
+            $budgets[] = array(
+                'name' => lang('Leftbar.text_budget'),
+                'href' => admin_url('budgets'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        
+		if ($this->user->hasPermission('budgets/approval')) {
+            $budgets[] = array(
+                'name' => lang('Leftbar.text_budgets_approval'),
+                'href' => admin_url('budgets/approval'),
+                'heading' => 0,
                 'children' => array()
             );
         }
 
-
-        if ($this->user->hasPermission('access', 'banner/add')) {
-            $banner[] = array(
-                'name'	  => lang('Leftbar.text_add_banner'),
-                'href'     => admin_url('banner/add'),
-                'children' => array()
-            );
-        }
-
-
-        if ($banner) {
+      
+		if ($budgets) {
             $data['menus'][] = array(
-                'id'       => 'menu-banner',
-                'icon'	   => 'md-account-child',
-                'name'	   => lang('Leftbar.text_banner'),
-                'href'     => '',
-                'children' => $banner
+                'id' => 'menu-budgets',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_budgets'),
+                'heading' => 0,
+                'href' => '',
+                'children' => $budgets
             );
         }
 
-        // Dashboard
-        $data['menus'][] = array(
-            'id'       => 'menu-menu',
-            'icon'	  => 'md-menu',
-            'name'	  => lang('Leftbar.text_menu'),
-            'href'     => admin_url('menu'),
-            'children' => array()
+		if ($this->user->hasPermission('transaction')) {
+            $data['menus'][] = array(
+                'id' => 'menu-transaction',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_transactions'),
+                'heading' => 0,
+                'href' => admin_url('transaction'),
+                'children' =>[]
+            );
+        }
+
+		if ($this->user->hasPermission('otherreceipt')) {
+            $data['menus'][] = array(
+                'id' => 'menu-otherreceipt',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_otherreceipt'),
+                'heading' => 0,
+                'href' => admin_url('otherreceipt'),
+                'children' =>[]
+            );
+        }
+
+		if ($this->user->hasPermission('refundtoatma')) {
+            $data['menus'][] = array(
+                'id' => 'menu-refundtoatma',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_refundatma'),
+                'heading' => 0,
+                'href' => admin_url('refundtoatma'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('closingbalance')) {
+            $data['menus'][] = array(
+                'id' => 'menu-closingbalance',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_closingbalance'),
+                'heading' => 0,
+                'href' => admin_url('closingbalance'),
+                'children' =>[]
+            );
+        }
+
+		if ($this->user->hasPermission('approve')) {
+            $data['menus'][] = array(
+                'id' => 'menu-approve',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_soe_approve'),
+                'heading' => 0,
+                'href' => admin_url('approve'),
+                'children' =>[]
+            );
+        }
+
+		
+        $reports = array();
+
+        if ($this->user->hasPermission('reports/mpr')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_mpr'),
+                'href' => admin_url('reports/mpr'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        
+		if ($this->user->hasPermission('reports/abstractmpr')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_abstract_mpr'),
+                'href' => admin_url('reports/abstractmpr'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('mpr/state')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_state_mpr'),
+                'href' => admin_url('mpr/state'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('reports/bankinterest')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_bankinterest'),
+                'href' => admin_url('reports/bankinterest'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('reports/sfp')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_sfp'),
+                'href' => admin_url('reports/sfp'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('reports/uploadstatus')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_uploadstatus'),
+                'href' => admin_url('reports/uploadstatus'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        
+        if ($this->user->hasPermission('reports/oldmpr')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_last_mpr'),
+                'href' => admin_url('reports/oldmpr'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('incentive/uploadstatus')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_incentive_status'),
+                'href' => admin_url('incentive/uploadstatus'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+      
+		if ($reports) {
+            $data['menus'][] = array(
+                'id' => 'menu-reports',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_reports'),
+                'heading' => 0,
+                'href' => '',
+                'children' => $reports
+            );
+        }
+
+
+        if ($this->user->hasPermission('uc/allotment')) {
+            $data['menus'][] = array(
+                'id' => 'menu-allotment',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_uc_allotment'),
+                'heading' => 0,
+                'href' => admin_url('uc/allotment'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('uc/submit')) {
+            $data['menus'][] = array(
+                'id' => 'menu-ucsubmit',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_uc_submit'),
+                'heading' => 0,
+                'href' => admin_url('uc/submit'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('transaction/refund')) {
+            $data['menus'][] = array(
+                'id' => 'menu-ucsubmit',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_trefund'),
+                'heading' => 0,
+                'href' => admin_url('transaction/refund'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('oldportallogin')) {
+            $data['menus'][] = array(
+                'id' => 'menu-ucsubmit',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_oldportal'),
+                'heading' => 0,
+                'href' => admin_url('oldportallogin'),
+                'children' =>[]
+            );
+        }
+
+        
+        if ($this->user->hasPermission('mis')) {
+            $data['menus'][] = array(
+                'id' => 'menu-mis',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_mis'),
+                'heading' => 0,
+                'href' => admin_url('mis'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('fpo')) {
+            $data['menus'][] = array(
+                'id' => 'menu-fpo',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_fpo'),
+                'heading' => 0,
+                'href' => admin_url('fpo'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('incentive')) {
+            $data['menus'][] = array(
+                'id' => 'menu-incentive',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_incentive'),
+                'heading' => 0,
+                'href' => admin_url('incentive'),
+                'children' =>[]
+            );
+        }
+
+        if ($this->user->hasPermission('event')) {
+            $data['menus'][] = array(
+                'id' => 'menu-event',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_event'),
+                'heading' => 0,
+                'href' => admin_url('event'),
+                'children' =>[]
+            );
+        }
+
+        
+
+
+        if ($this->user->hasPermission('pendingstatus')) {
+            $data['menus'][] = array(
+                'id' => 'menu-pendingstatus',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_pendingstatus'),
+                'heading' => 0,
+                'href' => admin_url('pendingstatus'),
+                'children' =>[]
+            );
+        }
+
+
+        $areacoverage = array();
+
+        if ($this->user->hasPermission('areacoverage')) {
+            $areacoverage[] = array(
+                'name' => lang('Leftbar.text_areacoverage'),
+                'href' => admin_url('areacoverage'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        
+		if ($this->user->hasPermission('areacoverage/grampanchayat')) {
+            $areacoverage[] = array(
+                'name' => lang('Leftbar.text_grampanchayat'),
+                'href' => admin_url('areacoverage/grampanchayat'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('cropcoverage/crops')) {
+            $areacoverage[] = array(
+                'name' => lang('Leftbar.text_crop_add'),
+                'href' => admin_url('cropcoverage/crops'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        
+
+      
+		if ($areacoverage) {
+            $data['menus'][] = array(
+                'id' => 'menu-areacoverage',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_areacoverages'),
+                'heading' => 0,
+                'href' => '',
+                'children' => $areacoverage
+            );
+        }
+
+        if ($this->user->hasPermission('letter')) {
+            $data['menus'][] = array(
+                'id' => 'menu-letter',
+                'icon' => 'md-account-child',
+                'name' => lang('Leftbar.text_letters'),
+                'heading' => 0,
+                'href' => admin_url('letter'),
+                'children' =>[]
+            );
+        }
+
+
+		$data['menus'][] = array(
+            'id'       => 'menu-navigation',
+            'icon'	  => '',
+            'name'	  => lang('Leftbar.text_general'),
+            'heading' => 1,
+            'children'=> array()
         );
 		
-		// Dashboard
-        $data['menus'][] = array(
-            'id'       => 'menu-proceeding',
-            'icon'	  => 'md-proceeding',
-            'name'	  => lang('Leftbar.text_proceeding'),
-            'href'     => admin_url('proceeding'),
-            'children' => array()
-        );
 		// localization
 		
 		$localisation = array();
 		
-		if ($this->user->hasPermission('access', 'district/index')) {
+		if ($this->user->hasPermission('district')) {
 			$localisation[] = array(
 				'name'	   => lang('Leftbar.text_district'),
 				'href'     	=> admin_url('district'),
@@ -229,9 +424,7 @@ class Leftbar extends AdminController{
 			);
 		}
 		
-
-		
-		if ($this->user->hasPermission('access', 'block/index')) {
+		if ($this->user->hasPermission('block')) {
 			$localisation[] = array(
 				'name'	   => lang('Leftbar.text_block'),
 				'href'     	=> admin_url('block'),
@@ -239,7 +432,7 @@ class Leftbar extends AdminController{
 			);
 		}
 		
-		if ($this->user->hasPermission('access', 'grampanchayat/index')) {
+		if ($this->user->hasPermission('grampanchayat')) {
 			$localisation[] = array(
 				'name'	  => lang('Leftbar.text_grampanchayat'),
 				'href'     => admin_url('grampanchayat'),
@@ -247,15 +440,8 @@ class Leftbar extends AdminController{
 			);	
 		}
 
-        if ($this->user->hasPermission('access', 'cluster/index')) {
-            $localisation[] = array(
-                'name'	   => lang('Leftbar.text_cluster'),
-                'href'     	=> admin_url('cluster'),
-                'children' 	=> array()
-            );
-        }
-		
-		if ($this->user->hasPermission('access', 'village/index')) {
+       
+		if ($this->user->hasPermission('village')) {
 			$localisation[] = array(
 				'name'	   => lang('Leftbar.text_village'),
 				'href'     	=> admin_url('village'),
@@ -277,7 +463,7 @@ class Leftbar extends AdminController{
 		// users
 		$user = array();
 		
-		if ($this->user->hasPermission('access', 'user/index')) {
+		if ($this->user->hasPermission('user')) {
 			$user[] = array(
 				'name'	  => lang('Leftbar.text_user'),
 				'href'     => admin_url('users'),
@@ -285,7 +471,7 @@ class Leftbar extends AdminController{
 			);	
 		}
 
-        if ($this->user->hasPermission('access', 'users/members/index')) {
+        if ($this->user->hasPermission('users/members')) {
             $user[] = array(
                 'name'	  => lang('Leftbar.text_member'),
                 'href'     => admin_url('members'),
@@ -293,7 +479,7 @@ class Leftbar extends AdminController{
             );
         }
 		
-		if ($this->user->hasPermission('access', 'users/usergroup/index')) {
+		if ($this->user->hasPermission('users/usergroup')) {
 			$user[] = array(
 				'name'	  => lang('Leftbar.text_role'),
 				'href'     => admin_url('usergroup'),
@@ -301,10 +487,10 @@ class Leftbar extends AdminController{
 			);	
 		}
 
-        if ($this->user->hasPermission('access', 'permission/index')) {
+        if ($this->user->hasPermission('permissions')) {
             $user[] = array(
                 'name'	  => lang('Leftbar.text_permission'),
-                'href'     => admin_url('permission'),
+                'href'     => admin_url('permissions'),
                 'children' => array()
             );
         }
@@ -324,7 +510,7 @@ class Leftbar extends AdminController{
 		// System
 		$system = array();
 		
-		if ($this->user->hasPermission('access', 'setting/index')) {
+		if ($this->user->hasPermission('setting')) {
 			$system[] = array(
 				'name'	  => lang('Leftbar.text_setting'),
 				'href'     => admin_url('setting'),
@@ -333,11 +519,7 @@ class Leftbar extends AdminController{
 		}
 		
 		
-		
-		
-		
-		
-		if ($this->user->hasPermission('access', 'setting/serverinfo/index')) {
+		if ($this->user->hasPermission('setting/serverinfo')) {
 			$system[] = array(
 				'name'	  => lang('Leftbar.text_serverinfo'),
 				'href'     => admin_url('setting/serverinfo'),
