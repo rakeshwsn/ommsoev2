@@ -59,8 +59,8 @@ class User
         $user_permission=$permissionModel->get_modules_with_permission($this->user_group_id);
        
         foreach ( $user_permission as $value ) {
-            //$name = str_replace('_', '/', $value->name);
-            $name=$value->route;
+            $name = str_replace('_', '/', $value->name);
+            //$name=$value->route;
             $this->permission[$name] = $value->active;
         }
 
@@ -129,6 +129,7 @@ class User
     }
 
     public function hasPermission($data) {
+        
         //echo $data;
         $subUrl = ['add','edit','view','delete','download'];
         $other_permission=false;
@@ -154,7 +155,7 @@ class User
         }else if(isset($this->permission[$data]) && $this->permission[$data] == 'no'){
             return false;
         }else if($other_permission){
-            //return true;
+           return true;
         }
         return false;
 

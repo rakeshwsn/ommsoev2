@@ -435,8 +435,6 @@ class Dashboard extends AdminController
             'year_upto' => getCurrentYearId(),
         ];
 
-//        $data['ob'] = $this->reportModel->getOpeningBalanceTotal($filter);
-
         $filter['transaction_type'] = 'fund_receipt';
         $data['fr'] = $this->reportModel->getTransactionTotal($filter);
 

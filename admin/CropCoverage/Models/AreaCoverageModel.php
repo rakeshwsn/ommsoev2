@@ -77,7 +77,7 @@ FROM ac_crop_practices acp
   LEFT JOIN ac_crops ac
     ON acp.crop_id = ac.id
   LEFT JOIN ac_practices ap
-    ON acp.practice_id = ap.id ORDER BY acp.crop_id";
+    ON acp.practice_id = ap.id ORDER BY acp.crop_id,practice_id";
 
         $result = $this->db->query($sql)->getResultArray();
 
@@ -236,7 +236,6 @@ FROM ac_crop_practices acp
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date']."')";
             }
 
-            return $this->db->query($sql)->getResult();
         } else if (!empty($filter['district_id'])) {
             $sql = "SELECT ac.*,
   b.name block,bgps.gps FROM soe_blocks b 
@@ -246,7 +245,6 @@ FROM ac_crop_practices acp
                 " AND cc.season='" . $filter['season']."') ac ON ac.block_id=b.id 
                 WHERE b.district_id=".$filter['district_id']." ORDER BY date(ac.start_date) DESC,b.name ASC";
 
-            return $this->db->query($sql)->getResult();
         } else {
             $sql = "SELECT
   sd.id district_id,
@@ -275,6 +273,8 @@ FROM soe_districts sd
     WHERE vacd.status = 1) ac
     ON ac.district_id = sd.id";
         }
+//        echo $sql;exit;
+        return $this->db->query($sql)->getResult();
     }
 
     public function getPracticeArea($crop_coverage_id=0) {
@@ -303,19 +303,19 @@ AS
       ac.crops,
       aap.smi,
       lt,
-      ls
+      ls,
+      follow_up
     FROM ac_area_practices aap
       LEFT JOIN ac_crops ac
         ON aap.crop_id = ac.id
     WHERE aap.crop_coverage_id = $crop_coverage_id)
-
 SELECT
   t1.crop_id,
   t1.crop,
   t1.practice_id,
   t1.practice,
   t1.status,
-  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls ELSE 0.0 END AS area
+  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls WHEN 4 THEN t2.follow_up ELSE 0.0 END AS area
 FROM crop_practice AS t1
   JOIN practice_area AS t2
     ON t1.crop_id = t2.crop_id
