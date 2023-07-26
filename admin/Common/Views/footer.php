@@ -19,7 +19,7 @@ $user = service('user');
 <script>
     show = '<?= $show_old_portal ?>';
     $(function () {
-        if (s ho w == f alse) {
+        if (show == false) {
         $('.old-portal-login').hide();
     }
     });

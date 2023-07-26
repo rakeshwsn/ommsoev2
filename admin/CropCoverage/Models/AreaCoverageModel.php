@@ -248,7 +248,32 @@ FROM ac_crop_practices acp
 
             return $this->db->query($sql)->getResult();
         } else {
-
+            $sql = "SELECT
+  sd.id district_id,
+  sd.name district,
+  ac.start_date,
+  ac.end_date,
+  ac.farmers_covered,
+  ac.nursery_raised,
+  ac.balance_smi,
+  ac.balance_lt,
+  ac.ragi_smi,
+  ac.ragi_lt,
+  ac.ragi_ls,
+  ac.little_millet_lt,
+  ac.little_millet_ls,
+  ac.foxtail_ls,
+  ac.sorghum_ls,
+  ac.kodo_ls,
+  ac.barnyard_ls,
+  ac.pearl_ls,
+  ac.fc_area
+FROM soe_districts sd
+  LEFT JOIN (SELECT
+      *
+    FROM vw_area_coverage_districtwise vacd
+    WHERE vacd.status = 1) ac
+    ON ac.district_id = sd.id";
         }
     }
 

@@ -2,6 +2,7 @@
 namespace Admin\Permission\Controllers;
 use App\Controllers\AdminController;
 use Admin\Permission\Models\PermissionModel;
+use Admin\Users\Models\UserGroupModel;
 
 class Permission extends AdminController{
 	private $error = array();
@@ -122,7 +123,8 @@ class Permission extends AdminController{
 			
 			$datatable[]=array(
 				'<input type="checkbox" name="selected[]" value="'.$result->id.'" />',
-				$result->name,
+				$result->route,
+				$result->module,
 				$result->description,
                 $result->status?'Enable':'Disable',
 				$action
@@ -175,7 +177,49 @@ class Permission extends AdminController{
 			}
 		}
 
+		$data['permission_actions']=[
+			'index'=>'Index',
+			'add'=>'Add',
+			'edit'=>'Edit',
+			'delete'=>'Delete',
+			'view'=>'View',
+			'other'=>'Other'
+		];
+
 		echo $this->template->view('Admin\Permission\Views\permissionForm',$data);
+	}
+
+	public function assign(){
+		$id = $this->uri->getSegment(4);
+        $data['user_group_id']=$id;
+		$usergroupmodel= new UserGroupModel();
+
+        if ($this->request->getMethod(1) === 'POST'){
+
+            $this->permissionModel->addUserGroupPermission($id,$this->request->getPost());
+            $this->session->setFlashdata('message', 'Permission Updated Successfully.');
+
+            return redirect()->to(admin_url('usergroup'));
+        }
+        if((int)$id) {
+            $usergroup_info = $usergroupmodel->find($id);
+            $data['text_form'] = $usergroup_info->name ." Permission";
+            $data['cancel'] = admin_url('usergroup');
+            $data['id']=$id;
+            $gpermission= (array)$this->permissionModel->get_modules_with_permission($id);
+            $data['gpermission']=[];
+			
+            foreach($gpermission as $gpermission){
+				$module=$gpermission->module?:'Other';
+				$action=$gpermission->action?:'mis';
+				$data['gpermission'][$module][$action][]=$gpermission;
+			}
+			//printr( $data['gpermission']);
+			//exit;
+            echo $this->template->view('Admin\Permission\Views\assignPermission',$data);
+        }else {
+
+        }
 	}
 	
 	protected function validateForm() {

@@ -417,31 +417,48 @@ class Mpr extends AdminController
 
         
         $data['agency_type_id'] = $this->user->agency?$this->user->agency_type_id:0;
-        
         if($this->user->agency_type_id==$this->settings->district_user){
             $data['agency_type_id'] = 0;
         }
-
         if($this->user->agency_type_id==$this->settings->block_user){
             $data['agency_type_id'] = 0;
         }
 
-        if($this->request->getGet('agency_type_id')){
-            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
-        }
+        $data['user_group_id'] = $this->user->agency_type_id;
+        
 
         $data['district_id'] = $this->user->district_id;
         if($this->request->getGet('district_id')){
-            $data['district_id'] = $this->request->getGet('district_id');  
+            $data['district_id'] = $this->request->getGet('district_id');
+            $data['user_group_id']=7;  
         }
 
         $data['block_id'] = $this->user->block_id;
         if($this->request->getGet('block_id')){
+            
             $data['block_id'] = $this->request->getGet('block_id');
+            $data['user_group_id']=[6,5];  
         }
 
-       $data['component_agency']=
+        
+        if($this->request->getGet('agency_type_id')){
+            $data['agency_type_id'] = $data['user_group_id']=$this->request->getGet('agency_type_id');
+        }
 
+        $data['component_agency']=array_column((new UserGroupModel())->getAgencyTree([
+            'fund_agency_id'=>$data['fund_agency_id'],
+            'user_group_id'=>$data['user_group_id'],
+            'agency_type_id'=>$data['agency_type_id']
+        ]),'user_group_id');
+
+        $data['fund_receipt_agency']=array_column((new UserGroupModel())->getAgencyTree([
+            'fund_agency_id'=>$data['fund_agency_id'],
+            'user_group_id'=>$data['user_group_id'],
+            'agency_type_id'=>$data['agency_type_id']
+        ]),'user_group_id');
+
+       printr( $data['component_agency']);
+        
         $filter = [
             'month_id' => $data['month_id'],
             'year_id' => $data['year_id'],
@@ -452,7 +469,7 @@ class Mpr extends AdminController
             'fund_agency_id'=>$data['fund_agency_id'],
         ];
 
-        printr($filter);
+       // printr($filter);
         $data['components'] = [];
         $this->filterPanel($data);
         

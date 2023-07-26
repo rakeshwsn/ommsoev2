@@ -191,7 +191,6 @@ class PcmTargetModel extends Model
 
     public function showTargetComponents($filter = [])
     {
-        // printr($filter); exit;
         $sql = "SELECT
         mc_dist.district_id,
         mc_dist.district,
@@ -204,9 +203,10 @@ class PcmTargetModel extends Model
           sd.id district_id,
           sd.name district,
           mc.id mc_id,
+          mc.year_id,
           mc.description
         FROM soe_districts sd
-          CROSS JOIN mpr_components mc) mc_dist
+          CROSS JOIN mpr_components mc WHERE mc.year_id <= " . $filter['year_id'] . ") mc_dist
         LEFT JOIN (SELECT * FROM mpr_components_target_master mctm ";
 
         if (empty($filter['district_id'])) {
@@ -222,12 +222,12 @@ class PcmTargetModel extends Model
         if ($filter['district_id']) {
             $sql .= " AND mc_dist.district_id = " . $filter['district_id'] . " AND mcm.year_id = " . $filter['year_id'];
         }
-        $sql .= " ORDER BY mc_dist.district ASC, mc_dist.description ASC";
+        $sql .= " ORDER BY mc_dist.district ASC, mc_dist.mc_id ASC";
         return $this->db->query($sql)->getResultArray();
     }
 
 
-    public function getTargetcomponent()
+    public function getTargetcomponent($filter = [])
     {
         $sql = "SELECT
         mc_dist.district_id,
@@ -241,6 +241,7 @@ class PcmTargetModel extends Model
           sd.id district_id,
           sd.name district,
           mc.id mc_id,
+          mc.year_id,
           mc.description
         FROM soe_districts sd
           CROSS JOIN mpr_components mc) mc_dist
@@ -249,9 +250,8 @@ class PcmTargetModel extends Model
         LEFT JOIN mpr_components_target_data mctd
           ON mctd.mprcomponents_master_id = mcm.id
           AND mctd.mpr_component_id = mc_dist.mc_id
-      WHERE mcm.deleted_at IS NULL
+      WHERE mcm.deleted_at IS NULL AND mcm.year_id = " . $filter['year_id'] . "
       ORDER BY mc_dist.district ASC, mc_dist.description ASC";
-
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -260,7 +260,6 @@ class PcmTargetModel extends Model
         $builder = $this->db->table('mpr_components_target_data')
             ->Where(['mprcomponents_master_id' => $id])
             ->get();
-
         $componentData = $builder->getResultArray();
         return $componentData;
     }

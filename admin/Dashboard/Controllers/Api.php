@@ -12,11 +12,10 @@ use Admin\Dashboard\Models\EstablishmentModel;
 
 use Admin\Dashboard\Models\PdsModel;
 
-use App\Controllers\AdminController;
+use CodeIgniter\Controller;
 
-class Api extends AdminController
+class Api extends Controller
 {
-
 	public function areacoverage()
 	{
 		$districtmodel = new DistrictModel();
