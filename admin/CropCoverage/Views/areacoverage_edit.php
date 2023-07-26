@@ -220,6 +220,15 @@
         });
     }
 
+    //disable inputs
+    <?php if(!$show_form){ ?>
+    $(function () {
+        $('input').each(function (i,v) {
+            $(this).attr('disabled',true);
+        });
+    });
+    <?php } ?>
+
 </script>
 
 <?php js_end(); ?>

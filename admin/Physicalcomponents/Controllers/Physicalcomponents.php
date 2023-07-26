@@ -28,7 +28,6 @@ class Physicalcomponents extends AdminController
 
     public function add()
     {
-
         $this->template->set_meta_title('Components');
 
         if ($this->request->getMethod(1) === 'POST') {
@@ -44,8 +43,6 @@ class Physicalcomponents extends AdminController
 
     public function edit()
     {
-
-
         $this->template->set_meta_title('Components');
 
         if ($this->request->getMethod(1) === 'POST') {
@@ -125,7 +122,7 @@ class Physicalcomponents extends AdminController
         );
         $totalFiltered = $this->physicalcomponents->getTotal($filter_data);
         $filteredData = $this->physicalcomponents->getAll($filter_data);
-        //printr($this); exit;
+       //printr($filteredData); exit;
         $datatable = array();
         foreach ($filteredData as $result) {
 
@@ -134,9 +131,9 @@ class Physicalcomponents extends AdminController
             $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('physicalcomponents/delete/' . $result['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
             $year = '';
-            if ($result['year_id'] == 1) {
+            if ($result['year_id'] == 2) {
                 $year = '2023-24';
-            } else if ($result['year_id'] == 2) {
+            } else if ($result['year_id'] == 3) {
                 $year = '2024-25';
             }
 
@@ -166,10 +163,8 @@ class Physicalcomponents extends AdminController
         return $this->respond($componentsData);
     }
 
-
     protected function getForm()
     {
-
         $this->template->add_package(array('select2'), true);
 
         $data['breadcrumbs'] = array();
@@ -188,8 +183,10 @@ class Physicalcomponents extends AdminController
             $data['error']     = $this->error['warning'];
         }
         $data['hasPlusbutton'] = true;
+       // $data['components_info'] = '';
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-            $components_info = $this->physicalcomponents->find($this->uri->getSegment(4));
+            $data['components_info'] = $this->physicalcomponents->find($this->uri->getSegment(4));
+           // printr($components_info); exit;
             $data['hasPlusbutton'] = false;
         }
         //printr($data['permissions']);
@@ -202,7 +199,6 @@ class Physicalcomponents extends AdminController
                 $data[$field] = '';
             }
         }
-        //   printr($data); exit;
         echo $this->template->view('Admin\Physicalcomponents\Views\componentsForm', $data);
     }
 

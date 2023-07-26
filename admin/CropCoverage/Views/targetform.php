@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <table id="datatable" class="table table-bordered table-striped table-vcenter">
+        <table id="target_form" class="table table-bordered table-striped table-vcenter">
             <thead>
                 <tr>
                     <th>Crop Name</th>
@@ -37,6 +37,7 @@
                             <?= $practice['practices']; ?>
                         </th>
                     <?php endforeach; ?>
+
                 </tr>
             </thead>
             <tbody>
@@ -65,6 +66,14 @@
                                 oninput="calculateTotals()" <?= !$crop['ls']['status'] ? 'disabled' : '' ?>>
 
                         </td>
+                        <td>
+                            <input type="number" step=".01" data-practice="4"
+                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="crop[<?= $crop['id'] ?>][followup]" class="crop-input"
+                                value="<?= $crop['followup']['value'] ?>" oninput="calculateTotals()">
+
+                        </td>
+
                     </tr>
                 <?php endforeach; ?>
                 <tr>
@@ -72,6 +81,7 @@
                     <td><input type="number" id="total-smi" class="total-input" readonly></td>
                     <td><input type="number" id="total-lt" class="total-input" readonly></td>
                     <td><input type="number" id="total-ls" class="total-input" readonly></td>
+                    <td><input type="number" id="total-followup" class="total-input" readonly></td>
                 </tr>
             </tbody>
         </table>
@@ -95,6 +105,7 @@
         var totalSMI = 0;
         var totalLT = 0;
         var totalLS = 0;
+        var totalFOLLOWUP = 0;
 
         for (var i = 0; i < cropInputs.length; i++) {
             validateField(cropInputs[i]); // Validate the input field
@@ -111,12 +122,16 @@
                 } else if (practice === '3') {
                     totalLS += value;
                 }
+                else if (practice === '4') {
+                    totalFOLLOWUP += value;
+                }
             }
         }
 
         document.getElementById('total-smi').value = totalSMI.toFixed(2);
         document.getElementById('total-lt').value = totalLT.toFixed(2);
         document.getElementById('total-ls').value = totalLS.toFixed(2);
+        document.getElementById('total-followup').value = totalFOLLOWUP.toFixed(2);
     }
 
     document.addEventListener('DOMContentLoaded', calculateTotals);
