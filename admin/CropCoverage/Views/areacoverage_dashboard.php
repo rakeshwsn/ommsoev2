@@ -66,7 +66,7 @@
             text: 'Source: Your Data Source'
         },
         xAxis: {
-            categories: [],
+            categories: ['puri', 'jagatsinghpur', 'kendrapara', 'bargarh', 'cuttack', 'ganjam', 'keunjhar', 'mayurbhanj', 'boudh', 'malkangir'],
             crosshair: true
         },
 
