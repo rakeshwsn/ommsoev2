@@ -1,7 +1,7 @@
 <?php
 namespace App\Libraries;
 
-use Admin\Permissions\Models\PermissionsModel;
+use Admin\Permission\Models\PermissionModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 
@@ -55,8 +55,8 @@ class User
 		$this->appuser_token	= $user->central_appuser_token;
 		$permissions = json_decode($user_group->permissions, true);
 
-        $permissionModel = new PermissionsModel();
-        $user_permission=$permissionModel->get_modules_with_permissions($this->user_group_id);
+        $permissionModel = new PermissionModel();
+        $user_permission=$permissionModel->get_modules_with_permission($this->user_group_id);
        
         foreach ( $user_permission as $value ) {
             //$name = str_replace('_', '/', $value->name);
@@ -194,11 +194,12 @@ class User
         if ($route == "") {
             $route = "admin";
         }
-
+        
         $ignore = array(
             'admin',
             'login',
             'logout',
+            'relogin',
             'common/forgotten',
             'common/reset',
             'error/not_found',
