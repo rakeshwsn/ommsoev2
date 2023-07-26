@@ -77,7 +77,7 @@ FROM ac_crop_practices acp
   LEFT JOIN ac_crops ac
     ON acp.crop_id = ac.id
   LEFT JOIN ac_practices ap
-    ON acp.practice_id = ap.id ORDER BY acp.crop_id";
+    ON acp.practice_id = ap.id ORDER BY acp.crop_id,practice_id";
 
         $result = $this->db->query($sql)->getResultArray();
 
