@@ -1,7 +1,7 @@
 <?php
 // Text
 return [
-	'heading_title'        => 'Banner',
+	'heading_title'        => 'Permission',
 	'text_image'           => 'Select Image',
 	'text_clear'            => 'Clear'
 ];

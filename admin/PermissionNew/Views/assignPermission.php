@@ -34,7 +34,7 @@ $validation = \Config\Services::validation();
                             <tbody>
                                 <?php 
                                 $prePermission=['index','add','edit','delete','view','mis'];
-                                foreach($gpermissions as $module=>$permissions){?>
+                                foreach($gpermission as $module=>$permissions){?>
                                     <tr>
                                         
                                         <td data-title="Module Name">
