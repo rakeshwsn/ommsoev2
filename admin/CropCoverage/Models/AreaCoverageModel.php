@@ -236,7 +236,6 @@ FROM ac_crop_practices acp
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date']."')";
             }
 
-            return $this->db->query($sql)->getResult();
         } else if (!empty($filter['district_id'])) {
             $sql = "SELECT ac.*,
   b.name block,bgps.gps FROM soe_blocks b 
@@ -246,7 +245,6 @@ FROM ac_crop_practices acp
                 " AND cc.season='" . $filter['season']."') ac ON ac.block_id=b.id 
                 WHERE b.district_id=".$filter['district_id']." ORDER BY date(ac.start_date) DESC,b.name ASC";
 
-            return $this->db->query($sql)->getResult();
         } else {
             $sql = "SELECT
   sd.id district_id,
@@ -275,6 +273,8 @@ FROM soe_districts sd
     WHERE vacd.status = 1) ac
     ON ac.district_id = sd.id";
         }
+//        echo $sql;exit;
+        return $this->db->query($sql)->getResult();
     }
 
     public function getPracticeArea($crop_coverage_id=0) {
