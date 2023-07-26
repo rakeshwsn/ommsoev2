@@ -315,7 +315,7 @@ SELECT
   t1.practice_id,
   t1.practice,
   t1.status,
-  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls WHEN 4 THEN t3.follow_up ELSE 0.0 END AS area
+  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls WHEN 4 THEN t2.follow_up ELSE 0.0 END AS area
 FROM crop_practice AS t1
   JOIN practice_area AS t2
     ON t1.crop_id = t2.crop_id
