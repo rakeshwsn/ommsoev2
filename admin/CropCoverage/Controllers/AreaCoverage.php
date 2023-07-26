@@ -311,7 +311,7 @@ class AreaCoverage extends AdminController
 
             $from_date = $dates['start_date'];
             $to_date = $dates['end_date'];
-            $excel_from_date = $row_data[0][22];
+            $excel_from_date = isset($row_data[0][22]) ?:'' ;
 
             $exists = $acModel
                 ->where('start_date',$from_date)
@@ -322,9 +322,16 @@ class AreaCoverage extends AdminController
 //            $exists = false;
 
             //gp belongs to the block
-            $gp_cell = $row_data[4][1];
-            $gp = (new GrampanchayatModel())->find($gp_cell);
-            $gp_belongs = $gp->block_id==$this->user->block_id;
+            $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
+            $gp = [];
+            $gp_belongs = false;
+
+            if($gp_cell){
+                $gp = (new GrampanchayatModel())->find($gp_cell);
+            }
+            if($gp){
+                $gp_belongs = $gp->block_id==$this->user->block_id;
+            }
 
             //validation
             if(!isset($row_data[0][22])){
@@ -536,7 +543,7 @@ class AreaCoverage extends AdminController
         }
 
         $practices = [];
-        $_practices = ['smi','lt','ls','followup'];
+        $_practices = ['smi','lt','ls','follow_up'];
         foreach ($cropPrtcArea as $area) {
             foreach ($_practices as $_practice) {
                 if(strtolower($area['practice'])==$_practice){
@@ -544,6 +551,7 @@ class AreaCoverage extends AdminController
                 }
             }
         }
+
         //cacl total
         foreach ($_practices as $practice){
             $practices[$practice] = [
