@@ -48,12 +48,16 @@ $user  = service('user');
             <?php if (!$user->district_id) { ?>
                 <button id="btnExport"><i class="fa fa-download" aria-hidden="true"></i>
                 </button>
+                <div class="block-options float-right">
+                    <a href="<?php echo $addach; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
+                </div>
                 <?php } ?>
+                <?php if ($user->district_id && $checkExists!=0) { ?>
                 <div class="block-options float-right">
                     <a href="<?php echo $addach; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
                 </div>
 
-
+                <?php } ?>
         </div>
 
         <div class="block-content block-content-full" style="overflow-y: scroll;">
@@ -79,7 +83,7 @@ $user  = service('user');
                 <tr>
                     <td colspan=3 height="101"><b>Componet details</b></td>
                     <?php foreach ($componentsAll as $componentsAlls) { ?>
-                        <td colspan=3 height="101"><b><?php echo $componentsAlls['description'] ?></b></td>
+                        <td colspan=4 height="101"><b><?php echo $componentsAlls['description'] ?></b></td>
                     <?php } ?>
                 </tr>
                 <tr>
@@ -97,8 +101,8 @@ $user  = service('user');
                     <td><b><br></b></td>
                     <td><b><br></b></td>
                     <?php foreach ($componentsAll as $componentsAlls) { ?>
+                        <td sdval="45039" sdnum="1033;0;MMMM-D"><b>Up to prev.</b></td>
                         <td sdval="45069" sdnum="1033;0;MMMM-D"><b><?php echo $getMonths['name'] ?></b></td>
-                        <td sdval="45039" sdnum="1033;0;MMMM-D"><b>Up to</b></td>
                         <td sdval="45039" sdnum="1033;0;MMMM-D"><b>Cumulative</b></td>
 
                         <td><b><br></b></td>

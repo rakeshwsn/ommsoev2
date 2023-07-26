@@ -119,7 +119,7 @@ class ComponentPhyModel extends Model
                 $target_data = array(
                     "componentid" => $componentsdatas['componentid'],
                     "description" => $componentsdatas['description'],
-                    "year_id" => 1,
+                    "year_id" =>  $data['year_id'],
                 );
                 $this->db->table("mpr_components")->where("id", $id)->update($target_data);
             }
@@ -157,6 +157,7 @@ class ComponentPhyModel extends Model
         $builder->join('soe_components_assign', 'soe_components_assign.component_id = soe_components.id', 'left');
         $this->filtercomponent($builder, $data);
         $builder->select('soe_components.id, CONCAT(soe_components.description, " (Code-", soe_components_assign.number, ")") AS component');
+        $builder->groupBy('soe_components_assign.component_id');
         $res = $builder->get()->getResult();
         return $res;
     }
