@@ -183,7 +183,7 @@ class Permission extends AdminController{
 			'edit'=>'Edit',
 			'delete'=>'Delete',
 			'view'=>'View',
-			'other'=>'Other'
+			'mis'=>'Other'
 		];
 
 		echo $this->template->view('Admin\Permission\Views\permissionForm',$data);

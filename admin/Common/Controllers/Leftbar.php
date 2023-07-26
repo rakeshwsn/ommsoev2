@@ -392,6 +392,8 @@ class Leftbar extends AdminController{
             );
         }
 
+        
+
         if ($this->user->hasPermission('letter')) {
             $data['menus'][] = array(
                 'id' => 'menu-letter',
@@ -487,10 +489,10 @@ class Leftbar extends AdminController{
 			);	
 		}
 
-        if ($this->user->hasPermission('permissions')) {
+        if ($this->user->hasPermission('permission')) {
             $user[] = array(
                 'name'	  => lang('Leftbar.text_permission'),
-                'href'     => admin_url('permissions'),
+                'href'     => admin_url('permission'),
                 'children' => array()
             );
         }
