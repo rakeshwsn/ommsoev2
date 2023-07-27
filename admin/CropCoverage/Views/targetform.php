@@ -37,7 +37,7 @@
                             <?= $practice['practices']; ?>
                         </th>
                     <?php endforeach; ?>
-
+                    <th>FOLLOW UP CROPS</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,8 +68,8 @@
                         </td>
                         <td>
                             <input type="number" step=".01" data-practice="4"
-                                id="crop_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
-                                name="crop[<?= $crop['id'] ?>][followup]" class="crop-input"
+                                id="followup_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>"
+                                name="followup[<?= $crop['id'] ?>][followup]" class="crop-input"
                                 value="<?= $crop['followup']['value'] ?>" oninput="calculateTotals()">
 
                         </td>

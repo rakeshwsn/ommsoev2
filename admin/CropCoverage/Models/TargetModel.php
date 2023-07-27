@@ -74,6 +74,25 @@ class TargetModel extends Model
 			$this->db->table('ac_target_area')->insert($targetdata);
 		}
 	}
+	public function addFollowUpCrops($data, $target_id)
+	{
+		// Crop master table
+
+		$this->db->table('ac_target_followup_crop')->where('target_id', $target_id)->delete();
+
+		// Crop coverage target table
+		foreach ($data['followup_data'] as $crop_id => $area) {
+			$followupdata = array(
+				"target_id" => $target_id,
+				"crop_id" => $crop_id,
+
+				//Check if 'FOLLOWUP' key exists
+				"followup" => isset($area['followup']) ? $area['followup'] : 0,
+			);
+
+			$this->db->table('ac_target_followup_crop')->insert($followupdata);
+		}
+	}
 
 	public function getAll($filter = array())
 	{
@@ -84,136 +103,122 @@ class TargetModel extends Model
 		}
 
 		$sql = "SELECT
-		block_target.target_id,
-		sb.name block,
-		sb.id block_id,
-		sb.district_id,
-		block_target.year_id,
-		block_target.season,
-		block_target.RAGI RAGI_SMI,
-		block_target.RAGI_LT,
-		block_target.RAGI_LS,
-		block_target.LITTLE_MILLET_LT,
-		block_target.LITTLE_MILLET_LS,
-		block_target.FOXTAIL_MILLET_LT,
-		block_target.FOXTAIL_MILLET_LS,
-		block_target.SORGHUM_LT,
-		block_target.SORGHUM_LS,
-		block_target.PEARL_MILLET_LT,
-		block_target.PEARL_MILLET_LS,
-		block_target.BARNYARD_MILLET_LT,
-		block_target.BARNYARD_MILLET_LS,
-		block_target.KODO_MILLET_LT,
-		block_target.KODO_MILLET_LS,
-		block_target.RAGI_FOLLOWUP,
-        block_target.LITTLE_MILLET_FOLLOWUP,
-        block_target.FOXTAIL_MILLET_FOLLOWUP,
-        block_target.SORGHUM_FOLLOWUP,
-        block_target.PEARL_MILLET_FOLLOWUP,
-        block_target.BARNYARD_MILLET_FOLLOWUP,
-        block_target.KODO_MILLET_FOLLOWUP
+        block_target.target_id,
+        sb.name AS block,
+        sb.id AS block_id,
+        sb.district_id,
+        block_target.year_id,
+        block_target.season,
+        block_target.RAGI AS RAGI_SMI,
+        block_target.RAGI_LT,
+        block_target.RAGI_LS,
+        block_target.LITTLE_MILLET_LT,
+        block_target.LITTLE_MILLET_LS,
+        block_target.FOXTAIL_MILLET_LT,
+        block_target.FOXTAIL_MILLET_LS,
+        block_target.SORGHUM_LT,
+        block_target.SORGHUM_LS,
+        block_target.PEARL_MILLET_LT,
+        block_target.PEARL_MILLET_LS,
+        block_target.BARNYARD_MILLET_LT,
+        block_target.BARNYARD_MILLET_LS,
+        block_target.KODO_MILLET_LT,
+        block_target.KODO_MILLET_LS,
+        followup.RAGI AS RAGI_FOLLOWUP,
+        followup.LITTLE_MILLET AS LITTLE_MILLET_FOLLOWUP,
+        followup.FOXTAIL_MILLET AS FOXTAIL_MILLET_FOLLOWUP,
+        followup.SORGHUM AS SORGHUM_FOLLOWUP,
+        followup.PEARL_MILLET AS PEARL_MILLET_FOLLOWUP,
+        followup.BARNYARD_MILLET AS BARNYARD_MILLET_FOLLOWUP,
+        followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP
+    FROM soe_blocks sb
+    LEFT JOIN (
+        SELECT
+            tm.id AS target_id,
+            tm.block_id,
+            tm.year_id,
+            tm.season,
+            MAX(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
+            MAX(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
+            MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
+            MAX(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
+            MAX(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
+            MAX(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
+            MAX(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
+            MAX(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
+            MAX(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
+            MAX(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
+            MAX(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
+            MAX(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
+            MAX(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
+            MAX(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
+            MAX(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
+            MAX(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
+            MAX(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
+            MAX(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
+            MAX(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
+            MAX(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
+            MAX(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS
+        FROM ac_target_master tm
+        LEFT JOIN ac_target_area ta ON tm.id = ta.target_id
+        LEFT JOIN (SELECT *, id AS crop_id FROM ac_crops) c ON ta.crop_id = c.id
+        GROUP BY tm.block_id
+    ) block_target ON block_target.block_id = sb.id
+    LEFT JOIN (
+        SELECT
+            target_id,
+            MAX(CASE WHEN crop_id = 1 THEN followup END) AS RAGI,
+            MAX(CASE WHEN crop_id = 2 THEN followup END) AS LITTLE_MILLET,
+            MAX(CASE WHEN crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
+            MAX(CASE WHEN crop_id = 4 THEN followup END) AS SORGHUM,
+            MAX(CASE WHEN crop_id = 5 THEN followup END) AS PEARL_MILLET,
+            MAX(CASE WHEN crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
+            MAX(CASE WHEN crop_id = 7 THEN followup END) AS KODO_MILLET
+        FROM ac_target_followup_crop
+        GROUP BY target_id
+    ) followup ON block_target.target_id = followup.target_id
+    WHERE sb.district_id = $district_id";
 
-	  FROM soe_blocks sb
-		LEFT JOIN (SELECT
-			tm.id target_id,
-			tm.block_id,
-			tm.year_id,
-			tm.season,
-			MAX(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
-			MAX(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
-			MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
-			MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_FOLLOWUP,
-			MAX(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
-			MAX(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 2 THEN ta.followup END) AS LITTLE_MILLET_FOLLOWUP,
-
-			MAX(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
-			MAX(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 3 THEN ta.followup END) AS FOXTAIL_MILLET_FOLLOWUP,
-
-			MAX(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
-			MAX(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
-			MAX(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
-			MAX(CASE WHEN c.crop_id = 4 THEN ta.followup END) AS SORGHUM_FOLLOWUP,
-
-			MAX(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
-			MAX(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 5 THEN ta.followup END) AS PEARL_MILLET_FOLLOWUP,
-
-
-			MAX(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
-			MAX(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 6 THEN ta.followup END) AS BARNYARD_MILLET_FOLLOWUP,
-
-			MAX(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
-			MAX(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
-			MAX(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS,
-			MAX(CASE WHEN c.crop_id = 7 THEN ta.followup END) AS KODO_MILLET_FOLLOWUP
-
-			
-			
-		  FROM ac_target_master tm
-			LEFT JOIN ac_target_area ta
-			  ON tm.id = ta.target_id";
-		if (!empty($filter['year_id'])) {
-			$sql .= " AND tm.year_id=" . $filter['year_id'];
-		}
-		if (!empty($filter['season'])) {
-			$sql .= " AND tm.season=" . $filter['season'];
-		}
-		$sql .= " LEFT JOIN (SELECT
-				*,
-				id AS crop_id
-			  FROM ac_crops) c
-			  ON ta.crop_id = c.id
-		  GROUP BY tm.block_id) block_target
-		  ON block_target.block_id = sb.id
-	  WHERE sb.district_id = $district_id";
-		//echo $sql;
-		//exit;
+		// Execute the query and fetch the results
 		return $this->db->query($sql)->getResultArray();
+
 
 	}
 
 	public function getBlockTargets($filter = [])
 	{
 		$sql = "SELECT
-			ac.id,
-			ac.crops,
-			cd.smi,
-			cd.ls,
-			cd.lt,
-				cd.followup
-			FROM ac_crops ac
-			LEFT JOIN (SELECT
-				ata.crop_id,
-				ata.lt,
-				ata.ls,
-				ata.smi,
-				ata.followup
-				FROM ac_target_area ata
-				LEFT JOIN ac_target_master atm
-					ON ata.target_id = atm.id where 1=1 ";
+                ac.id,
+                ac.crops,
+                ata.smi,
+                ata.ls,
+                ata.lt,
+                afc.followup
+            FROM
+                ac_crops ac
+            LEFT JOIN ac_target_area ata ON ac.id = ata.crop_id
+            LEFT JOIN ac_target_master atm ON ata.target_id = atm.id
+            -- Join ac_target_followup_crop table and filter by target_id
+            LEFT JOIN ac_target_followup_crop afc ON atm.id = afc.target_id AND ata.crop_id = afc.crop_id
+            WHERE
+                ac.crops IS NOT NULL
+                AND atm.deleted_at IS NULL";
+
+		// Apply additional filters
 		if (!empty($filter['block_id'])) {
-			$sql .= " and atm.block_id = " . $filter['block_id'];
+			$sql .= " AND atm.block_id = " . $filter['block_id'];
 		}
 		if (!empty($filter['year_id'])) {
-			$sql .= " and atm.year_id = " . $filter['year_id'];
+			$sql .= " AND atm.year_id = " . $filter['year_id'];
 		}
 		if (!empty($filter['season'])) {
-			$sql .= " and atm.season = '" . $filter['season'] . "'";
+			$sql .= " AND atm.season = '" . $filter['season'] . "'";
 		}
 
-		$sql .= " AND atm.deleted_at IS NULL ) cd
-				ON ac.id = cd.crop_id
-			WHERE ac.crops IS NOT NULL";
 		//echo $sql;
 		return $this->db->query($sql)->getResultArray();
 	}
+
 
 	public function getPractices()
 	{
