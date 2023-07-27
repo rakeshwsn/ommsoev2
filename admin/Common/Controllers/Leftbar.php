@@ -404,16 +404,8 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
-<<<<<<< HEAD
-
-
-
 
         if ($areacoverage) {
-=======
-      
-		if ($areacoverage) {
->>>>>>> ae32cfa83232c8fee77aaaa15ca88e5cff96a2ba
             $data['menus'][] = array(
                 'id' => 'menu-areacoverage',
                 'icon' => 'md-account-child',
@@ -435,8 +427,8 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
-        
-		if ($this->user->hasPermission('physicalcomponentstarget')) {
+
+        if ($this->user->hasPermission('physicalcomponentstarget')) {
             $mprcomponent[] = array(
                 'name' => 'MPR Target',
                 'href' => admin_url('physicalcomponentstarget'),
@@ -453,8 +445,8 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
-      
-		if ($mprcomponent) {
+
+        if ($mprcomponent) {
             $data['menus'][] = array(
                 'id' => 'menu-mprcomponent',
                 'icon' => 'md-account-child',
@@ -466,7 +458,7 @@ class Leftbar extends AdminController
         }
 
 
-        
+
 
         if ($this->user->hasPermission('letter')) {
             $data['menus'][] = array(
@@ -565,13 +557,8 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission('permission')) {
             $user[] = array(
-<<<<<<< HEAD
                 'name' => lang('Leftbar.text_permission'),
-                'href' => admin_url('permissions'),
-=======
-                'name'	  => lang('Leftbar.text_permission'),
-                'href'     => admin_url('permission'),
->>>>>>> ae32cfa83232c8fee77aaaa15ca88e5cff96a2ba
+                'href' => admin_url('permission'),
                 'children' => array()
             );
         }

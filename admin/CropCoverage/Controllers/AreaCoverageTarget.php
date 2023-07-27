@@ -139,12 +139,18 @@ class AreaCoverageTarget extends AdminController
 			}
 
 			//insert new
-			$data['crop_data'] = $this->request->getPost('crop');
-			// printr($data['crop_data']);
+			// printr($this->request->getPost());
 			// exit;
-
+			$data['crop_data'] = $this->request->getPost('crop');
 
 			$this->targetModel->addTargets($data, $target_id);
+
+			$data['followup_data'] = $this->request->getPost('followup');
+			// printr($data['followup_data']);
+			// exit;
+
+			$this->targetModel->addFollowUpCrops($data, $target_id);
+
 
 			$this->session->setFlashdata('message', 'Target Updated Successfully.');
 
@@ -184,6 +190,8 @@ class AreaCoverageTarget extends AdminController
 			'season' => getCurrentSeason(),
 			'year_id' => getCurrentYearId()
 		]);
+		// printr($data['practicedata']);
+		// exit;
 
 
 		$output = array();
@@ -220,6 +228,8 @@ class AreaCoverageTarget extends AdminController
 		}
 
 		$data['practicedata'] = $output;
+		// printr($data['practicedata']);
+		// exit;
 
 
 
