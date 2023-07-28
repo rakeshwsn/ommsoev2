@@ -139,9 +139,11 @@ class AreaCoverageTarget extends AdminController
 			}
 
 			//insert new
-			// printr($this->request->getPost());
-			// exit;
+			//printr($this->request->getPost());
+			//exit;
 			$data['crop_data'] = $this->request->getPost('crop');
+			//printr($data['crop_data']);
+			//exit;
 
 			$this->targetModel->addTargets($data, $target_id);
 
@@ -172,6 +174,8 @@ class AreaCoverageTarget extends AdminController
 
 		$data['district_id'] = $this->user->district_id;
 		$data['block_id'] = $this->request->getGet('block_id');
+		// printr($data['block_id']);
+		// exit;
 		$data['year_id'] = date('Y');
 
 		$currentMonth = date('n');
@@ -186,6 +190,7 @@ class AreaCoverageTarget extends AdminController
 
 		// Pass the practice data to the view
 		$data['practicedata'] = $this->targetModel->getBlockTargets([
+
 			'block_id' => $data['block_id'],
 			'season' => getCurrentSeason(),
 			'year_id' => getCurrentYearId()
@@ -228,8 +233,8 @@ class AreaCoverageTarget extends AdminController
 		}
 
 		$data['practicedata'] = $output;
-		// printr($data['practicedata']);
-		// exit;
+
+
 
 
 
