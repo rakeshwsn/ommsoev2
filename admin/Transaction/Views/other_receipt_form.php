@@ -26,7 +26,7 @@
                        name="misc[<?=$head['id']?>]"
                        placeholder="<?=$head['name']?>"
                        value="<?=$head['value']?>"
-                       <?php if($can_edit) { ?>readonly<?php } ?>
+                       <?php if(!$can_edit) { ?>readonly<?php } ?>
                 >
             </div>
         </div>

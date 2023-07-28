@@ -326,7 +326,7 @@ class OtherReceipt extends AdminController
                 'value' => isset($amts[$head->id]) ? $amts[$head->id] : '',
             ];
         }
-        $data['can_edit'] = isset($txn) && $txn->status!==1;
+        $data['can_edit'] = (isset($txn) && $txn->status!=1);
 
         return view('\Admin\Transaction\Views\other_receipt_form', $data);
     }
