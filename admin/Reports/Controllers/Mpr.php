@@ -445,19 +445,23 @@ class Mpr extends AdminController
             $data['agency_type_id'] = $data['user_group_id']=$this->request->getGet('agency_type_id');
         }
 
-        $data['component_agency']=array_column((new UserGroupModel())->getAgencyTree([
+        $component_agency=array_column((new UserGroupModel())->getAgencyTree([
             'fund_agency_id'=>$data['fund_agency_id'],
             'user_group_id'=>$data['user_group_id'],
             'agency_type_id'=>$data['agency_type_id']
         ]),'user_group_id');
 
-        $data['fund_receipt_agency']=array_column((new UserGroupModel())->getAgencyTree([
-            'fund_agency_id'=>$data['fund_agency_id'],
-            'user_group_id'=>$data['user_group_id'],
-            'agency_type_id'=>$data['agency_type_id']
-        ]),'user_group_id');
+        if($data['user_group_id']==11){
+            $fund_receipt_agency=array_column((new UserGroupModel())->getAgencyChild([
+                'fund_agency_id'=>$data['fund_agency_id'],
+                'user_group_id'=>$data['user_group_id']
+            ]),'user_group_id');
+        }else{
+            $fund_receipt_agency=$data['user_group_id'];
+        }
+       
 
-       printr( $data['component_agency']);
+      // printr( $data['component_agency']);
         
         $filter = [
             'month_id' => $data['month_id'],
@@ -467,12 +471,92 @@ class Mpr extends AdminController
             'district_id'=>$data['district_id'],
             'block_id'=>$data['block_id'],
             'fund_agency_id'=>$data['fund_agency_id'],
+            'user_group_id'=>$data['user_group_id'],
+            'component_agency'=>(array)$component_agency,
+            'fundreceipt_agency'=>(array)$fund_receipt_agency
         ];
 
        // printr($filter);
+
+        $reportModel = new ReportsModel();
+        
         $data['components'] = [];
         $this->filterPanel($data);
         
+        $components = $reportModel->getMprFinal($filter);
+
+        $components = $this->buildTree($components, 'parent', 'scomponent_id');
+
+        if($action=='download') {
+            $data['components'] = $this->getTable($components, 'download');
+        } else {
+            $data['components'] = $this->getTable($components, 'view');
+        }
+
+        //mpr table html for excel and view --rakesh --092/06/23
+        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
+        
+        $this->filterPanel($data);
+        
+        if($data['district_id']) {
+            $data['district'] = (new DistrictModel())->find($data['district_id'])->name;
+            $data['blocks'] = $this->block_model->where(
+                [
+                    'district_id' => $data['district_id'],
+                    'fund_agency_id' => $data['fund_agency_id'],
+                ]
+            )->asArray()->findAll();
+
+        }
+
+        if($data['block_id']) {
+            $block = $this->block_model->find($data['block_id']);
+            $data['block'] = $block->name;
+
+            $data['fund_agency'] = $block->fund_agency_id ? (new CommonModel())->getFundAgency($block->fund_agency_id)['name']:'-';
+        }
+        $data['month_name'] = getMonthById($data['month_id'])['name'];
+        $data['fin_year'] = getYear($data['year_id']);
+
+        if($action=='download'){
+            $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
+
+            $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
+            if($spreadsheet){
+                $worksheet = $spreadsheet->getActiveSheet();
+                $columnIndex = 'B'; // Change this to the desired column index
+                $wordWrapCols=[
+                    'G2','O2','Q1'
+                ];
+                foreach($wordWrapCols as $col){
+                    $cell = $worksheet->getCell($col);
+                    $cell->getStyle()->getAlignment()->setWrapText(true);
+                }
+                
+                // Get the highest row index in the column
+                $highestRow = $worksheet->getHighestRow();
+
+                // Apply word wrap to each cell in column B
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $cell = $worksheet->getCell($columnIndex . $row);
+                    $cell->getStyle()->getAlignment()->setWrapText(true);
+                }
+                
+                $worksheet->getColumnDimension($columnIndex)->setWidth(20);
+
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="'. $filename .'"');
+                header('Cache-Control: max-age=0');
+
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+                exit();
+            }
+            exit;
+        }
+
+        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
+
       
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
 

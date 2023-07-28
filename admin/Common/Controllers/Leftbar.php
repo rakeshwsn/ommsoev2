@@ -480,6 +480,7 @@ class Leftbar extends AdminController
             'children' => array()
         );
 
+    
         // localization
 
         $localisation = array();

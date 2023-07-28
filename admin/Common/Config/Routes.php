@@ -13,6 +13,7 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->add('relogin', 'Common\Controllers\Auth::reLogin');
     $routes->get('oldportallogin', 'Common\Controllers\Auth::oldPortalLogin');
     $routes->match(['get','post'],'account/password', 'Common\Controllers\Auth::password');
+    $routes->add('error', 'Common\Controllers\Errors::index');
 
     $routes->get('spmu/chart', 'Common\Controllers\Dashboard::spmu_dashboard_chart');
     $routes->get('dashboard/chart','Common\Controllers\Dashboard::chart');
