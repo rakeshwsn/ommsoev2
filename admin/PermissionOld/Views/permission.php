@@ -13,8 +13,7 @@
 			<thead>
 				<tr>
 					<th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
-					<th>Route</th>
-					<th>Module</th>
+					<th>Name</th>
                     <th>Description </th>
 					<th>Status</th>
                     <th class="text-right no-sort">Actions</th>

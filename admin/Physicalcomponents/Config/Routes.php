@@ -8,9 +8,8 @@ if (!isset($routes)) {
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
     $routes->get('physicalcomponents', 'Physicalcomponents\Controllers\Physicalcomponents::index');
-    $routes->get('physicalcomponentsearch', 'Physicalcomponents\Controllers\Physicalcomponents::componentsearch');
-
-    $routes->post('physicalcomponents/search', 'Physicalcomponents\Controllers\Physicalcomponents::search');
+    $routes->get('physicalcomponentsearch', 'Physicalcomponents\Controllers\Physicalcomponents::componentsearch',['permission'=>false]);
+    $routes->post('physicalcomponents/search', 'Physicalcomponents\Controllers\Physicalcomponents::search',['permission'=>false]);
     $routes->match(['get', 'post'], 'physicalcomponents/add', 'Physicalcomponents\Controllers\Physicalcomponents::add');
     $routes->match(['get', 'post'], 'physicalcomponents/addform', 'Physicalcomponents\Controllers\Physicalcomponents::addform');
     $routes->match(['get', 'post'], 'physicalcomponents/edit/(:segment)', 'Physicalcomponents\Controllers\Physicalcomponents::edit/$1');

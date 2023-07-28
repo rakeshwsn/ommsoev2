@@ -7,8 +7,8 @@ if (!isset($routes)) {
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
     $routes->add('district', 'Localisation\Controllers\District::index');
-    $routes->post('district/search', 'Localisation\Controllers\District::search');
-    $routes->add('district/block/', 'Localisation\Controllers\District::block/');
+    $routes->post('district/search', 'Localisation\Controllers\District::search',['permission' => false]);
+    $routes->add('district/block/', 'Localisation\Controllers\District::block',['permission' => false]);
     $routes->get('district/block/(:segment)', 'Localisation\Controllers\District::block/$1');
     $routes->get('district/fundagency/', 'Localisation\Controllers\District::fundAgency');
     $routes->get('district/fundagency/(:segment)', 'Localisation\Controllers\District::fundAgency/$1');
@@ -21,7 +21,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('block/grampanchayat/', 'Localisation\Controllers\Block::grampanchayat/');
     $routes->get('block/grampanchayat/(:segment)', 'Localisation\Controllers\Block::grampanchayat/$1');
     $routes->get('block/grampanchayat/(:segment)/(:segment)', 'Localisation\Controllers\Block::grampanchayat/$1/$2');
-    $routes->post('block/search', 'Localisation\Controllers\Block::search');
+    $routes->post('block/search', 'Localisation\Controllers\Block::search',['permission'=>false]);
     $routes->match(['get', 'post'], 'block/add', 'Localisation\Controllers\Block::add');
     $routes->match(['get', 'post'], 'block/edit/(:segment)', 'Localisation\Controllers\Block::edit/$1');
     $routes->get('block/delete/(:segment)', 'Localisation\Controllers\Block::delete/$1');
@@ -33,7 +33,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('grampanchayat/delete/(:segment)', 'Localisation\Controllers\Grampanchayat::delete/$1');
     $routes->post('grampanchayat/delete', 'Localisation\Controllers\Grampanchayat::delete');
     $routes->match(['get', 'post'], 'grampanchayat/edit/(:segment)', 'Localisation\Controllers\Grampanchayat::edit/$1');
-    $routes->post('grampanchayat/search', 'Localisation\Controllers\Grampanchayat::search');
+    $routes->post('grampanchayat/search', 'Localisation\Controllers\Grampanchayat::search',['permission'=>false]);
 
 
 });

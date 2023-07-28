@@ -7,11 +7,11 @@ if(!isset($routes))
 
 $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
-    $routes->add('budgets','Budgets\Controllers\Budgets::index');
+    $routes->add('budgets','Budgets\Controllers\Budgets::index',['filter'=>'permission']);
     $routes->post('budgets/search','Budgets\Controllers\Budgets::search');
-    $routes->add('budgets/add','Budgets\Controllers\Budgets::add');
-    $routes->add('budgets/edit/(:num)','Budgets\Controllers\Budgets::edit/$1');
-    $routes->add('budgets/delete/(:num)','Budgets\Controllers\Budgets::delete/$1');
+    $routes->add('budgets/add','Budgets\Controllers\Budgets::add',['filter'=>'permission']);
+    $routes->add('budgets/edit/(:num)','Budgets\Controllers\Budgets::edit/$1',['filter'=>'permission']);
+    $routes->add('budgets/delete/(:num)','Budgets\Controllers\Budgets::delete/$1',['filter'=>'permission']);
 
     $routes->add('budgets/tupdate','Budgets\Controllers\Budgets::updateTransaction');
 

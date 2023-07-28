@@ -16,6 +16,7 @@ class Assign extends AdminController {
     }
 
     public function index(){
+        
         $this->template->add_package(array('jquerynestable','sweetalert','typehead'),true);
 
         if ($this->request->getMethod(1) === 'POST'){

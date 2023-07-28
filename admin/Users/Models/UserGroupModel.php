@@ -157,7 +157,17 @@ class UserGroupModel extends Model
             $sql.=" and user_group_id =".$filter['agency_type_id'];
           }
           $sql.=" and fund_agency_id=".$filter['fund_agency_id']."  GROUP BY user_group_id";
+         
         return $this->db->query($sql)->getResultArray();  
+    }
+
+    public function getAgencyChild($filter=[]){
+        $sql="SELECT
+        *
+      FROM fund_flow_chart
+      WHERE parent_id=".$filter['user_group_id']." 
+      AND fund_agency_id = ".$filter['fund_agency_id'];
+      return $this->db->query($sql)->getResultArray(); 
     }
 
     public function getAgencyTypes(){

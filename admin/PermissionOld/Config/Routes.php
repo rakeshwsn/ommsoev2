@@ -11,7 +11,6 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->match(['get','post'],'permission/edit/(:segment)', 'Permission\Controllers\Permission::edit/$1');
     $routes->get('permission/delete/(:segment)',   'Permission\Controllers\Permission::delete/$1');
     $routes->post('permission/delete','Permission\Controllers\Permission::delete');
-    $routes->add('permission/assign/(:segment)',   'Permission\Controllers\Permission::assign/$1');
-    
+
 });
     

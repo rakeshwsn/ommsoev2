@@ -8,7 +8,7 @@ if(!isset($routes))
 $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
     $routes->add('budgets','Budgets\Controllers\Budgets::index');
-    $routes->post('budgets/search','Budgets\Controllers\Budgets::search');
+    $routes->post('budgets/search','Budgets\Controllers\Budgets::search',['permission'=>false]);
     $routes->add('budgets/add','Budgets\Controllers\Budgets::add');
     $routes->add('budgets/edit/(:num)','Budgets\Controllers\Budgets::edit/$1');
     $routes->add('budgets/delete/(:num)','Budgets\Controllers\Budgets::delete/$1');

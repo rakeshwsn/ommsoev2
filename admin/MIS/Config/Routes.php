@@ -12,6 +12,6 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->add('mis/edit/(:num)','MIS\Controllers\MIS::edit/$1');
     $routes->get('mis/delete/(:num)','MIS\Controllers\MIS::delete/$1');
 	$routes->add('mis/upload','MIS\Controllers\MIS::upload');
-	$routes->post('mis/search','MIS\Controllers\MIS::search');
+	$routes->post('mis/search','MIS\Controllers\MIS::search',['permission'=>false]);
 
 });

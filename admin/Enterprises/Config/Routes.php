@@ -8,7 +8,7 @@ if (!isset($routes)) {
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
     $routes->add('enterprises', 'Enterprises\Controllers\Enterprises::index');
-    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search');
+    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
     // $routes->post('incentive/searchmain', 'Incentive\Controllers\Incentive::searchMain');
     // $routes->match(['get', 'post'], 'incentive/view/(:segment)', 'Incentive\Controllers\Incentive::view/$1');
     // $routes->match(['get', 'post'], 'incentive/add', 'Incentive\Controllers\Incentive::add');
