@@ -21,6 +21,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('areacoverage/edit', 'CropCoverage\Controllers\AreaCoverage::edit');
     $routes->get('areacoverage/approve', 'CropCoverage\Controllers\Approve::index');
     $routes->add('areacoverage/approve/block', 'CropCoverage\Controllers\Approve::block');
+    $routes->add('areacoverage/approve/district', 'CropCoverage\Controllers\Approve::district');
     $routes->get('dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
 
 

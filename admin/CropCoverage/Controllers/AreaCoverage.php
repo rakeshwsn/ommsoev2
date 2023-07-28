@@ -217,6 +217,10 @@ class AreaCoverage extends AdminController
 
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
+        if(!$gps){
+            return redirect()->to(admin_url('areacoverage'))->with('message','No GPs found. Please add GPs first.');
+        }
+
         $row = 4;
         foreach ($gps as $key => $gp) {
             $row++;

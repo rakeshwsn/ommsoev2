@@ -273,7 +273,10 @@ FROM soe_districts sd
     FROM vw_area_coverage_districtwise vacd
     WHERE vacd.status = 1) ac
     ON ac.district_id = sd.id 
-    LEFT JOIN vw_districtwise_blocks_gps dbg ON sd.id=dbg.district_id";
+    LEFT JOIN vw_districtwise_blocks_gps dbg ON sd.id=dbg.district_id WHERE 1=1";
+            if(!empty($filter['start_date'])){
+                $sql .= " AND DATE(ac.start_date)=date('" . $filter['start_date']."')";
+            }
         }
 //        echo $sql;exit;
         return $this->db->query($sql)->getResult();
