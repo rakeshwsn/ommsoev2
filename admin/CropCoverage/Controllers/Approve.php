@@ -86,9 +86,9 @@ class Approve extends AdminController
         $total_gps = 0;
 
         $data['blocks'] = [];
+        $action = '';
+        $week = '';
         foreach ($blocks as $block) {
-            $action = '';
-            $week = '';
             if ($block->start_date) {
                 $href = admin_url('areacoverage/approve/block?block_id=' . $block->block_id . '&start_date=' . $block->start_date);
                 $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
@@ -122,7 +122,6 @@ class Approve extends AdminController
                 $block->ragi_ls;
             $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
             $data['blocks'][] = [
-                'week' => $week,
                 'block' => $block->block,
                 'gps' => $block->total_gps,
                 'farmers_covered' => $block->farmers_covered,
@@ -172,7 +171,6 @@ class Approve extends AdminController
 
         $data['blocks'][] = [
             'block' => '<strong>Total</strong>',
-            'week' => '',
             'gps' => $total_gps,
             'farmers_covered' => $total_farmers_covered,
             'nursery_raised' => $total_nursery_raised,
@@ -203,6 +201,20 @@ class Approve extends AdminController
         foreach ($crops as $crop) {
             $data['crops'][$crop->id] = $crop->crops;
         }
+
+        $data['week_text'] = $week;
+
+        $weeks = $this->areacoveragemodel->getWeeks();
+
+        $data['weeks'] = [];
+        $week_start_date = '';
+        foreach ($weeks as $week) {
+            if(strtotime($week['start_date'])<=strtotime('today')){
+                $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
+            }
+        }
+
+        $data['week_start_date'] = $week_start_date;
 
         return $this->template->view('Admin\CropCoverage\Views\approve_district', $data);
     }

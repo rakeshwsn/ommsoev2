@@ -183,11 +183,7 @@ FROM ac_crop_practices acp
 
     public function getWeeks(){
 
-        if(isset($date)){
-            $dates = $this->getCurrentYearDates($date);
-        } else {
-            $dates = $this->getCurrentYearDates();
-        }
+        $dates = $this->getCurrentYearDates();
 
         $start = $dates['start_date'];
         $end = $dates['end_date'];

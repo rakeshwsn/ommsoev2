@@ -1,16 +1,40 @@
 <div class="main-container">
     <div class="block">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Filter</h3>
+        </div>
+        <div class="block-content block-content-full">
+            <form id="form-filter" class="form-horizontal">
+                <div class="form-layout">
+                    <div class="row mg-b-25">
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('week', $weeks, $week_start_date,"id='filter_block' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3 center">
+                            <label class="form-control-label">&nbsp;</label>
+                            <div class="form-layout-footer">
+                                <button type="button" id="btn-filter" class="btn btn-primary">Filter</button>
+                            </div><!-- form-layout-footer -->
+                        </div>
+                    </div><!-- row -->
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="block">
         <form action="" method="post">
             <div class="block-header block-header-default">
                 <h3 class="block-title">
-                    <?= $heading_title; ?>
+                    <?= $heading_title; ?>[<?=$week_text?>]
                 </h3>
             </div>
             <div class="block-content">
                 <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                     <thead>
                     <tr>
-                        <th rowspan="3">Week</th>
                         <th rowspan="3">Block</th>
                         <th rowspan="3">No of GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
@@ -45,7 +69,6 @@
                     <?php if ($blocks) {?>
                         <?php foreach ($blocks as $block) {?>
                             <tr>
-                                <td><?=$block['week']?></td>
                                 <td><?=$block['block']?></td>
                                 <td><?=$block['gps']?></td>
                                 <td><?=$block['farmers_covered']?></td>
