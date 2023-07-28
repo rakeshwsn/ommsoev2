@@ -7,9 +7,9 @@ if(!isset($routes))
 
 $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($routes)
 {
-    $routes->add('components','Components\Controllers\Components::index');
-    $routes->post('components/search','Components\Controllers\Components::search');
-    $routes->add('components/autocomplete','Components\Controllers\Components::autocomplete');
+    $routes->add('components','Components\Controllers\Components::index',['filter' => 'permission']);
+    $routes->post('components/search','Components\Controllers\Components::search',['permission'=>false]);
+    $routes->add('components/autocomplete','Components\Controllers\Components::autocomplete',['permission'=>false]);
     $routes->add('components/phase/(:num)','Components\Controllers\Components::phase/$1');
 
     $routes->add('components/add','Components\Controllers\Components::add');
@@ -17,12 +17,12 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->add('components/delete/(:num)','Components\Controllers\Components::delete/$1');
 
     $routes->add('components/assign','Components\Controllers\Assign::index');
-    $routes->add('components/assign/(:num)','Components\Controllers\Assign::index/$1');
+    $routes->add('components/assign/(:num)','Components\Controllers\Assign::index/$1',['filter' => 'permission']);
     $routes->add('components/assign/add','Components\Controllers\Assign::add');
     $routes->post('components/assign/delete','Components\Controllers\Assign::delete');
 
     $routes->add('components/agencyassign','Components\Controllers\AgencyAssign::index');
-    $routes->add('components/agencyassign/(:num)','Components\Controllers\AgencyAssign::index/$1');
+    $routes->add('components/agencyassign/(:num)','Components\Controllers\AgencyAssign::index/$1',['filter' => 'permission']);
 
    
 

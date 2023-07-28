@@ -507,7 +507,7 @@ class Leftbar extends AdminController{
 		// users
 		$user = array();
 		
-		if ($this->user->hasPermission('user')) {
+		if ($this->user->hasPermission('users')) {
 			$user[] = array(
 				'name'	  => lang('Leftbar.text_user'),
 				'href'     => admin_url('users'),
