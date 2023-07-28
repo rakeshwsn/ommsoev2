@@ -479,6 +479,7 @@ class Approve extends AdminController
 
                 $week_text = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
             }
+            $status = $block->status;
             if (!isset($status)) {
                 $status = 3;
             }
