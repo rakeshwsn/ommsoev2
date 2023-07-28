@@ -1,4 +1,6 @@
+<?php if($can_edit) { ?>
 <form method="post" id="misc-txn" onsubmit="return false;">
+<?php } ?>
     <?php if($agency_types): ?>
     <div class="form-group row">
         <label class="col-12" for="agency-type">Agency Type</label>
@@ -32,4 +34,6 @@
         </div>
     </div>
     <?php endforeach; ?>
-</form>
+<?php if($can_edit) { ?>
+    </form>
+<?php } ?>

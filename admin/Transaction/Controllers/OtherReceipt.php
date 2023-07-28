@@ -204,6 +204,13 @@ class OtherReceipt extends AdminController
         } else {
             //update
             if($this->request->getMethod(1)=='POST'){
+                //validate
+                if($txn->status==1){
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Cannot edit other receipt',
+                    ]);
+                }
                 //delete exiting
                 $this->txnModel->where(['id'=>$txn->id])->delete();
                 $txnAmtModel = new MisctxnamtModel();
