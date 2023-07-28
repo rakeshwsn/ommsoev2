@@ -8,6 +8,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
+use Complex\Exception;
 use Config\Url;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -218,7 +219,8 @@ class AreaCoverage extends AdminController
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
         if(!$gps){
-            return redirect()->to(admin_url('areacoverage'))->with('message','No GPs found. Please add GPs first.');
+            return redirect()->to(admin_url('areacoverage'))
+                ->with('message','No GPs found. Please add GPs first.');
         }
 
         $row = 4;
@@ -301,9 +303,15 @@ class AreaCoverage extends AdminController
             $acModel = new AreaCoverageModel();
             $file = $this->request->getFile('file');
 
-            $reader = IOFactory::createReader('Xlsx');
-
-            $spreadsheet = $reader->load($file);
+            try {
+                $reader = IOFactory::createReader('Xlsx');
+                $spreadsheet = $reader->load($file);
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'Invalid file.'
+                ]);
+            }
 
             $activesheet = $spreadsheet->getSheet(0);
 
@@ -327,6 +335,7 @@ class AreaCoverage extends AdminController
 
             //gp belongs to the block
             $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
+            dd($row_data);
             $gp = [];
             $gp_belongs = false;
 
