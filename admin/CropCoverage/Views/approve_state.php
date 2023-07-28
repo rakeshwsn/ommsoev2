@@ -35,6 +35,7 @@
                 <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                     <thead>
                     <tr>
+                        <th rowspan="3">District</th>
                         <th rowspan="3">Block</th>
                         <th rowspan="3">No of GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
@@ -66,33 +67,34 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <?php if ($blocks) {?>
-                        <?php foreach ($blocks as $block) {?>
+                    <?php if ($districts) {?>
+                        <?php foreach ($districts as $district) {?>
                             <tr>
-                                <td><?=$block['block']?></td>
-                                <td><?=$block['gps']?></td>
-                                <td><?=$block['farmers_covered']?></td>
-                                <td><?=$block['nursery_raised']?></td>
-                                <td><?=$block['balance_smi']?></td>
-                                <td><?=$block['balance_lt']?></td>
-                                <td><?=$block['ragi_smi']?></td>
-                                <td><?=$block['ragi_lt']?></td>
-                                <td><?=$block['ragi_ls']?></td>
-                                <td><?=$block['little_millet_lt']?></td>
-                                <td><?=$block['little_millet_ls']?></td>
-                                <td><?=$block['foxtail_ls']?></td>
-                                <td><?=$block['sorghum_ls']?></td>
-                                <td><?=$block['kodo_ls']?></td>
-                                <td><?=$block['barnyard_ls']?></td>
-                                <td><?=$block['pearl_ls']?></td>
-                                <td><?=$block['total_ragi']?></td>
-                                <td><?=$block['total_non_ragi']?></td>
-                                <td><?=$block['total_fc']?></td>
-                                <td><?=$block['total_area']?></td>
-                                <td><?=$block['status']?></td>
+                                <td><?=$district['district']?></td>
+                                <td><?=$district['blocks']?></td>
+                                <td><?=$district['gps']?></td>
+                                <td><?=$district['farmers_covered']?></td>
+                                <td><?=$district['nursery_raised']?></td>
+                                <td><?=$district['balance_smi']?></td>
+                                <td><?=$district['balance_lt']?></td>
+                                <td><?=$district['ragi_smi']?></td>
+                                <td><?=$district['ragi_lt']?></td>
+                                <td><?=$district['ragi_ls']?></td>
+                                <td><?=$district['little_millet_lt']?></td>
+                                <td><?=$district['little_millet_ls']?></td>
+                                <td><?=$district['foxtail_ls']?></td>
+                                <td><?=$district['sorghum_ls']?></td>
+                                <td><?=$district['kodo_ls']?></td>
+                                <td><?=$district['barnyard_ls']?></td>
+                                <td><?=$district['pearl_ls']?></td>
+                                <td><?=$district['total_ragi']?></td>
+                                <td><?=$district['total_non_ragi']?></td>
+                                <td><?=$district['total_fc']?></td>
+                                <td><?=$district['total_area']?></td>
+                                <td><?=$district['status']?></td>
                                 <td>
                                     <div class="btn-group btn-group-sm pull-right">
-                                    <?=$block['action']?>
+                                    <?=$district['action']?>
                                     </div>
                                 </td>
                             </tr>

@@ -239,12 +239,17 @@ FROM ac_crop_practices acp
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc 
                     WHERE cc.year_id=" . $filter['year_id'] .
                 " AND cc.season='" . $filter['season']."') ac ON ac.block_id=b.id 
-                WHERE b.district_id=".$filter['district_id']." ORDER BY date(ac.start_date) DESC,b.name ASC";
-
+                WHERE b.district_id=".$filter['district_id'];
+            if(!empty($filter['start_date'])){
+                $sql .= " AND DATE(ac.start_date)=date('" . $filter['start_date']."')";
+            }
+            $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
         } else {
             $sql = "SELECT
   sd.id district_id,
   sd.name district,
+  dbg.total_blocks,
+  dbg.total_gps,
   ac.start_date,
   ac.end_date,
   ac.farmers_covered,
@@ -267,7 +272,8 @@ FROM soe_districts sd
       *
     FROM vw_area_coverage_districtwise vacd
     WHERE vacd.status = 1) ac
-    ON ac.district_id = sd.id";
+    ON ac.district_id = sd.id 
+    LEFT JOIN vw_districtwise_blocks_gps dbg ON sd.id=dbg.district_id";
         }
 //        echo $sql;exit;
         return $this->db->query($sql)->getResult();
