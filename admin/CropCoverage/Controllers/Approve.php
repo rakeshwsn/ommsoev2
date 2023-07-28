@@ -467,7 +467,7 @@ class Approve extends AdminController
         $action = '';
         foreach ($blocks as $block) {
             if ($block->start_date) {
-                $href = admin_url('areacoverage/approve/block?block_id=' . $block->block_id . '&start_date=' . $block->start_date);
+                $href = admin_url('areacoverage/approve/district?district_id=' . $block->district_id . '&start_date=' . $block->start_date);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
                                             <i class="fa fa-list"></i></a>';
                 /*if($block->status==0){
@@ -601,7 +601,6 @@ class Approve extends AdminController
 
         return $this->template->view('Admin\CropCoverage\Views\approve_state', $data);
     }
-
 
 }
 
