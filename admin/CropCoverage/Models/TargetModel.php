@@ -68,7 +68,7 @@ class TargetModel extends Model
 				"lt" => isset($area['lt']) ? $area['lt'] : 0,
 				// Check if 'LT' key exists
 				"ls" => isset($area['ls']) ? $area['ls'] : 0,
-				"followup" => isset($area['followup']) ? $area['followup'] : 0, // Check if 'LS' key exists
+
 			);
 
 			$this->db->table('ac_target_area')->insert($targetdata);
@@ -187,24 +187,28 @@ class TargetModel extends Model
 
 	public function getBlockTargets($filter = [])
 	{
-		$sql = "SELECT
-                ac.id,
-                ac.crops,
-                ata.smi,
-                ata.ls,
-                ata.lt,
-                afc.followup
-            FROM
-                ac_crops ac
-            LEFT JOIN ac_target_area ata ON ac.id = ata.crop_id
-            LEFT JOIN ac_target_master atm ON ata.target_id = atm.id
-            -- Join ac_target_followup_crop table and filter by target_id
-            LEFT JOIN ac_target_followup_crop afc ON atm.id = afc.target_id AND ata.crop_id = afc.crop_id
-            WHERE
-                ac.crops IS NOT NULL
-                AND atm.deleted_at IS NULL";
 
-		// Apply additional filters
+
+		$sql = "SELECT
+  ac.id,
+  ac.crops,
+  cd.smi,
+  cd.ls,
+  cd.lt,
+  fl.followup
+FROM ac_crops ac
+  LEFT JOIN (SELECT
+      ata.id,
+	  ata.crop_id,
+      ata.lt,
+      ata.ls,
+      ata.smi
+    FROM ac_target_area ata
+      LEFT JOIN ac_target_master atm
+        ON ata.target_id = atm.id
+		WHERE 1 = 1";
+
+
 		if (!empty($filter['block_id'])) {
 			$sql .= " AND atm.block_id = " . $filter['block_id'];
 		}
@@ -215,7 +219,33 @@ class TargetModel extends Model
 			$sql .= " AND atm.season = '" . $filter['season'] . "'";
 		}
 
-		//echo $sql;
+		$sql .= " AND atm.deleted_at IS NULL) cd
+    ON ac.id = cd.crop_id
+ LEFT JOIN (SELECT
+      ata.id,
+      ata.crop_id,
+      ata.followup
+    FROM ac_target_followup_crop ata
+      LEFT JOIN ac_target_master atm
+        ON ata.target_id = atm.id
+
+    WHERE 1 = 1";
+
+		if (!empty($filter['block_id'])) {
+			$sql .= " AND atm.block_id = " . $filter['block_id'];
+		}
+		if (!empty($filter['year_id'])) {
+			$sql .= " AND atm.year_id = " . $filter['year_id'];
+		}
+		if (!empty($filter['season'])) {
+			$sql .= " AND atm.season = '" . $filter['season'] . "'";
+		}
+		$sql .= " AND atm.deleted_at IS NULL) fl
+		 ON ac.id = fl.crop_id
+    WHERE ac.crops IS NOT NULL";
+
+
+
 		return $this->db->query($sql)->getResultArray();
 	}
 
