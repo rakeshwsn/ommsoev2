@@ -141,5 +141,29 @@ WHERE ms.deleted_at IS NULL";
         return false;
     }
 
+    public function isBlockMisUploaded($district_id=0,$year=0,$month=0) {
+	    $sql = "SELECT
+  sb.id block_id,
+  ms.id mis_id
+FROM (SELECT
+    *
+  FROM soe_blocks
+  WHERE district_id = $district_id) sb
+  LEFT JOIN (SELECT
+      *
+    FROM mis_submissions msb
+    WHERE msb.block_id > 0
+    AND msb.district_id = $district_id AND msb.year=$year AND msb.month=$month) ms
+    ON sb.id = ms.block_id";
+
+	    $res = $this->db->query($sql)->getResult();
+        foreach ($res as $item) {
+            if(!$item->mis_id){
+                return false;
+            }
+	    }
+	    return true;
+    }
+
 
 }

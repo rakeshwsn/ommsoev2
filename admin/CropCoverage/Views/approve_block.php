@@ -16,7 +16,7 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">
-                <?= $heading_title; ?>
+                <?= $heading_title; ?> [<?=$week?>]
             </h3>
             <?php if(!$approved){ ?>
             <div class="block-options">
@@ -28,7 +28,7 @@
             <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                 <thead>
                 <tr>
-                    <th rowspan="3">Week</th>
+                    <th rowspan="3">#</th>
                     <th rowspan="3">GP</th>
                     <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
                     <th rowspan="3">Nursery Raised (in Ha.)</th>
@@ -61,7 +61,7 @@
                 <?php if ($blocks) {?>
                     <?php foreach ($blocks as $block) {?>
                         <tr>
-                            <td><?=$block['week']?></td>
+                            <td><?=$block['slno']?></td>
                             <td><?=$block['gp']?></td>
                             <td><?=$block['farmers_covered']?></td>
                             <td><?=$block['nursery_raised']?></td>

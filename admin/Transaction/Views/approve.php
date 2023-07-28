@@ -1,10 +1,8 @@
 
 <!-- Main content -->
-<section class="content">
-
-    <div class="block" id="upload-controls">
-        <div class="block-content block-content-full">
-            <form>
+<div class="block" id="upload-controls">
+    <div class="block-content block-content-full">
+        <form>
             <div class="row">
                 <div class="col-md-2">
                     <select class="form-control" id="year" name="year" required>
@@ -75,28 +73,28 @@
                     <button id="btn-add" class="btn btn-outline btn-primary"><i class="fa fa-table"></i> Filter</button>
                 </div>
             </div>
-            </form>
-        </div>
+        </form>
     </div>
+</div>
 
-    <!--  Table block  -->
-    <div class="block">
-        <div class="block-content block-content-full">
-            <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
-                <thead>
-                <tr>
-                    <th>Year</th>
-                    <th>Month</th>
-                    <th>Date Added</th>
-                    <th>Txn Type</th>
-                    <th>Block</th>
-                    <th>Agency Type</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($upload_statuses as $status): ?>
+<!--  Table block  -->
+<div class="block">
+    <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
+            <thead>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Date Added</th>
+                <th>Txn Type</th>
+                <th>Block</th>
+                <th>Agency Type</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($upload_statuses as $status): ?>
                 <tr>
                     <td><?=$status->year?></td>
                     <td><?=$status->month?></td>
@@ -107,13 +105,11 @@
                     <td><?=$status->status?></td>
                     <td><?php if($status->action) { ?> <a href="<?=$status->action?>" class="btn btn-primary"><i class="fa fa-send"></i></a> <?php } ?></td>
                 </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
-
-</section>
+</div>
 <!-- content -->
 
 <?php js_start(); ?>
