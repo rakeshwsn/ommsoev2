@@ -8,7 +8,7 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Year</label>
-                        <select class="form-control" id="year" name="year" required>
+                        <select class="form-control" id="year_id" name="year_id" required>
                             <?php foreach ($years as $year) { ?>
                                 <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
                             <?php } ?>
@@ -16,7 +16,7 @@
                     </div>
                     <div class="col-md-2">
                         <label>Season</label>
-                        <select class="form-control" id="month" name="month">
+                        <select class="form-control" id="season" name="season">
                             <?php foreach ($seasons as $value => $season) { ?>
                                 <option value="<?=$value?>" <?php if($value==$current_season){echo 'selected';} ?>><?=$season?></option>
                             <?php } ?>

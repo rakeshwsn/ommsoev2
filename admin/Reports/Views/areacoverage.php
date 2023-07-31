@@ -14,7 +14,6 @@
                 <table class="table custom-table " id="txn-table">
                     <thead>
                     <tr>
-                        <th rowspan="3">Week</th>
                         <?php if($block_id){ ?>
                             <th rowspan="3">GP</th>
                         <?php } else if($district_id){ ?>
@@ -52,7 +51,31 @@
                     </tr>
                     </thead>
                     <tbody>
-
+                        <?php foreach ($blocks as $block): ?>
+                            <tr>
+                                <td><?=$block['district']?></td>
+                                <td><?=$block['blocks']?></td>
+                                <td><?=$block['gps']?></td>
+                                <td><?=$block['farmers_covered']?></td>
+                                <td><?=$block['nursery_raised']?></td>
+                                <td><?=$block['balance_smi']?></td>
+                                <td><?=$block['balance_lt']?></td>
+                                <td><?=$block['ragi_smi']?></td>
+                                <td><?=$block['ragi_lt']?></td>
+                                <td><?=$block['ragi_ls']?></td>
+                                <td><?=$block['little_millet_lt']?></td>
+                                <td><?=$block['little_millet_ls']?></td>
+                                <td><?=$block['foxtail_ls']?></td>
+                                <td><?=$block['sorghum_ls']?></td>
+                                <td><?=$block['kodo_ls']?></td>
+                                <td><?=$block['barnyard_ls']?></td>
+                                <td><?=$block['pearl_ls']?></td>
+                                <td><?=$block['total_ragi']?></td>
+                                <td><?=$block['total_non_ragi']?></td>
+                                <td><?=$block['total_fc']?></td>
+                                <td><?=$block['total_area']?></td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

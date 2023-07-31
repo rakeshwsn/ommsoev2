@@ -10,7 +10,7 @@
                         <div class="col-lg-3">
                             <div class="form-group mg-b-10-force">
                                 <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
-                                <?= form_dropdown('week', $weeks, $week_start_date,"id='filter_block' class='form-control js-select2'"); ?>
+                                <?= form_dropdown('start_date', $weeks, $week_start_date,"id='filter_block' class='form-control js-select2'"); ?>
                             </div>
                         </div><!-- col-4 -->
                         <div class="col-lg-3 center">
@@ -43,7 +43,7 @@
                         <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
                         <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
                         </th>
-                        <th colspan="10">Achievement under demonstration (in Ha.)</th>
+                        <th colspan="10">Achievement under demonstration (in Ha.) <?=$week_text?></th>
                         <th rowspan="3">Total Ragi</th>
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>

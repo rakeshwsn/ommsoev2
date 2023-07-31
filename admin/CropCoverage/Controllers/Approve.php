@@ -70,17 +70,19 @@ class Approve extends AdminController
             $data['district_id'] = $district_id = $this->user->district_id;
         }
 
-        if ($this->request->getGet('week')) {
-            $data['week'] = $this->request->getGet('week');
+        $week_dates = $this->areacoveragemodel->getWeekDate();
+
+        if ($this->request->getGet('start_date')) {
+            $data['start_date'] = $start_date = $this->request->getGet('start_date');
         } else {
-            $data['week'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+            $data['start_date'] = $week_dates['start_date'];
         }
 
         $filter = [
             'district_id' => $district_id,
             'year_id' => getCurrentYearId(),
             'season' => getCurrentSeason(),
-            'start_date' => $data['week']
+            'start_date' => $data['start_date']
         ];
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
@@ -93,9 +95,9 @@ class Approve extends AdminController
         $total_gps = 0;
 
         $data['blocks'] = [];
-        $action = '';
         $week_text = '';
         foreach ($blocks as $block) {
+            $action = '';
             if ($block->start_date) {
                 $href = admin_url('areacoverage/approve/block?block_id=' . $block->block_id . '&start_date=' . $block->start_date);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
@@ -219,14 +221,29 @@ class Approve extends AdminController
                 $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
             }
             //show week text
-            if(strtotime($week['start_date'])<=strtotime($data['week'])){
+            if(strtotime($week['start_date'])<=strtotime($data['start_date'])){
                 $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
             }
         }
 
-        $data['week_start_date'] = $data['week'];
+        $data['week_start_date'] = $data['start_date'];
 
         $data['week_text'] = $week_text;
+
+        $data['districts'] = [];
+        $districts = (new DistrictModel())->findAll();
+
+        foreach ($districts as $district) {
+            if($district->id==$district_id){
+                $data['districts'][$district->id] = $district->name;
+            }
+        }
+
+        $data['show_reject'] = false;
+        if($this->user->district_id!=$district_id){
+            $data['show_reject'] = true;
+            $data['reject_url'] = admin_url('areacoverage/approve/reject');
+        }
 
         return $this->template->view('Admin\CropCoverage\Views\approve_district', $data);
     }
@@ -235,6 +252,7 @@ class Approve extends AdminController
         $data['heading_title'] = lang('Approve Area Coverage');
 
         $block_id = $this->request->getGet('block_id');
+
         $start_date = $this->request->getGet('start_date');
 
         $dates = $this->areacoveragemodel->getWeekDate($start_date);
@@ -385,6 +403,31 @@ class Approve extends AdminController
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
+        $blockModel = new BlockModel();
+        $block = $blockModel->find($block_id);
+        $blocks = $blockModel->where('district_id',$block->district_id)->findAll();
+
+        $data['filter_blocks'] = [];
+        foreach ($blocks as $block) {
+            if($block->id==$block_id){
+                $data['filter_blocks'][$block->id] = $block->name;
+            }
+        }
+        $data['block_id'] = $block_id;
+
+        $weeks = $this->areacoveragemodel->getWeeks();
+
+        $data['weeks'] = [];
+        $week_start_date = $start_date;
+        foreach ($weeks as $week) {
+            //dropdown weeks
+            if(strtotime($week['start_date'])<=strtotime('today')){
+                $data['weeks'][$week['start_date']] = $week['start_date'];
+            }
+        }
+
+        $data['week_start_date'] = $week_start_date;
+
         return $this->template->view('Admin\CropCoverage\Views\approve_block', $data);
     }
 
@@ -440,16 +483,16 @@ class Approve extends AdminController
             $data['district_id'] = '';
         }
 
-        if ($this->request->getGet('week')) {
-            $data['week'] = $this->request->getGet('week');
+        if ($this->request->getGet('start_date')) {
+            $data['start_date'] = $this->request->getGet('start_date');
         } else {
-            $data['week'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+            $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
         }
 
         $filter = [
             'year_id' => getCurrentYearId(),
             'season' => getCurrentSeason(),
-            'start_date' => $data['week']
+            'start_date' => $data['start_date']
         ];
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
@@ -464,8 +507,8 @@ class Approve extends AdminController
 
         $week_text = '';
         $data['districts'] = [];
-        $action = '';
         foreach ($blocks as $block) {
+            $action = '';
             if ($block->start_date) {
                 $href = admin_url('areacoverage/approve/district?district_id=' . $block->district_id . '&start_date=' . $block->start_date);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
@@ -591,18 +634,36 @@ class Approve extends AdminController
                 $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
             }
             //show week text
-            if(strtotime($week['start_date'])<=strtotime($data['week'])){
+            if(strtotime($week['start_date'])<=strtotime($data['start_date'])){
                 $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
             }
         }
 
-        $data['week_start_date'] = $data['week'];
+        $data['week_start_date'] = $data['start_date'];
 
         $data['week_text'] = $week_text;
 
         return $this->template->view('Admin\CropCoverage\Views\approve_state', $data);
     }
 
+    public function reject() {
+        $district_id = $this->request->getPost('district_id');
+        $start_date = $this->request->getPost('start_date');
+
+        $updated = (new AreaCoverageModel())->where('district_id',$district_id)
+            ->where('start_date',$start_date)->set(['status'=>0])->update();
+        $redirect = '';
+        $status = false;
+        if($updated){
+            $status = true;
+            $redirect = admin_url('areacoverage/approve?start_date='.$start_date);
+            redirect()->to($redirect)->with('message','District data rejcted');
+        }
+        return $this->response->setJSON([
+            'status'=>$status,
+            'redirect' => $redirect
+        ]);
+    }
 }
 
 ?>
