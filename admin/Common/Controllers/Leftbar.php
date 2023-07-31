@@ -394,6 +394,14 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
+        if ($this->user->hasPermission('reports/areacoverage')) {
+            $areacoverage[] = array(
+                'name' => 'Area Coverage Report',
+                'href' => admin_url('reports/areacoverage'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
 
 
         if ($this->user->hasPermission('cropcoverage/crops')) {
