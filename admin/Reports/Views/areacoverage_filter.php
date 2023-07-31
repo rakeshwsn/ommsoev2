@@ -22,6 +22,24 @@
                             <?php } ?>
                         </select>
                     </div>
+                    <div class="col-md-2">
+                        <label>District</label>
+                        <select class="form-control" id="district" name="district_id">
+                            <option value="">All Districts</option>
+                            <?php foreach ($districts as $district) { ?>
+                                <option value="<?=$district['id']?>" <?php if($district['id']==$district_id){echo 'selected';} ?>><?=$district['name']?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Block</label>
+                        <select class="form-control" id="block" name="block_id">
+                            <option value="">All Blocks</option>
+                            <?php foreach ($blocks as $block) { ?>
+                                <option value="<?=$block['id']?>" <?php if($block['id']==$block_id){echo 'selected';} ?>><?=$block['name']?></option>
+                            <?php } ?>
+                        </select>
+                    </div>
                     <div class="col-md-2 mt-4">
                         <button id="btn-filter" class="btn btn-outline btn-primary">
                             <i class="fa fa-filter"></i> Filter</button>

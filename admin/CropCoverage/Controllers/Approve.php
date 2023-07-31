@@ -513,12 +513,6 @@ class Approve extends AdminController
                 $href = admin_url('areacoverage/approve/district?district_id=' . $block->district_id . '&start_date=' . $block->start_date);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
                                             <i class="fa fa-list"></i></a>';
-                /*if($block->status==0){
-                    $action .= '<a href="" class="btn btn-sm btn-success btn-approve" data-toggle="tooltip" title="Approve">
-                                            <i class="fa fa-check-square-o"></i></a>';
-                    $action .= '<a href="" class="btn btn-sm btn-danger btn-reject" data-toggle="tooltip" title="Reject">
-                                            <i class="fa fa-close"></i></a>';
-                }*/
 
                 $week_text = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
             }

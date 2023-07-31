@@ -70,8 +70,18 @@ class AreaCoverage extends AdminController {
             $data['crops'][$crop->id] = $crop->crops;
         }
 
+        $data['districts'] = (new DistrictModel())->asArray()->find();
+
+        $data['blocks'] = [];
+        if($data['district_id']){
+            $data['blocks'] = (new BlockModel())->where('district_id',$data['district_id'])
+                ->asArray()->findAll();
+        }
+
         $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
         $data['download_url'] = admin_url('reports/areacoverage/download');
+        $data['get_blocks'] = Url::getBlocks;
+
         return $this->template->view('Admin\Reports\Views\areacoverage', $data);
     }
 
@@ -83,7 +93,7 @@ class AreaCoverage extends AdminController {
         $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
         $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
-        $data['blocks'] = [];
+        $data['rows'] = [];
         foreach ($blocks as $block) {
             $total_area = $block->fc_area +
                 $block->ragi_smi +
@@ -101,7 +111,7 @@ class AreaCoverage extends AdminController {
                 $block->ragi_ls;
             $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
 
-            $data['blocks'][] = [
+            $data['rows'][] = [
                 'gp' => $block->gp,
                 'farmers_covered' => $block->farmers_covered,
                 'nursery_raised' => $block->nursery_raised,
@@ -145,7 +155,7 @@ class AreaCoverage extends AdminController {
 
         }
 
-        $data['blocks'][] = [
+        $data['rows'][] = [
             'gp' => '<strong>Total</strong>',
             'farmers_covered' => $total_farmers_covered,
             'nursery_raised' => $total_nursery_raised,
@@ -176,7 +186,7 @@ class AreaCoverage extends AdminController {
         $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
         $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
-        $data['blocks'] = [];
+        $data['rows'] = [];
         $gps = 0;
         foreach ($blocks as $block) {
             $total_area = $block->fc_area +
@@ -195,7 +205,7 @@ class AreaCoverage extends AdminController {
                 $block->ragi_ls;
             $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
 
-            $data['blocks'][] = [
+            $data['rows'][] = [
                 'block' => $block->block,
                 'gps' => $block->total_gps,
                 'farmers_covered' => $block->farmers_covered,
@@ -242,7 +252,7 @@ class AreaCoverage extends AdminController {
 
         }
 
-        $data['blocks'][] = [
+        $data['rows'][] = [
             'block' => '<strong>Total</strong>',
             'gps' => $gps,
             'farmers_covered' => $total_farmers_covered,
@@ -274,7 +284,7 @@ class AreaCoverage extends AdminController {
         $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
         $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
-        $data['blocks'] = [];
+        $data['rows'] = [];
         $gps = $tblocks = 0;
         foreach ($blocks as $block) {
             $total_area = $block->fc_area +
@@ -293,7 +303,7 @@ class AreaCoverage extends AdminController {
                 $block->ragi_ls;
             $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
 
-            $data['blocks'][] = [
+            $data['rows'][] = [
                 'district' => $block->district,
                 'blocks' => $block->total_blocks,
                 'gps' => $block->total_gps,
@@ -342,7 +352,7 @@ class AreaCoverage extends AdminController {
 
         }
 
-        $data['blocks'][] = [
+        $data['rows'][] = [
             'district' => '<strong>Total</strong>',
             'blocks' => $tblocks,
             'gps' => $gps,
