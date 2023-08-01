@@ -376,4 +376,43 @@ class AreaCoverage extends AdminController {
             'total_area' => $total_total_area
         ];
     }
+
+    public function download() {
+
+        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
+        $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
+
+        $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
+        if($spreadsheet){
+            $worksheet = $spreadsheet->getActiveSheet();
+            $columnIndex = 'B'; // Change this to the desired column index
+            $wordWrapCols=[
+                'G2','O2','Q1'
+            ];
+            foreach($wordWrapCols as $col){
+                $cell = $worksheet->getCell($col);
+                $cell->getStyle()->getAlignment()->setWrapText(true);
+            }
+
+            // Get the highest row index in the column
+            $highestRow = $worksheet->getHighestRow();
+
+            // Apply word wrap to each cell in column B
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $cell = $worksheet->getCell($columnIndex . $row);
+                $cell->getStyle()->getAlignment()->setWrapText(true);
+            }
+
+            $worksheet->getColumnDimension($columnIndex)->setWidth(20);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'. $filename .'"');
+            header('Cache-Control: max-age=0');
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit();
+        }
+        exit;
+    }
 }

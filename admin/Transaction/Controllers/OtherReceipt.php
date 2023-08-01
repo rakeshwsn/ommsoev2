@@ -140,9 +140,9 @@ class OtherReceipt extends AdminController
             'user_id' => $this->user->user_id,
         ];
 
-        $this->_validate($condition);
+        $error = $this->_validate($condition);
 
-        if($this->request->getMethod(1)=='POST'){
+        if($this->request->getMethod(1)=='POST' && !$error){
             $txn_id = $this->txnModel
                 ->insert([
                     'month'=>$month,
