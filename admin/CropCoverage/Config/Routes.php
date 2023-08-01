@@ -9,7 +9,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->match(['get', 'post'], 'cropcoverage/crops', 'CropCoverage\Controllers\AreaCoverageCrops::index');
     $routes->add('areacoverage/download', 'CropCoverage\Controllers\AreaCoverage::download');
     $routes->match(['get', 'post'], 'areacoverage', 'CropCoverage\Controllers\AreaCoverage::Index');
-    $routes->post('areacoverage/search', 'CropCoverage\Controllers\AreaCoverage::search',['permission'=>false]);
+    $routes->post('areacoverage/search', 'CropCoverage\Controllers\AreaCoverage::search', ['permission' => false]);
     $routes->match(['get', 'post'], 'areacoverage/target', 'CropCoverage\Controllers\AreaCoverageTarget::index');
     $routes->match(['get', 'post'], 'cropcoverage/reports', 'CropCoverage\Controllers\CropCoverageReports::index');
     $routes->match(['get', 'post'], 'areacoverage/dashboard', 'CropCoverage\Controllers\AreaCoverageDashboard::index');
@@ -21,7 +21,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('areacoverage/edit', 'CropCoverage\Controllers\AreaCoverage::edit');
     $routes->get('areacoverage/approve', 'CropCoverage\Controllers\Approve::index');
     $routes->add('areacoverage/approve/block', 'CropCoverage\Controllers\Approve::block');
-    $routes->get('dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
+    $routes->get('areacoverage/dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
+    $routes->get('areacoverage/dashboard/milletchart', 'CropCoverage\Controllers\AreaCoverageDashboard::milletChart');
 
 
 });

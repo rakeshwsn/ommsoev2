@@ -103,8 +103,8 @@ class AreaCoverageTarget extends AdminController
 	public function add()
 	{
 		if ($this->request->getMethod(1) === 'POST') {
-			printr($_POST);
-			exit;
+			//printr($_POST);
+			//exit;
 
 			$data['block_id'] = $this->request->getGet('block_id');
 			$data['crop_data'] = $this->request->getPost('crop');
@@ -126,7 +126,9 @@ class AreaCoverageTarget extends AdminController
 			//delete existing
 			$block_id = $this->request->getGet('block_id');
 			$data['block_id'] = $block_id;
+
 			$masterdata = array(
+				"district_id" => $this->user->district_id,
 				"block_id" => $data['block_id'],
 				"year_id" => getCurrentYearId(),
 				"season" => getCurrentSeason(),
