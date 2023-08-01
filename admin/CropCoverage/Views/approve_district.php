@@ -1,16 +1,51 @@
 <div class="main-container">
     <div class="block">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Filter</h3>
+        </div>
+        <div class="block-content block-content-full">
+            <form id="form-filter" class="form-horizontal">
+                <div class="form-layout">
+                    <div class="row mg-b-25">
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">District: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('district_id', $districts, $district_id,"id='filter_block' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('start_date', $weeks, $week_start_date,"id='filter_block' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3 center">
+                            <label class="form-control-label">&nbsp;</label>
+                            <div class="form-layout-footer">
+                                <button id="btn-filter" class="btn btn-primary">Filter</button>
+                            </div><!-- form-layout-footer -->
+                        </div>
+                    </div><!-- row -->
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="block">
         <form action="" method="post">
             <div class="block-header block-header-default">
                 <h3 class="block-title">
-                    <?= $heading_title; ?>
+                    <?= $heading_title; ?>[<?=$week_text?>]
                 </h3>
+                <?php if($show_reject): ?>
+                <div class="block-options">
+                    <button type="button" data-toggle="tooltip" title="Reject" class="btn btn-danger" id="btn-reject"><i class="fa fa-recycle"></i></button>
+                </div>
+                <?php endif; ?>
             </div>
             <div class="block-content">
                 <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                     <thead>
                     <tr>
-                        <th rowspan="3">Week</th>
                         <th rowspan="3">Block</th>
                         <th rowspan="3">No of GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
@@ -18,7 +53,7 @@
                         <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
                         <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
                         </th>
-                        <th colspan="10">Achievement under demonstration (in Ha.)</th>
+                        <th colspan="10">Achievement under demonstration (in Ha.) <?=$week_text?></th>
                         <th rowspan="3">Total Ragi</th>
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>
@@ -45,7 +80,6 @@
                     <?php if ($blocks) {?>
                         <?php foreach ($blocks as $block) {?>
                             <tr>
-                                <td><?=$block['week']?></td>
                                 <td><?=$block['block']?></td>
                                 <td><?=$block['gps']?></td>
                                 <td><?=$block['farmers_covered']?></td>
@@ -85,3 +119,33 @@
         </form>
     </div>
 </div>
+
+<?php if($show_reject){ ?>
+<?php js_start(); ?>
+<script>
+    $(function () {
+        $('#btn-reject').click(function () {
+            if(confirm('Are you sure you want to reject this district data?')==false){
+                return false;
+            }
+            district_id = <?=$district_id?>;
+            start_date = '<?=$week_start_date?>';
+            $.ajax({
+                url:'<?=$reject_url?>',
+                data:{district_id:district_id,start_date:start_date},
+                type:'POST',
+                dataType:'JSON',
+                success:function (res) {
+                    if(res.status){
+                        location.href = res.redirect;
+                    }
+                },
+                error:function () {
+                    alert('Something went wrong');
+                }
+            });
+        });
+    });
+</script>
+<?php js_end(); ?>
+<?php } ?>

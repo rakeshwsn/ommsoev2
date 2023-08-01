@@ -15,8 +15,39 @@
     </div>-->
     <div class="block">
         <div class="block-header block-header-default">
+            <h3 class="block-title">Filter</h3>
+        </div>
+        <div class="block-content block-content-full">
+            <form id="form-filter" class="form-horizontal">
+                <div class="form-layout">
+                    <div class="row mg-b-25">
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">Block: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('block_id', $filter_blocks, $block_id,"id='filter_block' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('start_date', $weeks, $week_start_date,"id='filter_week' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3 center">
+                            <label class="form-control-label">&nbsp;</label>
+                            <div class="form-layout-footer">
+                                <button id="btn-filter" class="btn btn-primary">Filter</button>
+                            </div><!-- form-layout-footer -->
+                        </div>
+                    </div><!-- row -->
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="block">
+        <div class="block-header block-header-default">
             <h3 class="block-title">
-                <?= $heading_title; ?>
+                <?= $heading_title; ?> [<?=$week?>]
             </h3>
             <?php if(!$approved){ ?>
             <div class="block-options">
@@ -28,14 +59,14 @@
             <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
                 <thead>
                 <tr>
-                    <th rowspan="3">Week</th>
+                    <th rowspan="3">#</th>
                     <th rowspan="3">GP</th>
                     <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
                     <th rowspan="3">Nursery Raised (in Ha.)</th>
                     <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
                     <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
                     </th>
-                    <th colspan="10">Achievement under demonstration (in Ha.)</th>
+                    <th colspan="10">Achievement under demonstration (in Ha.) <?=$week?></th>
                     <th rowspan="3">Total Ragi</th>
                     <th rowspan="3">Total Non-Ragi </th>
                     <th rowspan="3">Follow up Crops</th>
@@ -61,7 +92,7 @@
                 <?php if ($blocks) {?>
                     <?php foreach ($blocks as $block) {?>
                         <tr>
-                            <td><?=$block['week']?></td>
+                            <td><?=$block['slno']?></td>
                             <td><?=$block['gp']?></td>
                             <td><?=$block['farmers_covered']?></td>
                             <td><?=$block['nursery_raised']?></td>

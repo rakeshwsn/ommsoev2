@@ -394,6 +394,14 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
+        if ($this->user->hasPermission('reports/areacoverage')) {
+            $areacoverage[] = array(
+                'name' => 'Area Coverage Report',
+                'href' => admin_url('reports/areacoverage'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
 
 
         if ($this->user->hasPermission('cropcoverage/crops')) {
@@ -460,13 +468,13 @@ class Leftbar extends AdminController
 
 
 
-        if ($this->user->hasPermission('letter')) {
+        if ($this->user->hasPermission('letters')) {
             $data['menus'][] = array(
                 'id' => 'menu-letter',
                 'icon' => 'md-account-child',
                 'name' => lang('Leftbar.text_letters'),
                 'heading' => 0,
-                'href' => admin_url('letter'),
+                'href' => admin_url('letters'),
                 'children' => []
             );
         }
