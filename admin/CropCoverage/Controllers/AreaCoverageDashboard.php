@@ -6,6 +6,9 @@ use App\Controllers\AdminController;
 
 class AreaCoverageDashboard extends AdminController
 {
+    private $data;
+    private $error = array();
+    private $targetModel;
     function __construct()
     {
         $this->targetModel = new TargetModel();
@@ -66,7 +69,7 @@ class AreaCoverageDashboard extends AdminController
 
     public function milletChart()
     {
-        $data = [];
+
         $year_id = $this->request->getGet('year_id');
 
 
@@ -82,11 +85,11 @@ class AreaCoverageDashboard extends AdminController
         // exit;
         $millets = $series_target = $series_achievement = [];
         foreach ($milletstarget as $millettarget) {
-            $districts[] = $disttarget['district'];
-            $series_target[] = $disttarget['target_area'];
-            $series_achievement[] = $disttarget['ach_area'];
+            $millets[] = $millettarget['crop'];
+            $series_target[] = $millettarget['target_area'];
+            $series_achievement[] = $millettarget['achievement_area'];
         }
-        $data['xaxis'] = $districts;
+        $data['xaxis'] = $millets;
 
 
         /*$data['series'] = [

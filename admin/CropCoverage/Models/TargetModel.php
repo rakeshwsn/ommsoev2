@@ -341,80 +341,59 @@ LEFT JOIN (
         $season = $filter['season'];
 
         $sql = "SELECT
-    sd.id district_id,
-    sd.name district,
-    COALESCE((tar.lt + tar.ls + tar.smi + tar.fup), 0) target_area,
-    COALESCE((ach.smi + ach.ls + ach.lt + ach.fup_area), 0) ach_area
-FROM
-    soe_districts sd
-LEFT JOIN (
-    SELECT
-        ata.target_id,
-        sb.district_id,
-        SUM(ata.lt) lt,
-        SUM(ata.ls) ls,
-        SUM(ata.smi) smi,
-        SUM(fup.area) fup
-    FROM
-        ac_target_master atm
-    LEFT JOIN ac_target_area ata
-        ON ata.target_id = atm.id
-    LEFT JOIN soe_blocks sb
-        ON sb.id = atm.block_id
+      ac.id AS crop_id,
+      ac.crops AS crop,
+      COALESCE(tar.total, 0) + COALESCE(tar.total_fup, 0) AS target_area,
+      COALESCE(ach.smi, 0) + COALESCE(ach.lt, 0) + COALESCE(ach.ls, 0) AS achievement_area
+    FROM ac_crops ac
     LEFT JOIN (
         SELECT
-            atfc.target_id,
-            SUM(atfc.followup) area
-        FROM
-            ac_target_followup_crop atfc
-        GROUP BY
-            atfc.target_id
-    ) fup ON ata.target_id = fup.target_id
-    WHERE
-        atm.deleted_at IS NULL";
+            ata.crop_id,
+            (ata.smi + ata.lt + ata.ls) AS total,
+            SUM(fup.followup) AS total_fup
+        FROM ac_target_area ata
+        LEFT JOIN ac_target_master atm ON ata.target_id = atm.id
+        LEFT JOIN ac_target_followup_crop fup ON ata.target_id = fup.target_id AND ata.crop_id = fup.crop_id";
 
         if (!empty($filter['season'])) {
-            $sql .= " AND LOWER(atm.season) = '" . $filter['season'] . "'";
+            $sql .= " WHERE LOWER(atm.season) = '" . $filter['season'] . "'";
         }
         if (!empty($filter['year_id'])) {
-            $sql .= " AND atm.year_id = " . $filter['year_id'];
+            if (!empty($filter['season'])) {
+                $sql .= " AND";
+            } else {
+                $sql .= " WHERE";
+            }
+            $sql .= " atm.year_id = " . $filter['year_id'];
         }
-
-        $sql .= " GROUP BY sb.district_id
-) tar ON tar.district_id = sd.id
-LEFT JOIN (
-    SELECT
-        acc.district_id,
-        SUM(aap.smi) smi,
-        SUM(aap.lt) lt,
-        SUM(ls) ls,
-        SUM(fup.area) fup_area
-    FROM
-        ac_crop_coverage acc
-    LEFT JOIN ac_area_practices aap
-        ON acc.id = aap.crop_coverage_id
+        $sql .= " GROUP BY ata.crop_id
+    ) tar ON ac.id = tar.crop_id
     LEFT JOIN (
         SELECT
-            aafu.crop_coverage_id,
-            SUM(aafu.area) area
-        FROM
-            ac_area_follow_up aafu
-    ) fup ON acc.id = fup.crop_coverage_id
-    WHERE
-        acc.deleted_at IS NULL";
+            aap.crop_id,
+            SUM(aap.smi) AS smi,
+            SUM(aap.lt) AS lt,
+            SUM(aap.ls) AS ls
+        FROM ac_area_practices aap
+        LEFT JOIN ac_crop_coverage acc ON aap.crop_coverage_id = acc.id";
 
+        if (!empty($filter['season']) || !empty($filter['year_id'])) {
+            $sql .= " WHERE";
+        }
         if (!empty($filter['season'])) {
-            $sql .= " AND acc.season = '" . $filter['season'] . "'";
+            $sql .= " acc.season = '" . $filter['season'] . "'";
         }
         if (!empty($filter['year_id'])) {
-            $sql .= " AND acc.year_id = " . $filter['year_id'];
+            if (!empty($filter['season'])) {
+                $sql .= " AND";
+            }
+            $sql .= " acc.year_id = " . $filter['year_id'];
         }
 
-        $sql .= " GROUP BY acc.district_id
-) ach ON ach.district_id = sd.id";
+        $sql .= " GROUP BY aap.crop_id
+    ) ach ON ac.id = ach.crop_id";
 
         return $this->db->query($sql)->getResultArray();
-
     }
 
 

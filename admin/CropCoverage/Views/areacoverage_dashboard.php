@@ -73,7 +73,7 @@
                 <?php foreach ($seasons as $season) { ?>
                     <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
                           echo 'selected';
-                      } ?>><?= $season['name']; ?>
+                      } ?>><?= $season['name'] ?>
                     </option>
                 <?php } ?>
             </select>
@@ -174,7 +174,7 @@
             align: 'left'
         },
         xAxis: {
-            categories: ['Ragi', 'Little Millet', 'Foxtail Millet', 'Sorghum', 'Kodo Millet', 'Barnyard Millet', 'Pearl Millet'],
+            categories: [],
             crosshair: true,
             accessibility: {
                 description: 'Districts'
@@ -198,14 +198,14 @@
         series: [
             {
                 name: 'Millet Target',
-                data: [100, 200, 300, 400, 500, 600, 700]
+                data: []
             },
             {
                 name: 'Millet Achievement',
-                data: [50, 70, 90, 120, 180, 350, 400]
+                data: []
             }
         ]
-    });
+    };
         var bchart = Highcharts.chart('milletContainer',  milletChartOptions);
     $(document).ready(function () {
         $('[name="year"],[name="season"]').on('change', function () {
@@ -217,9 +217,9 @@
                 type: 'GET',
                 dataType: 'JSON',
                 success: function (response) {
-                    achart.xAxis[0].setCategories(response.xaxis);
-                    achart.series[0].setData(response.series_target);
-                    achart.series[1].setData(response.series_achievement);
+                    bchart.xAxis[0].setCategories(response.xaxis);
+                    bchart.series[0].setData(response.series_target);
+                    bchart.series[1].setData(response.series_achievement);
                 }
 
             });
