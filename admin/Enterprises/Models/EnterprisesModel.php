@@ -227,8 +227,34 @@ class EnterprisesModel extends Model
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
     }
+<<<<<<< HEAD
     if (isset($filter['block_id'])) {
       $sql .= " AND e.block_id = " . $filter['block_id'];
+=======
+
+    public function getTotal($data = array()) {
+        $builder=$this->db->table($this->table);
+        $this->filter($builder,$data);
+        $count = $builder->countAllResults();
+        return $count;
+    }
+
+    private function filter($builder,$data){
+
+        if (!empty($data['filter_search'])) {
+            $builder->where("
+				name LIKE '%{$data['filter_search']}%'"
+            );
+        }
+    }
+
+   
+
+    public function getBlockUsers() {
+        $this->settings = new \Config\Settings();
+        return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
+            ->asArray()->find();
+>>>>>>> 526a4ae32e32441203cb5f267041a2fac3a63edd
     }
     // echo $sql;
     // exit;

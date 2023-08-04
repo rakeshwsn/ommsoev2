@@ -79,29 +79,23 @@ class AdminController extends Controller
 	public function _remap($method, ...$params)
    	{
 		
-		//print_r($params);
+		
 		$router = service('router');
 		
 		//$controller_full_name = explode('\\', $router->controllerName());
         //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
         //Checks if it's a 404 or not
-        if(!$this->user->checkPermission()){
+        /*if(!$this->user->checkPermission()){
+			
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }else if (method_exists($this, $method)) {
+        }else */
+		if (method_exists($this, $method)) {
 			return call_user_func_array(array($this, $method),$params);
         } else {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 		
-		/*if($this->user->checkLogin()){
-			return Modules::run("common/login/index",$params);		
-		}else if(!$this->user->checkPermission()){
-			return modules::run("common/errors/index",$params);		
-		}else if (method_exists($this, $method)){
-			return call_user_func_array(array($this, $method), $params);
-		}else{
-			return modules::run("common/errors/index",$params);
-		}*/
+	
 		//show_404();
     }
 }

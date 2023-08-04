@@ -9,7 +9,7 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
 {
     //added by rakeshnayak
     $routes->add('letters/user', 'Letters\Controllers\Users::index');
-    $routes->post('letters/user/search','Letters\Controllers\Users::search');
+    $routes->post('letters/user/search','Letters\Controllers\Users::search',['permission'=>false]);
     $routes->match(['get','post'],'letters/user/add', 'Letters\Controllers\Users::add');
     $routes->match(['get','post'],'letters/user/edit/(:segment)', 'Letters\Controllers\Users::edit/$1');
     $routes->get('letters/user/delete/(:segment)',   'Letters\Controllers\Users::delete/$1');
@@ -17,7 +17,7 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
 
     //added by rakeshsahu
     $routes->get('letters','Letters\Controllers\Letter::index');
-    $routes->get('letters/search','Letters\Controllers\Letter::search');
+    $routes->get('letters/search','Letters\Controllers\Letter::search',['permission'=>false]);
     $routes->match(['get','post'],'letters/add', 'Letters\Controllers\Letter::add');
     $routes->match(['post'],'letters/delete', 'Letters\Controllers\Letter::delete');
 });

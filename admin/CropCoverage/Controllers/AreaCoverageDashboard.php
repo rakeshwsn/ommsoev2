@@ -1,105 +1,107 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
-use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
-use Admin\CropCoverage\Models\CropsModel;
-use Admin\CropCoverage\Models\PracticesModel;
-use Admin\Localisation\Models\BlockModel;
-use Admin\Localisation\Models\DistrictModel;
+use App\Controllers\AdminController;
 
 class AreaCoverageDashboard extends AdminController
 {
+    private $data;
     private $error = array();
     private $targetModel;
-    private $blockModel;
-    private $districtModel;
-    private $cropsModel;
-    private $practicesModel;
     function __construct()
     {
         $this->targetModel = new TargetModel();
-        $this->blockModel = new BlockModel();
-        $this->districtModel = new DistrictModel();
-        $this->cropsModel = new CropsModel;
-        $this->practicesModel = new PracticesModel;
+
     }
     public function index()
     {
-        $this->template->set_meta_title(lang('Grampanchayat.heading_title'));
-        return $this->getList();
-    }
-    protected function getList()
-    {
+        $data['chart_url'] = admin_url('areacoverage/dashboard/chart');
+        $data['milletchart_url'] = admin_url('areacoverage/dashboard/milletchart');
 
-        $data['breadcrumbs'] = array();
-        $data['breadcrumbs'][] = array(
-            'text' => lang('Grampanchayat.heading_title'),
-            'href' => admin_url('grampanchayat')
+        $data['years'] = getAllYears();
+
+        $seasons = array(
+            array(
+                'id' => '1',
+                'name' => 'Rabi'
+            ),
+            array(
+                'id' => '2',
+                'name' => 'Kharif'
+            )
         );
-
-        $this->template->add_package(array('datatable', 'select2'), true);
-
-        // $data['add'] = admin_url('areacoverage/target/add');
-        $data['edit'] = admin_url('areacoverage/target/edit');
-        $data['delete'] = admin_url('grampanchayat/delete');
-        $data['datatable_url'] = admin_url('grampanchayat/search');
-
-        $data['heading_title'] = lang('Area Coverage Approval');
-
-        $data['text_list'] = lang('Grampanchayat.text_list');
-        $data['text_no_results'] = lang('Grampanchayat.text_no_results');
-        $data['text_confirm'] = lang('Grampanchayat.text_confirm');
-
-        $data['button_add'] = lang('Add Target');
-        $data['button_edit'] = lang('Edit Target');
-        $data['button_delete'] = lang('Grampanchayat.button_delete');
-
-        if (isset($this->error['warning'])) {
-            $data['error'] = $this->error['warning'];
-        }
-
-        if ($this->request->getGet('district_id')) {
-            $data['district_id'] = (array) $this->request->getGet('district_id');
-        } else {
-            $data['district_id'] = $this->user->district_id;
-        }
-
-        $croppractices = $this->targetModel->getPractices();
-        // printr($croppractices);
-        // exit;
-        $practicedata = $this->targetModel->getAll([
-            'district_id' => $data['district_id']
-        ]);
-
-        $data['practicedata'] = $practicedata;
-
-
-        $data['year_id'] = date('Y');
-        $currentMonth = date('n');
-        if ($currentMonth >= 6 && $currentMonth <= 10) {
-            $season = 'Kharif';
-        } elseif ($currentMonth >= 11 && $currentMonth <= 4) {
-            $season = 'Rabi';
-        }
-        $data['season'] = $season;
-
-        //for heading
-        $crops = [];
-        foreach ($croppractices as $cp) {
-            $_crops = $cp['crops'];
-
-            if (!isset($crops[$_crops])) {
-                $crops[$_crops] = array();
-            }
-
-            $crops[$_crops][] = $cp['practice'];
-        }
-
-        $data['heading'] = $crops;
-
+        $data['seasons'] = $seasons;
 
         return $this->template->view('Admin\CropCoverage\Views\areacoverage_dashboard', $data);
     }
+    public function chart()
+    {
+        $data = [];
+        $year_id = $this->request->getGet('year_id');
+
+        // echo $year_id;
+        // exit;
+        $season = $this->request->getGet('season');
+
+        $filter = [
+            'year_id' => $year_id,
+            'season' => $season
+        ];
+
+        $distwisetarget = $this->targetModel->getDistrictWiseTarget($filter);
+        $districts = $series_target = $series_achievement = [];
+
+        foreach ($distwisetarget as $disttarget) {
+            $districts[] = $disttarget['district'];
+            $series_target[] = $disttarget['target_area'];
+            $series_achievement[] = $disttarget['ach_area'];
+        }
+
+        $data['xaxis'] = $districts;
+        $data['series_target'] = $series_target;
+        $data['series_achievement'] = $series_achievement;
+
+        header('content-type:application/json');
+        echo json_encode($data, JSON_NUMERIC_CHECK);
+    }
+
+
+    public function milletChart()
+    {
+
+        $year_id = $this->request->getGet('year_id');
+
+
+        $season = $this->request->getGet('season');
+
+        $filter = [
+            'year_id' => $year_id,
+            'season' => $season
+        ];
+
+        $milletstarget = $this->targetModel->getMilletWiseTarget($filter);
+        // printr($distwisetarget);
+        // exit;
+        $millets = $series_target = $series_achievement = [];
+        foreach ($milletstarget as $millettarget) {
+            $millets[] = $millettarget['crop'];
+            $series_target[] = $millettarget['target_area'];
+            $series_achievement[] = $millettarget['achievement_area'];
+        }
+        $data['xaxis'] = $millets;
+
+
+        /*$data['series'] = [
+            ['name' => 'Millet Target', 'data' => $series_target],
+            ['name' => 'Millet Achievement', 'data' => $series_achievement]
+        ];*/
+        $data['series_target'] = $series_target;
+        $data['series_achievement'] = $series_achievement;
+
+        header('content-type:application/json');
+        echo json_encode($data, JSON_NUMERIC_CHECK);
+
+    }
+
 }
-?>

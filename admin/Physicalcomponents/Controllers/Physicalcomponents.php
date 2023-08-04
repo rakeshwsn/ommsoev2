@@ -183,8 +183,10 @@ class Physicalcomponents extends AdminController
             $data['error']     = $this->error['warning'];
         }
         $data['hasPlusbutton'] = true;
+       // $data['components_info'] = '';
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-            $components_info = $this->physicalcomponents->find($this->uri->getSegment(4));
+            $data['components_info'] = $this->physicalcomponents->find($this->uri->getSegment(4));
+           // printr($components_info); exit;
             $data['hasPlusbutton'] = false;
         }
         //printr($data['permissions']);

@@ -1,54 +1,229 @@
-<div id="chart_div" style="height: 500px;"></div>
-<script>
-    google.charts.load('current', { packages: ['corechart', 'bar'] });
-    google.charts.setOnLoadCallback(drawMaterial);
-
-    function drawMaterial() {
-        var data = new google.visualization.DataTable();
-        data.addColumn('timeofday', 'Name Of District');
-        data.addColumn('number', 'Target In Hectare');
-        data.addColumn('number', 'Achievement In Hectare');
-
-        data.addRows([
-            [{ v: [8, 0, 0], f: '8 am' }, 1, .25],
-            [{ v: [9, 0, 0], f: '9 am' }, 2, .5],
-            [{ v: [10, 0, 0], f: '10 am' }, 3, 1],
-            [{ v: [11, 0, 0], f: '11 am' }, 4, 2.25],
-            [{ v: [12, 0, 0], f: '12 pm' }, 5, 2.25],
-            [{ v: [13, 0, 0], f: '1 pm' }, 6, 3],
-            [{ v: [14, 0, 0], f: '2 pm' }, 7, 4],
-            [{ v: [15, 0, 0], f: '3 pm' }, 8, 5.25],
-            [{ v: [16, 0, 0], f: '4 pm' }, 9, 7.5],
-            [{ v: [17, 0, 0], f: '5 pm' }, 10, 10],
-        ]);
-
-        var options = {
-            title: 'Dist wise Target vs Achievement',
-            hAxis: {
-                title: 'Time of Day',
-                format: 'h:mm a',
-                viewWindow: {
-                    min: [7, 30, 0],
-                    max: [17, 30, 0]
-                }
-            },
-            vAxis: {
-                title: 'Rating (scale of 1-10)'
-            },
-            colors: ['#FFD700', '#FF1493'], // Specify your desired colors here
-            series: {
-                0: {  // For the first series (Target In Hectare)
-                    targetAxisIndex: 0,
-                    bar: { groupWidth: '10%' } // Adjust the width of the bars here (e.g., '50%' means 50% of the available space)
-                },
-                1: {  // For the second series (Achievement In Hectare)
-                    targetAxisIndex: 1,
-                    bar: { groupWidth: '10%' } // Adjust the width of the bars here (e.g., '50%' means 50% of the available space)
-                }
-            }
-        };
-
-        var materialChart = new google.charts.Bar(document.getElementById('chart_div'));
-        materialChart.draw(data, options);
+<style>
+    #container {
+        height: 500px;
     }
+
+    #container1 {
+        height: 500px;
+    }
+
+    .highcharts-figure,
+    .highcharts-data-table table {
+        min-width: 320px;
+        max-width: 100%;
+        margin: 1em auto;
+    }
+
+
+
+    .highcharts-data-table table {
+        font-family: Verdana, sans-serif;
+        border-collapse: collapse;
+        border: 1px solid #ebebeb;
+        margin: 10px auto;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .highcharts-data-table caption {
+        padding: 1em 0;
+        font-size: 1.2em;
+        color: #555;
+    }
+
+    .highcharts-data-table th {
+        font-weight: 600;
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table td,
+    .highcharts-data-table th,
+    .highcharts-data-table caption {
+        padding: 0.5em;
+    }
+
+    .highcharts-data-table thead tr,
+    .highcharts-data-table tr:nth-child(even) {
+        background: #f8f8f8;
+    }
+
+    .highcharts-data-table tr:hover {
+        background: #f1f7ff;
+    }
+
+    .form-check-input {
+        display: none;
+    }
+</style>
+<div class="content1">
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <select name="year" id="year" class="form-control">
+                <?php foreach ($years as $year) { ?>
+                    <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
+                          echo 'selected';
+                      } ?>><?= $year['name'] ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="season" id="season" class="form-control">
+                <?php foreach ($seasons as $season) { ?>
+                    <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
+                          echo 'selected';
+                      } ?>><?= $season['name'] ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+
+    </div>
+</div>
+<figure class="highcharts-figure">
+    <div id="container"></div>
+    <!-- <p class="highcharts-description">
+        Comparative Variwide charts showing Labor Costs in Europe for two different years, 2016 and 2017.
+        The column width is proportional to the country's GDP.
+    </p> -->
+</figure>
+<figure class="highcharts-figure">
+    <div id="milletContainer"></div>
+    <p class="highcharts-description">
+
+    </p>
+</figure>
+
+<script>
+    var chartOptions = {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'District Wise Millet Target vs Achievement'
+        },
+
+        xAxis: {
+            categories: [],
+            crosshair: true
+        },
+
+        yAxis: {
+            title: {
+                text: 'Millet Target and Achievement'
+            },
+            labels: {
+                format: '{value}'
+            }
+        },
+        legend: {
+            enabled: true
+        },
+        series: [
+            {
+                name: 'District Target',
+                data: [], // Replace this value with the millet target for the one district
+                color: 'rgba(165,170,217,1)',
+                borderRadius: 3,
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            {
+                name: 'District Achievement',
+                data: [], // Replace this value with the millet achievement for the one district
+                color: 'rgba(126,86,134,.9)',
+                borderRadius: 3,
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        ]
+    };
+    var achart = Highcharts.chart('container', chartOptions);
+    $(document).ready(function () {
+        $('[name="year"],[name="season"]').on('change', function () {
+            year_id = $('#year').val();
+            season = $('#season').val();
+            $.ajax({
+                url: '<?= $chart_url ?>',
+                data: { year_id: year_id, season: season },
+                type: 'GET',
+                dataType: 'JSON',
+                success: function (response) {
+                    achart.xAxis[0].setCategories(response.xaxis);
+                    achart.series[0].setData(response.series_target);
+                    achart.series[1].setData(response.series_achievement);
+                }
+
+            });
+        });
+        $('[name="year"]').trigger('change');
+    });
+</script>
+<script>
+        var milletChartOptions = {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Millet Wise Target vs Achievement',
+            align: 'left'
+        },
+        subtitle: {
+            text: '',
+            align: 'left'
+        },
+        xAxis: {
+            categories: [],
+            crosshair: true,
+            accessibility: {
+                description: 'Districts'
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Millet Wise Target vs Achievement'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' (some unit)'
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: [
+            {
+                name: 'Millet Target',
+                data: []
+            },
+            {
+                name: 'Millet Achievement',
+                data: []
+            }
+        ]
+    };
+        var bchart = Highcharts.chart('milletContainer',  milletChartOptions);
+    $(document).ready(function () {
+        $('[name="year"],[name="season"]').on('change', function () {
+            year_id = $('#year').val();
+            season = $('#season').val();
+            $.ajax({
+                url: '<?= $milletchart_url ?>',
+                data: { year_id: year_id, season: season },
+                type: 'GET',
+                dataType: 'JSON',
+                success: function (response) {
+                    bchart.xAxis[0].setCategories(response.xaxis);
+                    bchart.series[0].setData(response.series_target);
+                    bchart.series[1].setData(response.series_achievement);
+                }
+
+            });
+        });
+        $('[name="year"]').trigger('change');
+    });
 </script>

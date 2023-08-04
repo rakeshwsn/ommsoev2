@@ -153,7 +153,7 @@
             }
         });
 
-        $.each(['smi','lt','ls'],function (i,v) {
+        $.each(<?=json_encode($practices)?>,function (i,v) {
             $('[name$="['+v+']').keyup(function (e) {
                 var tot=0;
                 $('[name$="['+v+']"]').each(function (i,element) {

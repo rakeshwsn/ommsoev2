@@ -140,9 +140,9 @@ class OtherReceipt extends AdminController
             'user_id' => $this->user->user_id,
         ];
 
-        $this->_validate($condition);
+        $error = $this->_validate($condition);
 
-        if($this->request->getMethod(1)=='POST'){
+        if($this->request->getMethod(1)=='POST' && !$error){
             $txn_id = $this->txnModel
                 ->insert([
                     'month'=>$month,
@@ -204,6 +204,13 @@ class OtherReceipt extends AdminController
         } else {
             //update
             if($this->request->getMethod(1)=='POST'){
+                //validate
+                if($txn->status==1){
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Cannot edit other receipt',
+                    ]);
+                }
                 //delete exiting
                 $this->txnModel->where(['id'=>$txn->id])->delete();
                 $txnAmtModel = new MisctxnamtModel();
@@ -326,7 +333,15 @@ class OtherReceipt extends AdminController
                 'value' => isset($amts[$head->id]) ? $amts[$head->id] : '',
             ];
         }
-        $data['can_edit'] = isset($txn) && $txn->status!==1;
+
+        $data['can_edit'] = false;
+        if(isset($txn)){
+            if($txn->status!=1){
+                $data['can_edit'] = true;
+            }
+        } else {
+            $data['can_edit'] = true;
+        }
 
         return view('\Admin\Transaction\Views\other_receipt_form', $data);
     }

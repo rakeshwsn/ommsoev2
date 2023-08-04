@@ -27,10 +27,17 @@ $user = service('user');
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700&display=swap">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/codebase.min.css'); ?>">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/custom.css?v=3'); ?>">
+     
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/variwide.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
     <!-- Controller Defined Stylesheets -->
     <?= $template->stylesheets() ?>
     <script src="<?= theme_url('assets/js/codebase.core.min.js'); ?>"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
 
     <script type="text/javascript">
         var BASE_URL = '<?= base_url(); ?>';

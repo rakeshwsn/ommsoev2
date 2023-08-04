@@ -12,6 +12,6 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->match(['get', 'post'], 'Physicalcomponentstarget/edit/(:segment)', 'Physicalcomponentstarget\Controllers\Physicalcomponentstarget::edit/$1');
     $routes->get('physicalcomponents/delete/(:segment)',   'Physicalcomponents\Controllers\Physicalcomponents::delete/$1');
     $routes->post('physicalcomponents/delete', 'Physicalcomponents\Controllers\Physicalcomponents::delete');
-    $routes->post('physicalachievement/searchtargetdata', 'Physicalachievement\Controllers\Physicalachievement::searchtargetdata');
+    $routes->post('physicalachievement/searchtargetdata', 'Physicalachievement\Controllers\Physicalachievement::searchtargetdata',['permission'=>false]);
 
 });

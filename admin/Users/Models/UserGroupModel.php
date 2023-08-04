@@ -99,6 +99,7 @@ class UserGroupModel extends Model
     }
 
     public function addUserGroupPermission($id,$data){
+       
         $builder=$this->db->table("user_group_permission");
         $builder->where("user_group_id",$id);
         $builder->delete();
@@ -132,6 +133,41 @@ class UserGroupModel extends Model
         $res=$builder->get()->getResult();
        
         return $res;
+    }
+
+    public function getAgencyTree($filter=[]){
+        $sql="WITH RECURSIVE ParentChildTree AS (
+            SELECT id, user_group_id, parent_id, fund_agency_id, 0 AS level
+            FROM fund_flow_chart
+            WHERE 1=1";
+            if(is_array($filter['user_group_id'])){
+                $sql.=" and user_group_id IN (".implode(',',$filter['user_group_id']).")"; 
+            }else{
+                $sql.=" and user_group_id = ".$filter['user_group_id']; 
+            }
+            
+            $sql.=" UNION ALL
+          
+            SELECT c.id, c.user_group_id, c.parent_id, c.fund_agency_id, pct.level + 1
+            FROM fund_flow_chart c
+            INNER JOIN ParentChildTree pct ON c.parent_id = pct.user_group_id
+          )
+          SELECT * FROM ParentChildTree WHERE 1=1 ";
+          if($filter['agency_type_id']){
+            $sql.=" and user_group_id =".$filter['agency_type_id'];
+          }
+          $sql.=" and fund_agency_id=".$filter['fund_agency_id']."  GROUP BY user_group_id";
+         
+        return $this->db->query($sql)->getResultArray();  
+    }
+
+    public function getAgencyChild($filter=[]){
+        $sql="SELECT
+        *
+      FROM fund_flow_chart
+      WHERE parent_id=".$filter['user_group_id']." 
+      AND fund_agency_id = ".$filter['fund_agency_id'];
+      return $this->db->query($sql)->getResultArray(); 
     }
 
     public function getAgencyTypes(){

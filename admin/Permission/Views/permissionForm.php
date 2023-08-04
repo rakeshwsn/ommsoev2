@@ -14,11 +14,11 @@ $validation = \Config\Services::validation();
             </div>
             <div class="block-content">
                 <div class="form-group row">
-                    <label class="col-lg-2 col-form-label" for="example-hf-email">Name</label>
-                    <div class="col-lg-10 <?=$validation->hasError('name')?'is-invalid':''?>">
+                    <label class="col-lg-2 col-form-label" for="example-hf-email">Route</label>
+                    <div class="col-lg-10 <?=$validation->hasError('route')?'is-invalid':''?>">
                         <input type="hidden" name="id" id="id" value="<?=$id?>"/>
-                        <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name))); ?>
-                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('name'); ?></div>
+                        <?php echo form_input(array('class'=>'form-control','name' => 'route', 'id' => 'route', 'placeholder'=>'Route','value' => set_value('route', $route))); ?>
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('route'); ?></div>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -28,7 +28,20 @@ $validation = \Config\Services::validation();
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('description'); ?></div>
                     </div>
                 </div>
-
+                <div class="form-group row">
+                    <label class="col-lg-2 col-form-label" for="example-hf-email">Module</label>
+                    <div class="col-lg-10 <?=$validation->hasError('module')?'is-invalid':''?>">
+                        <?php echo form_input(array('class'=>'form-control','name' => 'module', 'id' => 'description', 'placeholder'=>'Module','value' => set_value('module', $module))); ?>
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('module'); ?></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-2 col-form-label" for="example-hf-email">Action</label>
+                    <div class="col-lg-10 <?=$validation->hasError('module')?'is-invalid':''?>">
+                        <?php echo form_dropdown('action', $permission_actions, set_value('action', $action), 'id=\'action\' class=\'form-control\'')?>
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('action'); ?></div>
+                    </div>
+                </div>
                 <div class="form-group row">
                     <label class="col-sm-2 control-label" for="input-status">Status</label>
                     <div class="col-md-10">

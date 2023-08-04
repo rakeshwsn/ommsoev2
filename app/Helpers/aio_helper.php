@@ -979,3 +979,19 @@ if (!function_exists('buildTree')) {
         return $tree;
     }
 }
+if (!function_exists('getRegEx')) {
+    function getRegEx($url){
+        $url = str_replace("admin/", "", $url);
+
+        if (strpos($url, "/(") !== false) {
+            $url = preg_replace('/\/\(/', ')/(', $url, 1);
+            $escapedString = str_replace('/', '\/', $url);
+            $pattern = "#^(".$escapedString."#";
+        }else{
+            /*$escapedString = str_replace('/', '\/', $url);
+            $pattern = "#^(".$escapedString.")#";*/
+            $pattern="";
+        }
+        return $pattern;   
+    }
+}

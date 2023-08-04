@@ -224,8 +224,6 @@ class BudgetPlanModel extends Model
         }
         //echo $sql;
         return $this->db->query($sql)->getResultArray();
-        
-
     }
 
 }

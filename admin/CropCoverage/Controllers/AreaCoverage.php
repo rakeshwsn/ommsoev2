@@ -8,6 +8,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
+use Complex\Exception;
 use Config\Url;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -217,6 +218,11 @@ class AreaCoverage extends AdminController
 
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
+        if(!$gps){
+            return redirect()->to(admin_url('areacoverage'))
+                ->with('message','No GPs found. Please add GPs first.');
+        }
+
         $row = 4;
         foreach ($gps as $key => $gp) {
             $row++;
@@ -297,9 +303,15 @@ class AreaCoverage extends AdminController
             $acModel = new AreaCoverageModel();
             $file = $this->request->getFile('file');
 
-            $reader = IOFactory::createReader('Xlsx');
-
-            $spreadsheet = $reader->load($file);
+            try {
+                $reader = IOFactory::createReader('Xlsx');
+                $spreadsheet = $reader->load($file);
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'Invalid file.'
+                ]);
+            }
 
             $activesheet = $spreadsheet->getSheet(0);
 
@@ -311,7 +323,7 @@ class AreaCoverage extends AdminController
 
             $from_date = $dates['start_date'];
             $to_date = $dates['end_date'];
-            $excel_from_date = $row_data[0][22];
+            $excel_from_date = isset($row_data[0][22]) ? $row_data[0][22]:0 ;
 
             $exists = $acModel
                 ->where('start_date',$from_date)
@@ -322,9 +334,17 @@ class AreaCoverage extends AdminController
 //            $exists = false;
 
             //gp belongs to the block
-            $gp_cell = $row_data[4][1];
-            $gp = (new GrampanchayatModel())->find($gp_cell);
-            $gp_belongs = $gp->block_id==$this->user->block_id;
+            $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
+
+            $gp = [];
+            $gp_belongs = false;
+
+            if($gp_cell){
+                $gp = (new GrampanchayatModel())->find($gp_cell);
+            }
+            if($gp){
+                $gp_belongs = $gp->block_id==$this->user->block_id;
+            }
 
             //validation
             if(!isset($row_data[0][22])){
@@ -434,6 +454,7 @@ class AreaCoverage extends AdminController
         if($this->request->getMethod(1)=='POST'){
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
+                'status' => 0
             ];
             $this->areacoveragemodel->update($cc_id,$master);
 
@@ -460,6 +481,7 @@ class AreaCoverage extends AdminController
                     $_areas[$practice] = $this->request->getPost('area')[$crop_id][$practice];
                 }
                 $areas[] = $_areas;
+
             }
 
             $this->areacoveragemodel->deleteArea($cc_id);
@@ -533,20 +555,19 @@ class AreaCoverage extends AdminController
                 'practices' => $practices,
             ];
         }
+
         $practices = [];
+        $_practices = ['smi','lt','ls'];
         foreach ($cropPrtcArea as $area) {
-            if(strtolower($area['practice'])=='smi'){
-                $smi += $area['area'];
-            }
-            if(strtolower($area['practice'])=='lt'){
-                $lt += $area['area'];
-            }
-            if(strtolower($area['practice'])=='ls'){
-                $ls += $area['area'];
+            foreach ($_practices as $_practice) {
+                if(strtolower($area['practice'])==$_practice){
+                    $$_practice += $area['area'];
+                }
             }
         }
+
         //cacl total
-        foreach (['smi','lt','ls'] as $practice){
+        foreach ($_practices as $practice){
             $practices[$practice] = [
                 'area' => $$practice,
                 'status' => 0
@@ -560,12 +581,14 @@ class AreaCoverage extends AdminController
 
         //fup
         $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
+
         $area = 0;
         foreach ($data['fups'] as $fup) {
             $area += $fup['area'];
         }
 
         $data['fups_total'] = $area;
+        $data['practices'] = $_practices;
 
         if($return_data){
             return $data;

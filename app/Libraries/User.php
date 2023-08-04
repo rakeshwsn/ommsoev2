@@ -57,8 +57,10 @@ class User
 
         $permissionModel = new PermissionModel();
         $user_permission=$permissionModel->get_modules_with_permission($this->user_group_id);
+       
         foreach ( $user_permission as $value ) {
-            $name = str_replace('_', '/', $value->name);
+            //$name = str_replace('_', '/', $value->name);
+            $name=$value->route;
             $this->permission[$name] = $value->active;
         }
 
@@ -127,8 +129,47 @@ class User
     }
 
     public function hasPermission($data) {
-
-        $subUrl = ['add','edit','view','delete','download'];
+        $url=$data;
+        //$routes = service('routes');
+        //$url="admin/incentive/edit/([^/]+)";
+       /* $url="admin/users/allowupload/update";*/
+        $routes = service('routes');
+        $request = service('request');
+        $postroutes=$routes->getRoutes("post");
+        $getroutes=$routes->getRoutes("get");
+        $allroutes=array_merge($postroutes,$getroutes);
+        //printr($allroutes);
+        $method=$request->getMethod();
+        
+        //print_r($routes->reverseRoute("admin/".$url));
+        
+        $pattern="";
+        foreach($allroutes as $route=>$namespace){
+            $pattern=getRegEx($route);
+           // echo $pattern;
+            if (!empty($pattern)) {
+                if (preg_match($pattern, $url, $matches)) {
+                    $data = $matches[1];
+                    break;
+                } else {
+                    //echo "URL does not match the pattern.";
+                }
+             }
+        }
+        $routeOption=$routes->getRoutesOptions("admin/".$data,$method);
+        
+        $other_permission=false;
+        if($routeOption){
+            if(isset($routeOption['permission']) && !$routeOption['permission']){
+                $other_permission=true;
+            }
+        }
+       
+        
+       // printr($routes->getRoutesOptions($url,'post'));
+       // exit;
+        
+        /*$subUrl = ['add','edit','view','delete','download'];
         $other_permission=false;
         foreach ($subUrl as $value) {
 
@@ -140,11 +181,11 @@ class User
         }
         if($data=="#"){
             $other_permission=false;
-        }
+        }*/
         
-       // printr($this->permission);
-       // echo $data;
-       // exit;
+        //print_r($this->permission);
+       // echo $data."<br>";
+        //exit;
         if ($this->user_group_id == 1) {
             return true;
         }else if(isset($this->permission[$data]) && $this->permission[$data] == 'yes') {
@@ -152,7 +193,20 @@ class User
         }else if(isset($this->permission[$data]) && $this->permission[$data] == 'no'){
             return false;
         }else if($other_permission){
+           return true;
+        }
+        return false;
+
+    }
+
+    public function hasPermission_old($data) {
+       
+        if ($this->user_group_id == 1) {
             return true;
+        }else if(isset($this->permission[$data]) && $this->permission[$data] == 'yes') {
+            return true;
+        }else if(isset($this->permission[$data]) && $this->permission[$data] == 'no'){
+            return false;
         }
         return false;
 
@@ -192,18 +246,13 @@ class User
         if ($route == "") {
             $route = "admin";
         }
-
+        
         $ignore = array(
             'admin',
             'login',
             'logout',
-            'common/forgotten',
-            'common/reset',
-            'error/not_found',
-            'error/permission',
-            'setting/state',
-            'setting/tool',
-            'setting/tool/abl',
+            'relogin',
+            'error'
         );
 
         if ($this->user_group_id == 1) {

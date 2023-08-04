@@ -14,7 +14,6 @@
                 <table class="table custom-table " id="txn-table">
                     <thead>
                     <tr>
-                        <th rowspan="3">Week</th>
                         <?php if($block_id){ ?>
                             <th rowspan="3">GP</th>
                         <?php } else if($district_id){ ?>
@@ -52,9 +51,67 @@
                     </tr>
                     </thead>
                     <tbody>
-
+                        <?php foreach ($rows as $block): ?>
+                            <tr>
+                                <?php if($block_id){ ?>
+                                    <td><?=$block['gp']?></td>
+                                <?php } else if($district_id){ ?>
+                                    <td><?=$block['block']?></td>
+                                    <td><?=$block['gps']?></td>
+                                <?php } else { ?>
+                                    <td><?=$block['district']?></td>
+                                    <td><?=$block['blocks']?></td>
+                                    <td><?=$block['gps']?></td>
+                                <?php } ?>
+                                <td><?=$block['farmers_covered']?></td>
+                                <td><?=$block['nursery_raised']?></td>
+                                <td><?=$block['balance_smi']?></td>
+                                <td><?=$block['balance_lt']?></td>
+                                <td><?=$block['ragi_smi']?></td>
+                                <td><?=$block['ragi_lt']?></td>
+                                <td><?=$block['ragi_ls']?></td>
+                                <td><?=$block['little_millet_lt']?></td>
+                                <td><?=$block['little_millet_ls']?></td>
+                                <td><?=$block['foxtail_ls']?></td>
+                                <td><?=$block['sorghum_ls']?></td>
+                                <td><?=$block['kodo_ls']?></td>
+                                <td><?=$block['barnyard_ls']?></td>
+                                <td><?=$block['pearl_ls']?></td>
+                                <td><?=$block['total_ragi']?></td>
+                                <td><?=$block['total_non_ragi']?></td>
+                                <td><?=$block['total_fc']?></td>
+                                <td><?=$block['total_area']?></td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+<?php js_start(); ?>
+    <script>
+        $(function () {
+            $('#district').on('change',function () {
+                district_id = $(this).val();
+                $.ajax({
+                    url:'<?=$get_blocks?>',
+                    data:{district_id:district_id},
+                    type:'GET',
+                    dataType:'JSON',
+                    success:function(res){
+                        html = '<option value="">All Blocks</option>';
+                        if(res){
+                            $.each(res,function (i,v) {
+                                html += '<option value="'+v.id+'">'+v.name+'</option>';
+                            });
+                        }
+                        $('#block').html(html);
+                    },
+                    error:function () {
+                        alert('Something went wrong');
+                    }
+                });
+            });
+        });
+    </script>
+<?php js_end(); ?>
