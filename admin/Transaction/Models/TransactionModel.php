@@ -241,7 +241,9 @@ FROM (SELECT
         $sql .= " AND sca.fund_agency_id = ".$filter['fund_agency_id'].") sc
     LEFT JOIN soe_components_assign sca
       ON sca.component_id = sc.id
-      AND sca.fund_agency_id = sc.fund_agency_id) comp
+      AND sca.fund_agency_id = sc.fund_agency_id WHERE sc.deleted_at IS NULL AND sca.deleted_at IS NULL
+      GROUP BY component_id,
+              sca.number) comp
     LEFT JOIN user_group ug
       ON comp.agency_type_id = ug.id
     LEFT JOIN (SELECT
