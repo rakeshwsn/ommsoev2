@@ -390,7 +390,7 @@ LEFT JOIN (
             }
             $sql .= " acc.year_id = " . $filter['year_id'];
         }
-
+        $sql .= " AND acc.status = 1";
         $sql .= " GROUP BY aap.crop_id
     ) ach ON ac.id = ach.crop_id";
 
