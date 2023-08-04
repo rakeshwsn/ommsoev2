@@ -66,14 +66,14 @@ $routes->group('/', ['namespace' => 'Admin'], function ($routes) {
     }
 });
 */
-$routes->get('api', 'Api::index');
+$routes->get('api1', 'Api::index');
+//$routes->get('dashboard', 'Front\Pages\Controllers\Dashboard::index');
 
 //$routes->get('/', 'Admin\Common\Controllers\Dashboard::index',['filter' => 'login']);
 
-//$routes->group('', ['namespace' => 'Front'], function($routes){
-//    $routes->get('/', 'App\Controllers\Home::index');
-//});
-
+$routes->group('', ['namespace' => 'Front'], function($routes){
+  $routes->add('dashboard', 'Pages\Controllers\Dashboard::index');
+});
 
 /*
  * --------------------------------------------------------------------

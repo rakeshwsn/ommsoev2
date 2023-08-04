@@ -1,123 +1,237 @@
 <?php
 
-namespace Admin\Users\Models;
+namespace Admin\Enterprises\Models;
 
 use CodeIgniter\Model;
 
-class UserGroupModel extends Model
+class EnterprisesModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'user_group';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
-    protected $useSoftDeletes        = true;
-    protected $protectFields        = false;
-//	protected $allowedFields        = [];
+  protected $DBGroup              = 'default';
+  protected $table                = 'enterprises';
+  protected $primaryKey           = 'id';
+  protected $useAutoIncrement     = true;
+  protected $insertID             = 0;
+  protected $returnType           = 'object';
+  protected $useSoftDeletes        = true;
+  protected $protectFields        = false;
+  protected $allowedFields        = [];
 
-	// Dates
-	protected $useTimestamps        = false;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+  // Dates
+  protected $useTimestamps        = true;
+  protected $dateFormat           = 'datetime';
+  protected $createdField         = 'created_at';
+  protected $updatedField         = 'updated_at';
+  protected $deletedField         = 'deleted_at';
 
-	// Validation
-    protected $validationRules      = [
-        'name' => array(
-            'label' => 'Name',
-            'rules' => 'trim|required|max_length[100]'
-        ),
-    ];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
-	protected $cleanValidationRules = true;
+  // Validation
+  protected $validationRules      = [
+    'managing_unit_name' =>  [
+      'label'  => 'managing_unit_name|min_length[30]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Managing unit name is required',
+      ]
+    ],
 
-	// Callbacks
-	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = [];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = [];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+    'contact_person' =>  [
+      'label'  => 'contact_person|min_length[30]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Conatct person name is required',
+      ]
+    ],
+    'contact_mobile' =>   [
+      'label'  => 'contact_mobile|min_length[10]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Conatct is required',
+      ]
+    ],
 
-    public function getAll($data = array()){
-        //printr($data);
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    'date_estd' => [
+      'label'  => 'date_estd',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+          Date of Enterprise Establishment is required',
+      ]
+    ],
 
-        $builder->select("*");
+    'unit_id' =>  [
+      'label'  => 'unit_id',
+      'rules'  => 'required|greater_than[0]',
+      'errors' => [
+        'required' => 'Name/Type of Unit',
+       'greater_than'=> 'Select Unit Type',
+      ]
+    ],
+    'management_unit_type' => [
+      'label'  => 'management_unit_type',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+         Selelct Date of OMU Under OMM',
+      ]
+    ],
+    'district_id' => [
+      'label'  => 'district_id',
+      'rules'  => 'required|greater_than[0]',
+      'errors' => [
+        'required' => 'Select District name',
+        'greater_than' => 'Select District name'
+      ]
+    ],
+    'block_id' => [
+      'label'  => 'block_id|greater_than[0]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Selelct Block name',
+        'greater_than'=> 'Select Block Name'
+      ]
+    ],
+    'gp_id' =>  [
+      'label'  => 'gp_id|greater_than[0]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Selelct Grampanchayat name',
+        'greater_than'=> 'Select GramPanchayat Name'
+      ]
+    ],
+    'village_id' => [
+      'label'  => 'village_id|graeter_than[0]',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+         Selelct Village name',
+         'greater_than'=> 'Select Village Name'
+      ]
+    ],
+    'budget_fin_yr' => [
+      'label'  => 'budget_fin_yr',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+         Selelct Budget Utilized of Financial year ',
+      ]
+    ],
+    'mou_date' =>  [
+      'label'  => 'mou_date',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+        Selelct Budget Utilized of Financial year ',
+      ]
+    ],
+    'unit_budget_id' => [
+      'label'  => 'unit_budget_id',
+      'rules'  => 'required|greater_than[0]',
+      'errors' => [
+        'required' => 'Select Budget Code',
+        'greater_than' => 'Select Budget Code'
+      ]
+    ],
+    'unit_budget_amount' =>  [
+      'label'  => 'unit_budget_amount',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Enter Amount',
+      ]
+    ],
+    'is_support_basis_infr' =>  [
+      'label'  => 'is_support_basis_infr',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Select yes or no ',
+      ]
+    ],
+    'purpose_infr_support' =>  [
+      'label'  => 'purpose_infr_support',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => '
+          Type/ Purposeof Addl. infa structure is required ',
+      ]
+    ],
+    'addl_budget_id' =>  [
+      'label'  => 'addl_budget_id',
+      'rules'  => 'required|greater_than[0]',
+      'errors' => [
+        'required' => 'Select Budget Code',
+        'greater_than' => 'Select Budget Code'
+      ]
+    ], 'required',
+    'support_infr_amount' =>  [
+      'label'  => 'support_infr_amount',
+      'rules'  => 'required',
+      'errors' => [
+        'required' => 'Enter Amount ',
+      ]
+    ], 'required',
 
-        if (isset($data['sort']) && $data['sort']) {
-            $sort = $data['sort'];
-        } else {
-            $sort = "name";
-        }
 
-        if (isset($data['order']) && ($data['order'] == 'desc')) {
-            $order = "desc";
-        } else {
-            $order = "asc";
-        }
-        $builder->orderBy($sort, $order);
+  ];
+  protected $validationMessages   = [];
+  protected $skipValidation       = false;
+  protected $cleanValidationRules = true;
 
-        if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
-            }
+  // Callbacks
+  protected $allowCallbacks       = true;
+  protected $beforeInsert         = [];
+  protected $afterInsert          = [];
+  protected $beforeUpdate         = [];
+  protected $afterUpdate          = [];
+  protected $beforeFind           = [];
+  protected $afterFind            = [];
+  protected $beforeDelete         = [];
+  protected $afterDelete          = [];
 
-            if ($data['limit'] < 1) {
-                $data['limit'] = 10;
-            }
-            $builder->limit((int)$data['limit'],(int)$data['start']);
-        }
-        //$builder->where($this->deletedField, null);
+  public function getAll($filter = [])
+  {
+    $sql = "SELECT
+    e.id,
+    e.unit_id,
+    e.district_id,
+   e.block_id,
+    e.gp_id,
+    e.village_id,
+    e.budget_fin_yr,
+    e.management_unit_type,
+    e.managing_unit_name,
+    e.contact_person,
+    e.contact_mobile,
+    e.date_estd,
+    e.mou_date,
+    e.unit_budget_id,
+    e.addl_budget_id,
+    e.unit_budget_amount,
+    e.is_support_basis_infr,
+    e.is_support_basis_infr,
+    e.purpose_infr_support,
+    e.support_infr_budget_id,
+    e.support_infr_amount,
+    sd.name districts,
+    sb.name blocks,
+    v.name villages,
+    gp.name gp
+  FROM enterprises e
+    LEFT JOIN soe_districts sd
+      ON sd.id = e.district_id
+    LEFT JOIN soe_blocks sb
+      ON sb.id = e.block_id
+    LEFT JOIN villages v
+      ON v.id = e.village_id
+    LEFT JOIN grampanchayat gp
+      ON gp.id = e.gp_id 
+      WHERE e.deleted_at IS NULL";
 
-        $res = $builder->get()->getResult();
-
-        return $res;
+    if (isset($filter['district_id'])) {
+      $sql .= " AND e.district_id = " . $filter['district_id'];
     }
-
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
-        $count = $builder->countAllResults();
-        return $count;
+    if (isset($filter['block_id'])) {
+      $sql .= " AND e.block_id = " . $filter['block_id'];
     }
-
-    private function filter($builder,$data){
-
-        if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
-        }
-    }
-
-    public function addUserGroupPermission($id,$data){
-        $builder=$this->db->table("user_group_permission");
-        $builder->where("user_group_id",$id);
-        $builder->delete();
-
-        if (isset($data)) {
-            foreach ($data as $key => $value) {
-                $array = array(
-                    'permission_id'=>$value,
-                    'user_group_id'=>$id
-                );
-                $builder->insert($array);
-            }
-        }
-        return "success";
-    }
-
-    public function getBlockUsers() {
-        $this->settings = new \Config\Settings();
-        return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
-            ->asArray()->find();
-    }
+    // echo $sql;
+    // exit;
+    return $this->db->query($sql)->getResult();
+  }
 }
