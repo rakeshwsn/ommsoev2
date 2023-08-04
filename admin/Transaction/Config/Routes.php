@@ -43,5 +43,6 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->get('approve/getform','Transaction\Controllers\Approve::getForm');
 
     $routes->get('correction','Transaction\Controllers\Correction::index');
+    $routes->get('correction/(:segment)','Transaction\Controllers\Correction::$1');
 
 });

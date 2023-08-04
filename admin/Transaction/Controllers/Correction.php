@@ -12,6 +12,7 @@ use Admin\MIS\Models\MISModel;
 use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Transaction\Models\MisctransactionModel;
 use Admin\Transaction\Models\MisctxnamtModel;
+use Admin\Transaction\Models\TransactionComponentModel;
 use Admin\Transaction\Models\TransactionModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
@@ -102,7 +103,7 @@ class Correction extends AdminController {
             'user_id' => $this->user->user_id,
         ];
 
-        $data['upload_statuses'] = (new TransactionModel())->getTransactionStatus($filter);
+        $data['upload_statuses'] = (new TransactionModel())->getBlockUploadStatus($filter);
 
         $data['modules'] = (new CommonModel())->getModules();
 
@@ -129,16 +130,16 @@ class Correction extends AdminController {
                 .'&agency_type_id='.$status->agency_type_id
                 .'&fund_agency_id='.$status->fund_agency_id;
             if($status->transaction_type=='fund_receipt' || $status->transaction_type=='expense'){
-                $status->action = site_url(Url::approveTransaction.$url_params);
+                $status->action = site_url(Url::correctionTransaction.$url_params);
             }
             if($status->transaction_type=='other_receipt'){
-                $status->action = site_url(Url::approveOtherReceipt.$url_params);
+                $status->action = site_url(Url::correctionOtherReceipt.$url_params);
             }
             if($status->transaction_type=='closing_balance'){
-                $status->action = site_url(Url::approveClosingBalance.$url_params);
+                $status->action = site_url(Url::correctionClosingBalance.$url_params);
             }
             if($status->transaction_type=='mis'){
-                $status->action = site_url(Url::approveMIS.$url_params);
+                $status->action = site_url(Url::correctionMIS.$url_params);
             }
 
             $status->created_at = $status->created_at ? ymdToDmy($status->created_at):'-';
@@ -149,6 +150,7 @@ class Correction extends AdminController {
 
     public function transaction() {
         $txnModel = new TransactionModel();
+        $txnCompModel = new TransactionComponentModel();
 
         $data = [];
 
@@ -158,15 +160,44 @@ class Correction extends AdminController {
 
             $txn = $txnModel->find($txn_id);
 
-            $txn_data = [
-                'status' => $this->request->getPost('status'),
-                'status_user' => $this->user->user_id,
-                'remarks' => $this->request->getPost('remarks')
-            ];
-            $txnModel->update($txn->id,$txn_data);
+            $id = $txn->id;
 
-            $this->session->setFlashdata('message','Your changes have been saved.');
-            return redirect()->to(Url::approve);
+            $txnModel->delete($id);
+
+            $txn_data = [
+                'block_id'=>$txn->block_id,
+                'district_id'=>$txn->district_id,
+                'agency_type_id'=>$txn->agency_type_id,
+                'month' => $txn->month,
+                'year' => $txn->year,
+                'filename' => $txn->filename,
+                'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
+                'date_added' => date('Y-m-d'),
+                'user_id' => $txn->user_id,
+                'transaction_type' => $txn->transaction_type,
+                'fund_agency_id' => $txn->fund_agency_id
+            ];
+            $txn_id = $txnModel->insert($txn_data);
+
+            //delete the existing transaction components
+            $txnCompModel->where(['transaction_id'=>$id])->delete();
+            $components = [];
+
+            foreach ($this->request->getPost() as $component_id => $value) {
+                $components[] = [
+                    'transaction_id' => $txn_id,
+                    'component_id' => $component_id,
+                    'physical' => $value['phy'],
+                    'financial' => $value['fin']
+                ];
+            }
+            $txnCompModel->insertBatch($components);
+
+            $this->session->setFlashdata('message','Your changes have been saved');
+
+            $url_params = $this->getUrlParam();
+
+            return redirect()->to(Url::correction.$url_params);
         }
 
         $txn = new \stdClass();
@@ -178,13 +209,13 @@ class Correction extends AdminController {
                 $this->session->setFlashdata('message','Transaction not found!');
                 $url_params = $this->getUrlParam();
 
-                return redirect()->to(Url::approve.$url_params);
+                return redirect()->to(Url::correction.$url_params);
             }
 
         }
 
-        $action = 'view';
-        $data['show_form'] = false;
+        $action = 'edit';
+        $data['show_form'] = true;
 
         $data['block'] = $txn->block;
         $data['district'] = $txn->district;
@@ -225,7 +256,7 @@ class Correction extends AdminController {
 
         $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
 
-        $data['approval'] = true;
+        $data['approval'] = false;
 
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
@@ -253,7 +284,7 @@ class Correction extends AdminController {
             $this->session->setFlashdata('message','Your changes have been saved.');
             $url_params = $this->getUrlParam();
 
-            return redirect()->to(Url::approve.$url_params);
+            return redirect()->to(Url::correction.$url_params);
         }
 
         $heads = $txnModel->getHeads($txn->agency_type_id);
@@ -339,7 +370,7 @@ class Correction extends AdminController {
             $this->session->setFlashdata('message','Your changes have been saved.');
             $url_params = $this->getUrlParam();
 
-            return redirect()->to(Url::approve.$url_params);
+            return redirect()->to(Url::correction.$url_params);
         }
 
         $filter['user_id'] = $cb->user_id;
@@ -395,28 +426,38 @@ class Correction extends AdminController {
         if($this->request->getMethod(1)=='POST'){
             $txn = $misModel->find($txn_id);
 
-            $txn_data = [
-                'status' => (int)$this->request->getPost('status'),
-                'status_user' => $this->user->user_id,
-                'remarks' => $this->request->getPost('remarks')
-            ];
-            $misModel->update($txn->id,$txn_data);
+            $id = $txn->id;
 
-            $this->session->setFlashdata('message','Your changes have been saved.');
+            $misDetailModel->where(['submission_id' => $id])->delete();
+
+            $achievements = [];
+
+            foreach ($this->request->getPost('achievement') as $indicator_id => $value) {
+                $achievements[] = [
+                    'submission_id' => $id,
+                    'output_indicator_id' => $indicator_id,
+                    'achievement' => isset($value['number']) ? $value['number'] : '',
+                    'file' => isset($value['file']) ? $value['file'] : ''
+                ];
+            }
+
+            $misDetailModel->insertBatch($achievements);
+
+            $this->session->setFlashdata('message', 'MIS Updated Successfully');
 
             $url_params = $this->getUrlParam();
 
-            return redirect()->to(Url::approve.$url_params);
+            return redirect()->to(Url::correction.$url_params);
         }
         $txn = new \stdClass();
         if ($txn_id && ($this->request->getMethod(true) != 'POST')) {
             $txn = $misModel->find($txn_id);
         }
-        $action = 'view';
-        $data['show_form'] = false;
+
         $block_id = $txn->block_id;
         $district_id = $txn->district_id;
         $agency_type_id = $txn->agency_type_id;
+        $fund_agency_id = $txn->fund_agency_id;
         $month = $txn->month;
         $year = $txn->year;
         $misdetails = $misDetailModel->asArray()->where('submission_id', $txn_id)->findAll();
@@ -425,8 +466,11 @@ class Correction extends AdminController {
             'block_id' => $block_id,
             'month' => $month,
             'year' => $year,
-            'user_group' => $agency_type_id
+            'user_group' => $agency_type_id == 5 ? [5, 6] : $agency_type_id,
+            'component_category' => 'program',
+            'fund_agency_id' => $fund_agency_id
         ];
+
         $filter['component_agency_type_id'] = [5, 6, 7, 0];
         $filter['component_category'] = ['program'];
 
@@ -439,6 +483,9 @@ class Correction extends AdminController {
         $components = $this->buildTree($components, 'parent', 'assign_id');
 
         $misController = new MIS();
+
+        $action = 'edit';
+        $data['show_form'] = true;
 
         $data['components'] = $misController->getTable($components,$misdetails,$action);
 
@@ -458,11 +505,11 @@ class Correction extends AdminController {
         $data['status'] = $this->statuses[$txn->status];
         $data['upload_url'] = Url::MISUpload;
 
-        $data['approval'] = true;
+        $data['approval'] = false;
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
-        return $this->template->view('Admin\Transaction\Views\approve_mis', $data);
+        return $this->template->view('Admin\Transaction\Views\correction_mis', $data);
     }
 
     public function getForm()

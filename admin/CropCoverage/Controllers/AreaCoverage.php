@@ -335,7 +335,7 @@ class AreaCoverage extends AdminController
 
             //gp belongs to the block
             $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
-            dd($row_data);
+//            dd($row_data);
             $gp = [];
             $gp_belongs = false;
 
