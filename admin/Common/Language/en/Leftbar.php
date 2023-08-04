@@ -56,6 +56,7 @@ return [
 	'text_users'              		=> 'Users',
 	'text_user'              		=> 'All User',
 	'text_role'              		=> 'User Roles',
+	'text_allowupload'				=> 'Allow Upload',
 	
 	'text_reports'                 	=> 'Reports',
 

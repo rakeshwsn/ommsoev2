@@ -93,6 +93,7 @@ class Dashboard extends AdminController
                 'fund_agency_id' => $fund_agency_id
             ]);
 
+<<<<<<< HEAD
             $xaxis = [];
             foreach ($abstractDists as $dist) {
                 $xaxis[] = $dist->district;
@@ -119,6 +120,33 @@ class Dashboard extends AdminController
                         'value' => round(($abstractDist->ex_total / $fr_total) * 100, 2)
                     ];
                 }
+=======
+        $xaxis = [];
+        foreach ($Distsdata as $dist) {
+            $xaxis[] = $dist->district;
+        }
+        $series_ex = $series_fr = [];
+        foreach ($Distsdata as $dist) {
+            $series_ex[] = in_lakh($dist->ex_total, '');
+            $series_fr[] = in_lakh($dist->fr_total, '');
+        }
+        $data['xaxis'] = $xaxis;
+        $data['series'] = [
+            ['name' => 'Expense', 'data' => $series_ex],
+            ['name' => 'Fund Receipt', 'data' => $series_fr]
+        ];
+        $data['year'] = getYear($year);
+
+        //pie chart
+        $data['piechart'] = [];
+        foreach ($Distsdata as $abstractDist) {
+            $fr_total = (float) $abstractDist->fr_total;
+            if ($fr_total > 0) {
+                $data['piechart'][] = [
+                    'name' => $abstractDist->district,
+                    'value' => round(($abstractDist->ex_total / $fr_total) * 100, 2)
+                ];
+>>>>>>> 7b52a8838ac9a5e8b23ce3f6b3a63b3c841504ce
             }
         }
 

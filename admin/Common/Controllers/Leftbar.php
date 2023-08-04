@@ -572,6 +572,23 @@ class Leftbar extends AdminController
             );
         }
 
+        if ($this->user->hasPermission('users/allowupload')) {
+            $user[] = array(
+                'name' => lang('Leftbar.text_allowupload'),
+                'href' => admin_url('users/allowupload'),
+                'children' => array()
+            );
+        }
+        
+        if ($this->user->hasPermission('users/uploadstatus')) {
+            $user[] = array(
+                'name' => lang('Leftbar.text_uploadstatus'),
+                'href' => admin_url('users/uploadstatus'),
+                'children' => array()
+            );
+        }
+
+
 
         if ($user) {
             $data['menus'][] = array(
