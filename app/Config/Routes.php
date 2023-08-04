@@ -66,8 +66,13 @@ $routes->group('/', ['namespace' => 'Admin'], function ($routes) {
     }
 });
 */
-$routes->get('api1', 'Api::index');
-//$routes->get('dashboard', 'Front\Pages\Controllers\Dashboard::index');
+//$routes->get('api', 'Api::index');
+$routes->group('api', static function ($routes) {
+    $routes->group('v1', static function ($routes) {
+        $routes->get('/', 'Api::index');
+        $routes->get('districtarea', 'Api::districtArea');
+    });
+});
 
 //$routes->get('/', 'Admin\Common\Controllers\Dashboard::index',['filter' => 'login']);
 
