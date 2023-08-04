@@ -1247,4 +1247,141 @@ AND scb.month <= $month GROUP BY scb.block_id";
         }
 
     }
+
+    public function getBlockUploadStatus() {
+
+        $sql = "SELECT
+  bmym.district_id,
+  sd.name district,
+  bmym.block_id,
+  bmym.block,
+  sts.id txn_id,
+  sts.created_at,
+  bmym.module,
+  sts.transaction_type,
+  IFNULL(sts.status, 3) status,
+  bmym.year_id,
+  bmym.year,
+  bmym.month_id,
+  bmym.month,
+  sts.agency_type_id,
+  ug.name agency_type,
+  sts.user_id,
+  bmym.fund_agency_id
+FROM (SELECT
+    *
+  FROM vw_block_modules
+    CROSS JOIN vw_all_year_month vaym
+    CROSS JOIN (SELECT
+        ug.id agency_type_id,
+        ug.name agency_type
+      FROM user_group ug
+      WHERE id IN (5, 6)) atyp
+  WHERE (atyp.agency_type_id!=6 OR modulecode!='mis')";
+        if(!empty($filter['district_id'])){
+            $sql .= " AND district_id = ".$filter['district_id'];
+        }
+        if(!empty($filter['block_id'])){
+            $sql .= " AND block_id = ".$filter['block_id'];
+        }
+        if(!empty($filter['year_id'])){
+            $sql .= " AND year_id = ".$filter['year_id'];
+        }
+        if(!empty($filter['year_id']) && !empty($filter['month_id'])){
+            $sql .= " AND month_id = ".$filter['month_id'];
+        }
+        $sql .= " ) bmym
+  LEFT JOIN (SELECT
+      st.id,
+      st.year,
+      st.month,
+      st.date_added created_at,
+      st.transaction_type,
+      st.block_id,
+      st.district_id,
+      st.agency_type_id,
+      st.user_id,
+      st.status,
+      st.fund_agency_id
+    FROM soe_transactions st
+    WHERE st.deleted_at IS NULL
+    UNION
+    (SELECT
+        smt.id,
+        smt.year,
+        smt.month,
+        smt.created_at,
+        'other_receipt' transaction_type,
+        smt.block_id,
+        smt.district_id,
+        smt.agency_type_id,
+        smt.user_id,
+        smt.status,
+      smt.fund_agency_id
+      FROM soe_misc_transactions smt
+      WHERE smt.deleted_at IS NULL)
+    UNION
+    (SELECT
+        scb.id,
+        scb.year,
+        scb.month,
+        scb.created_at,
+        'closing_balance' transaction_type,
+        scb.block_id,
+        scb.district_id,
+        scb.agency_type_id,
+        scb.user_id,
+        scb.status,
+      sb.fund_agency_id
+      FROM soe_closing_balances scb
+        LEFT JOIN soe_blocks sb
+          ON scb.block_id = sb.id
+      WHERE scb.deleted_at IS NULL
+      AND scb.year > 0
+      AND scb.month > 0)
+    UNION
+      (SELECT
+  ms.id,
+        ms.year,
+        ms.month,
+        ms.created_at,
+        'mis' transaction_type,
+        ms.block_id,
+        ms.district_id,
+        ms.agency_type_id,
+        ms.user_id,
+        ms.status,
+        NULL fund_agency_id
+FROM mis_submissions ms
+  LEFT JOIN soe_blocks sb
+    ON ms.block_id = sb.id
+WHERE ms.deleted_at IS NULL
+AND ms.year > 0
+AND ms.month > 0)
+      ) sts
+    ON bmym.block_id = sts.block_id
+    AND sts.year = bmym.year_id
+    AND sts.month = bmym.month_id
+    AND sts.transaction_type = bmym.modulecode
+    AND bmym.agency_type_id = sts.agency_type_id
+  LEFT JOIN soe_districts sd
+    ON bmym.district_id = sd.id
+  LEFT JOIN user_group ug
+    ON sts.agency_type_id = ug.id HAVING 1=1";
+        if(!empty($filter['user_id'])){
+            $sql .= " AND (user_id !=".$filter['user_id'].' OR user_id IS NULL)';
+        }
+        if(!empty($filter['transaction_type'])){
+            $sql .= " AND transaction_type = '".$filter['transaction_type'].'\'';
+        }
+        if(!empty($filter['fund_agency_id'])){
+            $sql .= " AND (bmym.fund_agency_id =".$filter['fund_agency_id'].' OR fund_agency_id IS NULL)';
+        }
+        if(!empty($filter['agency_type_id'])){
+            $sql .= " AND agency_type_id =".$filter['agency_type_id'];
+        }
+        $sql .= " ORDER BY district_id,block_id,bmym.month_id, sts.transaction_type";
+//echo $sql;exit;
+        return $this->db->query($sql)->getResult();
+    }
 }

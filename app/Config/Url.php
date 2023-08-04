@@ -69,5 +69,10 @@ class Url {
     const userUploadStatus = 'admin/users/uploadstatus/update';
     const areaCoverageUpload = 'admin/areacoverage/upload';
 
-
+    const correction = 'admin/correction';
+    const correctionTransaction = 'admin/correction/transaction';
+    const correctionOtherReceipt = 'admin/correction/otherreceipt';
+    const correctionClosingBalance = 'admin/correction/closingbalance';
+    const correctionForm = 'admin/correction/getform';
+    const correctionMIS = 'admin/correction/mis';
 }
