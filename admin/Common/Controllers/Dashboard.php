@@ -94,11 +94,11 @@ class Dashboard extends AdminController
         $Distsdata = $this->reportModel->getDistrictwiseOpening($filter);
 
         $xaxis = [];
-        foreach ($abstractDists as $dist) {
+        foreach ($Distsdata as $dist) {
             $xaxis[] = $dist->district;
         }
         $series_ex = $series_fr = [];
-        foreach ($abstractDists as $dist) {
+        foreach ($Distsdata as $dist) {
             $series_ex[] = in_lakh($dist->ex_total, '');
             $series_fr[] = in_lakh($dist->fr_total, '');
         }
@@ -111,7 +111,7 @@ class Dashboard extends AdminController
 
         //pie chart
         $data['piechart'] = [];
-        foreach ($abstractDists as $abstractDist) {
+        foreach ($Distsdata as $abstractDist) {
             $fr_total = (float) $abstractDist->fr_total;
             if ($fr_total > 0) {
                 $data['piechart'][] = [
