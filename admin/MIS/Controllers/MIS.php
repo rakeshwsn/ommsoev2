@@ -74,6 +74,16 @@ class MIS extends AdminController
         if($txn){
             $this->session->setFlashdata('message','Cannot add MIS. MIS already exists!!');
             return redirect()->to(Url::mis);
+        } else {
+            $isBlockMisUploaded = true;
+            //check if blocks mis are complete
+            if($this->user->agency_type_id == $this->settings->district_user){
+                $isBlockMisUploaded = $misModel->isBlockMisUploaded($district_id,$year,$month);
+            }
+            if(!$isBlockMisUploaded){
+                $this->session->setFlashdata('message','Cannot add MIS. Block MIS is pending!!');
+                return redirect()->to(Url::mis);
+            }
         }
 
         if($this->request->getMethod(1)=='POST'){
@@ -460,4 +470,5 @@ class MIS extends AdminController
 
         return redirect()->to(Url::mis);
     }
+
 }

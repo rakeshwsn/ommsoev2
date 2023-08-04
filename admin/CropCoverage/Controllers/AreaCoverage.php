@@ -8,6 +8,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\CropsModel;
+use Complex\Exception;
 use Config\Url;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -217,6 +218,11 @@ class AreaCoverage extends AdminController
 
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
+        if(!$gps){
+            return redirect()->to(admin_url('areacoverage'))
+                ->with('message','No GPs found. Please add GPs first.');
+        }
+
         $row = 4;
         foreach ($gps as $key => $gp) {
             $row++;
@@ -297,9 +303,15 @@ class AreaCoverage extends AdminController
             $acModel = new AreaCoverageModel();
             $file = $this->request->getFile('file');
 
-            $reader = IOFactory::createReader('Xlsx');
-
-            $spreadsheet = $reader->load($file);
+            try {
+                $reader = IOFactory::createReader('Xlsx');
+                $spreadsheet = $reader->load($file);
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                return $this->response->setJSON([
+                    'status'=>false,
+                    'message'=>'Invalid file.'
+                ]);
+            }
 
             $activesheet = $spreadsheet->getSheet(0);
 
@@ -323,6 +335,7 @@ class AreaCoverage extends AdminController
 
             //gp belongs to the block
             $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
+            dd($row_data);
             $gp = [];
             $gp_belongs = false;
 
@@ -388,18 +401,13 @@ class AreaCoverage extends AdminController
 
                         $areas = [];
 
-                        $fup_row = 21;
                         foreach ($cropPractices as $crop_id => $practices) {
                             $_areas = [
                                 'crop_coverage_id' => $ac_crop_coverage_id,
                                 'crop_id' => $crop_id,
                             ];
                             foreach ($practices as $practice) {
-                                if($practice!='follow_up'){
-                                    $_areas[$practice] = $gp[++$col];
-                                } else {
-                                    $_areas[$practice] = $gp[$fup_row++];
-                                }
+                                $_areas[$practice] = $gp[++$col];
                             }
                             $areas[] = $_areas;
                         }
@@ -408,16 +416,16 @@ class AreaCoverage extends AdminController
 
                         //follow up crops
 
-//                        $col+=2;
-//                        $fCrop = [];
-//                        foreach ($crops as $crop) {
-//                            $fCrop[] = [
-//                                'crop_coverage_id' => $ac_crop_coverage_id,
-//                                'crop_id' => $crop->id,
-//                                'area' => $gp[++$col],
-//                            ];
-//                        }
-//                        $acModel->addFupCrops($fCrop);
+                        $col+=2;
+                        $fCrop = [];
+                        foreach ($crops as $crop) {
+                            $fCrop[] = [
+                                'crop_coverage_id' => $ac_crop_coverage_id,
+                                'crop_id' => $crop->id,
+                                'area' => $gp[++$col],
+                            ];
+                        }
+                        $acModel->addFupCrops($fCrop);
 
                     }
                 }
@@ -479,7 +487,7 @@ class AreaCoverage extends AdminController
             $this->areacoveragemodel->addArea($areas);
 
             //follow up crops
-/*
+
             $crops = (new CropsModel())->findAll();
             $fCrop = [];
             foreach ($crops as $crop) {
@@ -491,7 +499,7 @@ class AreaCoverage extends AdminController
             }
             $this->areacoveragemodel->deleteFupCrops($cc_id);
             $this->areacoveragemodel->addFupCrops($fCrop);
-*/
+
             return redirect()->to(admin_url('areacoverage'))->with('message','Area coverage data updated.');
         }
 
@@ -528,7 +536,7 @@ class AreaCoverage extends AdminController
         $data['nursery_info'] = $this->areacoveragemodel->getNursery($cc_id);
 
         $data['crops'] = [];
-        $smi = $lt = $ls = $follow_up = 0;
+        $smi = $lt = $ls = 0;
         foreach ($cropPrtcArea as $area) {
             $practices = [];
             foreach ($cropPrtcArea as $p) {
@@ -548,7 +556,7 @@ class AreaCoverage extends AdminController
         }
 
         $practices = [];
-        $_practices = ['smi','lt','ls','follow_up'];
+        $_practices = ['smi','lt','ls'];
         foreach ($cropPrtcArea as $area) {
             foreach ($_practices as $_practice) {
                 if(strtolower($area['practice'])==$_practice){
@@ -569,6 +577,16 @@ class AreaCoverage extends AdminController
             'crop_id' => 0,
             'practices' => $practices,
         ];
+
+        //fup
+        $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
+
+        $area = 0;
+        foreach ($data['fups'] as $fup) {
+            $area += $fup['area'];
+        }
+
+        $data['fups_total'] = $area;
         $data['practices'] = $_practices;
 
         if($return_data){

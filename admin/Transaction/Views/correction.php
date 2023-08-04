@@ -1,4 +1,3 @@
-
 <!-- Main content -->
 <div class="block" id="upload-controls">
     <div class="block-content block-content-full">
@@ -20,16 +19,6 @@
                         <?php } ?>
                     </select>
                 </div>
-                <?php if($agency_types): ?>
-                    <div class="col-md-2">
-                        <select class="form-control" id="agency_type_id" name="agency_type_id">
-                            <option value="">Choose Agency Type</option>
-                            <?php foreach ($agency_types as $agency_type) : ?>
-                                <option value="<?=$agency_type['id']?>" <?php if($agency_type['id']==$agency_type_id){echo 'selected';} ?>><?=$agency_type['name']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                <?php endif; ?>
                 <div class="col-md-2">
                     <select class="form-control" id="txn_type" name="txn_type">
                         <option value="">Choose Module</option>
@@ -44,15 +33,6 @@
                             <option value="">Choose District (if district level)</option>
                             <?php foreach ($districts as $district): ?>
                                 <option value="<?=$district['id']?>" <?php if($district['id']==$district_id){echo 'selected';} ?>><?=$district['name']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                <?php endif; ?>
-                <?php if($fund_agencies): ?>
-                    <div class="col-md-2">
-                        <select class="form-control" id="fund_agency_id" name="fund_agency_id">
-                            <?php foreach ($fund_agencies as $agency): ?>
-                                <option value="<?=$agency['fund_agency_id']?>" <?php if($agency['fund_agency_id']==$fund_agency_id){echo 'selected';} ?>><?=$agency['fund_agency']?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

@@ -3,6 +3,7 @@ namespace Admin\Reports\Controllers;
 
 use Admin\Common\Models\CommonModel;
 use Admin\CropCoverage\Models\AreaCoverageModel;
+use Admin\CropCoverage\Models\CropsModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Reports\Models\ReportsModel;
@@ -16,6 +17,7 @@ class AreaCoverage extends AdminController {
         $data = [];
 
         $acModel = new AreaCoverageModel();
+        $cropsModel = new CropsModel();
         $data['years'] = getAllYears();
         $data['seasons'] = $acModel->getSeasons();
 
@@ -40,18 +42,50 @@ class AreaCoverage extends AdminController {
             $data['block_id'] = $this->request->getGet('block_id');
         }
 
-        $filter = [];
+        $filter = [
+            'year_id' => $data['year_id'],
+            'season' => $data['current_season']
+        ];
         if($data['block_id']){
-            $filter = [
-                'block_id' => $data['block_id'],
-            ];
+            $filter['block_id'] = $data['block_id'];
         } else if($data['district_id']) {
-            $filter = [
-                'district_id' => $data['district_id'],
-            ];
+            $filter['district_id'] = $data['district_id'];
         }
 
-        $blocks = $acModel->getAreaCoverage($filter);
+        $blocks = $acModel->getAreaCoverageReport($filter);
+
+        if($data['block_id']){
+            $this->gps($blocks,$data);
+        } else if($data['district_id']) {
+            $this->blocks($blocks,$data);
+        } else {
+            $this->districts($blocks,$data);
+        }
+
+        $data['crop_practices'] = $acModel->getCropPractices();
+        $crops = $cropsModel->findAll();
+
+        $data['crops'] = [];
+        foreach ($crops as $crop) {
+            $data['crops'][$crop->id] = $crop->crops;
+        }
+
+        $data['districts'] = (new DistrictModel())->asArray()->find();
+
+        $data['blocks'] = [];
+        if($data['district_id']){
+            $data['blocks'] = (new BlockModel())->where('district_id',$data['district_id'])
+                ->asArray()->findAll();
+        }
+
+        $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
+        $data['download_url'] = admin_url('reports/areacoverage/download');
+        $data['get_blocks'] = Url::getBlocks;
+
+        return $this->template->view('Admin\Reports\Views\areacoverage', $data);
+    }
+
+    private function gps($blocks,&$data){
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
         $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
@@ -59,22 +93,8 @@ class AreaCoverage extends AdminController {
         $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
         $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
-        $data['blocks'] = [];
-        $data['approved'] = false;
+        $data['rows'] = [];
         foreach ($blocks as $block) {
-            $action = '';
-            $week = '';
-            if ($block->start_date) {
-                $href = admin_url('areacoverage/edit?id=' . $block->cc_id);
-                $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
-                                            <i class="fa fa-list"></i></a>';
-
-                $week = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
-            }
-            $status = $block->status;
-            if (!isset($status)) {
-                $status = 3;
-            }
             $total_area = $block->fc_area +
                 $block->ragi_smi +
                 $block->ragi_lt +
@@ -90,8 +110,8 @@ class AreaCoverage extends AdminController {
                 $block->ragi_lt +
                 $block->ragi_ls;
             $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
-            $data['blocks'][] = [
-                'week' => $week,
+
+            $data['rows'][] = [
                 'gp' => $block->gp,
                 'farmers_covered' => $block->farmers_covered,
                 'nursery_raised' => $block->nursery_raised,
@@ -110,8 +130,7 @@ class AreaCoverage extends AdminController {
                 'total_ragi' => $total_ragi,
                 'total_non_ragi' => $total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area,
-                'action' => $action,
+                'total_area' => $total_area
             ];
 
             //calc total
@@ -134,11 +153,9 @@ class AreaCoverage extends AdminController {
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
 
-            $data['approved'] = (bool)$block->status;
         }
 
-        $data['blocks'][] = [
-            'week' => '',
+        $data['rows'][] = [
             'gp' => '<strong>Total</strong>',
             'farmers_covered' => $total_farmers_covered,
             'nursery_raised' => $total_nursery_raised,
@@ -157,20 +174,245 @@ class AreaCoverage extends AdminController {
             'total_ragi' => $total_total_ragi,
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area,
-            'action' => ''
+            'total_area' => $total_total_area
         ];
+    }
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
-        $crops = $this->cropsModel->findAll();
+    private function blocks($blocks,&$data){
 
-        $data['crops'] = [];
-        foreach ($crops as $crop) {
-            $data['crops'][$crop->id] = $crop->crops;
+        $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
+        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+
+        $data['rows'] = [];
+        $gps = 0;
+        foreach ($blocks as $block) {
+            $total_area = $block->fc_area +
+                $block->ragi_smi +
+                $block->ragi_lt +
+                $block->ragi_ls +
+                $block->little_millet_lt +
+                $block->little_millet_ls +
+                $block->foxtail_ls +
+                $block->sorghum_ls +
+                $block->kodo_ls +
+                $block->barnyard_ls +
+                $block->pearl_ls;
+            $total_ragi = $block->ragi_smi +
+                $block->ragi_lt +
+                $block->ragi_ls;
+            $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+
+            $data['rows'][] = [
+                'block' => $block->block,
+                'gps' => $block->total_gps,
+                'farmers_covered' => $block->farmers_covered,
+                'nursery_raised' => $block->nursery_raised,
+                'balance_smi' => $block->balance_smi,
+                'balance_lt' => $block->balance_lt,
+                'ragi_smi' => $block->ragi_smi,
+                'ragi_lt' => $block->ragi_lt,
+                'ragi_ls' => $block->ragi_ls,
+                'little_millet_lt' => $block->little_millet_lt,
+                'little_millet_ls' => $block->little_millet_ls,
+                'foxtail_ls' => $block->foxtail_ls,
+                'sorghum_ls' => $block->sorghum_ls,
+                'kodo_ls' => $block->kodo_ls,
+                'barnyard_ls' => $block->barnyard_ls,
+                'pearl_ls' => $block->pearl_ls,
+                'total_ragi' => $total_ragi,
+                'total_non_ragi' => $total_non_ragi,
+                'total_fc' => $block->fc_area,
+                'total_area' => $total_area
+            ];
+
+            //calc total
+            $total_farmers_covered += $block->farmers_covered;
+            $total_nursery_raised += $block->nursery_raised;
+            $total_balance_smi += $block->balance_smi;
+            $total_balance_lt += $block->balance_lt;
+            $total_ragi_smi += $block->ragi_smi;
+            $total_ragi_lt += $block->ragi_lt;
+            $total_ragi_ls += $block->ragi_ls;
+            $total_little_millet_lt += $block->little_millet_lt;
+            $total_little_millet_ls += $block->little_millet_ls;
+            $total_foxtail_ls += $block->foxtail_ls;
+            $total_sorghum_ls += $block->sorghum_ls;
+            $total_kodo_ls += $block->kodo_ls;
+            $total_barnyard_ls += $block->barnyard_ls;
+            $total_pearl_ls += $block->pearl_ls;
+            $total_total_ragi += $total_ragi;
+            $total_total_non_ragi += $total_non_ragi;
+            $total_fc_area += $block->fc_area;
+            $total_total_area += $total_area;
+
+            $gps += $block->total_gps;
+
         }
 
-        $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
-        $data['download_url'] = admin_url('reports/areacoverage/download');
-        return $this->template->view('Admin\Reports\Views\areacoverage', $data);
+        $data['rows'][] = [
+            'block' => '<strong>Total</strong>',
+            'gps' => $gps,
+            'farmers_covered' => $total_farmers_covered,
+            'nursery_raised' => $total_nursery_raised,
+            'balance_smi' => $total_balance_smi,
+            'balance_lt' => $total_balance_lt,
+            'ragi_smi' => $total_ragi_smi,
+            'ragi_lt' => $total_ragi_lt,
+            'ragi_ls' => $total_ragi_ls,
+            'little_millet_lt' => $total_little_millet_lt,
+            'little_millet_ls' => $total_little_millet_ls,
+            'foxtail_ls' => $total_foxtail_ls,
+            'sorghum_ls' => $total_sorghum_ls,
+            'kodo_ls' => $total_kodo_ls,
+            'barnyard_ls' => $total_barnyard_ls,
+            'pearl_ls' => $total_pearl_ls,
+            'total_ragi' => $total_total_ragi,
+            'total_non_ragi' => $total_total_non_ragi,
+            'total_fc' => $total_fc_area,
+            'total_area' => $total_total_area
+        ];
+    }
+
+    private function districts($blocks,&$data){
+
+        $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
+        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+
+        $data['rows'] = [];
+        $gps = $tblocks = 0;
+        foreach ($blocks as $block) {
+            $total_area = $block->fc_area +
+                $block->ragi_smi +
+                $block->ragi_lt +
+                $block->ragi_ls +
+                $block->little_millet_lt +
+                $block->little_millet_ls +
+                $block->foxtail_ls +
+                $block->sorghum_ls +
+                $block->kodo_ls +
+                $block->barnyard_ls +
+                $block->pearl_ls;
+            $total_ragi = $block->ragi_smi +
+                $block->ragi_lt +
+                $block->ragi_ls;
+            $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+
+            $data['rows'][] = [
+                'district' => $block->district,
+                'blocks' => $block->total_blocks,
+                'gps' => $block->total_gps,
+                'farmers_covered' => $block->farmers_covered,
+                'nursery_raised' => $block->nursery_raised,
+                'balance_smi' => $block->balance_smi,
+                'balance_lt' => $block->balance_lt,
+                'ragi_smi' => $block->ragi_smi,
+                'ragi_lt' => $block->ragi_lt,
+                'ragi_ls' => $block->ragi_ls,
+                'little_millet_lt' => $block->little_millet_lt,
+                'little_millet_ls' => $block->little_millet_ls,
+                'foxtail_ls' => $block->foxtail_ls,
+                'sorghum_ls' => $block->sorghum_ls,
+                'kodo_ls' => $block->kodo_ls,
+                'barnyard_ls' => $block->barnyard_ls,
+                'pearl_ls' => $block->pearl_ls,
+                'total_ragi' => $total_ragi,
+                'total_non_ragi' => $total_non_ragi,
+                'total_fc' => $block->fc_area,
+                'total_area' => $total_area
+            ];
+
+            //calc total
+            $total_farmers_covered += $block->farmers_covered;
+            $total_nursery_raised += $block->nursery_raised;
+            $total_balance_smi += $block->balance_smi;
+            $total_balance_lt += $block->balance_lt;
+            $total_ragi_smi += $block->ragi_smi;
+            $total_ragi_lt += $block->ragi_lt;
+            $total_ragi_ls += $block->ragi_ls;
+            $total_little_millet_lt += $block->little_millet_lt;
+            $total_little_millet_ls += $block->little_millet_ls;
+            $total_foxtail_ls += $block->foxtail_ls;
+            $total_sorghum_ls += $block->sorghum_ls;
+            $total_kodo_ls += $block->kodo_ls;
+            $total_barnyard_ls += $block->barnyard_ls;
+            $total_pearl_ls += $block->pearl_ls;
+            $total_total_ragi += $total_ragi;
+            $total_total_non_ragi += $total_non_ragi;
+            $total_fc_area += $block->fc_area;
+            $total_total_area += $total_area;
+
+            $gps += $block->total_gps;
+            $tblocks += $block->total_blocks;
+
+        }
+
+        $data['rows'][] = [
+            'district' => '<strong>Total</strong>',
+            'blocks' => $tblocks,
+            'gps' => $gps,
+            'farmers_covered' => $total_farmers_covered,
+            'nursery_raised' => $total_nursery_raised,
+            'balance_smi' => $total_balance_smi,
+            'balance_lt' => $total_balance_lt,
+            'ragi_smi' => $total_ragi_smi,
+            'ragi_lt' => $total_ragi_lt,
+            'ragi_ls' => $total_ragi_ls,
+            'little_millet_lt' => $total_little_millet_lt,
+            'little_millet_ls' => $total_little_millet_ls,
+            'foxtail_ls' => $total_foxtail_ls,
+            'sorghum_ls' => $total_sorghum_ls,
+            'kodo_ls' => $total_kodo_ls,
+            'barnyard_ls' => $total_barnyard_ls,
+            'pearl_ls' => $total_pearl_ls,
+            'total_ragi' => $total_total_ragi,
+            'total_non_ragi' => $total_total_non_ragi,
+            'total_fc' => $total_fc_area,
+            'total_area' => $total_total_area
+        ];
+    }
+
+    public function download() {
+
+        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
+        $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
+
+        $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
+        if($spreadsheet){
+            $worksheet = $spreadsheet->getActiveSheet();
+            $columnIndex = 'B'; // Change this to the desired column index
+            $wordWrapCols=[
+                'G2','O2','Q1'
+            ];
+            foreach($wordWrapCols as $col){
+                $cell = $worksheet->getCell($col);
+                $cell->getStyle()->getAlignment()->setWrapText(true);
+            }
+
+            // Get the highest row index in the column
+            $highestRow = $worksheet->getHighestRow();
+
+            // Apply word wrap to each cell in column B
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $cell = $worksheet->getCell($columnIndex . $row);
+                $cell->getStyle()->getAlignment()->setWrapText(true);
+            }
+
+            $worksheet->getColumnDimension($columnIndex)->setWidth(20);
+
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'. $filename .'"');
+            header('Cache-Control: max-age=0');
+
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+            exit();
+        }
+        exit;
     }
 }

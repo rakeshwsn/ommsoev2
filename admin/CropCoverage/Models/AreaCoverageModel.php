@@ -115,7 +115,7 @@ FROM ac_crop_practices acp
 
     public function addFupCrops($fCrop)
     {
-        $builder = $this->db->table('ac_followup_crop');
+        $builder = $this->db->table('ac_area_follow_up');
         $builder->insertBatch($fCrop);
     }
 
@@ -133,7 +133,7 @@ FROM ac_crop_practices acp
 
     public function deleteFupCrops($crop_coverage_id)
     {
-        $builder = $this->db->table('ac_followup_crop');
+        $builder = $this->db->table('ac_area_follow_up');
         $builder->where('crop_coverage_id',$crop_coverage_id)->delete();
     }
 
@@ -183,11 +183,7 @@ FROM ac_crop_practices acp
 
     public function getWeeks(){
 
-        if(isset($date)){
-            $dates = $this->getCurrentYearDates($date);
-        } else {
-            $dates = $this->getCurrentYearDates();
-        }
+        $dates = $this->getCurrentYearDates();
 
         $start = $dates['start_date'];
         $end = $dates['end_date'];
@@ -238,17 +234,24 @@ FROM ac_crop_practices acp
 
         } else if (!empty($filter['district_id'])) {
             $sql = "SELECT ac.*,
-  b.name block,bgps.gps FROM soe_blocks b 
+  b.name block,bgps.gps total_gps FROM soe_blocks b 
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc 
                     WHERE cc.year_id=" . $filter['year_id'] .
-                " AND cc.season='" . $filter['season']."') ac ON ac.block_id=b.id 
-                WHERE b.district_id=".$filter['district_id']." ORDER BY date(ac.start_date) DESC,b.name ASC";
+                " AND cc.season='" . $filter['season']."'";
+            if(!empty($filter['start_date'])){
+                $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date']."')";
+            }
+            $sql .= ") ac ON ac.block_id=b.id 
+                WHERE b.district_id=".$filter['district_id'];
+            $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
 
         } else {
             $sql = "SELECT
   sd.id district_id,
   sd.name district,
+  dbg.total_blocks,
+  dbg.total_gps,
   ac.start_date,
   ac.end_date,
   ac.farmers_covered,
@@ -265,15 +268,115 @@ FROM ac_crop_practices acp
   ac.kodo_ls,
   ac.barnyard_ls,
   ac.pearl_ls,
-  ac.fc_area
+  ac.fc_area,
+  ac.status
 FROM soe_districts sd
   LEFT JOIN (SELECT
       *
     FROM vw_area_coverage_districtwise vacd
-    WHERE vacd.status = 1) ac
+    WHERE vacd.status = 1";
+            if(!empty($filter['start_date'])){
+                $sql .= " AND DATE(vacd.start_date)=date('" . $filter['start_date']."')";
+            }
+    $sql .= ") ac
     ON ac.district_id = sd.id";
+    $sql .=" LEFT JOIN vw_districtwise_blocks_gps dbg 
+    ON sd.id=dbg.district_id WHERE 1=1";
         }
-//        echo $sql;exit;
+//            echo $sql;exit;
+
+        return $this->db->query($sql)->getResult();
+    }
+
+    public function getAreaCoverageReport($filter = []) {
+        if(!empty($filter['year_id'])){
+            $year_id = $filter['year_id'];
+        } else {
+            $year_id = getCurrentYearId();
+        }
+        if(isset($filter['block_id'])){
+
+            $sql = "SELECT
+  block_id,
+  gp_id,
+  gp,
+  SUM(farmers_covered) AS farmers_covered,
+  SUM(nursery_raised) AS nursery_raised,
+  SUM(balance_smi) AS balance_smi,
+  SUM(balance_lt) AS balance_lt,
+  SUM(fc_area) AS fc_area,
+  SUM(ragi_smi) AS ragi_smi,
+  SUM(ragi_lt) AS ragi_lt,
+  SUM(ragi_ls) AS ragi_ls,
+  SUM(little_millet_lt) AS little_millet_lt,
+  SUM(little_millet_ls) AS little_millet_ls,
+  SUM(foxtail_ls) AS foxtail_ls,
+  SUM(sorghum_ls) AS sorghum_ls,
+  SUM(kodo_ls) AS kodo_ls,
+  SUM(barnyard_ls) AS barnyard_ls,
+  SUM(pearl_ls) AS pearl_ls
+FROM vw_area_coverage_report_gpwise vacrd
+WHERE (year_id IS NULL
+OR year_id = ".$year_id.")
+AND (LOWER(season) = '".strtolower($filter['season'])."'
+OR season IS NULL) AND vacrd.block_id=".$filter['block_id']."
+GROUP BY gp_id";
+
+        } else if(isset($filter['district_id'])){
+
+            $sql = "SELECT
+  block_id,
+  block,
+  vacrd.gps total_gps,
+  SUM(farmers_covered) AS farmers_covered,
+  SUM(nursery_raised) AS nursery_raised,
+  SUM(balance_smi) AS balance_smi,
+  SUM(balance_lt) AS balance_lt,
+  SUM(fc_area) AS fc_area,
+  SUM(ragi_smi) AS ragi_smi,
+  SUM(ragi_lt) AS ragi_lt,
+  SUM(ragi_ls) AS ragi_ls,
+  SUM(little_millet_lt) AS little_millet_lt,
+  SUM(little_millet_ls) AS little_millet_ls,
+  SUM(foxtail_ls) AS foxtail_ls,
+  SUM(sorghum_ls) AS sorghum_ls,
+  SUM(kodo_ls) AS kodo_ls,
+  SUM(barnyard_ls) AS barnyard_ls,
+  SUM(pearl_ls) AS pearl_ls
+FROM vw_area_coverage_report_blockwise vacrd
+WHERE (year_id IS NULL
+OR year_id = ".$year_id.")
+AND (LOWER(season) = '".strtolower($filter['season'])."'
+OR season IS NULL) AND vacrd.district_id=".$filter['district_id']."
+GROUP BY block_id";
+
+        } else {
+
+            $sql = "SELECT
+  district_id,district,total_blocks,total_gps,
+  SUM(farmers_covered) AS farmers_covered,
+SUM(nursery_raised) AS nursery_raised,
+SUM(balance_smi) AS balance_smi,
+SUM(balance_lt) AS balance_lt,
+SUM(fc_area) AS fc_area,
+SUM(ragi_smi) AS ragi_smi,
+SUM(ragi_lt) AS ragi_lt,
+SUM(ragi_ls) AS ragi_ls,
+SUM(little_millet_lt) AS little_millet_lt,
+SUM(little_millet_ls) AS little_millet_ls,
+SUM(foxtail_ls) AS foxtail_ls,
+SUM(sorghum_ls) AS sorghum_ls,
+SUM(kodo_ls) AS kodo_ls,
+SUM(barnyard_ls) AS barnyard_ls,
+SUM(pearl_ls) AS pearl_ls
+FROM vw_area_coverage_report_districtwise vacrd
+WHERE (year_id IS NULL
+OR year_id = ".$year_id.")
+AND (LOWER(season) = '".strtolower($filter['season'])."'
+OR season IS NULL) GROUP BY district_id";
+
+        }
+
         return $this->db->query($sql)->getResult();
     }
 
@@ -303,8 +406,7 @@ AS
       ac.crops,
       aap.smi,
       lt,
-      ls,
-      follow_up
+      ls
     FROM ac_area_practices aap
       LEFT JOIN ac_crops ac
         ON aap.crop_id = ac.id
@@ -315,7 +417,7 @@ SELECT
   t1.practice_id,
   t1.practice,
   t1.status,
-  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls WHEN 4 THEN t2.follow_up ELSE 0.0 END AS area
+  CASE t1.practice_id WHEN 1 THEN t2.smi WHEN 2 THEN t2.lt WHEN 3 THEN t2.ls ELSE 0.0 END AS area
 FROM crop_practice AS t1
   JOIN practice_area AS t2
     ON t1.crop_id = t2.crop_id
@@ -331,12 +433,11 @@ ORDER BY t1.crop_id, t1.practice_id";
 
     public function getFupCrops($crop_coverage_id=0){
         $sql = "SELECT
-  afc.crop_id,
+  c.id crop_id,
   afc.area,
-  ac.crops crop
-FROM ac_followup_crop afc
-  LEFT JOIN ac_crops ac
-    ON afc.crop_id = ac.id WHERE afc.crop_coverage_id=".$crop_coverage_id;
+  c.crops crop
+FROM ac_crops c LEFT JOIN (SELECT * FROM ac_area_follow_up fc 
+WHERE fc.crop_coverage_id=".$crop_coverage_id.") afc ON c.id=afc.crop_id";
 
         return $this->db->query($sql)->getResultArray();
     }

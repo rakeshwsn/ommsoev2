@@ -42,5 +42,6 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function($
     $routes->add('approve/mis','Transaction\Controllers\Approve::mis');
     $routes->get('approve/getform','Transaction\Controllers\Approve::getForm');
 
+    $routes->get('correction','Transaction\Controllers\Correction::index');
 
 });
