@@ -86,41 +86,41 @@ class Dashboard extends AdminController
         $chart_type = $this->request->getGet('chart_type');
         $year = $this->request->getGet('year');
         $fund_agency_id = $this->request->getGet('fund_agency_id') ?: $this->user->fund_agency_id;
-        $filter = [
-            'year' => $year,
-            'fund_agency_id' => $fund_agency_id
-        ];
 
-        $Distsdata = $this->reportModel->getDistrictwiseOpening($filter);
+        if ($chart_type == 'district') {
+            $abstractDists = $this->reportModel->getDistrictwiseOpening([
+                'year' => $year,
+                'fund_agency_id' => $fund_agency_id
+            ]);
 
-        $xaxis = [];
-        foreach ($abstractDists as $dist) {
-            $xaxis[] = $dist->district;
-        }
-        $series_ex = $series_fr = [];
-        foreach ($abstractDists as $dist) {
-            $series_ex[] = in_lakh($dist->ex_total, '');
-            $series_fr[] = in_lakh($dist->fr_total, '');
-        }
-        $data['xaxis'] = $xaxis;
-        $data['series'] = [
-            ['name' => 'Expense', 'data' => $series_ex],
-            ['name' => 'Fund Receipt', 'data' => $series_fr]
-        ];
-        $data['year'] = getYear($year);
+            $xaxis = [];
+            foreach ($abstractDists as $dist) {
+                $xaxis[] = $dist->district;
+            }
+            $series_ex = $series_fr = [];
+            foreach ($abstractDists as $dist) {
+                $series_ex[] = in_lakh($dist->ex_total, '');
+                $series_fr[] = in_lakh($dist->fr_total, '');
+            }
+            $data['xaxis'] = $xaxis;
+            $data['series'] = [
+                ['name' => 'Expense', 'data' => $series_ex],
+                ['name' => 'Fund Receipt', 'data' => $series_fr]
+            ];
+            $data['year'] = getYear($year);
 
-        //pie chart
-        $data['piechart'] = [];
-        foreach ($abstractDists as $abstractDist) {
-            $fr_total = (float) $abstractDist->fr_total;
-            if ($fr_total > 0) {
-                $data['piechart'][] = [
-                    'name' => $abstractDist->district,
-                    'value' => round(($abstractDist->ex_total / $fr_total) * 100, 2)
-                ];
+            //pie chart
+            $data['piechart'] = [];
+            foreach ($abstractDists as $abstractDist) {
+                $fr_total = (float) $abstractDist->fr_total;
+                if ($fr_total > 0) {
+                    $data['piechart'][] = [
+                        'name' => $abstractDist->district,
+                        'value' => round(($abstractDist->ex_total / $fr_total) * 100, 2)
+                    ];
+                }
             }
         }
-
 
         if ($chart_type == 'block') {
             $abstractBlocks = $this->reportModel->getBlockwiseOpening([

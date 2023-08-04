@@ -67,6 +67,7 @@ class TargetModel extends Model
                 "ls" => isset($area['ls']) ? $area['ls'] : 0
 
             ];
+            $this->db->table('ac_target_area')->insert($targetdata);
 
         }
     }
