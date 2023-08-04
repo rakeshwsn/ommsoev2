@@ -1,9 +1,10 @@
 <style>
     #chart-container {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
+        position: relative;
+        height: 100vh;
+        overflow: hidden;
     }
+
     .form-check-input {
         display: none;
     }
@@ -13,14 +14,20 @@
         <div class="col-md-2">
             <select name="year" id="year" class="form-control">
                 <?php foreach ($years as $year) { ?>
-                    <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
+                    <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
+                        echo 'selected';
+                    } ?>><?= $year['name'] ?>
+                    </option>
                 <?php } ?>
             </select>
         </div>
         <div class="col-md-2">
             <select name="fund_agency_id" id="fund_agency_id" class="form-control">
                 <?php foreach ($fund_agencies as $fund_agency) { ?>
-                    <option value="<?=$fund_agency['fund_agency_id']?>" <?php if($fund_agency['fund_agency_id']==$fund_agency_id){echo 'selected';} ?>><?=$fund_agency['fund_agency']?></option>
+                    <option value="<?= $fund_agency['fund_agency_id'] ?>" <?php if ($fund_agency['fund_agency_id'] == $fund_agency_id) {
+                        echo 'selected';
+                    } ?>>
+                        <?= $fund_agency['fund_agency'] ?></option>
                 <?php } ?>
             </select>
         </div>
@@ -33,7 +40,8 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="fa fa-retweet fa-2x text-corporate"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ob']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-corporate"><i class="fa fa-rupee"></i> <span id="ob"
+                            data-toggle="countTo" data-speed="1000" data-to="<?= $abstract['ob'] ?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Opening Balance</div>
                 </div>
             </a>
@@ -45,7 +53,8 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-login fa-2x text-earth-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['fr']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-earth"><i class="fa fa-rupee"></i> <span id="fr"
+                            data-toggle="countTo" data-speed="1000" data-to="<?= $abstract['fr'] ?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Fund Receipt</div>
                 </div>
             </a>
@@ -56,7 +65,8 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-logout fa-2x text-elegance-light"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['ex']?>">0</span> Lakh</div>
+                    <div class="font-size-h3 font-w600 text-elegance"><i class="fa fa-rupee"></i> <span id="ex"
+                            data-toggle="countTo" data-speed="1000" data-to="<?= $abstract['ex'] ?>">0</span> Lakh</div>
                     <div class="font-size-sm font-w600 text-uppercase text-muted">Expense</div>
                 </div>
             </a>
@@ -67,8 +77,10 @@
                     <div class="float-right mt-15 d-none d-sm-block">
                         <i class="si si-briefcase fa-2x text-pulse"></i>
                     </div>
-                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb" data-toggle="countTo" data-speed="1000" data-to="<?=$abstract['cb']?>">0</span> Lakh</div>
-                    <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on date</small></div>
+                    <div class="font-size-h3 font-w600 text-pulse"><i class="fa fa-rupee"></i> <span id="cb"
+                            data-toggle="countTo" data-speed="1000" data-to="<?= $abstract['cb'] ?>">0</span> Lakh</div>
+                    <div class="font-size-sm font-w600 text-uppercase text-muted">Closing Balance <small>as on
+                            date</small></div>
                 </div>
             </a>
         </div>
@@ -79,8 +91,8 @@
                 <div class="block-content block-content-full border-b clearfix">
                     <div class="btn-group float-right" role="group" data-toggle="buttons">
                         <label class="btn btn-secondary form-check-label active">
-                            <input class="form-check-input" type="radio" value="district"
-                                   name="chart_type" id="district" autocomplete="off" checked> Districtwise
+                            <input class="form-check-input" type="radio" value="district" name="chart_type"
+                                id="district" autocomplete="off" checked> Districtwise
                         </label>
                     </div>
                 </div>
@@ -105,7 +117,8 @@
 </div>
 
 <!-- Abstract Modal -->
-<div class="modal fade" id="modal-abstract" tabindex="-1" role="dialog" aria-labelledby="modal-popout" aria-hidden="true">
+<div class="modal fade" id="modal-abstract" tabindex="-1" role="dialog" aria-labelledby="modal-popout"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-popout modal-xl" role="document">
         <div class="modal-content">
             <div class="block block-themed block-transparent mb-0">
@@ -164,37 +177,37 @@
 
     // add an event listener to detect when the user selects a new option
     $(function () {
-        $('[name="chart_type"]').on('change',function () {
+        $('[name="chart_type"]').on('change', function () {
             chart_type = $(this).val();
             year = $('#year').val();
             fund_agency_id = $('#fund_agency_id').val();
             // update the chart options
             if (chart_type === 'district') {
                 $.ajax({
-                    url:'<?=$chart_url?>',
-                    data:{year:year,chart_type:chart_type,fund_agency_id:fund_agency_id},
-                    type:'GET',
-                    dataType:'JSON',
-                    beforeSend:function () {
+                    url: '<?= $chart_url ?>',
+                    data: { year: year, chart_type: chart_type, fund_agency_id: fund_agency_id },
+                    type: 'GET',
+                    dataType: 'JSON',
+                    beforeSend: function () {
 
                     },
-                    success:function (data) {
-                        if(data.xaxis){
+                    success: function (data) {
+                        if (data.xaxis) {
                             options.xAxis.categories = data.xaxis;
                         }
-                        if(data.series){
+                        if (data.series) {
                             options.series = data.series;
                         }
-                        if(data.year){
-                            options.title.text = 'Fund Received vs Expenditure: '+data.year;
+                        if (data.year) {
+                            options.title.text = 'Fund Received vs Expenditure: ' + data.year;
                         }
                         options.yAxis.title.text = 'Amount (in Lakhs)';
                         // Redraw the chart with the updated configuration
-                        chart = new Highcharts.Chart('container',options);
+                        chart = new Highcharts.Chart('container', options);
                         reloadAbstract(data);
                         createPieChart(data.piechart);
                     },
-                    error:function () {
+                    error: function () {
 
                     }
 
@@ -204,10 +217,10 @@
 
         $('[name="chart_type"]').trigger('change');
 
-        $('#year').on('change',function () {
+        $('#year').on('change', function () {
             $('[name="chart_type"]').trigger('change');
         });
-        $('#fund_agency_id').on('change',function () {
+        $('#fund_agency_id').on('change', function () {
             $('[name="chart_type"]').trigger('change');
         });
 
@@ -215,20 +228,20 @@
             year = $('#year').val();
 
             $.ajax({
-                url:'<?=$abstract_url?>',
-                data:{year:year},
-                type:'GET',
-                dataType:'JSON',
-                beforeSend:function () {
+                url: '<?= $abstract_url ?>',
+                data: { year: year },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function () {
                     $('#modal-content').html('Loading...');
                 },
-                success:function (data) {
+                success: function (data) {
                     $('#modal-content').html(data.html);
                 },
-                error:function () {
+                error: function () {
 
                 },
-                complete:function () {
+                complete: function () {
                     $("#modal-abstract").modal({
                         backdrop: 'static',
                     });
