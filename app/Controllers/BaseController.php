@@ -83,9 +83,11 @@ class BaseController extends Controller
         //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
         //Checks if it's a 404 or not
         if (method_exists($this, $method)) {
+			
 			return $this->$method(...$params);
 			//return call_user_func_array(array($this, $method), $params);
         } else {
+			
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 		
