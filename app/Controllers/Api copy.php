@@ -1,5 +1,5 @@
 <?php
-namespace Front\Api\Controllers;
+namespace App\Controllers;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\ClusterBlockModel;
@@ -12,7 +12,7 @@ use Admin\Users\Models\MemberModel;
 use Admin\Localisation\Models\VillageModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
-use Front\Api\Models\ApiModel;
+use App\Models\ApiModel;
 
 class Api extends ResourceController
 {
@@ -278,10 +278,10 @@ class Api extends ResourceController
 		header('Cache-Control: private', false);
 		header('Content-Type: text/csv');
 		header('Content-Disposition: attachment;filename=itemsets.csv'); 
-		
+		ob_end_clean();
 		//$fp = fopen('php://temp', 'r+');
 		$fp = fopen("php://output", "wb");
-		$header=['nir','list_name','name','label','district','block','cluster','grampanchayat'];
+		$header=['list_name','name','label','district','block','cluster','grampanchayat'];
 		fputcsv($fp,$header);
 
         $blockModel=new BlockModel();
@@ -347,7 +347,7 @@ class Api extends ResourceController
 		header('Cache-Control: private', false);
 		header('Content-Type: text/csv');
 		header('Content-Disposition: attachment;filename=itemsets.csv'); 
-		
+		ob_end_clean();
 		//$fp = fopen('php://temp', 'r+');
 		$fp = fopen("php://output", "wb");
 		$header=['list_name','name','label','district','block','cluster','grampanchayat','village'];
@@ -433,7 +433,7 @@ class Api extends ResourceController
         header('Cache-Control: private', false);
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment;filename=itemsets.csv');
-
+		ob_end_clean();	
         //$fp = fopen('php://temp', 'r+');
         $fp = fopen("php://output", "wb");
         $header=['list_name','name','label','district','block','cluster','grampanchayat','village','year','season','farmer'];
@@ -547,7 +547,7 @@ class Api extends ResourceController
         header('Cache-Control: private', false);
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment;filename=itemsets.csv');
-
+		ob_end_clean();
         //$fp = fopen('php://temp', 'r+');
         $fp = fopen("php://output", "wb");
         $header=['list_name','name','label','district','block','grampanchayat','designation'];

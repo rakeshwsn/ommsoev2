@@ -33,8 +33,6 @@ $routes->group('api', ['namespace' => 'Admin'],function($routes){
     $routes->get('mpr/filters','Reports\Controllers\Api::mprFilters');
     $routes->get('getBlocks','Reports\Controllers\Api::getBlocks');
     $routes->get('getAreaCoverage','Reports\Controllers\Api::getAreaCoverage');
-
     $routes->get('mpr1', 'Reports\Controllers\Api::mpr3');
     $routes->get('mpr1/filter','Reports\Controllers\Api::mprFilters');
-
 });
