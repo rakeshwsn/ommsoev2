@@ -706,6 +706,7 @@ class Budgets extends AdminController {
             }
             if($components) {
                 $components = $this->buildTree($components);
+                //printr($components);
                 $data['components'][0]['year'] = $budgetplan_info->year;
                 $data['components'][0]['phase'] = 0;
                 $data['components'][0]['fund_agency_id'] = $budgetplan_info->fund_agency_id;
