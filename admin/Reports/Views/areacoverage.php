@@ -19,6 +19,10 @@
                         <?php } else if($district_id){ ?>
                             <th rowspan="3">Block</th>
                             <th rowspan="3">GPs</th>
+                        <?php } else if(isset($allblocks)) { ?>
+                            <th rowspan="3">District</th>
+                            <th rowspan="3">Block</th>
+                            <th rowspan="3">GPs</th>
                         <?php } else { ?>
                             <th rowspan="3">District</th>
                             <th rowspan="3">Blocks</th>
@@ -56,6 +60,10 @@
                                 <?php if($block_id){ ?>
                                     <td><?=$block['gp']?></td>
                                 <?php } else if($district_id){ ?>
+                                    <td><?=$block['block']?></td>
+                                    <td><?=$block['gps']?></td>
+                                <?php } else if(isset($allblocks)) { ?>
+                                    <td><?=$block['district']?></td>
                                     <td><?=$block['block']?></td>
                                     <td><?=$block['gps']?></td>
                                 <?php } else { ?>

@@ -25,6 +25,10 @@ $routes->group('admin', ['namespace' => 'Admin','filter' => 'login'], function (
     $routes->get('reports/oldmpr','Reports\Controllers\Oldmpr::index');
 
     $routes->get('reports/areacoverage','Reports\Controllers\AreaCoverage::index');
+    $routes->get('reports/areacoverage/allblocks','Reports\Controllers\AreaCoverage::allblocks');
+    $routes->get('reports/areacoverage/download','Reports\Controllers\AreaCoverage::index/download');
+    $routes->get('reports/areacoverage/allblocks/download','Reports\Controllers\AreaCoverage::allblocks/download');
+    $routes->get('reports/areacoverage/getUploadStatus','Reports\Controllers\AreaCoverage::getUploadStatus');
 
 });
 

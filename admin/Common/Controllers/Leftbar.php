@@ -402,6 +402,22 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
+        if ($this->user->hasPermission('reports/areacoverage/allblocks')) {
+            $areacoverage[] = array(
+                'name' => 'Area Coverage Blockwise Report',
+                'href' => admin_url('reports/areacoverage/allblocks'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+        if ($this->user->hasPermission('reports/areacoverage/getUploadStatus')) {
+            $areacoverage[] = array(
+                'name' => 'Area Coverage Upload Status',
+                'href' => admin_url('reports/areacoverage/getUploadStatus'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
 
 
         if ($this->user->hasPermission('cropcoverage/crops')) {
