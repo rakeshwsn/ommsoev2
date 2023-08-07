@@ -34,7 +34,7 @@
         <form action="" method="post">
             <div class="block-header block-header-default">
                 <h3 class="block-title">
-                    <?= $heading_title; ?>[<?=$week_text?>]
+                    <?= $heading_title; ?> [<?=$week_text?>]
                 </h3>
                 <?php if($show_reject): ?>
                 <div class="block-options">
@@ -43,9 +43,20 @@
                 <?php endif; ?>
             </div>
             <div class="block-content">
-                <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
-                    <thead>
+                <table class="table table-bordered table-striped mb-20 custom-table">
+                    <tr class="highlight-heading1">
+                        <th>Status</th>
+                        <th>Remarks</th>
+                    </tr>
                     <tr>
+                        <td>Status</td>
+                        <td>Remarks</td>
+                    </tr>
+                </table>
+
+                <table id="block-coverage" class="table custom-table table-bordered table-striped table-vcenter table-responsive">
+                    <thead>
+                    <tr class="highlight-heading1">
                         <th rowspan="3">Block</th>
                         <th rowspan="3">No of GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
@@ -61,12 +72,12 @@
                         <th rowspan="3">Status </th>
                         <th rowspan="3" class="text-right no-sort">Actions</th>
                     </tr>
-                    <tr>
+                    <tr class="highlight-heading2">
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
                             <th colspan="<?= count($practices) ?>"><?= $crops[$crop_id] ?></th>
                         <?php endforeach; ?>
                     </tr>
-                    <tr>
+                    <tr class="highlight-heading3">
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
                             <?php foreach ($practices as $practice): ?>
                                 <th>
