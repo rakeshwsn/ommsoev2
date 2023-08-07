@@ -28,18 +28,20 @@ class Approve extends AdminController
         $this->areacoveragemodel = new AreaCoverageModel();
     }
 
-    public function index() {
+    public function index()
+    {
 
-        if($this->user->block_id){
+        if ($this->user->block_id) {
             return $this->block();
-        } else if($this->user->district_id){
+        } else if ($this->user->district_id) {
             return $this->district();
         } else {
             return $this->state();
         }
     }
 
-    public function district() {
+    public function district()
+    {
         $this->template->set_meta_title(lang('Approve.heading_title'));
 
         $data['breadcrumbs'] = array();
@@ -88,10 +90,10 @@ class Approve extends AdminController
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
         $total_gps = 0;
 
         $data['blocks'] = [];
@@ -129,7 +131,7 @@ class Approve extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
             $data['blocks'][] = [
                 'block' => $block->block,
                 'gps' => $block->total_gps,
@@ -156,8 +158,8 @@ class Approve extends AdminController
             ];
 
             //calc total
-            $total_gps += (int)$block->total_gps;
-            $total_farmers_covered += (int)$block->farmers_covered;
+            $total_gps += (int) $block->total_gps;
+            $total_farmers_covered += (int) $block->farmers_covered;
             $total_nursery_raised += $block->nursery_raised;
             $total_balance_smi += $block->balance_smi;
             $total_balance_lt += $block->balance_lt;
@@ -217,11 +219,11 @@ class Approve extends AdminController
         $week_start_date = '';
         foreach ($weeks as $week) {
             //dropdown weeks
-            if(strtotime($week['start_date'])<=strtotime('today')){
+            if (strtotime($week['start_date']) <= strtotime('today')) {
                 $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
             }
             //show week text
-            if(strtotime($week['start_date'])<=strtotime($data['start_date'])){
+            if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
                 $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
             }
         }
@@ -234,13 +236,13 @@ class Approve extends AdminController
         $districts = (new DistrictModel())->findAll();
 
         foreach ($districts as $district) {
-            if($district->id==$district_id){
+            if ($district->id == $district_id) {
                 $data['districts'][$district->id] = $district->name;
             }
         }
 
         $data['show_reject'] = false;
-        if($this->user->district_id!=$district_id){
+        if ($this->user->district_id != $district_id) {
             $data['show_reject'] = true;
             $data['reject_url'] = admin_url('areacoverage/approve/reject');
         }
@@ -248,7 +250,8 @@ class Approve extends AdminController
         return $this->template->view('Admin\CropCoverage\Views\approve_district', $data);
     }
 
-    public function block() { //gpwise
+    public function block()
+    { //gpwise
         $data['heading_title'] = lang('Approve Area Coverage');
 
         $block_id = $this->request->getGet('block_id');
@@ -257,16 +260,16 @@ class Approve extends AdminController
 
         $dates = $this->areacoveragemodel->getWeekDate($start_date);
 
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             $filter = [
                 'block_id' => $block_id,
                 'start_date' => $dates['start_date']
             ];
-            $status = (int)$this->request->getPost('status');
+            $status = (int) $this->request->getPost('status');
             $remarks = $this->request->getPost('remarks');
-            $this->areacoveragemodel->setStatus($filter,$status,$remarks);
+            $this->areacoveragemodel->setStatus($filter, $status, $remarks);
 
-            $this->session->setFlashdata('message','The area coverage data has been approved');
+            $this->session->setFlashdata('message', 'The area coverage data has been approved');
             return redirect()->to(admin_url('areacoverage/approve'));
         }
 
@@ -279,10 +282,10 @@ class Approve extends AdminController
 
         $data['from_date'] = $dates['start_date'];
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
         $data['blocks'] = [];
         $data['approved'] = false;
@@ -315,7 +318,7 @@ class Approve extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
             $data['blocks'][] = [
                 'slno' => $slno++,
                 'cc_id' => $block->cc_id,
@@ -361,7 +364,7 @@ class Approve extends AdminController
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
 
-            $data['approved'] = (bool)$block->status;
+            $data['approved'] = (bool) $block->status;
         }
 
         $data['blocks'][] = [
@@ -401,15 +404,15 @@ class Approve extends AdminController
 
         $data['approval'] = true;
         $form_data = $this->getForm();
-        $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
+        $data['approve_form'] = view('\Admin\Transaction\Views\approve_form', $form_data);
 
         $blockModel = new BlockModel();
         $block = $blockModel->find($block_id);
-        $blocks = $blockModel->where('district_id',$block->district_id)->findAll();
+        $blocks = $blockModel->where('district_id', $block->district_id)->findAll();
 
         $data['filter_blocks'] = [];
         foreach ($blocks as $block) {
-            if($block->id==$block_id){
+            if ($block->id == $block_id) {
                 $data['filter_blocks'][$block->id] = $block->name;
             }
         }
@@ -421,7 +424,7 @@ class Approve extends AdminController
         $week_start_date = $start_date;
         foreach ($weeks as $week) {
             //dropdown weeks
-            if(strtotime($week['start_date'])<=strtotime('today')){
+            if (strtotime($week['start_date']) <= strtotime('today')) {
                 $data['weeks'][$week['start_date']] = $week['start_date'];
             }
         }
@@ -437,10 +440,13 @@ class Approve extends AdminController
             [
                 'id' => 1,
                 'name' => 'Approved',
+
+
             ],
             [
                 'id' => 2,
                 'name' => 'Rejected',
+
             ],
         ];
 
@@ -452,7 +458,8 @@ class Approve extends AdminController
         return $data;
     }
 
-    public function state() {
+    public function state()
+    {
         $this->template->set_meta_title(lang('Approve.heading_title'));
 
         $data['breadcrumbs'] = array();
@@ -498,10 +505,10 @@ class Approve extends AdminController
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
         $total_gps = 0;
         $total_blocks = 0;
 
@@ -534,7 +541,7 @@ class Approve extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
             $data['districts'][] = [
                 'district' => $block->district,
                 'blocks' => $block->total_blocks,
@@ -562,9 +569,9 @@ class Approve extends AdminController
             ];
 
             //calc total
-            $total_blocks += (int)$block->total_blocks;
-            $total_gps += (int)$block->total_gps;
-            $total_farmers_covered += (int)$block->farmers_covered;
+            $total_blocks += (int) $block->total_blocks;
+            $total_gps += (int) $block->total_gps;
+            $total_farmers_covered += (int) $block->farmers_covered;
             $total_nursery_raised += $block->nursery_raised;
             $total_balance_smi += $block->balance_smi;
             $total_balance_lt += $block->balance_lt;
@@ -624,11 +631,11 @@ class Approve extends AdminController
         $week_start_date = '';
         foreach ($weeks as $week) {
             //dropdown weeks
-            if(strtotime($week['start_date'])<=strtotime('today')){
+            if (strtotime($week['start_date']) <= strtotime('today')) {
                 $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
             }
             //show week text
-            if(strtotime($week['start_date'])<=strtotime($data['start_date'])){
+            if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
                 $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
             }
         }
@@ -640,21 +647,22 @@ class Approve extends AdminController
         return $this->template->view('Admin\CropCoverage\Views\approve_state', $data);
     }
 
-    public function reject() {
+    public function reject()
+    {
         $district_id = $this->request->getPost('district_id');
         $start_date = $this->request->getPost('start_date');
 
-        $updated = (new AreaCoverageModel())->where('district_id',$district_id)
-            ->where('start_date',$start_date)->set(['status'=>0])->update();
+        $updated = (new AreaCoverageModel())->where('district_id', $district_id)
+            ->where('start_date', $start_date)->set(['status' => 0])->update();
         $redirect = '';
         $status = false;
-        if($updated){
+        if ($updated) {
             $status = true;
-            $redirect = admin_url('areacoverage/approve?start_date='.$start_date);
-            redirect()->to($redirect)->with('message','District data rejcted');
+            $redirect = admin_url('areacoverage/approve?start_date=' . $start_date);
+            redirect()->to($redirect)->with('message', 'District data rejcted');
         }
         return $this->response->setJSON([
-            'status'=>$status,
+            'status' => $status,
             'redirect' => $redirect
         ]);
     }

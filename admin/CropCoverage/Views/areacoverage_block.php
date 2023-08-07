@@ -2,31 +2,34 @@
     <div class="col-xl-12">
         <div class="block">
             <div class="block-header block-header-default bg-success">
-                <h3 class="block-title"><?= $heading_title; ?></h3>
+                <h3 class="block-title">
+                    <?= $heading_title; ?>
+                </h3>
             </div>
-			<div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
-				<div class="col-md-3">
-                <label>From Date</label>
-				<input type="text"  class="form-control" value="<?=$from_date?>" readonly>
-				</div>
-				<div class="col-md-3">
-				<label>To Date</label>
-				<input type="text" readonly value="<?=$to_date?>" class="form-control">
-				</div>
-				<div class="col-md-2 mt-4">
-					<a href="<?=$download_url?>" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>
-				</div>
-				<div class="col-md-2 mt-4">
-					<form class="dm-uploader" id="uploader">
-						<div role="button" class="btn btn-outline btn-warning">
-							<i class="fa fa-folder-o fa-fw"></i> Upload Excel
-							<input type="file" title="Click to add Files">
-						</div>
+            <div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
+                <div class="col-md-3">
+                    <label>From Date</label>
+                    <input type="text" class="form-control" value="<?= $from_date ?>" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label>To Date</label>
+                    <input type="text" readonly value="<?= $to_date ?>" class="form-control">
+                </div>
+                <div class="col-md-2 mt-4">
+                    <a href="<?= $download_url ?>" class="btn btn-square btn-info min-width-125 mb-10"><i
+                            class="fa fa-download mr-5"></i> Download</a>
+                </div>
+                <div class="col-md-2 mt-4">
+                    <form class="dm-uploader" id="uploader">
+                        <div role="button" class="btn btn-outline btn-warning">
+                            <i class="fa fa-folder-o fa-fw"></i> Upload Excel
+                            <input type="file" title="Click to add Files">
+                        </div>
                         <div class="status"></div>
-					</form>	
-				</div>		
-			</div>
-           
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="col-xl-12">
@@ -34,7 +37,7 @@
             <div class="block-header block-header-default  bg-primary">
                 <h3 class="block-title"> Area Coverage History</h3>
             </div>
-			
+
             <div class="block-content">
                 <table class="table">
                     <thead>
@@ -54,32 +57,54 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <?php if ($blocks) {?>
-                    <?php foreach ($blocks as $block) {?>
-                        <tr>
-                            <td><?=$block['week']?></td>
-                            <td><?=$block['gp']?></td>
-                            <td><?=$block['farmers_covered']?></td>
-                            <td><?=$block['nursery_raised']?></td>
-                            <td><?=$block['balance_smi']?></td>
-                            <td><?=$block['balance_lt']?></td>
-                            <td><?=$block['total_ragi']?></td>
-                            <td><?=$block['total_non_ragi']?></td>
-                            <td><?=$block['total_fc']?></td>
-                            <td><?=$block['total_area']?></td>
-                            <td><?=$block['status']?></td>
-                            <td style="display: flex;">
-                                <div class="btn-group btn-group-sm pull-right">
-                                <?=$block['action']?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php } ?>
-                    <?php } else { ?>
-                        <tr>
-                            <td colspan="4">Data not available.</td>
-                        </tr>
-                    <?php } ?>
+                        <?php if ($blocks) { ?>
+                            <?php foreach ($blocks as $block) { ?>
+                                <tr>
+                                    <td>
+                                        <?= $block['week'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['gp'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['farmers_covered'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['nursery_raised'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['balance_smi'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['balance_lt'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['total_ragi'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['total_non_ragi'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['total_fc'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['total_area'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['status'] ?>
+                                    </td>
+                                    <td style="display: flex;">
+                                        <div class="btn-group btn-group-sm pull-right">
+                                            <?= $block['action'] ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="4">Data not available.</td>
+                            </tr>
+                        <?php } ?>
                     </tbody>
                 </table>
             </div>
@@ -107,29 +132,29 @@
 
 <script type="text/javascript">
     $('#uploader').dmUploader({
-        dnd:false,
-        url: '<?=$upload_url?>',
-        dataType:'json',
+        dnd: false,
+        url: '<?= $upload_url ?>',
+        dataType: 'json',
         maxFileSize: 1000000, // 1MB
         multiple: false,
         allowedTypes: 'application/*',
         extFilter: ['xlsx'],
-        onInit: function(){
+        onInit: function () {
             // Plugin is ready to use
-//            console.log('initialized')
+            //            console.log('initialized')
         },
-        onComplete: function(){
+        onComplete: function () {
             // All files in the queue are processed (success or error)
             $('#upload-controls').loading('stop');
         },
-        onNewFile: function(id, file){
+        onNewFile: function (id, file) {
             // When a new file is added using the file selector or the DnD area
             show_error('')
         },
-        onBeforeUpload: function(id){
+        onBeforeUpload: function (id) {
             // about tho start uploading a file
             setProgress(0)
-            if(typeof(loading)=='undefined') {
+            if (typeof (loading) == 'undefined') {
                 loading = $('#upload-controls').loading({
                     overlay: $('#loading-overlay')
                 });
@@ -137,52 +162,49 @@
                 $('#upload-controls').loading();
             }
         },
-        onUploadCanceled: function(id) {
+        onUploadCanceled: function (id) {
             // Happens when a file is directly canceled by the user.
         },
-        onUploadProgress: function(id, percent){
+        onUploadProgress: function (id, percent) {
             // Updating file progress
             setProgress(percent)
         },
-        onUploadSuccess: function(id, data){
+        onUploadSuccess: function (id, data) {
             // A file was successfully uploaded server response
-            if(data.status) {
+            if (data.status) {
                 show_error('File uploaded successfully');
                 $('.dm-uploader .status').addClass('text-success');
-                location.href=data.url;
+                location.href = data.url;
             } else {
                 show_error(data.message)
             }
-            $('#progress-bar').width(0+'%');
+            $('#progress-bar').width(0 + '%');
         },
-        onUploadError: function(id, xhr, status, message){
+        onUploadError: function (id, xhr, status, message) {
             console.log(message);
             show_error(message);
             $('#upload-controls').loading('stop');
         },
-        onFileSizeError: function(file){
+        onFileSizeError: function (file) {
             // file.name
             show_error('Invalid file size');
         },
-        onFileExtError: function(file){
+        onFileExtError: function (file) {
             // file.name
             show_error('Invalid file type');
         },
-        onFileTypeError: function(file){
+        onFileTypeError: function (file) {
             // file.name
             show_error('Invalid file type');
         }
     });
 
-    function show_error(msg){
+    function show_error(msg) {
         $('.dm-uploader .status').addClass('text-danger').text(msg)
     }
     function setProgress(percent) {
-        $('#progress-bar').width(percent+'%')
-        $('#progress-percent').text(percent+'%')
+        $('#progress-bar').width(percent + '%')
+        $('#progress-percent').text(percent + '%')
     }
 </script>
-<?php js_end(); ?>    
-
-
-
+<?php js_end(); ?>
