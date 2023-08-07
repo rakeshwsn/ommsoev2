@@ -2,7 +2,7 @@
 
     <div class="block block-themed">
         <div class="block-header bg-muted">
-            <h3 class="block-title">Report</h3>
+            <h3 class="block-title"><?=$title?></h3>
             <div class="block-options">
                 <a href="<?=$download_url?>" class="btn btn-secondary" data-toggle="tooltip" data-original-title="Download">
                     <i class="si si-cloud-download"></i>
@@ -17,6 +17,10 @@
                         <?php if($block_id){ ?>
                             <th rowspan="3">GP</th>
                         <?php } else if($district_id){ ?>
+                            <th rowspan="3">Block</th>
+                            <th rowspan="3">GPs</th>
+                        <?php } else if(isset($allblocks)) { ?>
+                            <th rowspan="3">District</th>
                             <th rowspan="3">Block</th>
                             <th rowspan="3">GPs</th>
                         <?php } else { ?>
@@ -56,6 +60,10 @@
                                 <?php if($block_id){ ?>
                                     <td><?=$block['gp']?></td>
                                 <?php } else if($district_id){ ?>
+                                    <td><?=$block['block']?></td>
+                                    <td><?=$block['gps']?></td>
+                                <?php } else if(isset($allblocks)) { ?>
+                                    <td><?=$block['district']?></td>
                                     <td><?=$block['block']?></td>
                                     <td><?=$block['gps']?></td>
                                 <?php } else { ?>

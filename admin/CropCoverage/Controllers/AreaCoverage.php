@@ -18,42 +18,45 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
-	private $error = array();
-	function __construct() {
+    private $error = array();
+    function __construct()
+    {
         $this->cropsmodel = new CropsModel();
         $this->districtModel = new DistrictModel();
         $this->areacoveragemodel = new AreaCoverageModel();
     }
-	public function index()
-	{
-		$this->template->set_meta_title(lang('Seasons Data.heading_title'));
+    public function index()
+    {
 
-		return $this->getList();
+        $this->template->set_meta_title(lang('Seasons Data.heading_title'));
 
-	}
-	protected function getList() {
-		$this->template->add_package(array('datatable', 'select2','uploader','jquery_loading'), true);
+        return $this->getList();
 
-		$data['add'] = admin_url('areacoverage/gp/add');
-		$data['delete'] = admin_url('grampanchayat/delete');
-		$data['download_url'] = admin_url('areacoverage/download');
+    }
+    protected function getList()
+    {
+        $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 
-		$data['heading_title'] = lang('Add Area Coverage');
+        $data['add'] = admin_url('areacoverage/gp/add');
+        $data['delete'] = admin_url('grampanchayat/delete');
+        $data['download_url'] = admin_url('areacoverage/download');
 
-		$data['text_list'] = lang('Grampanchayat.text_list');
-		$data['text_no_results'] = lang('Grampanchayat.text_no_results');
-		$data['text_confirm'] = lang('Grampanchayat.text_confirm');
+        $data['heading_title'] = lang('Add Area Coverage');
 
-		$data['button_add'] = lang('Grampanchayat.button_add');
-		$data['button_edit'] = lang('Grampanchayat.button_edit');
-		$data['button_delete'] = lang('Grampanchayat.button_delete');
+        $data['text_list'] = lang('Grampanchayat.text_list');
+        $data['text_no_results'] = lang('Grampanchayat.text_no_results');
+        $data['text_confirm'] = lang('Grampanchayat.text_confirm');
 
-		if (isset($this->error['warning'])) {
-			$data['error'] = $this->error['warning'];
-		}
+        $data['button_add'] = lang('Grampanchayat.button_add');
+        $data['button_edit'] = lang('Grampanchayat.button_edit');
+        $data['button_delete'] = lang('Grampanchayat.button_delete');
 
-		$districtModel = new DistrictModel();
-		$data['districts'] = $districtModel->getAll();
+        if (isset($this->error['warning'])) {
+            $data['error'] = $this->error['warning'];
+        }
+
+        $districtModel = new DistrictModel();
+        $data['districts'] = $districtModel->getAll();
 
         $dates = $this->areacoveragemodel->getWeekDate();
 
@@ -62,7 +65,7 @@ class AreaCoverage extends AdminController
         $data['upload_url'] = Url::areaCoverageUpload;
 
         $view = 'areacoverage_block';
-        if($this->user->block_id){
+        if ($this->user->block_id) {
             $filter = [
                 'block_id' => $this->user->block_id,
                 'year_id' => getCurrentYearId(),
@@ -72,10 +75,10 @@ class AreaCoverage extends AdminController
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
 
             $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+                $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+                $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+                $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+                $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
             $data['blocks'] = [];
             foreach ($blocks as $block) {
@@ -86,7 +89,7 @@ class AreaCoverage extends AdminController
                 $action = '';
                 $week = '';
                 if ($block->start_date) {
-                    $href = admin_url('areacoverage/edit?id=' . $block->cc_id );
+                    $href = admin_url('areacoverage/edit?id=' . $block->cc_id);
                     $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
                                             <i class="fa fa-list"></i></a>';
                     $week = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
@@ -105,10 +108,10 @@ class AreaCoverage extends AdminController
                 $total_ragi = $block->ragi_smi +
                     $block->ragi_lt +
                     $block->ragi_ls;
-                $total_non_ragi = $total_area-$total_ragi-$block->fc_area;
+                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
 
                 $data['blocks'][] = [
-                    'week' => $week ,
+                    'week' => $week,
                     'gp' => $block->gp,
                     'farmers_covered' => $block->farmers_covered,
                     'nursery_raised' => $block->nursery_raised,
@@ -128,7 +131,8 @@ class AreaCoverage extends AdminController
                     'total_non_ragi' => $total_non_ragi,
                     'total_fc' => $block->fc_area,
                     'total_area' => $total_area,
-                    'status' => $this->statuses[$status],
+                    // 'status' => $this->statuses[$status],
+                    'status' => '<label class="badge badge-' . $this->colors[$status] . '">' . $this->statuses[$status] . '</label>',
                     'action' => $action,
                 ];
 
@@ -179,7 +183,7 @@ class AreaCoverage extends AdminController
             ];
 
             $view = 'areacoverage_block';
-        } else if($this->user->district_id){
+        } else if ($this->user->district_id) {
             $filter = [
                 'district_id' => $this->user->district_id,
                 'year_id' => getCurrentYearId(),
@@ -190,10 +194,11 @@ class AreaCoverage extends AdminController
             $view = 'areacoverage_district';
         }
 
-		return $this->template->view('Admin\CropCoverage\Views\\'.$view, $data);
-	}
+        return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
+    }
 
-	public function download() {
+    public function download()
+    {
 
         $dates = $this->areacoveragemodel->getWeekDate();
 
@@ -201,41 +206,41 @@ class AreaCoverage extends AdminController
         $data['to_date'] = $dates['end_date'];
 
         $reader = IOFactory::createReader('Xlsx');
-        $template_file = DIR_TEMPLATE.'area_coverage.xlsx';
+        $template_file = DIR_TEMPLATE . 'area_coverage.xlsx';
 
         $spreadsheet = $reader->load($template_file);
 
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->setCellValue('W1',$data['from_date']);
-        $sheet->setCellValue('Z1',$data['to_date']);
+        $sheet->setCellValue('W1', $data['from_date']);
+        $sheet->setCellValue('Z1', $data['to_date']);
         $year_text = getCurrentYear();
-        $sheet->setCellValue('F1','District wise weekly Crop Progress under OMM during '.$year_text);
+        $sheet->setCellValue('F1', 'District wise weekly Crop Progress under OMM during ' . $year_text);
 
         $current_season = $this->areacoveragemodel->getCurrentYearDates()['season'];
-        
+
         $fin_year = getCurrentYear();
 
         $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
 
-        if(!$gps){
+        if (!$gps) {
             return redirect()->to(admin_url('areacoverage'))
-                ->with('message','No GPs found. Please add GPs first.');
+                ->with('message', 'No GPs found. Please add GPs first.');
         }
 
         $row = 4;
         foreach ($gps as $key => $gp) {
             $row++;
-            $sheet->setCellValue("A$row",$gp->block_id);
-            $sheet->setCellValue("B$row",$gp->gp_id);
-            $sheet->setCellValue("C$row",($key+1));
-            $sheet->setCellValue("D$row",$gp->block);
-            $sheet->setCellValue("E$row",$gp->gp);
+            $sheet->setCellValue("A$row", $gp->block_id);
+            $sheet->setCellValue("B$row", $gp->gp_id);
+            $sheet->setCellValue("C$row", ($key + 1));
+            $sheet->setCellValue("D$row", $gp->block);
+            $sheet->setCellValue("E$row", $gp->gp);
 
-            $sheet->setCellValue("T$row","=J$row+K$row+L$row");
-            $sheet->setCellValue("U$row","=SUM(M$row:S$row)");
-            $sheet->setCellValue("AC$row","=SUM(V$row:AB$row)");
-            $sheet->setCellValue("AD$row","=SUM(T$row:AB$row)");
+            $sheet->setCellValue("T$row", "=J$row+K$row+L$row");
+            $sheet->setCellValue("U$row", "=SUM(M$row:S$row)");
+            $sheet->setCellValue("AC$row", "=SUM(V$row:AB$row)");
+            $sheet->setCellValue("AD$row", "=SUM(T$row:AB$row)");
         }
 
         // Set read-only mode to prevent adding new rows when reading
@@ -249,8 +254,8 @@ class AreaCoverage extends AdminController
 
         $validation = $sheet->getCell('F5')
             ->getDataValidation();
-        $validation->setType(DataValidation::TYPE_DECIMAL );
-        $validation->setErrorStyle(DataValidation::STYLE_STOP );
+        $validation->setType(DataValidation::TYPE_DECIMAL);
+        $validation->setErrorStyle(DataValidation::STYLE_STOP);
         $validation->setAllowBlank(true);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -273,7 +278,7 @@ class AreaCoverage extends AdminController
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
 
-//        $writer = new Xlsx($spreadsheet);
+        //        $writer = new Xlsx($spreadsheet);
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, "Xlsx");
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -281,9 +286,10 @@ class AreaCoverage extends AdminController
 
         $writer->save("php://output");
         exit;
-	}
+    }
 
-    public function upload() {
+    public function upload()
+    {
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
@@ -295,9 +301,9 @@ class AreaCoverage extends AdminController
 
         if (!$input) {
             return $this->response->setJSON([
-                'status'=>false,
-                'message'=>'Invalid file',
-                'errors'=>$this->validator->getErrors()
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
             ]);
         } else {
             $acModel = new AreaCoverageModel();
@@ -308,8 +314,8 @@ class AreaCoverage extends AdminController
                 $spreadsheet = $reader->load($file);
             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
                 return $this->response->setJSON([
-                    'status'=>false,
-                    'message'=>'Invalid file.'
+                    'status' => false,
+                    'message' => 'Invalid file.'
                 ]);
             }
 
@@ -323,56 +329,56 @@ class AreaCoverage extends AdminController
 
             $from_date = $dates['start_date'];
             $to_date = $dates['end_date'];
-            $excel_from_date = isset($row_data[0][22]) ? $row_data[0][22]:0 ;
+            $excel_from_date = isset($row_data[0][22]) ? $row_data[0][22] : 0;
 
             $exists = $acModel
-                ->where('start_date',$from_date)
-                ->where('block_id',$this->user->block_id)
-                ->where('season',$current['season'])
-                ->where('year_id',getCurrentYearId())
+                ->where('start_date', $from_date)
+                ->where('block_id', $this->user->block_id)
+                ->where('season', $current['season'])
+                ->where('year_id', getCurrentYearId())
                 ->first();
-//            $exists = false;
+            //            $exists = false;
 
             //gp belongs to the block
-            $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
+            $gp_cell = isset($row_data[4][1]) ? $row_data[4][1] : null;
 
             $gp = [];
             $gp_belongs = false;
 
-            if($gp_cell){
+            if ($gp_cell) {
                 $gp = (new GrampanchayatModel())->find($gp_cell);
             }
-            if($gp){
-                $gp_belongs = $gp->block_id==$this->user->block_id;
+            if ($gp) {
+                $gp_belongs = $gp->block_id == $this->user->block_id;
             }
 
             //validation
-            if(!isset($row_data[0][22])){
+            if (!isset($row_data[0][22])) {
                 return $this->response->setJSON([
-                    'status'=>false,
-                    'message'=>'Invalid file. Please download the file from here and upload again.'
+                    'status' => false,
+                    'message' => 'Invalid file. Please download the file from here and upload again.'
                 ]);
-            } else if(strtotime($from_date)!=strtotime($excel_from_date)){
+            } else if (strtotime($from_date) != strtotime($excel_from_date)) {
                 return $this->response->setJSON([
-                    'status'=>false,
-                    'message'=>'Invalid week dates. Please download the latest file and upload again.'
+                    'status' => false,
+                    'message' => 'Invalid week dates. Please download the latest file and upload again.'
                 ]);
-            } else if($exists){
+            } else if ($exists) {
                 return $this->response->setJSON([
-                    'status'=>false,
-                    'message'=>'This week data is already uploaded.'
+                    'status' => false,
+                    'message' => 'This week data is already uploaded.'
                 ]);
-            } else if(!$gp_belongs){
+            } else if (!$gp_belongs) {
                 return $this->response->setJSON([
-                    'status'=>false,
-                    'message'=>'The GP dont belong to your block. Please download the file and try again.'
+                    'status' => false,
+                    'message' => 'The GP dont belong to your block. Please download the file and try again.'
                 ]);
             } else {
                 $crops = (new CropsModel())->findAll();
 
                 foreach ($row_data as $gp) {
                     //only rows with gp_id
-                    if(is_numeric($gp[0])){
+                    if (is_numeric($gp[0])) {
                         $master = [
                             'start_date' => $from_date,
                             'end_date' => $to_date,
@@ -384,10 +390,10 @@ class AreaCoverage extends AdminController
                             'farmers_covered' => $gp[5],
                         ];
 
-//                        $ac_crop_coverage_id = 0;
+                        //                        $ac_crop_coverage_id = 0;
                         $ac_crop_coverage_id = $acModel->insert($master);
 
-                        $col=5;
+                        $col = 5;
                         $nursery = [
                             'crop_coverage_id' => $ac_crop_coverage_id,
                             'nursery_raised' => $gp[++$col],
@@ -416,7 +422,7 @@ class AreaCoverage extends AdminController
 
                         //follow up crops
 
-                        $col+=2;
+                        $col += 2;
                         $fCrop = [];
                         foreach ($crops as $crop) {
                             $fCrop[] = [
@@ -433,13 +439,14 @@ class AreaCoverage extends AdminController
         }
 
         return $this->response->setJSON([
-            'status'=>true,
-            'message'=>'Upload successful.',
+            'status' => true,
+            'message' => 'Upload successful.',
             'url' => admin_url('areacoverage')
         ]);
-	}
+    }
 
-    public function edit() {
+    public function edit()
+    {
         $cc_id = $this->request->getGet('id');
 
         $dates = $this->areacoveragemodel->getWeekDate();
@@ -447,16 +454,16 @@ class AreaCoverage extends AdminController
         $to_date = $dates['end_date'];
 
         $data['show_form'] = false;
-        if(strtotime($to_date)>=strtotime('today')){
+        if (strtotime($to_date) >= strtotime('today')) {
             $data['show_form'] = true;
         }
 
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
                 'status' => 0
             ];
-            $this->areacoveragemodel->update($cc_id,$master);
+            $this->areacoveragemodel->update($cc_id, $master);
 
             $nursery = [
                 'crop_coverage_id' => $cc_id,
@@ -501,24 +508,27 @@ class AreaCoverage extends AdminController
             $this->areacoveragemodel->deleteFupCrops($cc_id);
             $this->areacoveragemodel->addFupCrops($fCrop);
 
-            return redirect()->to(admin_url('areacoverage'))->with('message','Area coverage data updated.');
+            return redirect()->to(admin_url('areacoverage'))->with('message', 'Area coverage data updated.');
         }
 
         return $this->getForm();
     }
 
-    protected function getForm($return_data=false){
+    protected function getForm($return_data = false)
+    {
         $cc_id = $this->request->getGet('id');
 
         $cc_info = $this->areacoveragemodel->find($cc_id);
 
-        if(!$cc_info){
-            return redirect()->to(admin_url('areacoverage'))->with('message','Could not find the data requested');
+        if (!$cc_info) {
+            return redirect()->to(admin_url('areacoverage'))->with('message', 'Could not find the data requested');
         }
 
         $data['show_form'] = false;
-        if(strtotime('today') <= strtotime($cc_info->end_date)
-            && ($cc_info->status!=1) && ($cc_info->block_id==$this->user->block_id) ){
+        if (
+            strtotime('today') <= strtotime($cc_info->end_date)
+            && ($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)
+        ) {
             $data['show_form'] = true;
         }
 
@@ -541,7 +551,7 @@ class AreaCoverage extends AdminController
         foreach ($cropPrtcArea as $area) {
             $practices = [];
             foreach ($cropPrtcArea as $p) {
-                if($area['crop_id']==$p['crop_id']){
+                if ($area['crop_id'] == $p['crop_id']) {
                     $practices[strtolower($p['practice'])] = [
                         'area' => $p['area'],
                         'status' => $p['status']
@@ -557,17 +567,17 @@ class AreaCoverage extends AdminController
         }
 
         $practices = [];
-        $_practices = ['smi','lt','ls'];
+        $_practices = ['smi', 'lt', 'ls'];
         foreach ($cropPrtcArea as $area) {
             foreach ($_practices as $_practice) {
-                if(strtolower($area['practice'])==$_practice){
+                if (strtolower($area['practice']) == $_practice) {
                     $$_practice += $area['area'];
                 }
             }
         }
 
         //cacl total
-        foreach ($_practices as $practice){
+        foreach ($_practices as $practice) {
             $practices[$practice] = [
                 'area' => $$practice,
                 'status' => 0
@@ -590,7 +600,7 @@ class AreaCoverage extends AdminController
         $data['fups_total'] = $area;
         $data['practices'] = $_practices;
 
-        if($return_data){
+        if ($return_data) {
             return $data;
         }
 

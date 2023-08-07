@@ -289,14 +289,66 @@ FROM soe_districts sd
     }
 
     public function getAreaCoverageReport($filter = []) {
-        if(!empty($filter['year_id'])){
-            $year_id = $filter['year_id'];
-        } else {
-            $year_id = getCurrentYearId();
-        }
+
         if(isset($filter['block_id'])){
 
-            $sql = "SELECT
+            return $this->getByBlock($filter);
+
+        } else if(isset($filter['district_id'])){
+
+            return $this->getByDistrict($filter);
+
+        } else {
+
+            return $this->getAllDistricts($filter);
+
+        }
+    }
+
+    public function getByDistrict($filter=[]) {
+
+        $sql = "SELECT
+  district_id,
+  d.name district,
+  block_id,
+  block,
+  vacrd.gps total_gps,
+  SUM(farmers_covered) AS farmers_covered,
+  SUM(nursery_raised) AS nursery_raised,
+  SUM(balance_smi) AS balance_smi,
+  SUM(balance_lt) AS balance_lt,
+  SUM(fc_area) AS fc_area,
+  SUM(ragi_smi) AS ragi_smi,
+  SUM(ragi_lt) AS ragi_lt,
+  SUM(ragi_ls) AS ragi_ls,
+  SUM(little_millet_lt) AS little_millet_lt,
+  SUM(little_millet_ls) AS little_millet_ls,
+  SUM(foxtail_ls) AS foxtail_ls,
+  SUM(sorghum_ls) AS sorghum_ls,
+  SUM(kodo_ls) AS kodo_ls,
+  SUM(barnyard_ls) AS barnyard_ls,
+  SUM(pearl_ls) AS pearl_ls
+FROM vw_area_coverage_report_blockwise vacrd LEFT JOIN soe_districts d ON d.id=vacrd.district_id
+WHERE (year_id IS NULL";
+        if(!empty($filter['year_id'])){
+            $sql .= " OR year_id = ".$filter['year_id'];
+        }
+        $sql .= " ) AND (season IS NULL";
+        if(!empty($filter['season'])){
+            $sql .= " OR LOWER(season) = '".strtolower($filter['season'])."'";
+        }
+        $sql .= ")";
+        if(!empty($filter['district_id'])) {
+            $sql .= " AND vacrd.district_id=" . $filter['district_id'];
+        }
+        $sql .= " GROUP BY block_id ORDER BY district_id,block";
+
+        return $this->db->query($sql)->getResult();
+    }
+
+    public function getByBlock($filter=[]) {
+
+        $sql = "SELECT
   block_id,
   gp_id,
   gp,
@@ -316,43 +368,26 @@ FROM soe_districts sd
   SUM(barnyard_ls) AS barnyard_ls,
   SUM(pearl_ls) AS pearl_ls
 FROM vw_area_coverage_report_gpwise vacrd
-WHERE (year_id IS NULL
-OR year_id = ".$year_id.")
-AND (LOWER(season) = '".strtolower($filter['season'])."'
-OR season IS NULL) AND vacrd.block_id=".$filter['block_id']."
-GROUP BY gp_id";
+WHERE (year_id IS NULL";
+        if(!empty($filter['year_id'])){
+            $sql .= " OR year_id = ".$filter['year_id'];
+        }
+        $sql .= " ) AND (season IS NULL";
+        if(!empty($filter['season'])){
+            $sql .= " OR LOWER(season) = '".strtolower($filter['season'])."'";
+        }
+        $sql .= ")";
+        if(!empty($filter['block_id'])) {
+            $sql .= " AND vacrd.block_id=" . $filter['block_id'];
+        }
+        $sql .= " GROUP BY gp_id ORDER BY gp";
 
-        } else if(isset($filter['district_id'])){
+        return $this->db->query($sql)->getResult();
+    }
 
-            $sql = "SELECT
-  block_id,
-  block,
-  vacrd.gps total_gps,
-  SUM(farmers_covered) AS farmers_covered,
-  SUM(nursery_raised) AS nursery_raised,
-  SUM(balance_smi) AS balance_smi,
-  SUM(balance_lt) AS balance_lt,
-  SUM(fc_area) AS fc_area,
-  SUM(ragi_smi) AS ragi_smi,
-  SUM(ragi_lt) AS ragi_lt,
-  SUM(ragi_ls) AS ragi_ls,
-  SUM(little_millet_lt) AS little_millet_lt,
-  SUM(little_millet_ls) AS little_millet_ls,
-  SUM(foxtail_ls) AS foxtail_ls,
-  SUM(sorghum_ls) AS sorghum_ls,
-  SUM(kodo_ls) AS kodo_ls,
-  SUM(barnyard_ls) AS barnyard_ls,
-  SUM(pearl_ls) AS pearl_ls
-FROM vw_area_coverage_report_blockwise vacrd
-WHERE (year_id IS NULL
-OR year_id = ".$year_id.")
-AND (LOWER(season) = '".strtolower($filter['season'])."'
-OR season IS NULL) AND vacrd.district_id=".$filter['district_id']."
-GROUP BY block_id";
+    public function getAllDistricts($filter=[]) {
 
-        } else {
-
-            $sql = "SELECT
+        $sql = "SELECT
   district_id,district,total_blocks,total_gps,
   SUM(farmers_covered) AS farmers_covered,
 SUM(nursery_raised) AS nursery_raised,
@@ -370,12 +405,15 @@ SUM(kodo_ls) AS kodo_ls,
 SUM(barnyard_ls) AS barnyard_ls,
 SUM(pearl_ls) AS pearl_ls
 FROM vw_area_coverage_report_districtwise vacrd
-WHERE (year_id IS NULL
-OR year_id = ".$year_id.")
-AND (LOWER(season) = '".strtolower($filter['season'])."'
-OR season IS NULL) GROUP BY district_id";
-
+WHERE (year_id IS NULL";
+        if(!empty($filter['year_id'])){
+            $sql .= " OR year_id = ".$filter['year_id'];
         }
+        $sql .= " ) AND (season IS NULL";
+        if(!empty($filter['season'])){
+            $sql .= " OR LOWER(season) = '".strtolower($filter['season'])."'";
+        }
+        $sql .= ") GROUP BY district_id ORDER BY district";
 
         return $this->db->query($sql)->getResult();
     }
@@ -449,5 +487,23 @@ WHERE fc.crop_coverage_id=".$crop_coverage_id.") afc ON c.id=afc.crop_id";
         $builder->where('block_id',$filter['block_id'])
             ->where('start_date',$filter['start_date'])
             ->update();
+    }
+
+    public function getUploadStatus($week_start_date) {
+        $sql = "SELECT
+  vdbg.*,
+  COALESCE(ac.total_blocks,0) total_ac_blocks
+FROM vw_districtwise_blocks_gps vdbg
+  LEFT JOIN (SELECT
+      district_id,
+      COUNT(acc.block_id) total_blocks
+    FROM ac_crop_coverage acc
+    WHERE acc.deleted_at IS NULL
+    AND acc.status = 1
+    AND DATE(acc.start_date) = DATE('$week_start_date')
+    GROUP BY acc.district_id) ac
+    ON ac.district_id = vdbg.district_id ORDER BY vdbg.district";
+
+        return $this->db->query($sql)->getResult();
     }
 }

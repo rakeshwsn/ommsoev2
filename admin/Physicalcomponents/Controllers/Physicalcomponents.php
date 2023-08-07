@@ -186,9 +186,10 @@ class Physicalcomponents extends AdminController
        // $data['components_info'] = '';
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $data['components_info'] = $this->physicalcomponents->find($this->uri->getSegment(4));
-           // printr($components_info); exit;
+           // printr($data['components_info']); exit;
             $data['hasPlusbutton'] = false;
         }
+        //$data['components_info'] = new stdClass();
         //printr($data['permissions']);
         foreach ($this->physicalcomponents->getFieldNames('mpr_components') as $field) {
             if ($this->request->getPost($field)) {
