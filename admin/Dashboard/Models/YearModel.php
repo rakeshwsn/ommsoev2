@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 class YearModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'dashboard_years';
+	protected $table                = 'soe_years';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
