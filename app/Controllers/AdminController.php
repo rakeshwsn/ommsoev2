@@ -27,20 +27,20 @@ class AdminController extends Controller
 	 *
 	 * @var array
 	 */
-	protected $helpers = ['aio','form','date','general','number'];
-    public $statuses = ['Not Approved','Approved','Rejected','Not Uploaded','Not Required'];
-    public $colors = [
-        'warning',
-        'success',
-        'secondary',
-        'danger',
-        'primary',
-    ];
+	protected $helpers = ['aio', 'form', 'date', 'general', 'number'];
+	public $statuses = ['Not Approved', 'Approved', 'Rejected', 'Not Uploaded', 'Not Required'];
+	public $colors = [
+		'warning',
+		'success',
+		'danger',
+		'primary',
+		'secondary',
+	];
 
 	protected $template;
 
 	protected $user;
-	
+
 	protected $session;
 
 	/**
@@ -54,22 +54,22 @@ class AdminController extends Controller
 	{
 		// Do Not Edit This Line
 		parent::initController($request, $response, $logger);
-        $this->settings = new \Config\Settings();
+		$this->settings = new \Config\Settings();
 		$this->template = service('template');
-        $this->user = service('user');
+		$this->user = service('user');
 		$this->session = service('session');
 		$this->uri = service('uri');
-		
+
 		//dd($this->template);
 		$this->template->set_theme('admin');
-		$this->template->set('header',true);
-        $this->template->set('site_name',$this->settings->config_site_title);
+		$this->template->set('header', true);
+		$this->template->set('site_name', $this->settings->config_site_title);
 
-        $ckfinderdata = [
-			'root'  	=> WRITEPATH,
-			'baseUrl'   => base_url('writable/uploads')
+		$ckfinderdata = [
+			'root' => WRITEPATH,
+			'baseUrl' => base_url('writable/uploads')
 		];
-		$_SESSION['ckfinder']=$ckfinderdata;
+		$_SESSION['ckfinder'] = $ckfinderdata;
 		//--------------------------------------------------------------------
 		// Preload any models, libraries, etc, here.
 		//--------------------------------------------------------------------
@@ -77,25 +77,25 @@ class AdminController extends Controller
 	}
 
 	public function _remap($method, ...$params)
-   	{
-		
-		
+	{
+
+
 		$router = service('router');
-		
+
 		//$controller_full_name = explode('\\', $router->controllerName());
-        //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
-        //Checks if it's a 404 or not
-        /*if(!$this->user->checkPermission()){
-			
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }else */
+		//$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
+		//Checks if it's a 404 or not
+		/*if(!$this->user->checkPermission()){
+				  
+				  throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+			  }else */
 		if (method_exists($this, $method)) {
-			return call_user_func_array(array($this, $method),$params);
-        } else {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }
-		
-	
+			return call_user_func_array(array($this, $method), $params);
+		} else {
+			throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+		}
+
+
 		//show_404();
-    }
+	}
 }
