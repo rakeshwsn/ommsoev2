@@ -161,7 +161,7 @@ class BudgetModel extends Model
         WHERE bc.budget_plan_id = ".$filter['budget_plan_id']."
         AND sbp.year = ".$filter['year']."
         AND sbp.fund_agency_id = ".$filter['fund_agency_id'].") t2
-            ON t1.component_id = t2.component_id
+            ON t1.component_id = t2.component_id ORDER BY t1.id
         ";
 
         //echo $sql."<br>";
@@ -312,7 +312,7 @@ class BudgetModel extends Model
         AND bp.deleted_at IS NULL
         GROUP BY bp.block_id
         ORDER BY bp.block_id";
-       // echo $sql;
+       //echo $sql;
         return $this->db->query($sql)->getResultArray();
 
     }

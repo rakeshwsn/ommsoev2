@@ -18,7 +18,7 @@ class Proceeding extends BaseController
 	}
     protected function getList($template=true) {
 
-        $this->template->add_package(array('datatable','particle'),true);
+        $this->template->add_package(array('datatable'),true);
 
         $data['datatable_url'] = base_url('proceeding/search');
 
