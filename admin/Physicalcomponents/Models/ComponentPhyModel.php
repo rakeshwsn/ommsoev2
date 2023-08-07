@@ -91,7 +91,7 @@ class ComponentPhyModel extends Model
             foreach ($data['componentsdata'] as $componentsdatas) {
 
                 $target_data = array(
-                    "componentid" => $componentsdatas['componentid'],
+                   // "componentid" => $componentsdatas['componentid'],
                     "description" => $componentsdatas['description'],
                     "year_id" => $data['year_id'],
                 );
@@ -117,7 +117,7 @@ class ComponentPhyModel extends Model
             foreach ($data['componentsdata'] as $componentsdatas) {
 
                 $target_data = array(
-                    "componentid" => $componentsdatas['componentid'],
+                    //"componentid" => $componentsdatas['componentid'],
                     "description" => $componentsdatas['description'],
                     "year_id" =>  $data['year_id'],
                 );

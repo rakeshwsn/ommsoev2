@@ -328,9 +328,10 @@ class Correction extends AdminController {
 
         $data['txn_type_text'] = 'Other Receipt';
 
-        $data['approval'] = true;
+        $data['approval'] = false;
 
         $form_data = $this->getForm();
+
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
         return $this->template->view('\Admin\Transaction\Views\approve_other_receipt', $data);
@@ -512,8 +513,8 @@ class Correction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\correction_mis', $data);
     }
 
-    public function getForm()
-    {
+    public function getForm() {
+
         $txn_type = $this->request->getGet('txn_type');
         $txn_id = $this->request->getGet('txn_id');
 

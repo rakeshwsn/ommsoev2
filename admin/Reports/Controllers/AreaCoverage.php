@@ -52,6 +52,16 @@ class AreaCoverage extends AdminController {
             $filter['district_id'] = $data['district_id'];
         }
 
+        if($this->user->block_id){
+            $data['block_id'] = $filter['block_id'] = $this->user->block_id;
+            $data['districts'] = (new DistrictModel())->where('id',$this->user->district_id)->asArray()->find();
+        } else if($this->user->district_id){
+            $data['district_id'] = $filter['district_id'] = $this->user->district_id;
+            $data['districts'] = (new DistrictModel())->where('id',$this->user->district_id)->asArray()->find();
+        } else {
+            $data['districts'] = (new DistrictModel())->asArray()->find();
+        }
+
         $blocks = $acModel->getAreaCoverageReport($filter);
 
         if($data['block_id']){
@@ -69,8 +79,6 @@ class AreaCoverage extends AdminController {
         foreach ($crops as $crop) {
             $data['crops'][$crop->id] = $crop->crops;
         }
-
-        $data['districts'] = (new DistrictModel())->asArray()->find();
 
         $data['blocks'] = [];
         if($data['district_id']){
