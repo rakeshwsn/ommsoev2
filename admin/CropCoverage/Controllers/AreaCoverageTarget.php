@@ -64,9 +64,12 @@ class AreaCoverageTarget extends AdminController
 
 		$croppractices = $this->targetModel->getPractices();
 
+
 		$practicedata = $this->targetModel->getAll([
 			'district_id' => $data['district_id']
 		]);
+		// printr($practicedata);
+		// exit;
 
 		$data['practicedata'] = $practicedata;
 		// printr($practicedata);
@@ -100,23 +103,7 @@ class AreaCoverageTarget extends AdminController
 // 		exit;
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
-	public function add()
-	{
-		if ($this->request->getMethod(1) === 'POST') {
-			//printr($_POST);
-			//exit;
 
-			$data['block_id'] = $this->request->getGet('block_id');
-			$data['crop_data'] = $this->request->getPost('crop');
-
-			$this->targetModel->addTargets($data);
-
-			$this->session->setFlashdata('message', 'Target Saved Successfully.');
-
-			return redirect()->to(base_url('admin/areacoverage/target'));
-		}
-		$this->getForm();
-	}
 	public function edit()
 	{
 		if ($this->request->getMethod(1) === 'POST') {
@@ -144,8 +131,8 @@ class AreaCoverageTarget extends AdminController
 			//printr($this->request->getPost());
 			//exit;
 			$data['crop_data'] = $this->request->getPost('crop');
-			//printr($data['crop_data']);
-			//exit;
+			// printr($data['crop_data']);
+			// exit;
 
 			$this->targetModel->addTargets($data, $target_id);
 

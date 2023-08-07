@@ -335,7 +335,7 @@ class AreaCoverage extends AdminController
 
             //gp belongs to the block
             $gp_cell = isset($row_data[4][1]) ? $row_data[4][1]: null;
-            dd($row_data);
+
             $gp = [];
             $gp_belongs = false;
 
@@ -454,6 +454,7 @@ class AreaCoverage extends AdminController
         if($this->request->getMethod(1)=='POST'){
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
+                'status' => 0
             ];
             $this->areacoveragemodel->update($cc_id,$master);
 

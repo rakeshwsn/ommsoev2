@@ -7,6 +7,13 @@ if (!isset($routes)) {
 }
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
+    $routes->add('enterpriseunit', 'Enterprises\Controllers\EnterpriseUnit::index');
+    $routes->add('enterpriseunit/edit/(:num)', 'Enterprises\Controllers\EnterpriseUnit::edit/$1');
+    $routes->add('enterpriseunit/add', 'Enterprises\Controllers\EnterpriseUnit::add');
+    $routes->add('enterpriseunit/search', 'Enterprises\Controllers\EnterpriseUnit::search');
+    $routes->add('enterpriseunit/delete/(:num)', 'Enterprises\Controllers\EnterpriseUnit::delete/$1');
+    // enterprises
+    $routes->add('enterprises/add', 'Enterprises\Controllers\Enterprises::add');
     $routes->add('enterprises', 'Enterprises\Controllers\Enterprises::index');
     $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
     // $routes->post('incentive/searchmain', 'Incentive\Controllers\Incentive::searchMain');

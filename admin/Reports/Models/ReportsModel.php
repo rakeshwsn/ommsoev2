@@ -8,7 +8,7 @@ class ReportsModel extends Model
 {
 
   //niranjan --10-07-23
-  public function getMpr($filter = [])
+  public function getMpr1($filter = [])
   {
 
     $last_year = ($filter['year_id'] - 1);
@@ -330,7 +330,7 @@ class ReportsModel extends Model
     return $this->db->query($sql)->getResultArray();
   }
 
-  public function getMprFinal($filter = [])
+  public function getMpr($filter = [])
   {
 
     $last_year = ($filter['year_id'] - 1);
@@ -633,7 +633,7 @@ class ReportsModel extends Model
     return $this->db->query($sql)->getResultArray();
   }
 
-  public function getMprTestNew($filter = [])
+  public function getMprFinal($filter = [])
   {
 
     $last_year = ($filter['year_id'] - 1);
@@ -698,10 +698,10 @@ class ReportsModel extends Model
                   LEFT JOIN soe_components c
                     ON component_id = c.id
                 WHERE 1 = 1";
-                if (!empty($filter['fagency_type_id'])) {
-                  $sql .= " AND sca.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } 
-                
+                if (!empty($filter['component_agency'])) {
+                  $sql .= " AND sca.agency_type_id IN (" . implode(',',$filter['component_agency']) . ")";
+                }
+
                 $sql .= " AND sca.fund_agency_id = " . $filter['fund_agency_id'] . ") sc
                 LEFT JOIN soe_components_assign sca
                   ON sca.component_id = sc.id
@@ -729,15 +729,15 @@ class ReportsModel extends Model
 
                 if (!empty($filter['block_id'])) {
                   $sql .= " AND bp.block_id =  " . $filter['block_id'];
-                }else if(!empty($filter['agency_id'])){
+                }else if($filter['agency_type_id']==7){
                   $sql .= " AND bp.block_id =  0";
                 }
                 if (!empty($filter['district_id'])) {
                   $sql .= " AND bp.district_id =  " . $filter['district_id'];
-                  
+
                 }
                 $sql .= " GROUP BY b.component_id) bud ON bud.component_id=comp.component_id";
-                
+
                 $sql .= " LEFT JOIN (SELECT
                   tc.component_id,
                   SUM(physical) phy,
@@ -764,12 +764,12 @@ class ReportsModel extends Model
                 if (!empty($filter['fund_agency_id'])) {
                   $sql .= " AND t.fund_agency_id = " . $filter['fund_agency_id'];
                 }
-                if (!empty($filter['fagency_type_id'])) {
-                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } 
+                if (!empty($filter['component_agency'])) {
+                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['component_agency']) . ")";
+                }
                 if (!empty($filter['block_id'])) {
                   $sql .= " AND t.user_id IN (SELECT id FROM user u WHERE u.block_id=" . $filter['block_id'].")";
-                  
+
                 }
                 $sql .= " GROUP BY tc.component_id) expn_mon ON comp.component_id = expn_mon.component_id
               LEFT JOIN (SELECT
@@ -783,11 +783,8 @@ class ReportsModel extends Model
                 AND tc.deleted_at IS NULL
                 AND t.transaction_type = 'fund_receipt'
                 AND t.status = 1";
-                
-                if(!empty($data['fund_receipt_not'])){
-                    $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                }else  {
-                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
+                if (!empty($filter['fundreceipt_agency'])) {
+                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fundreceipt_agency']) . ")";
                 }
                 if (!empty($filter['month_id'])) {
                   $sql .= " AND t.month = " . $filter['month_id'];
@@ -833,9 +830,9 @@ class ReportsModel extends Model
                 if (!empty($filter['fund_agency_id'])) {
                   $sql .= " AND t.fund_agency_id = " . $filter['fund_agency_id'];
                 }
-                if (!empty($filter['fagency_type_id'])) {
-                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } 
+                if (!empty($filter['component_agency'])) {
+                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['component_agency']) . ")";
+                }
                 if (!empty($filter['block_id'])) {
                   $sql .= " AND t.user_id IN (SELECT id FROM user u WHERE u.block_id=" . $filter['block_id'].")";
                 }
@@ -858,13 +855,9 @@ class ReportsModel extends Model
                 if (!empty($filter['district_id'])) {
                   $sql .= " AND t.district_id = " . $filter['district_id'];
                 }
-
-                if(!empty($data['fund_receipt_not'])){
-                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                }else  {
-                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
+                if (!empty($filter['fundreceipt_agency'])) {
+                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fundreceipt_agency']) . ")";
                 }
-
                 if (!empty($filter['month_id']) && !empty($filter['year_id'])) {
                   $last_month = ($filter['month_id'] - 1);
                   $sql .= " AND ((t.year BETWEEN 0 AND $last_year)
@@ -874,7 +867,7 @@ class ReportsModel extends Model
                 if (!empty($filter['fund_agency_id'])) {
                   $sql .= " AND t.fund_agency_id = " . $filter['fund_agency_id'];
                 }
-               
+
                 $sql .= " GROUP BY tc.component_id) fr_upto ON comp.component_id = fr_upto.component_id
               LEFT JOIN (SELECT
                   tc.component_id,
@@ -893,13 +886,9 @@ class ReportsModel extends Model
                 if (!empty($filter['district_id'])) {
                   $sql .= " AND t.district_id = " . $filter['district_id'];
                 }
-
-                if(!empty($data['fund_receipt_not'])){
-                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                }else  {
-                    $sql .= " AND t.agency_type_id NOT IN (5,6)";
+                if (!empty($filter['fundreceipt_agency'])) {
+                  $sql .= " AND  t.agency_type_id IN (" . implode(',',$filter['fundreceipt_agency']) . ")";
                 }
-
                 if (!empty($filter['month_id']) && !empty($filter['year_id'])) {
                   $last_month = ($filter['month_id'] - 1);
                   $sql .= " AND (t.year = " . $filter['year_id'] . "
@@ -920,7 +909,7 @@ class ReportsModel extends Model
                 AND tc.deleted_at IS NULL
                 AND t.transaction_type = 'expense'
                 AND t.status = 1";
-                
+
                 if (!empty($filter['block_id'])) {
                   $sql .= " AND t.block_id = " . $filter['block_id'];
                 }
@@ -935,15 +924,15 @@ class ReportsModel extends Model
                 if (!empty($filter['fund_agency_id'])) {
                   $sql .= " AND t.fund_agency_id = " . $filter['fund_agency_id'];
                 }
-                if (!empty($filter['fagency_type_id'])) {
-                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['fagency_type_id']) . ")";
-                } 
+                if (!empty($filter['component_agency'])) {
+                  $sql .= " AND t.agency_type_id IN (" . implode(',',$filter['component_agency']) . ")";
+                }
                 if (!empty($filter['block_id'])) {
                   $sql .= " AND t.user_id IN (SELECT id FROM user u WHERE u.block_id=" . $filter['block_id'].")";
                 }
                 $sql .= " GROUP BY tc.component_id) exp_upto_cy ON comp.component_id = exp_upto_cy.component_id) res
           ORDER BY sort_order";
-          //echo $sql;exit;
+    //echo $sql;exit;
     return $this->db->query($sql)->getResultArray();
   }
 

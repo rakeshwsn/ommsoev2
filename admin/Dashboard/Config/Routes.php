@@ -36,14 +36,6 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
 });
 
-$routes->group('api', ['namespace' => 'Admin'], function ($routes) {
-    $routes->get('areacoverage', 'Dashboard\Controllers\Api::areacoverage');
-    $routes->get('procurement', 'Dashboard\Controllers\Api::procurement');
-    $routes->get('pds', 'Dashboard\Controllers\Api::pds');
-    $routes->get('enterprise', 'Dashboard\Controllers\Api::enterprise');
-    $routes->get('establishment', 'Dashboard\Controllers\Api::establishment');
-});
-
 
 $routes->group('admin', ['namespace' => 'Admin'], function ($routes) {
     //Dashboard Chart
