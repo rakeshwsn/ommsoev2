@@ -15,6 +15,7 @@ class AreaCoverage extends AdminController {
 
     public function index($action='') {
         $data = [];
+        $data['title'] = 'Area Coverage Report';
 
         $acModel = new AreaCoverageModel();
         $cropsModel = new CropsModel();
@@ -528,6 +529,8 @@ class AreaCoverage extends AdminController {
 
     public function allblocks($action='') {
         $data = [];
+
+        $data['title'] = 'Area Coverage Blockwise Report';
 
         $acModel = new AreaCoverageModel();
         $cropsModel = new CropsModel();
