@@ -29,9 +29,10 @@ $validation = \Config\Services::validation();
                 <div class="form-group row" id="fullDiv<?php echo $image_row; ?>">
                     <label class="col-lg-2 col-form-label" for="example-hf-email"><strong>Component Name</strong></label>
                     <div class="col-lg-8">
-                        <select class="search form-control" id="block_id<?php echo $image_row; ?>" required >
+                        <!-- <select class="search form-control" id="block_id<?php echo $image_row; ?>" required >
 
-                        </select>
+                        </select> -->
+                        <input type="text" name="componentsdata[<?php echo $image_row; ?>][description]" class="search form-control" id="block_id<?php echo $image_row; ?>" required value="<?php echo @$components_info->description ?>">
                     </div>
                     <?php if($hasPlusbutton){ ?>
                         <div class="col-lg-2">
@@ -39,9 +40,7 @@ $validation = \Config\Services::validation();
                         </div>
 
                         <?php }?>
-                    <input type="hidden" name="componentsdata[<?php echo $image_row; ?>][description]" id="block_id<?php echo $image_row; ?>_description" value="">
-                    <input type="hidden" name="componentsdata[<?php echo $image_row; ?>][componentid]" id="block_id<?php echo $image_row; ?>_componentid" value="">
-                </div>
+                    </div>
             </div>
 
         </div>
@@ -58,72 +57,72 @@ $validation = \Config\Services::validation();
         var html = '<div class="form-group row" id="fullDiv' + image_row + '">';
         html += '<label class="col-lg-2 col-form-label"></label>';
         html += '<div class="col-lg-8">';
-        html += '<select class="search form-control" id="block_id' + image_row + '"></select>';
+        html += '<input type="text" name="componentsdata[' + image_row + '][description]" id="block_id' + image_row + '_description" class="search form-control" id="block_id' + image_row + '">';
         html += '</div>';
         html += '<div class="col-lg-2">';
         html += '<button type="button" onclick="$(\'#fullDiv' + image_row + '\').remove();" data-toggle="tooltip" title="Remove" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>';
         html += '</div>';
-        html += '<input type="hidden" name="componentsdata[' + image_row + '][description]" id="block_id' + image_row + '_description" value="">';
-        html += '<input type="hidden" name="componentsdata[' + image_row + '][componentid]" id="block_id' + image_row + '_componentid" value="">';
+       // html += '<input type="hidden" name="componentsdata[' + image_row + '][description]" id="block_id' + image_row + '_description" value="">';
+      //  html += '<input type="hidden" name="componentsdata[' + image_row + '][componentid]" id="block_id' + image_row + '_componentid" value="">';
         html += '</div>';
 
         $('#appendHere').append(html);
-        var newBlockId = 'block_id' + image_row;
-        initializeSelect(newBlockId, image_row);
+        // var newBlockId = 'block_id' + image_row;
+        // initializeSelect(newBlockId, image_row);
         image_row++;
     }
 
-    function initializeSelect(block_idd, row) {
-        console.log(block_idd, row);
-        // Make AJAX call to fetch the data
-        $.ajax({
-            url: "<?php echo admin_url('physicalcomponentsearch'); ?>",
-            method: "GET",
-            dataType: "json",
-            data: {
-                input_value: ''
-            },
-            success: function(data) {
-                var results = [];
-               // console.log(data.length);
-                if (data) {
-                    for (var i = 0; i < data.length; i++) {
-                        results.push({
-                            id: data[i]['id'],
-                            text: data[i]['component']
-                        });
-                    }
-                }
-                // Initialize select2 once you have the data
-                $('#' + block_idd).select2({
-                    data: results,
-                    placeholder: "Select Component"
-                });
-                // Set the default selected value
-                var selectedValue = <?php echo $components_info->componentid ?? 'null'; ?>;
-                if (selectedValue) {
-                    $('#' + block_idd).val(selectedValue).trigger('change');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
-        });
+    // function initializeSelect(block_idd, row) {
+    //     console.log(block_idd, row);
+    //     // Make AJAX call to fetch the data
+    //     $.ajax({
+    //         url: "<?php echo admin_url('physicalcomponentsearch'); ?>",
+    //         method: "GET",
+    //         dataType: "json",
+    //         data: {
+    //             input_value: ''
+    //         },
+    //         success: function(data) {
+    //             var results = [];
+    //            // console.log(data.length);
+    //             if (data) {
+    //                 for (var i = 0; i < data.length; i++) {
+    //                     results.push({
+    //                         id: data[i]['id'],
+    //                         text: data[i]['component']
+    //                     });
+    //                 }
+    //             }
+    //             // Initialize select2 once you have the data
+    //             $('#' + block_idd).select2({
+    //                 data: results,
+    //                 placeholder: "Select Component"
+    //             });
+    //             // Set the default selected value
+    //             var selectedValue = <?php echo $components_info->componentid ?? 'null'; ?>;
+    //             if (selectedValue) {
+    //                 $('#' + block_idd).val(selectedValue).trigger('change');
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             console.error(error);
+    //         }
+    //     });
 
-        $(document).on('change', '#' + block_idd, function() {
+    //     $(document).on('change', '#' + block_idd, function() {
 
-            var selectedValue = $(this).val();
-            $('#block_id' + row + '_description').val("");
-            var selectedOption = $('#' + block_idd + ' option[value="' + selectedValue + '"]');
-            console.log(selectedOption);
-            $('#block_id' + row + '_description').val(selectedOption.text());
-            $('#block_id' + row + '_componentid').val(selectedOption.val());
-        });
-    }
+    //         var selectedValue = $(this).val();
+    //         $('#block_id' + row + '_description').val("");
+    //         var selectedOption = $('#' + block_idd + ' option[value="' + selectedValue + '"]');
+    //         console.log(selectedOption);
+    //         $('#block_id' + row + '_description').val(selectedOption.text());
+    //         $('#block_id' + row + '_componentid').val(selectedOption.val());
+    //     });
+    // }
 
-    $(document).ready(function() {
-        initializeSelect('block_id<?php echo $image_row; ?>', <?php echo $image_row; ?>);
-    });
+    // $(document).ready(function() {
+    //     initializeSelect('block_id<?php echo $image_row; ?>', <?php echo $image_row; ?>);
+    // });
 </script>
 
 
