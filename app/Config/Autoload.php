@@ -24,9 +24,9 @@ class Autoload extends AutoloadConfig
             $folder = pathinfo($item_dir, PATHINFO_FILENAME);
             $this->psr4["Admin\\" . $folder] = ROOTPATH . 'admin/' . $folder;
         }
-        foreach (glob(ROOTPATH . 'front/*', GLOB_ONLYDIR) as $item_dir) {
+		foreach (glob(ROOTPATH . 'api/*', GLOB_ONLYDIR) as $item_dir) {
             $folder = pathinfo($item_dir, PATHINFO_FILENAME);
-            $this->psr4[$folder] = ROOTPATH . 'front/' . $folder;
+            $this->psr4[$folder] = ROOTPATH . 'api/' . $folder;
         }
 //        $folder = 'Users';
 //        $this->psr4["Admin\\" . $folder] = ROOTPATH . 'admin/' . $folder;
@@ -58,7 +58,7 @@ class Autoload extends AutoloadConfig
 		APP_NAMESPACE => APPPATH, // For custom app namespace
 		'Config'      => APPPATH . 'Config',
 		'Admin' => ROOTPATH. 'admin', // here we have added.,
-		'Front' => ROOTPATH. 'front', // here we have added.,
+		'Api' => ROOTPATH. 'api', // here we have added.,
 	];
 
 	/**

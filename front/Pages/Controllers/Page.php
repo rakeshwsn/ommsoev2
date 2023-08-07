@@ -33,7 +33,7 @@ class Page extends BaseController
 			} else {
 				$data['feature_image'] = '';
 			}
-			$this->template->add_package(array('particle'),true);
+			//$this->template->add_package(array('particle'),true);
 
 			$this->template->set_meta_description($Page->meta_description)
                            ->set_meta_keywords($Page->meta_keywords)->set_meta_title($Page->meta_title);

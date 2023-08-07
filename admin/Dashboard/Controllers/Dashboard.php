@@ -43,7 +43,7 @@ class Dashboard extends AdminController
 		$data['procure_url'] = site_url('api/procurement');
 		$data['pds_url'] = site_url('api/pds');
 		$data['establish_url'] = site_url('api/establishment');
-		$data['enterprise_url'] = site_url('api/enterprise');
+		$data['enterprise_url'] = site_url('api/enterprises');
 		$data['odishamap_url'] = site_url('api/odishamap');
 
 		return $this->template->view('Admin\Dashboard\Views\dashboardChart', $data);
