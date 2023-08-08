@@ -36,10 +36,11 @@
                 <h3 class="block-title">
                     <?= $heading_title; ?> [<?=$week_text?>]
                 </h3>
-                <?php if($show_reject): ?>
-                <div class="block-options">
-                    <button type="button" data-toggle="tooltip" title="Reject" class="btn btn-danger" id="btn-reject"><i class="fa fa-recycle"></i></button>
-                </div>
+                <?php if($show_approval): ?>
+                    <div class="block-options">
+                        <a data-toggle="tooltip" title="" id="btn-action" class="btn btn-success btn-approve"><i
+                                    class="fa fa-check"></i> Approve/Reject</a>
+                    </div>
                 <?php endif; ?>
             </div>
             <div class="block-content">
@@ -49,8 +50,8 @@
                         <th>Remarks</th>
                     </tr>
                     <tr>
-                        <td>Status</td>
-                        <td>Remarks</td>
+                        <td><?php if($status): ?><label class="badge badge-<?=$status_color?>"><?=$status?></label><?php endif; ?></td>
+                        <td><?=$remarks?></td>
                     </tr>
                 </table>
 
@@ -62,8 +63,7 @@
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
                         <th rowspan="3">Nursery Raised (in Ha.)</th>
                         <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
-                        <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
-                        </th>
+                        <th rowspan="3">LT - Balance Nursery Raised (in Ha.)</th>
                         <th colspan="10">Achievement under demonstration (in Ha.) <?=$week_text?></th>
                         <th rowspan="3">Total Ragi</th>
                         <th rowspan="3">Total Non-Ragi </th>
@@ -131,32 +131,6 @@
     </div>
 </div>
 
-<?php if($show_reject){ ?>
-<?php js_start(); ?>
-<script>
-    $(function () {
-        $('#btn-reject').click(function () {
-            if(confirm('Are you sure you want to reject this district data?')==false){
-                return false;
-            }
-            district_id = <?=$district_id?>;
-            start_date = '<?=$week_start_date?>';
-            $.ajax({
-                url:'<?=$reject_url?>',
-                data:{district_id:district_id,start_date:start_date},
-                type:'POST',
-                dataType:'JSON',
-                success:function (res) {
-                    if(res.status){
-                        location.href = res.redirect;
-                    }
-                },
-                error:function () {
-                    alert('Something went wrong');
-                }
-            });
-        });
-    });
-</script>
-<?php js_end(); ?>
+<?php if($show_approval){ ?>
+    <?=$approve_form?>
 <?php } ?>

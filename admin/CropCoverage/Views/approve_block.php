@@ -63,8 +63,8 @@
                     <th>Remarks</th>
                 </tr>
                 <tr>
-                    <td>Status</td>
-                    <td>Remarks</td>
+                    <td><?php if($status): ?><label class="badge badge-<?=$status_color?>"><?=$status?></label><?php endif; ?></td>
+                    <td><?=$remarks?></td>
                 </tr>
             </table>
 
