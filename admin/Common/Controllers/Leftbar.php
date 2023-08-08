@@ -36,7 +36,7 @@ class Leftbar extends AdminController
         // Component
         $components = array();
 
-        if ($this->user->hasPermission('component')) {
+        if ($this->user->hasPermission('components')) {
             $components[] = array(
                 'name' => lang('Leftbar.text_component'),
                 'href' => admin_url('components'),
@@ -44,7 +44,7 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
-        if ($this->user->hasPermission('component/assign')) {
+        if ($this->user->hasPermission('components/assign')) {
             $components[] = array(
                 'name' => lang('Leftbar.text_component_assign'),
                 'href' => admin_url('components/assign'),
@@ -52,10 +52,10 @@ class Leftbar extends AdminController
                 'children' => array()
             );
         }
-        if ($this->user->hasPermission('component/agencyassign')) {
+        if ($this->user->hasPermission('components/agencyassign')) {
             $components[] = array(
                 'name' => lang('Leftbar.text_component_agency_assign'),
-                'href' => admin_url('component/agencyassign'),
+                'href' => admin_url('components/agencyassign'),
                 'heading' => 0,
                 'children' => array()
             );
