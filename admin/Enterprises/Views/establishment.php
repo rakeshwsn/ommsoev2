@@ -1,7 +1,7 @@
 <div class="main-container">
     <div class="block">
         <div class="block-header block-header-default">
-            <h3 class="block-title">Filter</h3>
+            <h3 class="block-title">Enterprises List</h3>
             <div class="block-options">
                 <a href="admin/enterprises/add" data-toggle="tooltip" title="" class="btn btn-primary js-tooltip-enabled">
                     <i class="fa fa-plus"></i>

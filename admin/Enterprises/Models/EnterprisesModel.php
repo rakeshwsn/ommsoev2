@@ -28,23 +28,20 @@ class EnterprisesModel extends Model
     'managing_unit_name' =>  [
       'label'  => 'managing_unit_name|min_length[30]',
       'rules'  => 'required',
-      'errors' => [
-        'required' => 'Managing unit name is required',
+      'errors' => ['required' => 'Managing unit name is required',
       ]
     ],
 
     'contact_person' =>  [
       'label'  => 'contact_person|min_length[30]',
       'rules'  => 'required',
-      'errors' => [
-        'required' => 'Conatct person name is required',
+      'errors' => ['required' => 'Conatct person name is required',
       ]
     ],
     'contact_mobile' =>   [
-      'label'  => 'contact_mobile|min_length[10]',
+      'label'  => 'contact_mobile|max_length[10]',
       'rules'  => 'required',
-      'errors' => [
-        'required' => 'Conatct is required',
+      'errors' => ['required' => 'Conatct is required',
       ]
     ],
 
@@ -52,8 +49,7 @@ class EnterprisesModel extends Model
       'label'  => 'date_estd',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-          Date of Enterprise Establishment is required',
+        'required' => 'Date of Enterprise Establishment is required',
       ]
     ],
 
@@ -69,8 +65,7 @@ class EnterprisesModel extends Model
       'label'  => 'management_unit_type',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-         Selelct Date of OMU Under OMM',
+        'required' => 'Selelct Date of OMU Under OMM',
       ]
     ],
     'district_id' => [
@@ -78,7 +73,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Select District name',
-        'greater_than' => 'Select District name'
+        'greater_than' => 'Select District name',
       ]
     ],
     'block_id' => [
@@ -86,7 +81,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required',
       'errors' => [
         'required' => 'Selelct Block name',
-        'greater_than'=> 'Select Block Name'
+        'greater_than'=> 'Select Block Name',
       ]
     ],
     'gp_id' =>  [
@@ -94,80 +89,74 @@ class EnterprisesModel extends Model
       'rules'  => 'required',
       'errors' => [
         'required' => 'Selelct Grampanchayat name',
-        'greater_than'=> 'Select GramPanchayat Name'
+        'greater_than'=> 'Select GramPanchayat Name',
       ]
     ],
     'village_id' => [
       'label'  => 'village_id|graeter_than[0]',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-         Selelct Village name',
-         'greater_than'=> 'Select Village Name'
+        'required' => 'Selelct Village name',
+         'greater_than'=> 'Select Village Name',
       ]
     ],
     'budget_fin_yr' => [
-      'label'  => 'budget_fin_yr',
+      'label'  => 'budget_fin_yr_id|graeter_than[0]',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-         Selelct Budget Utilized of Financial year ',
+        'required' => 'Selelct Budget Code',
+        'greater_than'=> 'Selelct Budget Utilized of Financial year ',
       ]
     ],
     'mou_date' =>  [
       'label'  => 'mou_date',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-        Selelct Budget Utilized of Financial year ',
+        'required' => 'Selelct Budget Utilized of Financial year ',
       ]
     ],
     'unit_budget_id' => [
-      'label'  => 'unit_budget_id',
-      'rules'  => 'required|greater_than[0]',
+      'label'  => 'unit_budget',
+      'rules'  => 'required',
       'errors' => [
-        'required' => 'Select Budget Code',
-        'greater_than' => 'Select Budget Code'
+        'required' => 'Enter Budget Code',
+        
       ]
     ],
     'unit_budget_amount' =>  [
       'label'  => 'unit_budget_amount',
       'rules'  => 'required',
-      'errors' => [
-        'required' => 'Enter Amount',
+      'errors' => ['required' => 'Enter Amount',
       ]
     ],
     'is_support_basis_infr' =>  [
       'label'  => 'is_support_basis_infr',
       'rules'  => 'required',
-      'errors' => [
-        'required' => 'Select yes or no ',
+      'errors' => ['required' => 'Select yes or no ',
       ]
     ],
     'purpose_infr_support' =>  [
       'label'  => 'purpose_infr_support',
       'rules'  => 'required',
       'errors' => [
-        'required' => '
-          Type/ Purposeof Addl. infa structure is required ',
+        'required' => 'Type/ Purposeof Addl. infa structure is required ',
       ]
     ],
     'addl_budget_id' =>  [
-      'label'  => 'addl_budget_id',
-      'rules'  => 'required|greater_than[0]',
+      'label'  => 'addl_budget',
+      'rules'  => 'required',
       'errors' => [
-        'required' => 'Select Budget Code',
-        'greater_than' => 'Select Budget Code'
+        'required' => 'Enter Budget Code',
+       
       ]
-    ], 'required',
+    ], 
     'support_infr_amount' =>  [
       'label'  => 'support_infr_amount',
       'rules'  => 'required',
       'errors' => [
         'required' => 'Enter Amount ',
       ]
-    ], 'required',
-
+    ], 
 
   ];
   protected $validationMessages   = [];
@@ -191,18 +180,18 @@ class EnterprisesModel extends Model
     e.id,
     e.unit_id,
     e.district_id,
-   e.block_id,
+    e.block_id,
     e.gp_id,
     e.village_id,
-    e.budget_fin_yr,
+    e.budget_fin_yr_id,
     e.management_unit_type,
     e.managing_unit_name,
     e.contact_person,
     e.contact_mobile,
     e.date_estd,
     e.mou_date,
-    e.unit_budget_id,
-    e.addl_budget_id,
+    e.unit_budget,
+    e.addl_budget,
     e.unit_budget_amount,
     e.is_support_basis_infr,
     e.is_support_basis_infr,
@@ -227,37 +216,6 @@ class EnterprisesModel extends Model
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
     }
-<<<<<<< HEAD
-    if (isset($filter['block_id'])) {
-      $sql .= " AND e.block_id = " . $filter['block_id'];
-=======
-
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
-        $count = $builder->countAllResults();
-        return $count;
-    }
-
-    private function filter($builder,$data){
-
-        if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
-        }
-    }
-
-   
-
-    public function getBlockUsers() {
-        $this->settings = new \Config\Settings();
-        return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
-            ->asArray()->find();
->>>>>>> 526a4ae32e32441203cb5f267041a2fac3a63edd
-    }
-    // echo $sql;
-    // exit;
     return $this->db->query($sql)->getResult();
   }
 }
