@@ -30,12 +30,12 @@ class AdminController extends Controller
 	protected $helpers = ['aio', 'form', 'date', 'general', 'number'];
 	public $statuses = ['Not Approved', 'Approved', 'Rejected', 'Not Uploaded', 'Not Required'];
 	public $colors = [
-        'warning',
-        'success',
-        'secondary',
-        'danger',
-        'primary',
-    ];
+		'warning',
+		'success',
+		'secondary',
+		'danger',
+		'primary',
+	];
 
 	protected $template;
 
@@ -86,15 +86,9 @@ class AdminController extends Controller
 		//$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
 		//Checks if it's a 404 or not
 		/*if(!$this->user->checkPermission()){
-<<<<<<< HEAD
-			
-			throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-		}else */
-=======
 
-				  throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-			  }else */
->>>>>>> 45d76e74d883f65951271ad5674d42f6ab7195ba
+						throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+					}else */
 		if (method_exists($this, $method)) {
 			return call_user_func_array(array($this, $method), $params);
 		} else {
