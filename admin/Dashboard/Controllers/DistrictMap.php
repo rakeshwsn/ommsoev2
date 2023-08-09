@@ -3,20 +3,19 @@
 namespace Admin\Dashboard\Controllers;
 
 
+use Admin\Dashboard\Models\DistrictMapModel;
 use Admin\Dashboard\Models\DistrictModel;
-use Admin\Dashboard\Models\DashboardDistrictMapModel;
 use App\Controllers\AdminController;
 use Admin\Dashboard\Models\YearModel;
-use Admin\Dashboard\Models\BlockModel;
 
 
-class DashboardDistrictMapController extends AdminController
+class DistrictMap extends AdminController
 {
 	// private $error = array();
 
     public function index()
 	{
-		$DistrictMapModel = new DashboardDistrictMapModel();
+		$DistrictMapModel = new DistrictMapModel();
 		$this->template->set_meta_title(lang('Pages.heading_title'));
 
 		helper('form');
@@ -59,7 +58,7 @@ class DashboardDistrictMapController extends AdminController
 	}
 	public function add()
 	{
-		$DistrictMapModel = new DashboardDistrictMapModel();
+		$DistrictMapModel = new DistrictMapModel();
 		if ($this->request->getMethod(1) == 'POST') {
 
 			//delete if year_id exists
@@ -85,7 +84,7 @@ class DashboardDistrictMapController extends AdminController
 	public function edit()
 	{
 		              	
-		$DistrictMapModel = new DashboardDistrictMapModel();
+		$DistrictMapModel = new DistrictMapModel();
 		if ($this->request->getMethod(1) == 'POST') {
 
 			$year_id = $this->request->getGet('year_id');
@@ -115,7 +114,7 @@ class DashboardDistrictMapController extends AdminController
 	{
 		$data = [];
 		helper('form');
-		$DistrictMapModel = new DashboardDistrictMapModel();
+		$DistrictMapModel = new DistrictMapModel();
 		
 		$year_id = $this->request->getGet('year_id');
 		

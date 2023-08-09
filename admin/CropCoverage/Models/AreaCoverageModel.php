@@ -503,7 +503,7 @@ FROM vw_districtwise_blocks_gps vdbg
     AND DATE(acc.start_date) = DATE('$week_start_date')
     GROUP BY acc.district_id) ac
     ON ac.district_id = vdbg.district_id ORDER BY vdbg.district";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 }

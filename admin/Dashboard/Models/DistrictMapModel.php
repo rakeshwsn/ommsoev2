@@ -5,7 +5,7 @@ namespace Admin\Dashboard\Models;
 use CodeIgniter\Model;
 use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
-class DashboardDistrictMapModel extends Model
+class DistrictMapModel extends Model
 {
 	protected $DBGroup              = 'default';
 	protected $table                = 'dashboard_district_map';

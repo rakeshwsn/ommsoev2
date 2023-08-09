@@ -34,9 +34,9 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('dashboard/establishment/chart', 'Dashboard\Controllers\Establishment::chart');
     $routes->get('dashboard/odishamap/chart', 'Dashboard\Controllers\Establishment::odishamap');
     //Dashboard district map
-    $routes->add('dashboard/map', 'Dashboard\Controllers\DashboardDistrictMapController::index');
-    $routes->add('dashboard/map/add', 'Dashboard\Controllers\DashboardDistrictMapController::add');
-    $routes->add('dashboard/map/edit', 'Dashboard\Controllers\DashboardDistrictMapController::edit');
+    $routes->add('dashboard/map', 'Dashboard\Controllers\DistrictMap::index');
+    $routes->add('dashboard/map/add', 'Dashboard\Controllers\DistrictMap::add');
+    $routes->add('dashboard/map/edit', 'Dashboard\Controllers\DistrictMap::edit');
 
 });
 
