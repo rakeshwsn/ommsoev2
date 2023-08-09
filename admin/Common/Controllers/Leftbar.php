@@ -211,10 +211,10 @@ class Leftbar extends AdminController
             ];
         }
 
-        if ($this->user->hasPermission('reports/mprupload')) {
+        if ($this->user->hasPermission('reports/mpr/status')) {
             $reports[] = array(
                 'name' => "MPR Upload Status",
-                'href' => admin_url('reports/mprupload'),
+                'href' => admin_url('reports/mpr/status'),
                 'heading' => 0,
                 'children' => array()
             );
