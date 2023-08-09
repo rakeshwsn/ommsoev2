@@ -18,6 +18,13 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
+    public $colors_ac = [
+        'warning',
+        'success',
+        'danger',
+        'secondary',
+        'primary',
+    ];
     private $error = array();
     function __construct()
     {
@@ -132,7 +139,7 @@ class AreaCoverage extends AdminController
                     'total_fc' => $block->fc_area,
                     'total_area' => $total_area,
                     // 'status' => $this->statuses[$status],
-                    'status' => '<label class="badge badge-' . $this->colors[$status] . '">' . $this->statuses[$status] . '</label>',
+                    'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
                     'action' => $action,
                 ];
 

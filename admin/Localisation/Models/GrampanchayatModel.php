@@ -36,7 +36,7 @@ class GrampanchayatModel extends Model
 		),
 		'name' => array(
 			'label' => 'Name',
-			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]|is_unique_gp[soe_grampanchayats.name,id,{id}]"
+			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]"
 		)
 	];
 	protected $validationMessages = [];
