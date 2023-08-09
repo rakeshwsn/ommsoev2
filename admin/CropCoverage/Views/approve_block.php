@@ -47,8 +47,7 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">
-                <?= $heading_title; ?> [
-                <?= $week ?>]
+                <?= $heading_title; ?> [<?= $week ?>]
             </h3>
             <?php if (!$approved) { ?>
                 <div class="block-options">
@@ -58,9 +57,20 @@
             <?php } ?>
         </div>
         <div class="block-content">
-            <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
+            <table class="table table-bordered table-striped mb-20 custom-table">
+                <tr class="highlight-heading1">
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+                <tr>
+                    <td><?php if($status): ?><label class="badge badge-<?=$status_color?>"><?=$status?></label><?php endif; ?></td>
+                    <td><?=$remarks?></td>
+                </tr>
+            </table>
+
+            <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive custom-table">
                 <thead>
-                    <tr>
+                    <tr class="highlight-heading1">
                         <th rowspan="3">#</th>
                         <th rowspan="3">GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>

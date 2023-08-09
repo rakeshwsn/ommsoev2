@@ -20,10 +20,10 @@ class Submit extends AdminController{
 
             $filter = ['recipient_id' => $recipient_id];
         } else {
+            $filter = [];
             if($this->user->agency_type_id==$this->settings->ps_user){
                 $filter = ['recipient_id' => 23];
-            }
-            if($this->user->agency_type_id==$this->settings->rs_user){
+            } else if($this->user->agency_type_id==$this->settings->rs_user){
                 $filter = ['recipient_id' => 15];
             }
         }
