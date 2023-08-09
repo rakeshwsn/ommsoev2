@@ -468,7 +468,8 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
-                'status' => 0
+                'status' => 0,
+                'remarks' => ''
             ];
             $this->areacoveragemodel->update($cc_id, $master);
 

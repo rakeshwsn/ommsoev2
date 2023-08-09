@@ -730,7 +730,8 @@ class Mpr extends AdminController
 
     //created by Niranjan code
     public function abstractMpr($action='') {
-        $data = [];
+        $this->block_model = new BlockModel();
+        $data=[];
 
         $data['year_id'] = getCurrentYearId();
         if($this->request->getGet('year')){
@@ -742,117 +743,80 @@ class Mpr extends AdminController
             $data['month_id'] = $this->request->getGet('month');
         }
 
-        $data['agency_type_id'] = '';
-        if($this->request->getGet('agency_type_id')){
-            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
-        }
-
-        $data['fund_agency_id'] = 1;
-        if($this->user->fund_agency_id){
-            $data['fund_agency_id'] = $this->user->fund_agency_id;
-        }
+        $data['fund_agency_id'] = $this->user->fund_agency_id?:1;
         if($this->request->getGet('fund_agency_id')){
             $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
         }
 
-        $data['district_id'] = '';
+
+        $data['agency_type_id'] = $this->user->agency?$this->user->agency_type_id:0;
+        if($this->user->agency_type_id==$this->settings->district_user){
+            $data['agency_type_id'] = 0;
+        }
+        if($this->user->agency_type_id==$this->settings->block_user){
+            $data['agency_type_id'] = 0;
+        }
+
+        $data['user_group_id'] = $this->user->agency_type_id;
+
+
+        $data['district_id'] = $this->user->district_id;
         if($this->request->getGet('district_id')){
             $data['district_id'] = $this->request->getGet('district_id');
+            $data['user_group_id']=7;
         }
 
-        $data['block_id'] = '';
+        $data['block_id'] = $this->user->block_id;
         if($this->request->getGet('block_id')){
+
             $data['block_id'] = $this->request->getGet('block_id');
+            $data['user_group_id']=[6,5];
         }
 
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $data['block_id'] = $this->user->block_id;
+
+        if($this->request->getGet('agency_type_id')){
+            $data['agency_type_id'] = $data['user_group_id']=$this->request->getGet('agency_type_id');
         }
 
-        if($this->user->agency_type_id==$this->settings->district_user){
-            $data['district_id'] = $this->user->district_id;
+        $component_agency=array_column((new UserGroupModel())->getAgencyTree([
+            'fund_agency_id'=>$data['fund_agency_id'],
+            'user_group_id'=>$data['user_group_id'],
+            'agency_type_id'=>$data['agency_type_id']
+        ]),'user_group_id');
+
+        if($data['user_group_id']==11){
+            $fund_receipt_agency=array_column((new UserGroupModel())->getAgencyChild([
+                'fund_agency_id'=>$data['fund_agency_id'],
+                'user_group_id'=>$data['user_group_id']
+            ]),'user_group_id');
+        }else{
+            $fund_receipt_agency=$data['user_group_id'];
         }
 
-        if($data['block_id']){
-            $where = ['block_id'=>$data['block_id'],'user_group_id'=>$this->settings->block_user];
-            $user = (new UserModel())->where($where)->first();
-            $data['block_user_id'] = $user->id;
-        }
 
-        if($data['district_id']){
-            $where = ['district_id'=>$data['district_id'],'user_group_id'=>$this->settings->district_user];
-            $user = (new UserModel())->where($where)->first();
-            $data['district_user_id'] = $user->id;
-        }
+        // printr( $data['component_agency']);
 
-        $data['agency_types'] = [];
-        // only ps and rs in state login where user dont belongs to any district
-        if(!$this->user->district_id) {
-            $data['agency_types'] = (new UserGroupModel())->whereIn('id', [8, 9])
-                ->orderBy('name')->asArray()->findAll();
-        }
-
-        $data['districts'] = [];
-
-        $this->block_model = new BlockModel();
-
-        $data['blocks'] = [];
-        $data['fund_agencies'] = [];
-
-        $reportModel = new ReportsModel();
-        $data['components'] = [];
         $filter = [
             'month_id' => $data['month_id'],
             'year_id' => $data['year_id'],
             'user_id' => $this->user->id,
+            'agency_type_id'=>$data['agency_type_id'],
+            'district_id'=>$data['district_id'],
+            'block_id'=>$data['block_id'],
+            'fund_agency_id'=>$data['fund_agency_id'],
+            'user_group_id'=>$data['user_group_id'],
+            'component_agency'=>(array)$component_agency,
+            'fundreceipt_agency'=>(array)$fund_receipt_agency
         ];
-        $filter['component_agency_type_id'] = $this->user->agency_type_id;
-        if($this->user->agency_type_id==11){ //spmu
-            $filter['component_agency_type_id'] = NULL;
-        }
-        if($data['agency_type_id']){
-            $filter['agency_type_id'] = $data['agency_type_id'];
-        }
-        if($data['district_id']){
-            $filter['district_id'] = $data['district_id'];
-            $filter['agency_type_id'] = [5,6,7]; //fa/cbo/atma --to be added to settings
 
-            //in case of dmf angul/keunjhar (district id 7) all agency_type
-            if($data['district_id']==7 || $data['district_id']==15){
-                $filter['agency_type_id'] = [5,6,7,8,9];
-                $filter['district_id'] = null;
-            }
-            $filter['component_agency_type_id'] = 7;
-        }
-        if($data['block_id']){
-            $filter['block_id'] = $data['block_id'];
-            $filter['block_user_id'] = $data['block_user_id'];
-            $filter['agency_type_id'] = [5,6,7]; //fa/cbo --to be added to settings
-            $filter['category'] = 'program'; //only program components when block is selected
-            $filter['component_agency_type_id'] = 5;
-        }
+        // printr($filter);
 
-        if($data['fund_agency_id']){
-            $filter['fund_agency_id'] = $data['fund_agency_id'];
-            $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
+        $reportModel = new ReportsModel();
 
-            //if fund_ag == dmf cati = 7
-            if($data['fund_agency_id']!=1)
-                $filter['component_agency_type_id'] = 7;
-                if($data['block_id'])
-                    $filter['component_agency_type_id'] = 5;
-        }
+        $data['components'] = [];
+        //$this->filterPanel($data);
 
-        $filter['block_users'] = [5,6];
-        $filter['block_user'] = false;
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $filter['block_user'] = true;
-        }
-        if($this->user->agency_type_id==$this->settings->district_user){
-            $filter['district_user_id'] = $data['district_user_id'];
-        }
-
-        $components = $reportModel->getMPR($filter);
+        $components = $reportModel->getMpr($filter);
 
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
         
