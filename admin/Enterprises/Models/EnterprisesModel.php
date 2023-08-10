@@ -41,7 +41,7 @@ class EnterprisesModel extends Model
       ]
     ],
     'contact_mobile' =>   [
-      'label'  => 'contact_mobile|min_length[10]',
+      'label'  => 'contact_mobile|max_length[10]',
       'rules'  => 'required',
       'errors' => [
         'required' => 'Conatct is required',
@@ -159,15 +159,14 @@ class EnterprisesModel extends Model
         'required' => 'Select Budget Code',
         'greater_than' => 'Select Budget Code'
       ]
-    ], 'required',
+    ], 
     'support_infr_amount' =>  [
       'label'  => 'support_infr_amount',
       'rules'  => 'required',
       'errors' => [
         'required' => 'Enter Amount ',
       ]
-    ], 'required',
-
+    ], 
 
   ];
   protected $validationMessages   = [];
@@ -194,15 +193,15 @@ class EnterprisesModel extends Model
    e.block_id,
     e.gp_id,
     e.village_id,
-    e.budget_fin_yr,
+    e.budget_fin_yr_id,
     e.management_unit_type,
     e.managing_unit_name,
     e.contact_person,
     e.contact_mobile,
     e.date_estd,
     e.mou_date,
-    e.unit_budget_id,
-    e.addl_budget_id,
+    e.unit_budget,
+    e.addl_budget,
     e.unit_budget_amount,
     e.is_support_basis_infr,
     e.is_support_basis_infr,
@@ -227,37 +226,6 @@ class EnterprisesModel extends Model
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
     }
-<<<<<<< HEAD
-    if (isset($filter['block_id'])) {
-      $sql .= " AND e.block_id = " . $filter['block_id'];
-=======
-
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
-        $count = $builder->countAllResults();
-        return $count;
-    }
-
-    private function filter($builder,$data){
-
-        if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
-        }
-    }
-
-   
-
-    public function getBlockUsers() {
-        $this->settings = new \Config\Settings();
-        return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
-            ->asArray()->find();
->>>>>>> 526a4ae32e32441203cb5f267041a2fac3a63edd
-    }
-    // echo $sql;
-    // exit;
     return $this->db->query($sql)->getResult();
   }
 }

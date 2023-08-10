@@ -15,6 +15,13 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     // enterprises
     $routes->add('enterprises/add', 'Enterprises\Controllers\Enterprises::add');
     $routes->add('enterprises', 'Enterprises\Controllers\Enterprises::index');
+    $routes->add('enterprises/blocks', 'Enterprises\Controllers\Enterprises::ajaxBlocks');
+    $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
+
+    $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');
+
+    $routes->add('enterprises/villages', 'Enterprises\Controllers\Enterprises::ajaxvillages');
+
     $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
     // $routes->post('incentive/searchmain', 'Incentive\Controllers\Incentive::searchMain');
     // $routes->match(['get', 'post'], 'incentive/view/(:segment)', 'Incentive\Controllers\Incentive::view/$1');

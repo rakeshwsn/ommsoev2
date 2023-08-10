@@ -18,10 +18,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
+    private $cropsModel;
+    private $districtModel;
+    private $areacoveragemodel;
+    public $colors_ac = [
+        'warning',
+        'success',
+        'danger',
+        'secondary',
+        'primary',
+    ];
     private $error = array();
     function __construct()
     {
-        $this->cropsmodel = new CropsModel();
+        $this->cropsModel = new CropsModel();
         $this->districtModel = new DistrictModel();
         $this->areacoveragemodel = new AreaCoverageModel();
     }
@@ -132,7 +142,7 @@ class AreaCoverage extends AdminController
                     'total_fc' => $block->fc_area,
                     'total_area' => $total_area,
                     // 'status' => $this->statuses[$status],
-                    'status' => '<label class="badge badge-' . $this->colors[$status] . '">' . $this->statuses[$status] . '</label>',
+                    'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
                     'action' => $action,
                 ];
 
