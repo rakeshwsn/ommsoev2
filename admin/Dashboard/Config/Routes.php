@@ -12,6 +12,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('dashboard/areacoverage/add', 'Dashboard\Controllers\AreaCoverage::add');
     $routes->add('dashboard/areacoverage/edit', 'Dashboard\Controllers\AreaCoverage::edit');
     $routes->get('dashboard/areacoverage/chart', 'Dashboard\Controllers\AreaCoverage::chart');
+    $routes->add('dashboard/blocks', 'Dashboard\Controllers\AreaCoverage::ajaxBlocks');
+
     //procurement
     $routes->get('dashboard/procurement', 'Dashboard\Controllers\Procurement::index');
     $routes->add('dashboard/procurement/add', 'Dashboard\Controllers\Procurement::add');

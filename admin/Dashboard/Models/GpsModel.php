@@ -2,20 +2,20 @@
 namespace Admin\Dashboard\Models;
 use CodeIgniter\Model;
 
-class YearModel extends Model
+class GpsModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'dashboard_years';
+	protected $table                = 'grampanchayat';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
 	protected $returnType           = 'object';
-	protected $useSoftDeletes       = true;
+	protected $useSoftDeletes       = false;
 	protected $protectFields        = false;
 	protected $allowedFields        = [];
 
 	// Dates
-	protected $useTimestamps        = true;
+	protected $useTimestamps        = false;
 	protected $dateFormat           = 'datetime';
 	protected $createdField         = 'created_at';
 	protected $updatedField         = 'updated_at';
@@ -38,6 +38,9 @@ class YearModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 	protected $bulider;
+	
 
+	
 
+	
 }
