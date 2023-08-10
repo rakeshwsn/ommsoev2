@@ -1194,7 +1194,7 @@ FROM soe_fund_receipt_check sfrc
 WHERE sfrc.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND sfrc.year = $year
 AND sfrc.month = $month AND sfrc.status=1";
-            $fr_check = $this->db->query($sql)->getResult();
+//            $fr_check = $this->db->query($sql)->getResult();
 
 
 
