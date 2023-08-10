@@ -211,13 +211,33 @@ class Leftbar extends AdminController
             ];
         }
 
-        if ($this->user->hasPermission("reports/oldmpr")) {
-            $reports[] = [
-                "name" => lang("Leftbar.text_last_mpr"),
-                "href" => admin_url("reports/oldmpr"),
-                "heading" => 0,
-                "children" => [],
-            ];
+        if ($this->user->hasPermission('reports/mpr/status')) {
+            $reports[] = array(
+                'name' => "MPR Upload Status",
+                'href' => admin_url('reports/mpr/status'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        if ($this->user->hasPermission('reports/mprupload')) {
+            $reports[] = array(
+                'name' => 'MPR Upload',
+                'href' => admin_url('reports/mprupload'),
+                'heading' => 0,
+                'children' => array()
+            );
+        }
+
+        
+
+        if ($this->user->hasPermission('reports/oldmpr')) {
+            $reports[] = array(
+                'name' => lang('Leftbar.text_last_mpr'),
+                'href' => admin_url('reports/oldmpr'),
+                'heading' => 0,
+                'children' => array()
+            );
         }
 
         if ($this->user->hasPermission("incentive/uploadstatus")) {

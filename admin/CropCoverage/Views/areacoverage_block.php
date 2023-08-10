@@ -57,8 +57,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if ($blocks) { ?>
-                            <?php foreach ($blocks as $block) { ?>
+                        <?php if (!empty($blocks))
+                            foreach ($blocks as $block) { ?>
                                 <tr>
                                     <td>
                                         <?= $block['week'] ?>
@@ -99,10 +99,10 @@
                                         </div>
                                     </td>
                                 </tr>
-                            <?php } ?>
-                        <?php } else { ?>
+
+                            <?php } else { ?>
                             <tr>
-                                <td colspan="4">Data not available.</td>
+                                <td colspan="12">Data not available.</td>
                             </tr>
                         <?php } ?>
                     </tbody>
