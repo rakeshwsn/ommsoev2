@@ -28,20 +28,23 @@ class EnterprisesModel extends Model
     'managing_unit_name' =>  [
       'label'  => 'managing_unit_name|min_length[30]',
       'rules'  => 'required',
-      'errors' => ['required' => 'Managing unit name is required',
+      'errors' => [
+        'required' => 'Managing unit name is required',
       ]
     ],
 
     'contact_person' =>  [
       'label'  => 'contact_person|min_length[30]',
       'rules'  => 'required',
-      'errors' => ['required' => 'Conatct person name is required',
+      'errors' => [
+        'required' => 'Conatct person name is required',
       ]
     ],
     'contact_mobile' =>   [
       'label'  => 'contact_mobile|max_length[10]',
       'rules'  => 'required',
-      'errors' => ['required' => 'Conatct is required',
+      'errors' => [
+        'required' => 'Conatct is required',
       ]
     ],
 
@@ -49,7 +52,8 @@ class EnterprisesModel extends Model
       'label'  => 'date_estd',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Date of Enterprise Establishment is required',
+        'required' => '
+          Date of Enterprise Establishment is required',
       ]
     ],
 
@@ -65,7 +69,8 @@ class EnterprisesModel extends Model
       'label'  => 'management_unit_type',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Selelct Date of OMU Under OMM',
+        'required' => '
+         Selelct Date of OMU Under OMM',
       ]
     ],
     'district_id' => [
@@ -73,7 +78,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Select District name',
-        'greater_than' => 'Select District name',
+        'greater_than' => 'Select District name'
       ]
     ],
     'block_id' => [
@@ -81,7 +86,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required',
       'errors' => [
         'required' => 'Selelct Block name',
-        'greater_than'=> 'Select Block Name',
+        'greater_than'=> 'Select Block Name'
       ]
     ],
     'gp_id' =>  [
@@ -89,65 +94,70 @@ class EnterprisesModel extends Model
       'rules'  => 'required',
       'errors' => [
         'required' => 'Selelct Grampanchayat name',
-        'greater_than'=> 'Select GramPanchayat Name',
+        'greater_than'=> 'Select GramPanchayat Name'
       ]
     ],
     'village_id' => [
       'label'  => 'village_id|graeter_than[0]',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Selelct Village name',
-         'greater_than'=> 'Select Village Name',
+        'required' => '
+         Selelct Village name',
+         'greater_than'=> 'Select Village Name'
       ]
     ],
     'budget_fin_yr' => [
-      'label'  => 'budget_fin_yr_id|graeter_than[0]',
+      'label'  => 'budget_fin_yr',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Selelct Budget Code',
-        'greater_than'=> 'Selelct Budget Utilized of Financial year ',
+        'required' => '
+         Selelct Budget Utilized of Financial year ',
       ]
     ],
     'mou_date' =>  [
       'label'  => 'mou_date',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Selelct Budget Utilized of Financial year ',
+        'required' => '
+        Selelct Budget Utilized of Financial year ',
       ]
     ],
     'unit_budget_id' => [
-      'label'  => 'unit_budget',
-      'rules'  => 'required',
+      'label'  => 'unit_budget_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
-        'required' => 'Enter Budget Code',
-        
+        'required' => 'Select Budget Code',
+        'greater_than' => 'Select Budget Code'
       ]
     ],
     'unit_budget_amount' =>  [
       'label'  => 'unit_budget_amount',
       'rules'  => 'required',
-      'errors' => ['required' => 'Enter Amount',
+      'errors' => [
+        'required' => 'Enter Amount',
       ]
     ],
     'is_support_basis_infr' =>  [
       'label'  => 'is_support_basis_infr',
       'rules'  => 'required',
-      'errors' => ['required' => 'Select yes or no ',
+      'errors' => [
+        'required' => 'Select yes or no ',
       ]
     ],
     'purpose_infr_support' =>  [
       'label'  => 'purpose_infr_support',
       'rules'  => 'required',
       'errors' => [
-        'required' => 'Type/ Purposeof Addl. infa structure is required ',
+        'required' => '
+          Type/ Purposeof Addl. infa structure is required ',
       ]
     ],
     'addl_budget_id' =>  [
-      'label'  => 'addl_budget',
-      'rules'  => 'required',
+      'label'  => 'addl_budget_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
-        'required' => 'Enter Budget Code',
-       
+        'required' => 'Select Budget Code',
+        'greater_than' => 'Select Budget Code'
       ]
     ], 
     'support_infr_amount' =>  [
@@ -180,7 +190,7 @@ class EnterprisesModel extends Model
     e.id,
     e.unit_id,
     e.district_id,
-    e.block_id,
+   e.block_id,
     e.gp_id,
     e.village_id,
     e.budget_fin_yr_id,

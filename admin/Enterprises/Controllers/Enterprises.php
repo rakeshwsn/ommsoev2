@@ -4,12 +4,11 @@ namespace Admin\Enterprises\Controllers;
 
 use Admin\Enterprises\Models\BlockModel;
 use Admin\Enterprises\Models\DistrictModel;
-// use Admin\Enterprises\Models\EnterprisesBudgetModel;
+use Admin\Enterprises\Models\EnterprisesBudgetModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Enterprises\Models\GpModel;
 use Admin\Enterprises\Models\VillagesModel;
-use Admin\Enterprises\Models\YearModel;
 use App\Controllers\AdminController;
 
 class Enterprises extends AdminController
@@ -58,7 +57,7 @@ class Enterprises extends AdminController
 		}
 
 		$enterpriseslist = $enterprisesmodel->getAll($filter);
-		// dd($enterpriseslist);
+// dd($enterpriseslist);
 		$data['enterprises'] = [];
 
 		foreach ($enterpriseslist as $row) {
@@ -80,22 +79,22 @@ class Enterprises extends AdminController
 		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
 	}
 	public function add()
-	{
-
-
-		if ($this->request->getMethod(1) == 'POST') {
+    {
+		
+		
+		if ($this->request->getMethod(1) == 'POST'  && $this->validateForm() )
+		 {
 			// dd($this->request->getPost());
-			
 			$enterprisesmodel = new EnterprisesModel();
 			$enterprisesmodel->where('id', $this->request->getGet('id'))->delete();
-
+          
 			$enterprisesdata[] = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $this->request->getPost('district_id'),
 				'block_id' => $this->request->getPost('block_id'),
 				'gp_id' => $this->request->getPost('gp_id'),
 				'village_id' => $this->request->getPost('village_id'),
-				'budget_fin_yr_id ' => $this->request->getPost('budget_fin_yr_id '),
+				'budget_fin_yr_id' => $this->request->getPost('budget_fin_yr_id'),
 				'management_unit_type' => $this->request->getPost('management_unit_type'),
 				'managing_unit_name' => $this->request->getPost('managing_unit_name'),
 				'contact_person' => $this->request->getPost('contact_person'),
@@ -110,10 +109,10 @@ class Enterprises extends AdminController
 				'support_infr_budget_id' => $this->request->getPost('unit_budget_amount'),
 				'support_infr_amount' => $this->request->getPost('support_infr_amount')
 			];
-
-dd($enterprisesdata);
+	
+			
 			$enterprisesmodel->insertBatch($enterprisesdata);
-
+			
 			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
 		}
 
@@ -134,7 +133,7 @@ dd($enterprisesdata);
 				'block_id' => $this->request->getPost('block_id'),
 				'gp_id' => $this->request->getPost('gp_id'),
 				'village_id' => $this->request->getPost('village_id'),
-				'budget_fin_yr_id ' => $this->request->getPost('budget_fin_yr_id '),
+				'budget_fin_yr_id' => $this->request->getPost('budget_fin_yr_id'),
 				'management_unit_type' => $this->request->getPost('management_unit_type'),
 				'managing_unit_name' => $this->request->getPost('managing_unit_name'),
 				'contact_person' => $this->request->getPost('contact_person'),
@@ -263,32 +262,24 @@ dd($enterprisesdata);
 		if ($this->request->getGet('village_id')) {
 			$data['village_id'] = $this->request->getGet('village_id');
 		}
-	
 		//village end
-		// $enterprisesbudgetmodel = new EnterprisesBudgetModel();
-		// $data['unit_budgets'][0] = 'Select budgets';
-		// // $budget_id = [];
-		// $unit_budgets = $enterprisesbudgetmodel->findAll();
-
-		// foreach ($unit_budgets as $unit_budget) {
-		// 	$data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
-		// }
-		// $enterprisesbudgetmodel = new EnterprisesBudgetModel();
-		// $data['addl_budgets'][0] = 'Select budgets';
-		// // $budget_id = [];
-		// $addl_budgets = $enterprisesbudgetmodel->findAll();
-
-		// foreach ($addl_budgets as $addl_budget) {
-		// 	$data['addl_budgets'][$addl_budget->id] = $addl_budget->budget_code;
-		// }
-		$yearmodel = new YearModel();
-		$data['budget_fin_yrs'][0] = 'Select Years';
+		$enterprisesbudgetmodel = new EnterprisesBudgetModel();
+		$data['unit_budgets'][0] = 'Select budgets';
 		// $budget_id = [];
-		$budget_fin_yrs = $yearmodel->findAll();
+		$unit_budgets = $enterprisesbudgetmodel->findAll();
 
-		foreach ($budget_fin_yrs as $budget_fin_yr) {
-			$data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
+		foreach ($unit_budgets as $unit_budget) {
+			$data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
 		}
+		$enterprisesbudgetmodel = new EnterprisesBudgetModel();
+		$data['addl_budgets'][0] = 'Select budgets';
+		// $budget_id = [];
+		$addl_budgets = $enterprisesbudgetmodel->findAll();
+
+		foreach ($addl_budgets as $addl_budget) {
+			$data['addl_budgets'][$addl_budget->id] = $addl_budget->budget_code;
+		}
+
 
 
 		$enterprisesunitmodel = new EnterprisesUnitModel();
@@ -309,7 +300,8 @@ dd($enterprisesdata);
 			foreach ($enterprise as $col => $value) {
 				$data[$col] = $value;
 			}
-		} else {
+			
+} else {
 			$enterprise = $enterprisesmodel->db->getFieldData('enterprises');
 			// dd($enterprise);
 			foreach ($enterprise as $value) {
@@ -327,10 +319,10 @@ dd($enterprisesdata);
 	{
 		$enterprisesmodel = new EnterprisesModel();
 		$validation =  \Config\Services::validation();
-		$id = $this->uri->getSegment(4);
+		$id=$this->uri->getSegment(4);
 
 		$rules = $enterprisesmodel->validationRules;
-		// dd($this->request->getPost());
+// dd($this->request->getPost());
 		if ($this->validate($rules)) {
 			return true;
 		} else {
