@@ -18,6 +18,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
+    private $cropsModel;
+    private $districtModel;
+    private $areacoveragemodel;
     public $colors_ac = [
         'warning',
         'success',
@@ -28,7 +31,7 @@ class AreaCoverage extends AdminController
     private $error = array();
     function __construct()
     {
-        $this->cropsmodel = new CropsModel();
+        $this->cropsModel = new CropsModel();
         $this->districtModel = new DistrictModel();
         $this->areacoveragemodel = new AreaCoverageModel();
     }
