@@ -36,11 +36,7 @@
                         </div>
                         <div class="col-2">
                             <label class="form-label">Season :</label>
-                            <select class="form-control mb-3" name="season" id="season">
-                                <option value="rabi"<?= set_select('season', 'rabi', $season == "rabi") ? 'selected' : ''; ?>>rabi</option>
-                                <option value="kharif"<?= set_select('season', 'kharif', $season == "kharif") ? 'selected' : ''; ?>>kharif</option>
-                            </select>
-
+                            <?php echo form_dropdown('season', $seasons, $season, ['class' => 'form-control mb-3', 'id' => 'seasons']); ?>
                         </div>
                         <div class="col-3 mt-4">
                             <button class="btn btn-primary">Submit</button>
@@ -88,35 +84,30 @@
     </div>
 </div>
 <script>
-    $('#districts').on('change', function() {
-
-        d_id = $(this).val();
-
-        $.ajax({
-            url: 'admin/dashboard/blocks',
-            data: {
-                district_id: d_id
-            },
-            type: 'GET',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(response) {
-                if (response.blocks) {
-                    html = '<option value="">Select Block</option>';
-                    $.each(response.blocks, function(k, v) {
-
-                        html += '<option value="' + v.id + '">' + v.name + '</option>';
-
-                    });
-                    $('#blocks').html(html)
-                }
-            },
-            error: function() {
-                alert('something went wrong');
-            },
-            complete: function() {
-
-            }
+    $(function () {
+        $('#districts').on('change', function() {
+            d_id = $(this).val();
+            $.ajax({
+                url: 'admin/dashboard/blocks',
+                data: {
+                    district_id: d_id
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response.blocks) {
+                        html = '<option value="">Select Block</option>';
+                        $.each(response.blocks, function(k, v) {
+                            html += '<option value="' + v.id + '">' + v.name + '</option>';
+                        });
+                        $('#blocks').html(html)
+                    }
+                },
+                error: function() {
+                    alert('something went wrong');
+                },
+            });
         });
     });
 </script>

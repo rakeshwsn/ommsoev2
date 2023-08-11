@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 class GrampanchayatModel extends Model
 {
 	protected $DBGroup = 'default';
-	protected $table = 'soe_grampanchayats';
+	protected $table = 'grampanchayat';
 	protected $primaryKey = 'id';
 	protected $useAutoIncrement = true;
 	protected $insertID = 0;
@@ -89,7 +89,7 @@ class GrampanchayatModel extends Model
 		//$builder->where($this->deletedField, null);
 		//$builder->where('g.tcode', null);
 		$res = $builder->get()->getResult();
-		//echo $this->db->getLastQuery();
+//		echo $this->db->getLastQuery();
 		return $res;
 	}
 
@@ -103,10 +103,10 @@ class GrampanchayatModel extends Model
 
 	private function filter($builder, $data)
 	{
-		$builder->join('soe_districts sd', 'sg.district_id = sd.id', 'left');
-		$builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
+        $builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
+        $builder->join('soe_districts sd', 'sb.district_id = sd.id', 'left');
 
-		if (!empty($data['filter_district'])) {
+        if (!empty($data['filter_district'])) {
 			$builder->where("sg.district_id  = '" . $data['filter_district'] . "'");
 		}
 

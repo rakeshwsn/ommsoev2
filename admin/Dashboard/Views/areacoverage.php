@@ -78,7 +78,7 @@
 						<tbody>
 							<tr class="odd">
 								<td colspan="7">
-									<h3 class="text-center">data not avaliable</h3>
+									<h3 class="text-center">Data not available</h3>
 								</td>
 							</tr>
 						</tbody>
@@ -90,36 +90,35 @@
 	</div>
 </div>
 <script>
-    $('#districts').on('change', function() {
+    $(function(){
+        $('#districts').on('change', function() {
+            d_id = $(this).val();
+            $.ajax({
+                url: 'admin/dashboard/blocks',
+                data: {
+                    district_id: d_id
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response.blocks) {
+                        html = '<option value="">Select Block</option>';
+                        $.each(response.blocks, function(k, v) {
 
-        d_id = $(this).val();
+                            html += '<option value="' + v.id + '">' + v.name + '</option>';
 
-        $.ajax({
-            url: 'admin/dashboard/blocks',
-            data: {
-                district_id: d_id
-            },
-            type: 'GET',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(response) {
-                if (response.blocks) {
-                    html = '<option value="">Select Block</option>';
-                    $.each(response.blocks, function(k, v) {
+                        });
+                        $('#blocks').html(html)
+                    }
+                },
+                error: function() {
+                    alert('something went wrong');
+                },
+                complete: function() {
 
-                        html += '<option value="' + v.id + '">' + v.name + '</option>';
-
-                    });
-                    $('#blocks').html(html)
                 }
-            },
-            error: function() {
-                alert('something went wrong');
-            },
-            complete: function() {
-
-            }
+            });
         });
     });
-	$('#districts').trigger('change');
 </script>
