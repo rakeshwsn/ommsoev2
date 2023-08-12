@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 class GrampanchayatModel extends Model
 {
 	protected $DBGroup = 'default';
-	protected $table = 'grampanchayat';
+	protected $table = 'soe_grampanchayats';
 	protected $primaryKey = 'id';
 	protected $useAutoIncrement = true;
 	protected $insertID = 0;
@@ -148,7 +148,7 @@ AND sg.block_id = $block_id";
 	{
 		$builder = $this->db->table("cluster_to_gp cg");
 		$builder->join('cluster c', 'cg.cluster_id = c.id');
-		$builder->join('grampanchayat g', 'cg.gp_id = g.id');
+		$builder->join('soe_grampanchayats g', 'cg.gp_id = g.id');
 		$builder->select("g.*");
 		$builder->where("c.code", $cluster);
 		$res = $builder->get()->getResult();
