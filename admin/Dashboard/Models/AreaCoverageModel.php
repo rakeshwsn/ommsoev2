@@ -82,7 +82,8 @@ class AreaCoverageModel extends Model
 		if (isset($filter['block_id'])) {
 			$sql .= " AND a.block_id = " . $filter['block_id'];
 		}
-		$sql .=  " GROUP BY a.year_id,a.district_id";
+		$sql .=  " GROUP BY a.year_id,a.district_id ORDER BY a.year_id,districts";
+
 		return $this->db->query($sql)->getResult();
 	}
 

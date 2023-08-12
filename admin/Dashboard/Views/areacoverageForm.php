@@ -2,11 +2,8 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Area</h3>
-
         </div>
         <div class="block-content block-content-full">
-            <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-
             <form>
                 <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="row">
@@ -52,12 +49,10 @@
                         <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                             <thead>
                                 <tr>
-
                                     <th>slno</th>
                                     <th>Gp</th>
                                     <th>Farmers</th>
                                     <th>Achievement</th>
-
                                 </tr>
                             </thead>
                             <tbody>
