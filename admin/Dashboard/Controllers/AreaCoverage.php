@@ -86,7 +86,7 @@ class AreaCoverage extends AdminController
                 'districts' => $row->districts,
                 'blocks' => $row->blocks,
                 'farmers' => $row->total_farmers,
-                'achievement' => $row->total_achievement,
+                'achievement' => $row->total_achievements,
                 'created_at' => ymdToDmy($row->created_at),
                 'edit_url' => admin_url('dashboard/areacoverage/edit?year_id=' . $row->year_id . '&district_id=' . $row->district_id . '&block_id=' . $row->block_id . '&season=' . $row->season),
 
