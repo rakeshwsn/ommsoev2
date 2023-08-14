@@ -7,8 +7,8 @@ if (!isset($routes)) {
 }
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
-    $routes->get('physicalachievement', 'Physicalachievement\Controllers\Physicalachievement::index');
-    $routes->get('physicalachievement/enterprises', 'Physicalachievement\Controllers\Physicalachievement::enterprisesindex');
+    $routes->get('phyachtraining', 'Physicalachievement\Controllers\Physicalachievement::index');
+    $routes->get('phyachenterprise', 'Physicalachievement\Controllers\Physicalachievement::enterprisesindex');
     $routes->match(['get', 'post'], 'physicalachievement/add', 'Physicalachievement\Controllers\Physicalachievement::add');
     $routes->match(['get', 'post'], 'Physicalcomponentstarget/edit/(:segment)', 'Physicalcomponentstarget\Controllers\Physicalcomponentstarget::edit/$1');
     $routes->get('physicalcomponents/delete/(:segment)',   'Physicalcomponents\Controllers\Physicalcomponents::delete/$1');
