@@ -44,7 +44,7 @@ $user  = service('user');
 
         <div class="block-header bg-muted">
 
-            <h3 class="block-title float-left">Acheivements Data Training</h3>
+            <h3 class="block-title float-left">Acheivements Data Enterprises</h3>
             <?php if (!$user->district_id) { ?>
                 <button id="btnExport"><i class="fa fa-download" aria-hidden="true"></i>
                 </button>
@@ -62,38 +62,49 @@ $user  = service('user');
         <div class="block-content block-content-full" style="overflow-y: scroll;">
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="testTable">
                 <thead>
-                <tr>
+                    <tr>
                         <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Target vs Ach. for different Training programme, Awareness and other activity under OMM during 2023-24</td>
 
                     </tr>
+                </thead>
+                <tbody>
                     <tr>
                         <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-2023</td>
 
                     </tr>
                     <tr>
-                        <td colspan="3">Componet&nbsp;&nbsp;&nbsp;details</td>
+                        <td colspan="3">Componet details</td>
                         <?php foreach ($componentsAll as $componentsAlls) { ?>
-                            <td colspan="4"><?php echo $componentsAlls['description'] ?></td>
-                        <?php } ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td rowspan="2">SN</td>
-                        <td rowspan="2">Name of the District</td>
-                        <td rowspan="2">No. of Blocks</td>
-
-
-                        <?php foreach ($componentsAll as $componentsAlls) { ?>
-                            <td rowspan="2">Physical Target</td>
-                            <td colspan="3">Ach.</td>
+                            <td colspan="7"><?php echo $componentsAlls['description'] ?></td>
                         <?php } ?>
                     </tr>
                     <tr>
-                    <?php foreach ($componentsAll as $componentsAlls) { ?>
-                            <td>Up to prev.</td>
-                            <td><?php echo $getMonths['name'] ?></td>
-                            <td>Cumulative<br></td>
+                        <th rowspan="3">SN</th>
+                        <th rowspan="3">Name of the District</th>
+                        <th rowspan="3">No. of Blocks</th>
+                        <?php foreach ($componentsAll as $componentsAlls) { ?>
+                            <td rowspan="3">Physical Target</td>
+                            <td colspan="6">Ach.</td>
+                        <?php } ?>
+                    </tr>
+                    <tr>
+
+                        <?php foreach ($componentsAll as $componentsAlls) { ?>
+                            <td colspan="2">Up to prev.</td>
+                            <td colspan="2"><?php echo $getMonths['name'] ?></td>
+                            <td colspan="2">Cumulative<br></td>
+                        <?php } ?>
+                    </tr>
+
+                    <tr>
+
+                        <?php foreach ($componentsAll as $componentsAlls) { ?>
+                            <td>Fpo</td>
+                            <td>wshg</td>
+                            <td>Fpo</td>
+                            <td>wshg</td>
+                            <td>Fpo</td>
+                            <td>wshg</td>
                         <?php } ?>
                     </tr>
                     <?php
@@ -109,6 +120,7 @@ $user  = service('user');
                         <?php } ?>
                     </tr>
                     <?php } ?>
+
                     <tr>
                     <td colspan="2">Total</td>
                     <td sdval="<?php echo array_sum(array_column($target_acv_data, 'total_block')); ?>" sdnum="1033;"><b><?php echo array_sum(array_column($target_acv_data, 'total_block')); ?></b></td>

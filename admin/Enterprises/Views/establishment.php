@@ -16,12 +16,12 @@
                 <div class="row">
                     <div class="col-3">
                         <label class="form-label">District</label>
-                        <?php echo form_dropdown('district_id', $districts, $district_id, ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+                        <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
 
                     </div>
                     <div class="col-3">
                         <label class="form-label">Block</label>
-                        <?php echo form_dropdown('block_id', $blocks, $block_id, ['class' => 'form-control mb-3', 'id' => 'blocks']); ?>
+                        <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), ['class' => 'form-control mb-3', 'id' => 'blocks']); ?>
 
                     </div>
                     <div class="col-3 mt-4">
@@ -86,35 +86,39 @@
     </div>
 </div>
 <script>
-    $('#districts').on('change', function() {
+    $(function() {
+        $('#districts').on('change', function() {
 
-        d_id = $(this).val();
+            d_id = $(this).val();
 
-        $.ajax({
-            url: 'admin/enterprises/blocks',
-            data: {
-                district_id: d_id
-            },
-            type: 'GET',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(response) {
-                if (response.blocks) {
-                    html = '<option value="">Select Block</option>';
-                    $.each(response.blocks, function(k, v) {
+            $.ajax({
+                url: 'admin/enterprises/blocks',
+                data: {
+                    district_id: d_id
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response.blocks) {
+                        html = '<option value="">Select Block</option>';
+                        $.each(response.blocks, function(k, v) {
 
-                        html += '<option value="' + v.id + '">' + v.name + '</option>';
+                            html += '<option value="' + v.id + '">' + v.name + '</option>';
 
-                    });
-                    $('#blocks').html(html)
+                        });
+                        $('#blocks').html(html)
+                    }
+                },
+                error: function() {
+                    alert('something went wrong');
+                },
+                complete: function() {
+
                 }
-            },
-            error: function() {
-                alert('something went wrong');
-            },
-            complete: function() {
-
-            }
+            });
         });
-    });
+    })
+
+   
 </script>

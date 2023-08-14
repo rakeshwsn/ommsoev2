@@ -14,6 +14,7 @@
                     <tr>
                         <th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
                         <th>Name</th>
+                        <th>Category</th>
                         <th>Year</th>
                         <th class="text-right no-sort">Actions</th>
                     </tr>
