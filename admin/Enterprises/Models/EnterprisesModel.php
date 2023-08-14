@@ -82,36 +82,35 @@ class EnterprisesModel extends Model
       ]
     ],
     'block_id' => [
-      'label'  => 'block_id|greater_than[0]',
-      'rules'  => 'required',
+      'label'  => 'block_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Block name',
         'greater_than'=> 'Select Block Name'
       ]
     ],
     'gp_id' =>  [
-      'label'  => 'gp_id|greater_than[0]',
-      'rules'  => 'required',
+      'label'  => 'gp_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Grampanchayat name',
         'greater_than'=> 'Select GramPanchayat Name'
       ]
     ],
     'village_id' => [
-      'label'  => 'village_id|graeter_than[0]',
-      'rules'  => 'required',
+      'label'  => 'village_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
-        'required' => '
-         Selelct Village name',
+        'required' => 'Selelct Village name',
          'greater_than'=> 'Select Village Name'
       ]
     ],
-    'budget_fin_yr' => [
-      'label'  => 'budget_fin_yr',
-      'rules'  => 'required',
+    'budget_fin_yr_id' => [
+      'label'  => 'budget_fin_yr_id',
+      'rules'  => 'required|greater_than[0]',
       'errors' => [
-        'required' => '
-         Selelct Budget Utilized of Financial year ',
+        'required' => 'Selelct Financial year ',
+         'greater_than'=> 'Select Financial year'
       ]
     ],
     'mou_date' =>  [
@@ -122,12 +121,12 @@ class EnterprisesModel extends Model
         Selelct Budget Utilized of Financial year ',
       ]
     ],
-    'unit_budget_id' => [
-      'label'  => 'unit_budget_id',
-      'rules'  => 'required|greater_than[0]',
+    'unit_budget' => [
+      'label'  => 'unit_budget',
+      'rules'  => 'required',
       'errors' => [
         'required' => 'Select Budget Code',
-        'greater_than' => 'Select Budget Code'
+        
       ]
     ],
     'unit_budget_amount' =>  [
@@ -137,34 +136,26 @@ class EnterprisesModel extends Model
         'required' => 'Enter Amount',
       ]
     ],
-    'is_support_basis_infr' =>  [
-      'label'  => 'is_support_basis_infr',
-      'rules'  => 'required',
-      'errors' => [
-        'required' => 'Select yes or no ',
-      ]
-    ],
     'purpose_infr_support' =>  [
       'label'  => 'purpose_infr_support',
-      'rules'  => 'required',
+      'rules'  => 'required_if_value[is_support_basis_infr,yes]',
       'errors' => [
-        'required' => '
-          Type/ Purposeof Addl. infa structure is required ',
+        'required_if_value' => 'Type/Purpose of Addl. infa structure is required ',
       ]
     ],
-    'addl_budget_id' =>  [
-      'label'  => 'addl_budget_id',
-      'rules'  => 'required|greater_than[0]',
+    'addl_budget' =>  [
+      'label'  => 'addl_budget',
+      'rules'  => 'required_if_value[is_support_basis_infr,yes]',
       'errors' => [
-        'required' => 'Select Budget Code',
-        'greater_than' => 'Select Budget Code'
+        'required_if_value' => 'Select Budget Code',
+        
       ]
     ], 
     'support_infr_amount' =>  [
       'label'  => 'support_infr_amount',
-      'rules'  => 'required',
+      'rules'  => 'required_if_value[is_support_basis_infr,yes]',
       'errors' => [
-        'required' => 'Enter Amount ',
+        'required_if_value' => 'Enter Amount ',
       ]
     ], 
 
@@ -190,7 +181,7 @@ class EnterprisesModel extends Model
     e.id,
     e.unit_id,
     e.district_id,
-   e.block_id,
+    e.block_id,
     e.gp_id,
     e.village_id,
     e.budget_fin_yr_id,
@@ -206,7 +197,6 @@ class EnterprisesModel extends Model
     e.is_support_basis_infr,
     e.is_support_basis_infr,
     e.purpose_infr_support,
-    e.support_infr_budget_id,
     e.support_infr_amount,
     sd.name districts,
     sb.name blocks,
@@ -220,11 +210,14 @@ class EnterprisesModel extends Model
     LEFT JOIN villages v
       ON v.id = e.village_id
     LEFT JOIN grampanchayat gp
-      ON gp.id = e.gp_id 
-      WHERE e.deleted_at IS NULL";
+      ON gp.id = e.gp_id
+  WHERE e.deleted_at IS NULL";
 
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
+    }
+    if (isset($filter['block_id'])) {
+      $sql .= " AND e.block_id = " . $filter['block_id'];
     }
     return $this->db->query($sql)->getResult();
   }

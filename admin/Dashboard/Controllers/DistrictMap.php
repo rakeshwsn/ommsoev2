@@ -71,6 +71,9 @@ class DistrictMap extends AdminController
 					'blocks' =>$values['blocks'],
 					'gps' => $values['gps'],
 					'villages' => $values['villages'],
+					'tentative_farmers' => $values['tentative_farmers'],
+					'chcs' => $values['chcs'],
+					'cmscs' => $values['cmscs'],
 				];
 			}
 			$DistrictMapModel->insertBatch($mapdata);
@@ -98,7 +101,10 @@ class DistrictMap extends AdminController
 					'blocks' => $values['blocks'],
 					'gps' => $values['gps'],
                     'villages' => $values['villages'],
-                    'tentative_farmers' => $values['tentative_farmers']
+                    'tentative_farmers' => $values['tentative_farmers'],
+					'chcs' => $values['chcs'],
+					'cmscs' => $values['cmscs']
+
 				];
 			}
 			$data['maps']=$DistrictMapModel->insertBatch($mapdata);
@@ -152,14 +158,16 @@ class DistrictMap extends AdminController
 					'blocks' => $district->blocks ?:0,
 					'gps' => $district->gps ?: 0,
 					'villages' => $district->villages ?: 0,
-                    'tentative_farmers' => $district->tentative_farmers ?:0
+                    'tentative_farmers' => $district->tentative_farmers ?:0,
+					'chcs' => $district->chcs ?:0,
+					'cmscs' => $district->cmscs ?:0
 
 				]; 	
 			}
-
+			$data['year_text'] = $yearmodel->find($year_id)->name;
 
 		} else {
-			$districts = $distModel->findAll();
+			$districts = $distModel->orderBy('name')->findAll();
 			
 			foreach($districts as $district){
 				$data['districts'][] = [
@@ -168,7 +176,9 @@ class DistrictMap extends AdminController
 					'blocks' => '',
 					'gps' => '',
                     'villages' => '',
-                    'tentative_farmers' => ''
+                    'tentative_farmers' => '',
+					'chcs' => '',
+					'cmscs' => ''
 
 				];
 			}
