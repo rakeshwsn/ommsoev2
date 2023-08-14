@@ -50,22 +50,40 @@ class AreaCoverageModel extends Model
 		a.id area_id,
 		year_id,
 		y.name year,
-		district_id,
-		d.name district,
+		a.district_id,
+		d.name districts,
+		sb.name blocks,
+		sg.name gps,
 		a.farmers,
-        a.achievement,
-        a.created_at
+		a.block_id,
+		a.gp_id,
+		a.season,
+		a.achievement,
+		a.created_at,
+		SUM(a.farmers) total_farmers,
+		SUM(a.achievement) total_achievements
 	  FROM dashboard_areacoverage a
 		LEFT JOIN dashboard_years y
 		  ON a.year_id = y.id
 		LEFT JOIN soe_districts d
 		  ON a.district_id = d.id
+		LEFT JOIN soe_blocks sb
+		  ON a.block_id = sb.id
+		LEFT JOIN soe_grampanchayats sg
+		  ON a.gp_id = sg.id
 	  WHERE a.deleted_at IS NULL
 	  AND y.deleted_at IS NULL";
 		if (isset($filter['year_id'])) {
 			$sql .= " AND a.year_id = " . $filter['year_id'];
 		}
-		$sql .=  " GROUP BY a.year_id";
+		if (isset($filter['district_id'])) {
+			$sql .= " AND a.district_id = " . $filter['district_id'];
+		}
+		if (isset($filter['block_id'])) {
+			$sql .= " AND a.block_id = " . $filter['block_id'];
+		}
+		$sql .=  " GROUP BY a.year_id,a.district_id ORDER BY a.year_id,districts";
+
 		return $this->db->query($sql)->getResult();
 	}
 
@@ -75,22 +93,33 @@ class AreaCoverageModel extends Model
 		a.id area_id,
 		year_id,
 		y.name year,
-		district_id,
-		d.name district,
+		a.district_id,
+		d.name districts,
+		sb.name blocks,
+		sg.name gps,
 		a.farmers,
-        a.achievement,
-        a.created_at
+		a.block_id,
+		a.gp_id,
+		a.season,
+		a.achievement,
+		a.created_at,
+		SUM(a.farmers) total_farmers,
+		SUM(a.achievement) total_achievements
 	  FROM dashboard_areacoverage a
 		LEFT JOIN dashboard_years y
 		  ON a.year_id = y.id
 		LEFT JOIN soe_districts d
 		  ON a.district_id = d.id
+		LEFT JOIN soe_blocks sb
+		  ON a.block_id = sb.id
+		LEFT JOIN soe_grampanchayats sg
+		  ON a.gp_id = sg.id
 	  WHERE a.deleted_at IS NULL
 	  AND y.deleted_at IS NULL";
 		if (isset($filter['year_id'])) {
 			$sql .= " AND a.year_id = " . $filter['year_id'];
 		}
-		$sql .=  " ORDER BY d.name";
+		$sql .=  " ORDER BY sg.name";
 
 		return $this->db->query($sql)->getResult();
 	}
@@ -112,4 +141,21 @@ class AreaCoverageModel extends Model
 		return $this->db->query($sql)->getResult();
 	}
 	
+	public function getByBlock($filter=[]) {
+		$sql = "SELECT
+		g.id gp_id,
+		g.name gp,
+		da.farmers,
+		da.achievement
+	  FROM soe_grampanchayats g
+		LEFT JOIN (SELECT
+			*
+		  FROM dashboard_areacoverage ac
+		  WHERE ac.deleted_at IS NULL
+		  AND ac.year_id = ".$filter['year_id']."
+		  AND ac.season = '".$filter['season']."') da
+		  ON da.gp_id = g.id WHERE g.deleted_at IS NULL AND g.block_id=".$filter['block_id'];
+
+		  return $this->db->query($sql)->getResult();
+	}
 }

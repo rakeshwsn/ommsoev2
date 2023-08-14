@@ -105,7 +105,7 @@ class VillageModel extends Model
 	}
 	
 	private function filter($builder,$data){
-		$builder->join('grampanchayat g', 'v.gp_id = g.id','left');
+		$builder->join('soe_grampanchayats g', 'v.gp_id = g.id','left');
 		$builder->join('block b', 'g.block_id = b.id','left');
 		$builder->join('district d', 'b.district_id = d.id','left');
 		
@@ -158,8 +158,6 @@ class VillageModel extends Model
 
 		return $data;
 	}
-	
-	
 	
 	public function getVillageByGP($gp) {
 		$builder=$this->db->table("{$this->table} v");

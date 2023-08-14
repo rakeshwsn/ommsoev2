@@ -44,7 +44,6 @@ class AreaCoverageTarget extends AdminController
 
 		$this->template->add_package(array('datatable', 'select2'), true);
 
-		// $data['add'] = admin_url('areacoverage/target/add');
 		$data['edit'] = admin_url('areacoverage/target/edit');
 		$data['add'] = admin_url('areacoverage/target/add');
 		$data['heading_title'] = lang('Area Coverage Target');
@@ -68,12 +67,10 @@ class AreaCoverageTarget extends AdminController
 		$practicedata = $this->targetModel->getAll([
 			'district_id' => $data['district_id']
 		]);
-		// printr($practicedata);
-		// exit;
+
 
 		$data['practicedata'] = $practicedata;
-		// printr($practicedata);
-		// exit;
+
 
 		$data['year_id'] = date('Y');
 
@@ -99,8 +96,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['heading'] = $crops;
 
-		// printr($crops);
-// 		exit;
+
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
 
@@ -108,9 +104,7 @@ class AreaCoverageTarget extends AdminController
 	{
 		if ($this->request->getMethod(1) === 'POST') {
 
-			// printr($_POST);
-			// exit;
-			//delete existing
+
 			$block_id = $this->request->getGet('block_id');
 			$data['block_id'] = $block_id;
 
@@ -127,18 +121,14 @@ class AreaCoverageTarget extends AdminController
 				$target_id = $this->targetModel->insert($masterdata);
 			}
 
-			//insert new
-			//printr($this->request->getPost());
-			//exit;
+
 			$data['crop_data'] = $this->request->getPost('crop');
-			// printr($data['crop_data']);
-			// exit;
+
 
 			$this->targetModel->addTargets($data, $target_id);
 
 			$data['followup_data'] = $this->request->getPost('followup');
-			// printr($data['followup_data']);
-			// exit;
+
 
 			$this->targetModel->addFollowUpCrops($data, $target_id);
 
@@ -163,8 +153,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['district_id'] = $this->user->district_id;
 		$data['block_id'] = $this->request->getGet('block_id');
-		// printr($data['block_id']);
-		// exit;
+
 		$data['year_id'] = date('Y');
 
 		$currentMonth = date('n');
@@ -184,8 +173,7 @@ class AreaCoverageTarget extends AdminController
 			'season' => getCurrentSeason(),
 			'year_id' => getCurrentYearId()
 		]);
-		// printr($data['practicedata']);
-		// exit;
+
 
 
 		$output = array();
@@ -196,9 +184,7 @@ class AreaCoverageTarget extends AdminController
 			if (array_key_exists($crop_id, $data['croppractices'])) {
 				// If the crop_id exists, get the crop values from $crop array
 				$crop_values = $data['croppractices'][$crop_id];
-				// printr($crop_values);
-				// exit;
-				// Define the fields to check
+
 				$fields = ['smi', 'lt', 'ls', 'followup'];
 
 				// Initialize an empty array to store the values for 'smi', 'lt', and 'ls'

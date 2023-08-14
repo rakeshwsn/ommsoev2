@@ -349,9 +349,9 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function summerydata(){
+	public function summary(){
 		$distmapmodel = new DistrictMapModel();;
-		$summerydata = $distmapmodel->summeryData();
+		$summerydata = $distmapmodel->summary();
 		$data['data']=[];
 		foreach ($summerydata as $summery) {
 			$data['data'][]=[
@@ -368,7 +368,7 @@ class Dashboard extends ResourceController
 			];
 		}
 		//heading
-		$data['heading'] = 'Summery Data';
+		$data['heading'] = 'Summary Data';
 		
 
 		return $this->respond($data);

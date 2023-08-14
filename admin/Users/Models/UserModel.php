@@ -9,61 +9,62 @@ use CodeIgniter\Validation\ValidationInterface;
 
 class UserModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'user';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
-	protected $useSoftDeletes        = true;
-	protected $protectFields        = false;
-//	protected $allowedFields        = [];
+    protected $DBGroup = 'default';
+    protected $table = 'user';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $insertID = 0;
+    protected $returnType = 'object';
+    protected $useSoftDeletes = true;
+    protected $protectFields = false;
+    //	protected $allowedFields        = [];
 
-	// Dates
-	protected $useTimestamps        = true;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
-	// Validation
-	protected $validationRules      = [
+    // Validation
+    protected $validationRules = [
+        'id' => 'is_natural_no_zero',
         'firstname' => array(
             'label' => 'Name',
             'rules' => 'trim|required|max_length[100]'
         ),
 
-        'email' =>array(
+        'email' => array(
             'label' => 'Email',
-            'rules' => 'required',
-            'rules' => "trim|required|valid_email|max_length[255]|is_unique[user.email,id,{id}]"
+            'rules' => "trim|required|valid_email|is_unique[user.email,id,{id}]"
         ),
 
-        'username' =>array(
-                'label' => 'Username',
-                'rules' => "required|is_unique[user.username,id,{id}]"
+        'username' => array(
+            'label' => 'Username',
+            'rules' => "required|is_unique[user.username,id,{id}]"
         ),
-        'password' =>array(
+        'password' => array(
             'label' => 'Password',
             'rules' => 'required'
         )
     ];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
-	protected $cleanValidationRules = true;
+    protected $validationMessages = [];
+    protected $skipValidation = false;
+    protected $cleanValidationRules = true;
 
-	// Callbacks
-	protected $allowCallbacks       = true;
-    protected $beforeInsert         = ['setPassword','gparray','localisation','resetAssign'];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = ['setPassword','gparray','localisation','resetAssign'];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = ['setUserType'];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert = ['setPassword', 'gparray', 'localisation', 'resetAssign'];
+    protected $afterInsert = [];
+    protected $beforeUpdate = ['setPassword', 'gparray', 'localisation', 'resetAssign'];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = ['setUserType'];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
 
-    public function getAll($filter=[]) {
+    public function getAll($filter = [])
+    {
         $sql = "SELECT
   u.*,d.name district,b.name block,ug.name role
 FROM user u
@@ -108,13 +109,14 @@ WHERE  u.deleted_at IS NULL";
             }
         }
 
-        $sql .= " LIMIT ".$filter['start'].', '.$filter['limit'];
+        $sql .= " LIMIT " . $filter['start'] . ', ' . $filter['limit'];
 
         return $this->db->query($sql)->getResult();
-//        return
-	}
+        //        return
+    }
 
-    public function getTotal($filter=[]) {
+    public function getTotal($filter = [])
+    {
         $sql = "SELECT
               COUNT(u.id) total
             FROM user u
@@ -138,12 +140,13 @@ WHERE  u.deleted_at IS NULL";
 
         $count = $this->db->query($sql)->getRow()->total;
 
-//        $count = $this->countAllResults();
+        //        $count = $this->countAllResults();
 
         return $count;
-	}
+    }
 
-	public function addCentralUser($firstname=""){
+    public function addCentralUser($firstname = "")
+    {
         $odk = service('odkcentral');
         $appUser = $odk->projects(2)->appUsers()->create([
             'displayName' => $firstname
@@ -151,46 +154,53 @@ WHERE  u.deleted_at IS NULL";
         return $appUser;
     }
 
-    public function deleteCentralUser($id){
-	    $odk = service('odkcentral');
+    public function deleteCentralUser($id)
+    {
+        $odk = service('odkcentral');
         $odk->projects(2)->appUsers($id)->delete();
     }
 
-    public function allOdkForms(){
+    public function allOdkForms()
+    {
         $odk = service('odkcentral');
         $forms = $odk->projects(2)->forms()->get();
         return $forms;
     }
 
-    public function getAssignForm(){
+    public function getAssignForm()
+    {
         $odk = service('odkcentral');
         $forms = $odk->projects(2)->assignments()->forms()->get();
 
         return $forms;
     }
 
-    protected  function setPassword(array $data){
-        $data['data']['show_password']=$data['data']['password'];
-	    $data['data']['password']=password_hash($data['data']['password'], PASSWORD_DEFAULT);
+    protected function setPassword(array $data)
+    {
+        $data['data']['show_password'] = $data['data']['password'];
+        $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_DEFAULT);
 
         return $data;
     }
 
-    protected  function resetAssign(array $data){
+    protected function resetAssign(array $data)
+    {
         unset($data['data']['form_assign']);
         //printr($data);
         return $data;
 
     }
-	
-	protected function gparray(array $data){
-		if(isset($data['data']['gp'])){
-		$data['data']['gp']=implode(',',$data['data']['gp']);
-		}
-		return $data;
-	}
-	
-	protected function localisation(array $data){
+
+    protected function gparray(array $data)
+    {
+        if (isset($data['data']['gp'])) {
+            $data['data']['gp'] = implode(',', $data['data']['gp']);
+        }
+        return $data;
+    }
+
+    protected function localisation(array $data)
+    {
 
         /*if($data['data']['district_id']) {
             $districtModel=new DistrictModel();
@@ -203,17 +213,19 @@ WHERE  u.deleted_at IS NULL";
             $data['data']['block_id']=$block?$block['id']:0;
         }*/
 
-		return $data;
-		
-	}
+        return $data;
 
-	//rakesh
-    public function setUserType($data) {
+    }
 
-	    return $data;
-	}
+    //rakesh
+    public function setUserType($data)
+    {
 
-    public function getUserUploadMonths($filter=[]) {
+        return $data;
+    }
+
+    public function getUserUploadMonths($filter = [])
+    {
 
         $sql = "SELECT
   users.*,
@@ -243,8 +255,8 @@ FROM soe_allow_uploads sau
       LEFT JOIN soe_districts sd
         ON u.district_id = sd.id
     WHERE u.deleted_at IS NULL";
-        if(!empty($filter['agency_type_id'])){
-            $sql .= " AND u.user_group_id = ".$filter['agency_type_id'];
+        if (!empty($filter['agency_type_id'])) {
+            $sql .= " AND u.user_group_id = " . $filter['agency_type_id'];
         } else {
             $sql .= " AND u.user_group_id IN (5, 7, 8, 9)";
         }
@@ -254,28 +266,29 @@ FROM soe_allow_uploads sau
   LEFT JOIN soe_allow_upload_blocks saub
     ON sau.id = saub.upload_id AND saub.user_id = users.user_id WHERE 1=1";
 
-        if(!empty($filter['district_id'])){
-            $sql .= " AND users.district_id = ".$filter['district_id'];
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND users.district_id = " . $filter['district_id'];
         }
-        if(!empty($filter['month'])){
-            $sql .= " AND sau.month = ".$filter['month'];
+        if (!empty($filter['month'])) {
+            $sql .= " AND sau.month = " . $filter['month'];
         }
-        if(!empty($filter['year'])){
-            $sql .= " AND sau.year = ".$filter['year'];
+        if (!empty($filter['year'])) {
+            $sql .= " AND sau.year = " . $filter['year'];
         }
 
         return $this->db->query($sql)->getResult();
-	}
+    }
 
-    public function getUploadStatus($filter) {
-	    if(empty($filter['year'])){
-	        return [];
+    public function getUploadStatus($filter)
+    {
+        if (empty($filter['year'])) {
+            return [];
         }
-	    if(empty($filter['month'])){
-	        return [];
+        if (empty($filter['month'])) {
+            return [];
         }
-	    if(empty($filter['district_id'])){
-	        return [];
+        if (empty($filter['district_id'])) {
+            return [];
         }
 
         $year = $filter['year'];

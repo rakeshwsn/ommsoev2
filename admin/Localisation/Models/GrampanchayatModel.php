@@ -36,7 +36,7 @@ class GrampanchayatModel extends Model
 		),
 		'name' => array(
 			'label' => 'Name',
-			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]|is_unique_gp[soe_grampanchayats.name,id,{id}]"
+			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]"
 		)
 	];
 	protected $validationMessages = [];
@@ -89,7 +89,7 @@ class GrampanchayatModel extends Model
 		//$builder->where($this->deletedField, null);
 		//$builder->where('g.tcode', null);
 		$res = $builder->get()->getResult();
-		//echo $this->db->getLastQuery();
+//		echo $this->db->getLastQuery();
 		return $res;
 	}
 
@@ -103,10 +103,10 @@ class GrampanchayatModel extends Model
 
 	private function filter($builder, $data)
 	{
-		$builder->join('soe_districts sd', 'sg.district_id = sd.id', 'left');
-		$builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
+        $builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
+        $builder->join('soe_districts sd', 'sb.district_id = sd.id', 'left');
 
-		if (!empty($data['filter_district'])) {
+        if (!empty($data['filter_district'])) {
 			$builder->where("sg.district_id  = '" . $data['filter_district'] . "'");
 		}
 
@@ -148,7 +148,7 @@ AND sg.block_id = $block_id";
 	{
 		$builder = $this->db->table("cluster_to_gp cg");
 		$builder->join('cluster c', 'cg.cluster_id = c.id');
-		$builder->join('grampanchayat g', 'cg.gp_id = g.id');
+		$builder->join('soe_grampanchayats g', 'cg.gp_id = g.id');
 		$builder->select("g.*");
 		$builder->where("c.code", $cluster);
 		$res = $builder->get()->getResult();

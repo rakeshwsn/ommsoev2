@@ -24,21 +24,23 @@ $validation = \Config\Services::validation();
                 </div>
                 <div class="block-content">
                     <?php echo form_open_multipart('',array('class' => 'form-horizontal', 'id' => 'form-component-agency','role'=>'form')); ?>
-                        <table id="" class="table table-striped table-bordered table-hover dataTable no-footer">
-                            <thead>
-                            <tr>
-                                
-                                <th class="">Number</th>
-                                <th class="">Name</th>
-                                <?php foreach($agency_types as $agency){?>
-                                <th class=""><?=$agency->name?></th>
-                                <?}?>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                <?=$components?>
-                            </tbody>
-                        </table>
+                        <div class="tableFixHead">
+                            <table id="" class="table table-striped table-bordered table-hover dataTable no-footer custom-table">
+                                <thead>
+                                <tr>
+                                    
+                                    <th class="">Number</th>
+                                    <th class="">Name</th>
+                                    <?php foreach($agency_types as $agency){?>
+                                    <th class=""><?=$agency->name?></th>
+                                    <?}?>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <?=$components?>
+                                </tbody>
+                            </table>
+                        </div>
                     <?php echo form_close(); ?>
                 </div>
             </div>

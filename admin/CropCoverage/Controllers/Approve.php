@@ -77,7 +77,20 @@ class Approve extends AdminController
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
         } else {
-            $data['start_date'] = $week_dates['start_date'];
+            $data['start_date'] = $start_date = $week_dates['start_date'];
+        }
+
+        $acModel = new AreaCoverageModel();
+        //update status
+        if($this->request->getMethod(1)=='POST'){
+            $status = [
+                'status' => $this->request->getPost('status'),
+                'remarks' => $this->request->getPost('remarks'),
+            ];
+            $acModel->where('district_id', $district_id)
+                ->where('start_date', $start_date)->set($status)->update();
+            return redirect()->to(admin_url('areacoverage/approve/district?district_id='.$district_id.'&start_date='.$start_date))
+                ->with('message','Status has been updated.');
         }
 
         $filter = [
@@ -104,13 +117,6 @@ class Approve extends AdminController
                 $href = admin_url('areacoverage/approve/block?block_id=' . $block->block_id . '&start_date=' . $block->start_date);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
                                             <i class="fa fa-list"></i></a>';
-                /*if($block->status==0){
-                    $action .= '<a href="" class="btn btn-sm btn-success btn-approve" data-toggle="tooltip" title="Approve">
-                                            <i class="fa fa-check-square-o"></i></a>';
-                    $action .= '<a href="" class="btn btn-sm btn-danger btn-reject" data-toggle="tooltip" title="Reject">
-                                            <i class="fa fa-close"></i></a>';
-                }*/
-
                 $week_text = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
             }
             $status = $block->status;
@@ -241,10 +247,24 @@ class Approve extends AdminController
             }
         }
 
-        $data['show_reject'] = false;
+        $district_status = $acModel->where('district_id',$district_id)
+            ->where('start_date',$start_date)->first();
+
+        $data['status'] = '';
+        $data['remarks'] = '';
+        $data['status_color'] = '';
+        if($district_status){
+            $data['status'] = $this->statuses[$district_status->status];
+            $data['status_color'] = $this->colors[$district_status->status];
+            $data['remarks'] = $district_status->remarks;
+        }
+
+        $data['show_approval'] = false;
         if ($this->user->district_id != $district_id) {
-            $data['show_reject'] = true;
+            $data['show_approval'] = true;
             $data['reject_url'] = admin_url('areacoverage/approve/reject');
+            $form_data = $this->getForm();
+            $data['approve_form'] = view('\Admin\Transaction\Views\approve_form', $form_data);
         }
 
         return $this->template->view('Admin\CropCoverage\Views\approve_district', $data);
@@ -273,6 +293,19 @@ class Approve extends AdminController
             return redirect()->to(admin_url('areacoverage/approve'));
         }
 
+        $acModel = new AreaCoverageModel();
+        //update status
+        if($this->request->getMethod(1)=='POST'){
+            $status = [
+                'status' => $this->request->getPost('status'),
+                'remarks' => $this->request->getPost('remarks'),
+            ];
+            $acModel->where('block_id', $block_id)
+                ->where('start_date', $start_date)->set($status)->update();
+            return redirect()->to(admin_url('areacoverage/approve/block?block_id='.$block_id.'&start_date='.$start_date))
+                ->with('message','Status has been updated.');
+        }
+
         $filter = [
             'block_id' => $block_id,
             'start_date' => $dates['start_date']
@@ -290,6 +323,7 @@ class Approve extends AdminController
         $data['blocks'] = [];
         $data['approved'] = false;
         $slno = 1;
+        $week = '';
         foreach ($blocks as $block) {
             $action = '';
             $week = '';
@@ -364,7 +398,7 @@ class Approve extends AdminController
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
 
-            $data['approved'] = (bool) $block->status;
+            $data['approved'] = $block->status==1;
         }
 
         $data['blocks'][] = [
@@ -430,6 +464,18 @@ class Approve extends AdminController
         }
 
         $data['week_start_date'] = $week_start_date;
+
+        $district_status = $acModel->where('block_id',$block_id)
+            ->where('start_date',$start_date)->first();
+
+        $data['status'] = '';
+        $data['remarks'] = '';
+        $data['status_color'] = '';
+        if($district_status){
+            $data['status'] = $this->statuses[$district_status->status];
+            $data['status_color'] = $this->colors[$district_status->status];
+            $data['remarks'] = $district_status->remarks;
+        }
 
         return $this->template->view('Admin\CropCoverage\Views\approve_block', $data);
     }
@@ -659,7 +705,7 @@ class Approve extends AdminController
         if ($updated) {
             $status = true;
             $redirect = admin_url('areacoverage/approve?start_date=' . $start_date);
-            redirect()->to($redirect)->with('message', 'District data rejcted');
+            redirect()->to($redirect)->with('message', 'District data rejected');
         }
         return $this->response->setJSON([
             'status' => $status,

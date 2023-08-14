@@ -261,54 +261,47 @@ FROM ac_crops ac
         $season = $filter['season'];
 
         $sql = "SELECT
-    sd.id district_id,
-    sd.name district,
-    COALESCE((tar.lt + tar.ls + tar.smi + tar.fup), 0) target_area,
-    COALESCE((ach.smi + ach.ls + ach.lt + ach.fup_area), 0) ach_area
+    sd.id AS district_id,
+    sd.name AS district,
+    COALESCE(tar.area_ + tar.fup, 0) AS target_area,
+    COALESCE((ach.smi + ach.lt + ach.ls + ach.fup_area), 0) AS ach_area
 FROM
     soe_districts sd
 LEFT JOIN (
     SELECT
-        ata.target_id,
-        sb.district_id,
-        SUM(ata.lt) lt,
-        SUM(ata.ls) ls,
-        SUM(ata.smi) smi,
-        SUM(fup.area) fup
+        atm.district_id,
+        SUM(ar.area_) AS area_,
+        SUM(fup.area_) AS fup
     FROM
         ac_target_master atm
-    LEFT JOIN ac_target_area ata
-        ON ata.target_id = atm.id
-    LEFT JOIN soe_blocks sb
-        ON sb.id = atm.block_id
+    LEFT JOIN (
+        SELECT
+            ata.target_id,
+            SUM(ata.smi + ata.lt + ata.ls) AS area_
+        FROM
+            ac_target_area ata
+        GROUP BY
+            ata.target_id
+    ) ar ON ar.target_id = atm.id
     LEFT JOIN (
         SELECT
             atfc.target_id,
-            SUM(atfc.followup) area
+            SUM(atfc.followup) AS area_
         FROM
             ac_target_followup_crop atfc
         GROUP BY
             atfc.target_id
-    ) fup ON ata.target_id = fup.target_id
-    WHERE
-        atm.deleted_at IS NULL";
-
-        if (!empty($filter['season'])) {
-            $sql .= " AND LOWER(atm.season) = '" . $filter['season'] . "'";
-        }
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND atm.year_id = " . $filter['year_id'];
-        }
-
-        $sql .= " GROUP BY sb.district_id
+    ) fup ON atm.id = fup.target_id
+    GROUP BY
+        atm.district_id
 ) tar ON tar.district_id = sd.id
 LEFT JOIN (
     SELECT
         acc.district_id,
-        SUM(aap.smi) smi,
-        SUM(aap.lt) lt,
-        SUM(ls) ls,
-        SUM(fup.area) fup_area
+        SUM(aap.smi) AS smi,
+        SUM(aap.lt) AS lt,
+        SUM(ls) AS ls,
+        COALESCE(SUM(fup.area), 0) AS fup_area
     FROM
         ac_crop_coverage acc
     LEFT JOIN ac_area_practices aap
@@ -316,22 +309,29 @@ LEFT JOIN (
     LEFT JOIN (
         SELECT
             aafu.crop_coverage_id,
-            SUM(aafu.area) area
+            SUM(aafu.area) AS area
         FROM
             ac_area_follow_up aafu
+        GROUP BY
+            aafu.crop_coverage_id
     ) fup ON acc.id = fup.crop_coverage_id
     WHERE
         acc.deleted_at IS NULL";
 
         if (!empty($filter['season'])) {
-            $sql .= " AND acc.season = '" . $filter['season'] . "'";
+            $sql .= " AND LOWER(acc.season) = '" . $filter['season'] . "'";
         }
         if (!empty($filter['year_id'])) {
             $sql .= " AND acc.year_id = " . $filter['year_id'];
         }
 
-        $sql .= " GROUP BY acc.district_id
-) ach ON ach.district_id = sd.id";
+        $sql .= "
+    GROUP BY
+        acc.district_id
+) ach ON ach.district_id = sd.id;
+";
+
+
 
         return $this->db->query($sql)->getResultArray();
 

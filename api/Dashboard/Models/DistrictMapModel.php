@@ -41,22 +41,30 @@ class DistrictMapModel extends Model
 	
 	public function getMapData(){
 		$sql="SELECT
-		ddm.year_id,
-		ddm.district_id,
-		sd.name district,
-		ddm.blocks,
-		ddm.gps,
-		ddm.villages,
-		ddm.farmers,
-		ddm.chcs,
-		ddm.cmscs
-	  FROM dashboard_district_map ddm
-		LEFT JOIN soe_districts sd
-		  ON ddm.district_id = sd.id";
+  sd.id district_id,
+  sd.name district,
+  ddm.blocks,
+  ddm.gps,
+  ddm.villages,
+  ddm.farmers,
+  e.total_cmsc chcs,
+  e.total_chc cmscs
+FROM soe_districts sd
+  LEFT JOIN dashboard_district_map ddm
+    ON sd.id = ddm.district_id
+  LEFT JOIN (SELECT
+      id,
+      district_id,
+    SUM(CASE WHEN establishment_type = 'CHC' THEN main_center + sub_center ELSE 0 END) AS total_chc,
+    SUM(CASE WHEN establishment_type = 'CMSC' THEN main_center + sub_center ELSE 0 END) AS total_cmsc
+    FROM dashboard_establishment
+    WHERE deleted_at IS NULL
+    GROUP BY district_id) e
+    ON sd.id = e.district_id WHERE ddm.deleted_at IS NULL";
 		 return $this->db->query($sql)->getResult(); 
 	}
 
-	public function summeryData(){
+	public function summary(){
 
 		$sql="SELECT
 		year_id,

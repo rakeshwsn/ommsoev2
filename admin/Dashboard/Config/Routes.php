@@ -12,6 +12,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('dashboard/areacoverage/add', 'Dashboard\Controllers\AreaCoverage::add');
     $routes->add('dashboard/areacoverage/edit', 'Dashboard\Controllers\AreaCoverage::edit');
     $routes->get('dashboard/areacoverage/chart', 'Dashboard\Controllers\AreaCoverage::chart');
+    $routes->add('dashboard/blocks', 'Dashboard\Controllers\AreaCoverage::ajaxBlocks');
+
     //procurement
     $routes->get('dashboard/procurement', 'Dashboard\Controllers\Procurement::index');
     $routes->add('dashboard/procurement/add', 'Dashboard\Controllers\Procurement::add');
@@ -34,9 +36,9 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('dashboard/establishment/chart', 'Dashboard\Controllers\Establishment::chart');
     $routes->get('dashboard/odishamap/chart', 'Dashboard\Controllers\Establishment::odishamap');
     //Dashboard district map
-    $routes->add('dashboard/map', 'Dashboard\Controllers\DashboardDistrictMapController::index');
-    $routes->add('dashboard/map/add', 'Dashboard\Controllers\DashboardDistrictMapController::add');
-    $routes->add('dashboard/map/edit', 'Dashboard\Controllers\DashboardDistrictMapController::edit');
+    $routes->add('dashboard/map', 'Dashboard\Controllers\DistrictMap::index');
+    $routes->add('dashboard/map/add', 'Dashboard\Controllers\DistrictMap::add');
+    $routes->add('dashboard/map/edit', 'Dashboard\Controllers\DistrictMap::edit');
 
 });
 

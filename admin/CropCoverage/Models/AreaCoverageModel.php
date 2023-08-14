@@ -496,7 +496,7 @@ WHERE fc.crop_coverage_id=".$crop_coverage_id.") afc ON c.id=afc.crop_id";
 FROM vw_districtwise_blocks_gps vdbg
   LEFT JOIN (SELECT
       district_id,
-      COUNT(acc.block_id) total_blocks
+      COUNT(DISTINCT acc.block_id) total_blocks
     FROM ac_crop_coverage acc
     WHERE acc.deleted_at IS NULL
     AND acc.status = 1

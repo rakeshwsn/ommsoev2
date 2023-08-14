@@ -18,10 +18,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
+    private $cropsModel;
+    private $districtModel;
+    private $areacoveragemodel;
+    public $colors_ac = [
+        'warning',
+        'success',
+        'danger',
+        'secondary',
+        'primary',
+    ];
     private $error = array();
     function __construct()
     {
-        $this->cropsmodel = new CropsModel();
+        $this->cropsModel = new CropsModel();
         $this->districtModel = new DistrictModel();
         $this->areacoveragemodel = new AreaCoverageModel();
     }
@@ -132,7 +142,7 @@ class AreaCoverage extends AdminController
                     'total_fc' => $block->fc_area,
                     'total_area' => $total_area,
                     // 'status' => $this->statuses[$status],
-                    'status' => '<label class="badge badge-' . $this->colors[$status] . '">' . $this->statuses[$status] . '</label>',
+                    'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
                     'action' => $action,
                 ];
 
@@ -461,7 +471,8 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
-                'status' => 0
+                'status' => 0,
+                'remarks' => ''
             ];
             $this->areacoveragemodel->update($cc_id, $master);
 
@@ -525,11 +536,11 @@ class AreaCoverage extends AdminController
         }
 
         $data['show_form'] = false;
-        if (
-            strtotime('today') <= strtotime($cc_info->end_date)
-            && ($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)
-        ) {
+        if ((strtotime('today') <= strtotime($cc_info->end_date)) || ($cc_info->status != 1)) {
             $data['show_form'] = true;
+        }
+        if($cc_info->block_id != $this->user->block_id){
+            $data['show_form'] = false;
         }
 
         $data['district'] = (new DistrictModel())->find($cc_info->district_id)->name;
