@@ -100,14 +100,13 @@ class AreaCoverage extends AdminController
     {
         $areamodel = new AreaCoverageModel();
         if ($this->request->getMethod(1) == 'POST') {
-            // d($this->request->getPost());
-            // dd($this->request->getGet());
+
             //delete if year_id exists
             $areamodel->where('year_id', $this->request->getGet('year_id'))
                 ->where('season', $this->request->getGet('season'))
                 ->where('gp_id', $this->request->getGet('gp_id'))->delete();
 
-            // print_r($gp);
+
             foreach ($this->request->getPost('gp') as $key => $values) {
                 $areadata[] = [
                     'year_id' => $this->request->getGet('year_id'),
@@ -118,7 +117,7 @@ class AreaCoverage extends AdminController
                     'season' => $this->request->getGet('season'),
                     'achievement' => $values['achievement'],
                 ];
-                // printr($areadata);
+
             }
             $areamodel->insertBatch($areadata);
 
@@ -181,14 +180,8 @@ class AreaCoverage extends AdminController
         $data = [];
         helper('form');
         $areamodel = new AreaCoverageModel();
-
-        $year_id = $this->request->getGet('year_id');
-
-        $district_id = $this->request->getGet('district_id');
-        $block_id = $this->request->getGet('block_id');
-
-
         $yearmodel = new YearModel();
+        
         $data['years'][0] = 'Select years';
 
         $years = $yearmodel->findAll();
