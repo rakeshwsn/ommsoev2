@@ -351,20 +351,17 @@ class Dashboard extends ResourceController
 
 	public function summary(){
 		$distmapmodel = new DistrictMapModel();;
-		$summerydata = $distmapmodel->summary();
+		$summerydata = $distmapmodel->getSummary();
 		$data['data']=[];
 		foreach ($summerydata as $summery) {
 			$data['data'][]=[
-				'year_id'=>$summery->year_id,
-				'year'=>$summery->year,
 				'total_districts'=>(int)$summery->total_districts,
 				'total_blocks'=>(int)$summery->total_blocks,
 				'total_gps'=>(int)$summery->total_gps,
 				'total_villages'=>(int)$summery->total_villages,
 				'total_farmers'=>(int)$summery->total_farmers,
 				'total_chc'=>(int)$summery->total_chc,
-				'total_cmsc'=>(int)$summery->total_cmsc,
-				'total_area'=>(float)$summery->total_area,
+				'total_cmsc'=>(int)$summery->total_cmsc
 			];
 		}
 		//heading
