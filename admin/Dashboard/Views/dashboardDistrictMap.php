@@ -16,8 +16,9 @@
 				<div class="row">
 					<div class="col-3">
 						<label class="form-label">Year</label>
-						<?php echo form_dropdown('year_id', $years, $year_id, ['class' => 'form-control mb-3']); ?>
-
+						
+							<?php echo form_dropdown('year_id', $years, $year_id, ['class' => 'form-control mb-3']); ?>
+						
 					</div>
 					<div class="col-3 mt-4">
 						<button class="btn btn-primary">Submit</button>
@@ -33,7 +34,7 @@
 		<div class="block-content block-content-full">
 			<div class="row">
 				<div class="col-sm-12">
-					<table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info" >
+					<table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
 						<thead>
 							<tr>
 								<th>Year</th>
@@ -42,24 +43,26 @@
 							</tr>
 						</thead>
 						<tbody>
-						<?php if ($maps) { ?>
-                              <?php foreach($maps as $map){ ?>
-								<tr class="odd">
-									<td><?= $map['year'] ?></td>
-									<td><?= $map['created_at'] ?></td>
-									<td>
-										<div class="btn-group btn-group-lg pull-right"><a class="btn btn-sm btn-primary" href="<?=$map['edit_url']?>"><i class="fa fa-pencil"></i></a></div>
-									</td>
-								</tr>
+							<?php if ($maps) { ?>
+								<?php foreach ($maps as $map) { ?>
+									<tr class="odd">
+										<td><?= $map['year'] ?></td>
+										<td><?= $map['created_at'] ?></td>
+										<td>
+											<div class="btn-group btn-group-lg pull-right"><a class="btn btn-sm btn-primary" href="<?= $map['edit_url'] ?>"><i class="fa fa-pencil"></i></a></div>
+										</td>
+									</tr>
 								<?php } ?>
 						</tbody>
-						<?php  } else { ?>
-                            <tbody>
-                                <tr class="odd" >
-                                    <td colspan="7"><h3 class="text-center">data not avaliable</h3></td>
-                                </tr>
-                            </tbody>
-                        <?php  } ?>
+					<?php  } else { ?>
+						<tbody>
+							<tr class="odd">
+								<td colspan="7">
+									<h3 class="text-center">data not avaliable</h3>
+								</td>
+							</tr>
+						</tbody>
+					<?php  } ?>
 					</table>
 				</div>
 			</div>
