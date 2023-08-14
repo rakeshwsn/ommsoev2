@@ -67,7 +67,7 @@ class DistrictMapModel extends Model
 		if (isset($filter['year_id'])) {
 			$sql .= " AND ddm.year_id = " . $filter['year_id'];
 		}
-		$sql .=  " GROUP BY ddm.year_id";
+		$sql .=  " GROUP BY ddm.year_id ORDER BY sd.name";
 		return $this->db->query($sql)->getResult();
 	}
 

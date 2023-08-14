@@ -167,7 +167,7 @@ class DistrictMap extends AdminController
 			$data['year_text'] = $yearmodel->find($year_id)->name;
 
 		} else {
-			$districts = $distModel->findAll();
+			$districts = $distModel->orderBy('name')->findAll();
 			
 			foreach($districts as $district){
 				$data['districts'][] = [
