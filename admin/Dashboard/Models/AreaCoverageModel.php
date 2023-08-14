@@ -146,14 +146,14 @@ class AreaCoverageModel extends Model
 		g.name gp,
 		da.farmers,
 		da.achievement
-	  FROM grampanchayat g
+	  FROM soe_grampanchayats g
 		LEFT JOIN (SELECT
 			*
 		  FROM dashboard_areacoverage ac
 		  WHERE ac.deleted_at IS NULL
 		  AND ac.year_id = ".$filter['year_id']."
 		  AND ac.season = '".$filter['season']."') da
-		  ON da.gp_id = g.id WHERE g.block_id=".$filter['block_id'];
+		  ON da.gp_id = g.id WHERE g.deleted_at IS NULL AND g.block_id=".$filter['block_id'];
 
 		  return $this->db->query($sql)->getResult();
 	}
