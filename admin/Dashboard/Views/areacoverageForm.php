@@ -2,11 +2,8 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Area</h3>
-
         </div>
         <div class="block-content block-content-full">
-            <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-
             <form>
                 <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="row">
@@ -36,11 +33,7 @@
                         </div>
                         <div class="col-2">
                             <label class="form-label">Season :</label>
-                            <select class="form-control mb-3" name="season" id="season">
-                                <option value="rabi"<?= set_select('season', 'rabi', $season == "rabi") ? 'selected' : ''; ?>>rabi</option>
-                                <option value="kharif"<?= set_select('season', 'kharif', $season == "kharif") ? 'selected' : ''; ?>>kharif</option>
-                            </select>
-
+                            <?php echo form_dropdown('season', $seasons, $season, ['class' => 'form-control mb-3', 'id' => 'seasons']); ?>
                         </div>
                         <div class="col-3 mt-4">
                             <button class="btn btn-primary">Submit</button>
@@ -56,12 +49,10 @@
                         <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                             <thead>
                                 <tr>
-
                                     <th>slno</th>
                                     <th>Gp</th>
                                     <th>Farmers</th>
                                     <th>Achievement</th>
-
                                 </tr>
                             </thead>
                             <tbody>
@@ -88,35 +79,30 @@
     </div>
 </div>
 <script>
-    $('#districts').on('change', function() {
-
-        d_id = $(this).val();
-
-        $.ajax({
-            url: 'admin/dashboard/blocks',
-            data: {
-                district_id: d_id
-            },
-            type: 'GET',
-            dataType: 'JSON',
-            beforeSend: function() {},
-            success: function(response) {
-                if (response.blocks) {
-                    html = '<option value="">Select Block</option>';
-                    $.each(response.blocks, function(k, v) {
-
-                        html += '<option value="' + v.id + '">' + v.name + '</option>';
-
-                    });
-                    $('#blocks').html(html)
-                }
-            },
-            error: function() {
-                alert('something went wrong');
-            },
-            complete: function() {
-
-            }
+    $(function () {
+        $('#districts').on('change', function() {
+            d_id = $(this).val();
+            $.ajax({
+                url: 'admin/dashboard/blocks',
+                data: {
+                    district_id: d_id
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response.blocks) {
+                        html = '<option value="">Select Block</option>';
+                        $.each(response.blocks, function(k, v) {
+                            html += '<option value="' + v.id + '">' + v.name + '</option>';
+                        });
+                        $('#blocks').html(html)
+                    }
+                },
+                error: function() {
+                    alert('something went wrong');
+                },
+            });
         });
     });
 </script>

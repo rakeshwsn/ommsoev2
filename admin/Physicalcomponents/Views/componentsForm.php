@@ -24,51 +24,77 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
             </div>
-            <div class="block-content" id="appendHere">
-                <?php $image_row = 0; ?>
-                <div class="form-group row" id="fullDiv<?php echo $image_row; ?>">
-                    <label class="col-lg-2 col-form-label" for="example-hf-email"><strong>Component Name</strong></label>
-                    <div class="col-lg-8">
-                        <!-- <select class="search form-control" id="block_id<?php echo $image_row; ?>" required >
 
-                        </select> -->
-                        <input type="text" name="componentsdata[<?php echo $image_row; ?>][description]" class="search form-control" id="block_id<?php echo $image_row; ?>" required value="<?php echo @$components_info->description ?>">
-                    </div>
-                    <?php if($hasPlusbutton){ ?>
-                        <div class="col-lg-2">
-                            <button type="button" onclick="addImage();" data-toggle="tooltip" title="Components Add" class="btn btn-primary"><i class="fa fa-plus"></i></button>
-                        </div>
+            <div class="block-content">
+            <table id="banner_images" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr class="">
+                        <th class="text-left">Component Name</th>
+                        <th class="text-left">Component Category</th>
+                        <th class="text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php $image_row = 0; ?>
 
+                    <tr id="image-row<?php echo $image_row; ?>">
+                        <td class="text-left">
+                            <input type="text" name="componentsdata[<?php echo $image_row; ?>][description]" value="<?php echo $description; ?>" placeholder="Component" class="form-control" />
+                        </td>
+                        <td class="text-left">
+                        <select class="search form-control" id="categoryid" name="componentsdata[<?php echo $image_row; ?>][categoryid]" required>
+                            <option value="">select</option>
+                            <option value="1" <?php echo ($comp_categoryid == 1) ? 'selected' : ''; ?>>Enterprises</option>
+                            <option value="2" <?php echo ($comp_categoryid == 2) ? 'selected' : ''; ?>>Training</option>
+
+                        </select>
+                        </td>
+                        <?php if($hasPlusbutton){ ?>
+                            <td class="text-right"><button type="button" onclick="addImage();" data-toggle="tooltip" title="Banner Add" class="btn btn-primary"><i class="fa fa-plus"></i></button></td>
                         <?php }?>
-                    </div>
-            </div>
 
+
+                    </tr>
+                    <?php $image_row++; ?>
+
+                </tbody>
+                <?php if($hasPlusbutton){ ?>
+                <tfoot>
+                    <tr>
+                        <td colspan="3"></td>
+                        </tr>
+                </tfoot>
+                <?php }?>
+            </table>
+            </div>
         </div>
     </div>
 </div>
 <?php echo form_close(); ?>
 <?php js_start(); ?>
 <script type="text/javascript">
-    var compoEdit = 20;
-    console.log(compoEdit);
-    var image_row = <?php echo $image_row + 1; ?>;
+    // var compoEdit = 20;
+    // console.log(compoEdit);
+    var image_row = <?php echo $image_row++; ?>;
 
     function addImage() {
-        var html = '<div class="form-group row" id="fullDiv' + image_row + '">';
-        html += '<label class="col-lg-2 col-form-label"></label>';
-        html += '<div class="col-lg-8">';
-        html += '<input type="text" name="componentsdata[' + image_row + '][description]" id="block_id' + image_row + '_description" class="search form-control" id="block_id' + image_row + '">';
-        html += '</div>';
-        html += '<div class="col-lg-2">';
-        html += '<button type="button" onclick="$(\'#fullDiv' + image_row + '\').remove();" data-toggle="tooltip" title="Remove" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>';
-        html += '</div>';
-       // html += '<input type="hidden" name="componentsdata[' + image_row + '][description]" id="block_id' + image_row + '_description" value="">';
-      //  html += '<input type="hidden" name="componentsdata[' + image_row + '][componentid]" id="block_id' + image_row + '_componentid" value="">';
-        html += '</div>';
+        var html = '<tr id="image-row' + image_row + '">';
+    html += '<td class="text-left">';
+    html += '<input type="text" name="componentsdata[' + image_row + '][description]" value="" placeholder="Component" class="form-control" />';
+    html += '</td>';
+    html += '<td class="text-left">';
+    html += '<select class="search form-control" id="categoryid" name="componentsdata[' + image_row + '][categoryid]" required>';
+    html += '<option value="">select</option>';
+    html += '<option value="1">Enterprises</option>';
+    html += '<option value="2">Training</option>';
+    html += '</select>';
+    html += '</td>';
+    html += '<td class="text-right">';
+    html += '<button type="button" onclick="$(\'#image-row' + image_row + ', .tooltip\').remove();" data-toggle="tooltip" title="Remove" class="btn btn-danger"><i class="fa fa-minus"></i></button>';
+    html += '</td>';
+    html += '</tr>';
 
-        $('#appendHere').append(html);
-        // var newBlockId = 'block_id' + image_row;
-        // initializeSelect(newBlockId, image_row);
+    $('#banner_images tbody').append(html);
         image_row++;
     }
 

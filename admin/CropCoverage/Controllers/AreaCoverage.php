@@ -18,6 +18,9 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 // use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
+    private $cropsModel;
+    private $districtModel;
+    private $areacoveragemodel;
     public $colors_ac = [
         'warning',
         'success',
@@ -28,7 +31,7 @@ class AreaCoverage extends AdminController
     private $error = array();
     function __construct()
     {
-        $this->cropsmodel = new CropsModel();
+        $this->cropsModel = new CropsModel();
         $this->districtModel = new DistrictModel();
         $this->areacoveragemodel = new AreaCoverageModel();
     }
@@ -533,11 +536,11 @@ class AreaCoverage extends AdminController
         }
 
         $data['show_form'] = false;
-        if (
-            strtotime('today') <= strtotime($cc_info->end_date)
-            && ($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)
-        ) {
+        if ((strtotime('today') <= strtotime($cc_info->end_date)) || ($cc_info->status != 1)) {
             $data['show_form'] = true;
+        }
+        if($cc_info->block_id != $this->user->block_id){
+            $data['show_form'] = false;
         }
 
         $data['district'] = (new DistrictModel())->find($cc_info->district_id)->name;

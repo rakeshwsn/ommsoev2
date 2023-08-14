@@ -14,257 +14,255 @@ use Admin\Dashboard\Models\YearModel;
 
 class AreaCoverage extends AdminController
 {
-	public function index()
-	{
-		$areamodel = new AreaCoverageModel();
-		$this->template->set_meta_title(lang('Pages.heading_title'));
+    public function index()
+    {
+        $areamodel = new AreaCoverageModel();
+        $this->template->set_meta_title(lang('Pages.heading_title'));
 
-		helper('form');
+        helper('form');
 
-		$yearmodel = new YearModel();
-		$data['years'][0] = 'Select years';
+        $yearmodel = new YearModel();
+        $data['years'][0] = 'Select years';
 
-		$years = $yearmodel->findAll();
+        $years = $yearmodel->findAll();
 
-		foreach ($years as $year) {
-			$data['years'][$year->id] = $year->name;
-		}
-		$distModel = new DistrictModel();
-		$data['districts'][0] = 'Select Districts';
+        foreach ($years as $year) {
+            $data['years'][$year->id] = $year->name;
+        }
+        $distModel = new DistrictModel();
+        $data['districts'][0] = 'Select Districts';
 
-		$districts = $distModel->findAll();
+        $districts = $distModel->findAll();
 
-		foreach ($districts as $district) {
-			$data['districts'][$district->id] = $district->name;
-		}
+        foreach ($districts as $district) {
+            $data['districts'][$district->id] = $district->name;
+        }
 
-		$blockmodel = new BlockModel();
-		$data['blocks'][0] = 'Select Blocks';
+        $blockmodel = new BlockModel();
+        $data['blocks'][0] = 'Select Blocks';
 
-		$data['year_id'] = 0;
-		$data['district_id'] = 0;
-		$data['block_id'] = 0;
-		if ($this->request->getGet('year_id')) {
-			$data['year_id'] = $this->request->getGet('year_id');
-		}
-		if ($this->request->getGet('district_id')) {
-			$data['district_id'] = $this->request->getGet('district_id');
-		}
-		if ($this->request->getGet('block_id')) {
-			$data['block_id'] = $this->request->getGet('block_id');
-		}
+        $data['year_id'] = 0;
+        $data['district_id'] = 0;
+        $data['block_id'] = 0;
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+        }
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $this->request->getGet('district_id');
 
-		$filter = [];
+            $blocks = $blockmodel->where('district_id', $data['district_id'])->findAll();
 
-		if ($data['year_id'] > 0) {
-			$filter = [
-				'year_id' =>  $data['year_id'],
-			];
-		}
-		
-		if ($data['district_id'] > 0) {
-			$filter['district_id'] = $data['district_id'];
-		}
-		
-		if ($data['block_id'] > 0) {
-			$filter['block_id'] = $data['block_id'];
-		}
-		$areaList = $areamodel->getAll($filter);
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        }
+        if ($this->request->getGet('block_id')) {
+            $data['block_id'] = $this->request->getGet('block_id');
+        }
 
-		$data['areas'] = [];
+        $filter = [];
 
-		foreach ($areaList as $row) {
-			$data['areas'][] = [
-				'year' => $row->year,
-				'season' => $row->season,
-				'districts' => $row->districts,
-				'blocks' => $row->blocks,
-				'farmers' => $row->farmers,
-				'achievement' => $row->achievement,
-				'created_at' => ymdToDmy($row->created_at),
-				'edit_url' => admin_url('dashboard/areacoverage/edit?year_id=' . $row->year_id . '&district_id=' . $row->district_id . '&block_id=' . $row->block_id  . '&season=' . $row->season),
+        if ($data['year_id'] > 0) {
+            $filter = [
+                'year_id' => $data['year_id'],
+            ];
+        }
 
-			];
-		}
+        if ($data['district_id'] > 0) {
+            $filter['district_id'] = $data['district_id'];
+        }
 
+        if ($data['block_id'] > 0) {
+            $filter['block_id'] = $data['block_id'];
+        }
+        $areaList = $areamodel->getAll($filter);
 
-		return $this->template->view('Admin\Dashboard\Views\areacoverage', $data);
-	}
+        $data['areas'] = [];
 
-	public function add()
-	{
-		$areamodel = new AreaCoverageModel();
-		if ($this->request->getMethod(1) == 'POST') {
-			// d($this->request->getPost());
-			// dd($this->request->getGet());
-			//delete if year_id exists
-			$areamodel->where('year_id', $this->request->getGet('year_id'))
-			->where('season', $this->request->getGet('season'))
-			->where('gp_id', $this->request->getGet('gp_id'))->delete();
+        foreach ($areaList as $row) {
+            $data['areas'][] = [
+                'year' => $row->year,
+                'season' => $row->season,
+                'districts' => $row->districts,
+                'blocks' => $row->blocks,
+                'farmers' => $row->total_farmers,
+                'achievement' => $row->total_achievements,
+                'created_at' => ymdToDmy($row->created_at),
+                'edit_url' => admin_url('dashboard/areacoverage/edit?year_id=' . $row->year_id . '&district_id=' . $row->district_id . '&block_id=' . $row->block_id . '&season=' . $row->season),
 
-			// print_r($gp);
-			foreach ($this->request->getPost('gp')  as $key => $values) {
-				$areadata[] = [
-					'year_id' => $this->request->getGet('year_id'),
-					'gp_id' => $key,
-					'district_id' => $this->request->getGet('district_id'),
-					'farmers' => $values['farmers'],
-					'block_id' => $this->request->getGet('block_id'),
-					'season' => $this->request->getGet('season'),
-					'achievement' => $values['achievement'],
-				];
-				// printr($areadata);
-			}
-			$areamodel->insertBatch($areadata);
+            ];
+        }
 
-			return redirect()->to(admin_url('dashboard/areacoverage'))->with('message', 'successful');
-		}
+        return $this->template->view('Admin\Dashboard\Views\areacoverage', $data);
+    }
 
-		return $this->getForm();
-	}
+    public function add()
+    {
+        $areamodel = new AreaCoverageModel();
+        if ($this->request->getMethod(1) == 'POST') {
 
-	public function edit()
-	{
-
-		$areamodel = new AreaCoverageModel();
-		if ($this->request->getMethod(1) == 'POST') {
-
-			$year_id = $this->request->getGet('year_id');
-			$district_id = $this->request->getGet('year_id');
-			$block_id = $this->request->getGet('block_id');
-			$season = $this->request->getGet('season');
-
-			$areamodel->where('year_id', $this->request->getGet('year_id'))
-			->where('season', $this->request->getGet('season'))
-			->where('gp_id', $this->request->getGet('gp_id'))
-			->where('district_id', $this->request->getGet('district_id'))->delete();
-
-			foreach ($this->request->getPost('gp') as $key => $values) {
-				$areadata[] = [
-					'year_id' => $year_id,
-					'gp_id' => $key,
-					'district_id' => $district_id,
-					'block_id' => $block_id,
-					'farmers' => $values['farmers'],
-					'season' => $season,
-					'achievement' => $values['achievement'],
-				];
-			}
-			$data['areas'] = $areamodel->insertBatch($areadata);
-
-			return redirect()->to(admin_url('dashboard/areacoverage'))->with('message', 'successful');
-		}
+            //delete if year_id exists
+            $areamodel->where('year_id', $this->request->getGet('year_id'))
+                ->where('season', $this->request->getGet('season'))
+                ->where('gp_id', $this->request->getGet('gp_id'))->delete();
 
 
-		return $this->getForm();
-	}
-	public function ajaxBlocks()
-	{
+            foreach ($this->request->getPost('gp') as $key => $values) {
+                $areadata[] = [
+                    'year_id' => $this->request->getGet('year_id'),
+                    'gp_id' => $key,
+                    'district_id' => $this->request->getGet('district_id'),
+                    'farmers' => $values['farmers'],
+                    'block_id' => $this->request->getGet('block_id'),
+                    'season' => $this->request->getGet('season'),
+                    'achievement' => $values['achievement'],
+                ];
 
-		$data['blocks'] = [];
-		$BlocksModel = new BlockModel();
+            }
+            $areamodel->insertBatch($areadata);
 
-		$district_id = $this->request->getGet('district_id');
+            return redirect()->to(admin_url('dashboard/areacoverage'))->with('message', 'successful');
+        }
 
-		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->findAll();
+        return $this->getForm();
+    }
 
-		return $this->response->setJSON($data);
-	}
+    public function edit()
+    {
+        $areamodel = new AreaCoverageModel();
+        if ($this->request->getMethod(1) == 'POST') {
 
-	private function getForm()
-	{
-		$data = [];
-		helper('form');
-		$areamodel = new AreaCoverageModel();
+            $year_id = $this->request->getGet('year_id');
+            $district_id = $this->request->getGet('year_id');
+            $block_id = $this->request->getGet('block_id');
+            $season = $this->request->getGet('season');
 
-		$year_id = $this->request->getGet('year_id');
+            $areamodel->where('year_id', $this->request->getGet('year_id'))
+                ->where('season', $this->request->getGet('season'))
+                ->where('block_id', $this->request->getGet('block_id'))
+                ->where('district_id', $this->request->getGet('district_id'))->delete();
 
-		$district_id = $this->request->getGet('district_id');
-		$block_id = $this->request->getGet('block_id');
+            foreach ($this->request->getPost('gp') as $key => $values) {
+                $areadata[] = [
+                    'year_id' => $year_id,
+                    'gp_id' => $key,
+                    'district_id' => $district_id,
+                    'block_id' => $block_id,
+                    'farmers' => $values['farmers'],
+                    'season' => $season,
+                    'achievement' => $values['achievement'],
+                ];
+            }
+            $data['areas'] = $areamodel->insertBatch($areadata);
 
-
-		$yearmodel = new YearModel();
-		$data['years'][0] = 'Select years';
-
-		$years = $yearmodel->findAll();
-
-		foreach ($years as $year) {
-			$data['years'][$year->id] = $year->name;
-		}
-
-
-
-		$distModel = new DistrictModel();
-		$data['districts'][0] = 'Select Districts';
-
-		$districts = $distModel->findAll();
-
-		foreach ($districts as $district) {
-			$data['districts'][$district->id] = $district->name;
-		}
-
-		$blockmodel = new BlockModel();
-		$data['blocks'][0] = 'Select Blocks';
-
-		$data['year_id'] = 0;
-		if ($this->request->getGet('year_id')) {
-			$data['year_id'] = $this->request->getGet('year_id');
-		}
-		$data['district_id'] = 0;
-		if ($this->request->getGet('district_id')) {
-			$data['district_id'] = $this->request->getGet('district_id');
-
-			$blocks = $blockmodel->where('district_id',$data['district_id'])->findAll();
-
-			foreach ($blocks as $block) {
-				$data['blocks'][$block->id] = $block->name;
-			}
-		}
-		$data['block_id'] = 0;
-		if ($this->request->getGet('block_id')) {
-			$data['block_id'] = $this->request->getGet('block_id');
-		}
-		$data['season'] = '';
-		if ($this->request->getGet('season')) {
-			$data['season'] = $this->request->getGet('season');
-		}
-
-		$gpsmodel = new GpsModel();
-
-		$data['gps'] = [];
-		$filter = [
-			'block_id' => $data['block_id'],
-			'year_id' => $data['year_id'],
-			'season' => $data['season'],
-		];
-
-		$gps = $areamodel->getByBlock($filter);
-		foreach ($gps as $gp) {
-			$data['gps'][] = [
-				'id' => $gp->gp_id,
-				'name' => $gp->gp,
-				'farmers' => $gp->farmers ?: 0,
-				'achievement' => $gp->achievement ?: 0,
-			];
-		}
+            return redirect()->to(admin_url('dashboard/areacoverage'))->with('message', 'successful');
+        }
 
 
-		return $this->template->view('Admin\Dashboard\Views\areacoverageForm', $data);
-	}
+        return $this->getForm();
+    }
 
-	public function chart()
-	{
-		$this->template->set_meta_title(lang('Pages.heading_title'));
+    public function ajaxBlocks()
+    {
 
-		$districtmodel = new DistrictModel();
-		$data['districts'][0] = 'Select districts';
+        $data['blocks'] = [];
+        $BlocksModel = new BlockModel();
 
-		$districts = $districtmodel->findAll();
+        $district_id = $this->request->getGet('district_id');
 
-		foreach ($districts as $district) {
-			$data['districts'][$district->id] = $district->name;
-		}
-		$data['area_url'] = site_url('api/areacoverage');
-		return $this->template->view('Admin\Dashboard\Views\areaCoverageChart', $data);
-	}
+        $data['blocks'] = $BlocksModel->where('district_id', $district_id)->findAll();
+
+        return $this->response->setJSON($data);
+    }
+
+    private function getForm()
+    {
+        $data = [];
+        helper('form');
+        $areamodel = new AreaCoverageModel();
+        $yearmodel = new YearModel();
+        
+        $data['years'][0] = 'Select years';
+
+        $years = $yearmodel->findAll();
+
+        foreach ($years as $year) {
+            $data['years'][$year->id] = $year->name;
+        }
+
+        $distModel = new DistrictModel();
+        $data['districts'][0] = 'Select Districts';
+
+        $districts = $distModel->findAll();
+
+        foreach ($districts as $district) {
+            $data['districts'][$district->id] = $district->name;
+        }
+
+        $blockmodel = new BlockModel();
+        $data['blocks'][0] = 'Select Blocks';
+
+        $data['year_id'] = 0;
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+        }
+        $data['district_id'] = 0;
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $this->request->getGet('district_id');
+
+            $blocks = $blockmodel->where('district_id', $data['district_id'])->findAll();
+
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        }
+        $data['block_id'] = 0;
+        if ($this->request->getGet('block_id')) {
+            $data['block_id'] = $this->request->getGet('block_id');
+        }
+        $data['season'] = '';
+        if ($this->request->getGet('season')) {
+            $data['season'] = $this->request->getGet('season');
+        }
+
+        $data['gps'] = [];
+        $filter = [
+            'block_id' => $data['block_id'],
+            'year_id' => $data['year_id'],
+            'season' => $data['season'],
+        ];
+
+        $gps = $areamodel->getByBlock($filter);
+        foreach ($gps as $gp) {
+            $data['gps'][] = [
+                'id' => $gp->gp_id,
+                'name' => $gp->gp,
+                'farmers' => $gp->farmers ?: 0,
+                'achievement' => $gp->achievement ?: 0,
+            ];
+        }
+
+        $data['seasons'] = [
+            'rabi' => 'Rabi',
+            'kharif' => 'Kharif'
+        ];
+
+        return $this->template->view('Admin\Dashboard\Views\areacoverageForm', $data);
+    }
+
+    public function chart()
+    {
+        $this->template->set_meta_title(lang('Pages.heading_title'));
+
+        $districtmodel = new DistrictModel();
+        $data['districts'][0] = 'Select districts';
+
+        $districts = $districtmodel->findAll();
+
+        foreach ($districts as $district) {
+            $data['districts'][$district->id] = $district->name;
+        }
+        $data['area_url'] = site_url('api/areacoverage');
+        return $this->template->view('Admin\Dashboard\Views\areaCoverageChart', $data);
+    }
 }
