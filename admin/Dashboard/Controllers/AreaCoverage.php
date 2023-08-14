@@ -139,7 +139,7 @@ class AreaCoverage extends AdminController
 
             $areamodel->where('year_id', $this->request->getGet('year_id'))
                 ->where('season', $this->request->getGet('season'))
-                ->where('gp_id', $this->request->getGet('gp_id'))
+                ->where('block_id', $this->request->getGet('block_id'))
                 ->where('district_id', $this->request->getGet('district_id'))->delete();
 
             foreach ($this->request->getPost('gp') as $key => $values) {
