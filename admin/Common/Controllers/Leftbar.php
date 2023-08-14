@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\Common\Controllers;
 
 use App\Controllers\AdminController;
@@ -229,7 +230,7 @@ class Leftbar extends AdminController
             );
         }
 
-        
+
 
         if ($this->user->hasPermission('reports/oldmpr')) {
             $reports[] = array(
@@ -496,7 +497,7 @@ class Leftbar extends AdminController
             ];
         }
         if (
-        $this->user->hasPermission("reports/areacoverage/getUploadStatus")
+            $this->user->hasPermission("reports/areacoverage/getUploadStatus")
         ) {
             $areacoverage[] = [
                 "name" => "Area Coverage Upload Status",
@@ -546,15 +547,22 @@ class Leftbar extends AdminController
             ];
         }
 
-        if ($this->user->hasPermission("physicalachievement")) {
+        if ($this->user->hasPermission("phyachtraining")) {
             $mprcomponent[] = [
-                "name" => "MPR Achievements",
-                "href" => admin_url("physicalachievement"),
+                "name" => "MPR <Ach></Ach> Training",
+                "href" => admin_url("phyachtraining"),
                 "heading" => 0,
                 "children" => [],
             ];
         }
-
+        if ($this->user->hasPermission("phyachenterprise")) {
+            $mprcomponent[] = [
+                "name" => "MPR Ach Enterprises",
+                "href" => admin_url("phyachenterprise"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
         if ($mprcomponent) {
             $data["menus"][] = [
                 "id" => "menu-mprcomponent",
