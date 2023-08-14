@@ -107,9 +107,12 @@ class PhysicalachievementModel extends Model
         $sql = "SELECT
         mc.id,
         mc.description AS component,
+        mc.comp_categoryid,
         target.no_total targettotal,
         IFNULL(SUM(upto_prev.no_total), 0) AS ach_total,
-        cur_ach.cur_total
+        cur_ach.cur_total,
+        cur_ach.fpo_total,
+        cur_ach.wshg_total
       FROM mpr_components mc
         LEFT JOIN (
           SELECT
@@ -134,7 +137,9 @@ class PhysicalachievementModel extends Model
           SELECT
             mcad.mpr_component_id,
             mcad.mprcomponents_master_id,
-            mcad.no_total AS cur_total
+            mcad.no_total AS cur_total,
+            mcad.fpo AS fpo_total,
+            mcad.wshg AS wshg_total
           FROM mpr_components_achive_data mcad
           WHERE mcad.month_id = " . $filter['month_id'] . "
         ) cur_ach ON cur_ach.mpr_component_id = mc.id AND cur_ach.mprcomponents_master_id = target.mprcomponents_master_id
@@ -214,17 +219,99 @@ class PhysicalachievementModel extends Model
     }
 
     protected function getMprComponents($data){
-        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data . " ORDER BY id ASC";
+      $sql = "SELECT * FROM mpr_components WHERE year_id <= " . $data . " AND comp_categoryid = 2 ORDER BY id ASC";
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getMprComponentsall($data = []){
-        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data['year_id'] . " ORDER BY id ASC";
+    public function getMprComponentsall($data){
+      //printr($data['year_id']); exit;
+        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data['year_id'] . " AND comp_categoryid = 2 ORDER BY id ASC";
         return $this->db->query($sql)->getResultArray();
     }
 
+    public function showTargetAchDataEnt($data=[])
+    {
+        $preMonth = $data['month_id'] -1;
+        $currentYearStartMonth = 4;
+        $currentMonth = date('n');
+        $currentYear = 1;
+        $nextYearAprilMonth = 4;
+
+        $sql = "SELECT
+        dist.id AS district_id,
+        dist.district,
+        dist.total_block";
+        $componets=$this->getMprComponentsEnt($data['year_id']);
+        foreach($componets as $comp){
+        $sql .= " , comp_target{$comp['id']}.target{$comp['id']},upto_ach{$comp['id']}.upto_fpo{$comp['id']},upto_ach{$comp['id']}.upto_wshg{$comp['id']},curr_ach{$comp['id']}.cur_fpo{$comp['id']}, curr_ach{$comp['id']}.cur_wshg{$comp['id']} ";
+        }
+        $sql .= " FROM (SELECT
+          sd.id,
+          sd.name AS district,
+          COUNT(sb.id) total_block
+        FROM soe_districts sd
+          LEFT JOIN soe_blocks sb
+            ON sb.district_id = sd.id where 1=1";
+            if (!empty($data['district_id'])) {
+                $sql .= " and sb.district_id = " . $data['district_id'];
+            }
+            $sql .= "
+        GROUP BY sb.district_id) dist";
+
+          foreach($componets as $comp){
+            $sql.=" LEFT JOIN (SELECT
+            mctm.district_id,
+            SUM(mctd.no_total) AS target{$comp['id']}
+          FROM mpr_components_target_master mctm
+            LEFT JOIN mpr_components_target_data mctd
+              ON mctm.id = mctd.mprcomponents_master_id
+          WHERE mctm.year_id = " . $data['year_id'] . "
+          AND mctd.mpr_component_id = {$comp['id']}
+          GROUP BY mctm.district_id) comp_target{$comp['id']}
+          ON comp_target{$comp['id']}.district_id = dist.id
+         LEFT JOIN (SELECT
+            mctm.district_id,
+            SUM(mcad.wshg) AS upto_wshg{$comp['id']},
+            SUM(mcad.fpo) AS upto_fpo{$comp['id']}
+          FROM mpr_components_target_master mctm
+            LEFT JOIN mpr_components_achive_data mcad
+              ON mctm.id = mcad.mprcomponents_master_id
+          WHERE mctm.year_id = " . $data['year_id'] . "
+          AND mcad.mpr_component_id = {$comp['id']}
+          AND mcad.month_id BETWEEN 4 AND " . $preMonth . "
+          GROUP BY mctm.district_id) upto_ach{$comp['id']}
+          ON upto_ach{$comp['id']}.district_id = dist.id
+        LEFT JOIN (SELECT
+            mctm.district_id,
+            SUM(mcad.fpo) AS cur_fpo{$comp['id']},
+            SUM(mcad.wshg) AS cur_wshg{$comp['id']}
+          FROM mpr_components_target_master mctm
+            LEFT JOIN mpr_components_achive_data mcad
+              ON mctm.id = mcad.mprcomponents_master_id
+          WHERE mctm.year_id = " . $data['year_id'] . "
+          AND mcad.mpr_component_id = {$comp['id']}
+          AND mcad.month_id = " . $data['month_id'] . "
+          GROUP BY mctm.district_id) curr_ach{$comp['id']}
+          ON curr_ach{$comp['id']}.district_id = dist.id";
+        }
+        $sql .= " ORDER BY dist.district ASC";
+        // echo $sql; exit;
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    protected function getMprComponentsEnt($data){
+      $sql = "SELECT * FROM mpr_components WHERE year_id <= " . $data . " AND comp_categoryid = 1 ORDER BY id ASC";
+        return $this->db->query($sql)->getResultArray();
+    }
+
+    public function getMprComponentsallEnt($data){
+      //printr($data['year_id']); exit;
+        $sql="SELECT * FROM mpr_components WHERE year_id <= " . $data['year_id'] . " AND comp_categoryid = 1 ORDER BY id ASC";
+        return $this->db->query($sql)->getResultArray();
+    }
     public function addPhysicalachData($data)
     {
+      //printr($data); exit;
         $monthid = $data['monthid'];
         $masterid = $data['componentidmain'];
 
@@ -250,11 +337,15 @@ class PhysicalachievementModel extends Model
                     "mprcomponents_master_id" => $masterid,
                     "mpr_component_id" => $componentid,
                     "month_id" => $monthid,
-                    "no_total" => $achmultiple ? $achmultiple : 0,
+                    "no_total" => $achmultiple['data'] ,
+                    "wshg" => isset($achmultiple['wshg']) ? $achmultiple['wshg'] : 0,
+                    "fpo" => isset($achmultiple['fpo']) ?  $achmultiple['fpo'] : 0,
                 );
 
                 $this->db->table("mpr_components_achive_data")->insert($masterTableData);
+
             }
+
         }
     }
 

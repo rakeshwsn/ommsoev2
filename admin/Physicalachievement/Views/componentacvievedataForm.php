@@ -86,8 +86,8 @@ $validation = \Config\Services::validation();
                         <label class="col-sm-2 control-label" for="input-category">Year</label>
                         <div class="col-sm-10">
                             <select class="form-control" id="year_id" name="year_id">
-                            <?php foreach($allYears as $allYear){?>
-                                <option value="<?php echo $allYear->id;?>" <?php if ($editYear == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name;?></option>
+                                <?php foreach ($allYears as $allYear) { ?>
+                                    <option value="<?php echo $allYear->id; ?>" <?php if ($editYear == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name; ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -115,7 +115,7 @@ $validation = \Config\Services::validation();
 
                 <div class="block-content block-content-full" style="overflow-y: scroll;">
                     <table id="datatable" class="table table-bordered table-striped table-vcenter">
-                      <!-- ajax code append here -->
+                        <!-- ajax code append here -->
                     </table>
                 </div>
 
@@ -176,8 +176,10 @@ $validation = \Config\Services::validation();
                 },
                 success: function(response) {
 
-                    console.log("hello");
+                    //console.log("hello");
                     $('#datatable').html(response);
+                    $('.currentMonth').trigger('input');
+
 
                 },
                 error: function(xhr, status, error) {
@@ -192,11 +194,14 @@ $validation = \Config\Services::validation();
 </script>
 <script>
     $(document).ready(function() {
+
         $(document).on('input', '.currentMonth', function() {
             var $row = $(this).closest('tr');
             var targetTotal = parseFloat($row.find('.targettotal').text());
             var achTotal = parseFloat($row.find('.achTotal').text());
             var currentMonthValue = parseFloat($(this).val());
+            // var fpo = parseFloat($(this).val());
+            // var wshg = parseFloat($(this).val());
             var cumulativeTotal = achTotal + currentMonthValue;
             if (currentMonthValue + achTotal > targetTotal) {
                 currentMonthValue = 0;
@@ -214,6 +219,41 @@ $validation = \Config\Services::validation();
                 $row.find('.message').text('');
             }
         });
+
+        $(document).on('input', '.fwsg', function() {
+            var that=$(this);
+            var $row = $(this).closest('tr');
+            var currentMonthValue = $row.find(".currentMonth").val();
+            var fpo = $row.find(".fpo");
+            var wshg = $row.find(".wshg");
+            var fpoValue = parseFloat(fpo.val());
+            var wshgValue = parseFloat(wshg.val());
+            var thatt = parseInt(that.val().replace(/[^\d.]/g, '')) || 0 ;
+            fposhg=parseInt($(fpo).val())+parseInt($(wshg).val());
+
+            $(fpo).val(fpoValue) ;
+             $(wshg).val(wshgValue) ;
+
+            if(thatt > currentMonthValue){
+               $(fpo).val(0) ;
+               $(wshg).val(0) ; // = 0;
+
+            }
+
+            if (that.is(fpo)) {
+                fpoval=currentMonthValue-$(fpo).val();
+                $(wshg).val(fpoval);
+            }else{
+                wshgval=currentMonthValue-$(wshg).val();
+                $(fpo).val(wshgval);
+            }
+
+
+           // $row.find('.fpo').val(fpo);
+            //$row.find('.cumulative').val(cumulativeTotal);
+        });
+
+
     });
 </script>
 <?php js_end(); ?>
