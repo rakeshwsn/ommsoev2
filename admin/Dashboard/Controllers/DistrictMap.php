@@ -167,7 +167,7 @@ class DistrictMap extends AdminController
 
 
 		} else {
-			$districts = $distModel->findAll();
+			$districts = $distModel->orderBy('name')->findAll();
 			
 			foreach($districts as $district){
 				$data['districts'][] = [
