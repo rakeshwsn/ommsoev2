@@ -56,8 +56,6 @@ class DistrictMapModel extends Model
         ddm.created_at,
         sy.name year
       FROM dashboard_district_map ddm
-        LEFT JOIN soe_years sy
-          ON ddm.year_id = sy.id
         LEFT JOIN soe_districts sd
           ON ddm.district_id = sd.id
 	  WHERE ddm.deleted_at IS NULL
