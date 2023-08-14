@@ -14,38 +14,29 @@ $validation = \Config\Services::validation();
                     <label for="unit_id">Name/Type of Unit</label>
                     <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'units']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_id'); ?></div>
-
-
                 </div>
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('management_unit_type') ? 'is-invalid' : '' ?>">
                     <label for="management_unit">Type of management unit</label>
-                    <select name="management_unit_type" id="unit" class="form-control">
-                        <option value="SHG" <?= set_select('management_unit_type', 'SHG', $management_unit_type == "SHG") ? 'selected' : ''; ?>> SHG</option>
-                        <option value="FPO" <?= set_select('management_unit_type', 'FPO', $management_unit_type == "FPO") ? 'selected' : ''; ?>> FPO</option>
-                    </select>
+                    <?php echo form_dropdown('management_unit_type', $management_unit_types, set_value('management_unit_type', $management_unit_type), ['class' => 'form-control mb-3', 'id' => 'management_unit_type']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('management_unit_type'); ?></div>
-
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
-                    <label for="district">District</label>
-                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+                    <label for="district_id">District</label>
+                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' =>'districts']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
-
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('managing_unit_name') ? 'is-invalid' : '' ?>">
                     <label for="managing unit name">Name Of Managing Unit</label>
                     <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('managing_unit_name'); ?></div>
-
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
-                    <label for="block">Block</label>
-
-                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), ['class' => 'form-control mb-3', 'id' => 'blocks']); ?>
+                    <label for="block_id">Block</label>
+                    <?php echo form_dropdown('block_id', $blocks,set_value('block_id', $block_id), ['class' =>'form-control mb-3', 'id' =>'blocks']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
 
                 </div>
@@ -58,8 +49,8 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
-                    <label for="Gp">GP</label>
-                    <?php echo form_dropdown('gp_id', $gps, set_value('gp_id', $gp_id), ['class' => 'form-control mb-3', 'id' => 'gps']); ?>
+                    <label for="gp_id">GP</label>
+                    <?php echo form_dropdown('gp_id', $gps, set_value('gp_id', $gp_id), ['class' => 'form-control mb-3', 'id' =>'gps']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('gp_id'); ?></div>
 
                 </div>
@@ -73,7 +64,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                     <label for="village">Village</label>
-                    <?php echo form_dropdown('village_id', $villages, set_value('village_id', $village_id), ['class' => 'form-control mb-3', 'id' => 'villages']); ?>
+                    <?php echo form_dropdown('village_id', $villages, set_value('village_id', $village_id), ['class' => 'form-control mb-3', 'id' =>'villages']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('village_id'); ?></div>
 
                 </div>
@@ -88,9 +79,8 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('budget_fin_yr_id') ? 'is-invalid' : '' ?>">
                     <label for="budget finnacial year">Budget Utilized of Financial year</label>
-                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yr, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control mb-3', 'id' => 'villages']); ?>
+                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control mb-3', 'id' => '']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('budget_fin_yr_id'); ?></div>
-
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('mou_date') ? 'is-invalid' : '' ?>">
                     <label for="Date of OMU Under OMM">Date of OMU Under OMM</label>
@@ -98,58 +88,59 @@ $validation = \Config\Services::validation();
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('mou_date'); ?></div>
 
                 </div>
-
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget') ? 'is-invalid' : '' ?>">
                     <label for="Established Unit Budget Head">Established Unit Budget Head</label>
-                    <?php echo form_dropdown('unit_budget', $unit_budgets, set_value('unit_budget', $unit_budget), ['class' => 'form-control mb-3', 'id' => 'budgets']); ?>
+                    <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder=" " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
-
                 </div>
+
+            </div>
+            <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
                     <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes</label>
                     <input type="text" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
-
                 </div>
+
             </div>
             <div class="row">
-                <div class="col-6 form-group <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
-                    <label for="Addl. Support">Addl. Support provided for basic infrastructure Creation</label>
-                    <select name="is_support_basis_infr" id="is_support_basis_infr" class="form-control">
-                        <option value="No" <?= set_select('is_support_basis_infr', 'No', $is_support_basis_infr == "No") ? 'selected' : ''; ?>>No</option>
-                        <option value="Yes" <?= set_select('is_support_basis_infr', 'Yes', $is_support_basis_infr == "Yes") ? 'selected' : ''; ?>>Yes</option>
-                    </select>
+                <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
+                    <label for="management_unit">Is basic infrastructure support required?</label>
+                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' =>'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
-
+                </div>
+            </div>
+            <div class="block" id="budget_utilize">
+                <div class="row">
+                    <div class=" col-6 form-group <?= $validation->hasError('purpose_infr_support') ? 'is-invalid' : '' ?>">
+                        <label for="Purposeof Addl. infa structure">Type/ Purposeof Addl. infa structure</label>
+                        <input type="text" name="purpose_infr_support" class="form-control" id="purpose_infr_support" placeholder="Type/ Purposeof Addl. infa structure " value="<?= set_value('purpose_infr_support', $purpose_infr_support) ?>">
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('purpose_infr_support'); ?></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="  col-6 form-group <?= $validation->hasError('addl_budget') ? 'is-invalid' : '' ?>">
+                        <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support</label>
+                        <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Enter Budget " value="<?= set_value('addl_budget', $addl_budget) ?>">
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('addl_budget'); ?></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
+                        <label for="Budget Ruppes">Budget Utilized in Ruppes</label>
+                        <input type="text" name="support_infr_amount" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
+                        <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class=" col-6 form-group <?= $validation->hasError('purpose_infr_support') ? 'is-invalid' : '' ?>">
-                    <label for="Purposeof Addl. infa structure">Type/ Purposeof Addl. infa structure</label>
-                    <input type="text" name="purpose_infr_support" class="form-control" id=" purpose_infr_support" placeholder="Type/ Purposeof Addl. infa structure " value="<?= set_value('purpose_infr_support', $purpose_infr_support) ?>">
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('purpose_infr_support'); ?></div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="reset" class="btn btn-primary">Cancel</button>
                 </div>
             </div>
-            <div class="row">
-
-                <div class="  col-6 form-group <?= $validation->hasError('addl_budget') ? 'is-invalid' : '' ?>">
-                    <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support</label>
-                    <?php echo form_dropdown('addl_budget', $addl_budgets, set_value('addl_budget', $addl_budget), ['class' => 'form-control mb-3', 'id' => 'budgets']); ?>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('addl_budget'); ?></div>
-                </div>
-            </div>
-            <div class="row">
-                <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
-                    <label for="Budget Ruppes">Budget Utilized in Ruppes</label>
-                    <input type="text" name="support_infr_amount" class="form-control" id=" support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="reset" class="btn btn-primary">Cancel</button>
-
         </div>
 
     </form>
@@ -171,7 +162,7 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                    // console.log(response);
+                    console.log(response);
                     if (response.blocks) {
                         html = '<option value="">Select Block</option>';
                         $.each(response.blocks, function(k, v) {
@@ -207,7 +198,7 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                    //   console.log(response);
+                      console.log(response);
                     if (response.gps) {
                         html = '<option value="">Select Gp</option>';
                         $.each(response.gps, function(k, v) {
@@ -229,7 +220,6 @@ $validation = \Config\Services::validation();
             });
         });
 
-
         $('#gps').on('change', function() {
 
             g_id = $(this).val();
@@ -244,8 +234,9 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
+                    console.log(response);
                     if (response.villages) {
-                        html = '<option value="">Select Gp</option>';
+                        html = '<option value="">Select Village</option>';
                         $.each(response.villages, function(k, v) {
 
                             html += '<option value="' + v.id + '"' + (villageid == v.id ? ' selected' : '') + '>' + v.name + '</option>';
@@ -263,5 +254,17 @@ $validation = \Config\Services::validation();
             });
 
         });
+
+        //hide show addl budget
+        $('#is_support_basis_infr').on('change',function(){
+            $is_support_basis_infr=$(this).val();
+            if($is_support_basis_infr == 'no'){
+                $('#budget_utilize').hide();
+            }
+            else{
+                $('#budget_utilize').show();
+            }
+        })
+        $('#is_support_basis_infr').trigger('change');
     });
 </script>
