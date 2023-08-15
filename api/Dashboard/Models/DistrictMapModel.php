@@ -79,7 +79,7 @@ FROM soe_districts sd
 	  LEFT JOIN dashboard_years y ON dm.year_id=y.id 
 	  WHERE dm.deleted_at IS NULL AND year_id=$year_id";
 
-		return $this->db->query($sql)->getResult(); 
+		return $this->db->query($sql)->getFirstRow();
 	}
 	
 }

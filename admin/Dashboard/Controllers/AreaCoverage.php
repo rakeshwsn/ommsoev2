@@ -104,7 +104,7 @@ class AreaCoverage extends AdminController
             //delete if year_id exists
             $areamodel->where('year_id', $this->request->getGet('year_id'))
                 ->where('season', $this->request->getGet('season'))
-                ->where('gp_id', $this->request->getGet('gp_id'))->delete();
+                ->where('block_id', $this->request->getGet('block_id'))->delete();
 
 
             foreach ($this->request->getPost('gp') as $key => $values) {
@@ -133,7 +133,7 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
 
             $year_id = $this->request->getGet('year_id');
-            $district_id = $this->request->getGet('year_id');
+            $district_id = $this->request->getGet('district_id');
             $block_id = $this->request->getGet('block_id');
             $season = $this->request->getGet('season');
 
