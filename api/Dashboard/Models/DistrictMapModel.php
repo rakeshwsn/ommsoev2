@@ -46,7 +46,7 @@ class DistrictMapModel extends Model
   ddm.blocks,
   ddm.gps,
   ddm.villages,
-  ddm.tentative_farmers,
+  ddm.tentative_farmers farmers,
   e.total_cmsc chcs,
   e.total_chc cmscs
 FROM soe_districts sd
