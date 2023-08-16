@@ -1,6 +1,5 @@
-
 <style>
- .block-content {
+    .block-content {
         width: 100%;
     }
 
@@ -62,19 +61,19 @@ $user  = service('user');
                     <div class="col-md-4">
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id">
-                        <?php foreach($allYears as $allYear){?>
-                                <option value="<?php echo $allYear->id;?>" <?php if ($year_id == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name;?></option>
-                                <?php } ?>
+                            <?php foreach ($allYears as $allYear) { ?>
+                                <option value="<?php echo $allYear->id; ?>" <?php if ($year_id == $allYear->id) echo 'selected'; ?>><?php echo $allYear->name; ?></option>
+                            <?php } ?>
                         </select>
                     </div>
                     <div class="col-md-4" style="margin: 23px;">
                         <button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-filter"></i> Filter</button>
                     </div>
-                    <?php if ($user->district_id && $checkExists!=0) { ?>
+                    <?php if ($user->district_id && $checkExists != 0) { ?>
 
-                    <div class="col-md-3" style="margin: 23px;">
-                    <a href="<?php echo $addachForm; ?>" data-toggle="tooltip" title="Add" class="btn btn-outline btn-primary"><i class="fa fa-plus"></i> Add Achivements</a>
-                    </div>
+                        <div class="col-md-3" style="margin: 23px;">
+                            <a href="<?php echo $addachForm; ?>" data-toggle="tooltip" title="Add" class="btn btn-outline btn-primary"><i class="fa fa-plus"></i> Add Achivements</a>
+                        </div>
                     <?php } ?>
                 </div>
             </div>
@@ -93,7 +92,7 @@ $user  = service('user');
 
             <?php } ?>
 
-            <?php if ($user->district_id && $checkExists!=0) { ?>
+            <?php if ($user->district_id && $checkExists != 0) { ?>
                 <!-- <div class="block-options float-right">
                     <a href="<?php echo $addachForm; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
                 </div> -->
@@ -107,9 +106,7 @@ $user  = service('user');
                     <tr>
                         <?php foreach ($headers as $header) : ?>
                             <td><?= $header ?></td>
-
                         <?php endforeach; ?>
-                        <!-- <td height="101">Total</td> -->
                         <?php if (!$user->district_id) { ?> <td>Action</td> <?php } ?>
                     </tr>
                 </thead>
@@ -119,17 +116,23 @@ $user  = service('user');
                 ?>
                     <tbody>
                         <?php
-                        $sum = 0;
+                        $column_sums = array_fill(0, count($headers) - 2, 0); // Initialize an array to store column sums
                         foreach ($target_data as $key => $targetDatas) : ?>
                             <tr>
                                 <td><?php echo $serino++; ?></td>
                                 <td><?php echo $key; ?></td>
-                                <?php $sum = 0; ?>
-                                <?php foreach ($targetDatas as $row) : ?>
+                                <?php
+                                $row_total = 0; // Initialize row total for each row
+                                $col_index = 0; // Initialize column index
+                                foreach ($targetDatas as $row) : ?>
                                     <td class="totaldata"><?php echo $row['total']; ?></td>
-                                    <?php $sum += $row['total']; ?>
+                                    <?php
+                                    $row_total += $row['total'];
+                                    $column_sums[$col_index] += $row['total']; // Update column sum
+                                    $col_index++;
+                                    ?>
                                 <?php endforeach; ?>
-                                <td><?php echo $sum; ?></td>
+                                <td><?php echo $row_total; ?></td>
                                 <?php if (!$user->district_id) { ?>
                                     <td>
                                         <?php if ($row['mprcomponents_master_id']) { ?>
@@ -139,18 +142,25 @@ $user  = service('user');
                                 <?php } ?>
                             </tr>
                         <?php endforeach; ?>
-                    </tbody>
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <?php foreach ($column_sums as $sum) : ?>
+                                <td><?php echo $sum; ?></td>
+                            <?php endforeach; ?>
 
+                        </tr>
+                    </tbody>
                 <?php
                 } else {
                     echo "<h1>No data available.</h1>";
                 }
                 ?>
-
-                <tfoot>
-
-                </tfoot>
             </table>
+
+
+
+
+
         </div>
     </div>
 
