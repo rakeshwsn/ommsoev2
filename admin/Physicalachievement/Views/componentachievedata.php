@@ -52,7 +52,7 @@ $user  = service('user');
                     <a href="<?php echo $addach; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
                 </div>
             <?php } ?>
-            <?php if ($user->district_id && $checkExists != 0) { ?>
+            <?php if (!empty($user->district_id) && $checkExists != 0) { ?>
                 <div class="block-options float-right">
                     <a href="<?php echo $addach; ?>" data-toggle="tooltip" title="Add" class="btn btn-primary"><i class="fa fa-plus"></i></a>
                 </div>
