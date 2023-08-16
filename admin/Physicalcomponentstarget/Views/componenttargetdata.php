@@ -106,7 +106,9 @@ $user  = service('user');
                     <tr>
                         <?php foreach ($headers as $header) : ?>
                             <td><?= $header ?></td>
+
                         <?php endforeach; ?>
+                        <!-- <td height="101">Total</td> -->
                         <?php if (!$user->district_id) { ?> <td>Action</td> <?php } ?>
                     </tr>
                 </thead>
@@ -116,23 +118,17 @@ $user  = service('user');
                 ?>
                     <tbody>
                         <?php
-                        $column_sums = array_fill(0, count($headers) - 2, 0); // Initialize an array to store column sums
+                        $sum = 0;
                         foreach ($target_data as $key => $targetDatas) : ?>
                             <tr>
                                 <td><?php echo $serino++; ?></td>
                                 <td><?php echo $key; ?></td>
-                                <?php
-                                $row_total = 0; // Initialize row total for each row
-                                $col_index = 0; // Initialize column index
-                                foreach ($targetDatas as $row) : ?>
+                                <?php $sum = 0; ?>
+                                <?php foreach ($targetDatas as $row) : ?>
                                     <td class="totaldata"><?php echo $row['total']; ?></td>
-                                    <?php
-                                    $row_total += $row['total'];
-                                    $column_sums[$col_index] += $row['total']; // Update column sum
-                                    $col_index++;
-                                    ?>
+                                    <?php $sum += $row['total']; ?>
                                 <?php endforeach; ?>
-                                <td><?php echo $row_total; ?></td>
+                                <td><?php echo $sum; ?></td>
                                 <?php if (!$user->district_id) { ?>
                                     <td>
                                         <?php if ($row['mprcomponents_master_id']) { ?>
@@ -141,26 +137,21 @@ $user  = service('user');
                                     </td>
                                 <?php } ?>
                             </tr>
-                        <?php endforeach; ?>
-                        <tr>
-                            <td colspan="2">Total</td>
-                            <?php foreach ($column_sums as $sum) : ?>
-                                <td><?php echo $sum; ?></td>
-                            <?php endforeach; ?>
 
-                        </tr>
+
+                        <?php endforeach; ?>
                     </tbody>
+
                 <?php
                 } else {
                     echo "<h1>No data available.</h1>";
                 }
                 ?>
+
+                <tfoot>
+
+                </tfoot>
             </table>
-
-
-
-
-
         </div>
     </div>
 
