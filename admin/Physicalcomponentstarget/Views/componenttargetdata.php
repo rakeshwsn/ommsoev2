@@ -73,7 +73,7 @@ $user  = service('user');
                     <?php if ($user->district_id && $checkExists!=0) { ?>
 
                     <div class="col-md-3" style="margin: 23px;">
-                        <button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-plus"></i> Add Achivements</button>
+                    <a href="<?php echo $addachForm; ?>" data-toggle="tooltip" title="Add" class="btn btn-outline btn-primary"><i class="fa fa-plus"></i> Add Achivements</a>
                     </div>
                     <?php } ?>
                 </div>
