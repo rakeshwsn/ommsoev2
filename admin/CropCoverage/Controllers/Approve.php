@@ -323,6 +323,7 @@ class Approve extends AdminController
         $data['blocks'] = [];
         $data['approved'] = false;
         $slno = 1;
+        $week = '';
         foreach ($blocks as $block) {
             $action = '';
             $week = '';

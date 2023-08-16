@@ -42,17 +42,12 @@ class AreaChartModel extends Model
 	protected $bulider;
 
 
-
-
-	
 	public function getYearwiseFarmerAchievement($filter=[]) {
 		$sql = "SELECT
 		a.year_id,
 		y.name `year`,
 		SUM(a.farmers) total_farmers,
-		SUM(a.achievement) total_ach,
-		SUM(a.nursery_bed) total_nursery,
-  SUM(a.intercropping) total_intercropping
+		SUM(a.achievement) total_ach
 	  FROM dashboard_areacoverage a LEFT JOIN dashboard_years y ON y.id=a.year_id
 	  WHERE a.deleted_at IS NULL";
 	  if(!empty($filter['district_id'])){
@@ -70,7 +65,6 @@ class AreaChartModel extends Model
 		y.name `year`,
 		da.district_id,
 		sd.name AS district,
-		SUM(da.intercropping) AS total_intercropping,
 		SUM(da.farmers) AS total_farmer,
 		SUM(da.achievement) AS total_area
 	  FROM dashboard_areacoverage da

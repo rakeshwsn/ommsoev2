@@ -128,7 +128,7 @@ class Physicalcomponents extends AdminController
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
             $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('physicalcomponents/edit/' . $result['id']) . '"><i class="fa fa-pencil"></i></a>';
-            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('physicalcomponents/delete/' . $result['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+           // $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('physicalcomponents/delete/' . $result['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
             $year = '';
             if ($result['year_id'] == 2) {
@@ -137,9 +137,16 @@ class Physicalcomponents extends AdminController
                 $year = '2024-25';
             }
 
+            if ($result['comp_categoryid'] == 1) {
+                $category = 'Enterprises';
+            } else if ($result['comp_categoryid'] == 2) {
+                $category = 'Training';
+            }
+
             $datatable[] = array(
                 '<input type="checkbox" name="selected[]" value="' . $result['id'] . '" />',
                 $result['description'],
+                $category,
                 $year,
                 $action
             );
@@ -185,8 +192,13 @@ class Physicalcomponents extends AdminController
         $data['hasPlusbutton'] = true;
        // $data['components_info'] = '';
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
-            $data['components_info'] = $this->physicalcomponents->find($this->uri->getSegment(4));
-           // printr($data['components_info']); exit;
+         $components_info =  $this->physicalcomponents->find($this->uri->getSegment(4));
+        //    printr($data['components_info']); exit;
+        foreach( $components_info as  $col=>$components_infos){
+            $data[$col] = $components_infos;
+        }
+
+        //printr($data); exit;
             $data['hasPlusbutton'] = false;
         }
         //$data['components_info'] = new stdClass();
@@ -200,6 +212,7 @@ class Physicalcomponents extends AdminController
                 $data[$field] = '';
             }
         }
+        //printr($data); exit;
         echo $this->template->view('Admin\Physicalcomponents\Views\componentsForm', $data);
     }
 

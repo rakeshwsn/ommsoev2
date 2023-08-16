@@ -71,7 +71,7 @@ class AreaCoverageModel extends Model
 		  ON a.block_id = sb.id
 		LEFT JOIN soe_grampanchayats sg
 		  ON a.gp_id = sg.id
-	  WHERE a.deleted_at IS NULL
+	  WHERE a.deleted_at IS NULL AND sg.deleted_at IS NULL
 	  AND y.deleted_at IS NULL";
 		if (isset($filter['year_id'])) {
 			$sql .= " AND a.year_id = " . $filter['year_id'];
@@ -82,7 +82,8 @@ class AreaCoverageModel extends Model
 		if (isset($filter['block_id'])) {
 			$sql .= " AND a.block_id = " . $filter['block_id'];
 		}
-		$sql .=  " GROUP BY a.year_id,a.district_id";
+		$sql .=  " GROUP BY a.year_id,a.district_id ORDER BY a.year_id,districts";
+//echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
 
@@ -146,15 +147,15 @@ class AreaCoverageModel extends Model
 		g.name gp,
 		da.farmers,
 		da.achievement
-	  FROM grampanchayat g
+	  FROM soe_grampanchayats g
 		LEFT JOIN (SELECT
 			*
 		  FROM dashboard_areacoverage ac
 		  WHERE ac.deleted_at IS NULL
 		  AND ac.year_id = ".$filter['year_id']."
 		  AND ac.season = '".$filter['season']."') da
-		  ON da.gp_id = g.id WHERE g.block_id=".$filter['block_id'];
-
+		  ON da.gp_id = g.id WHERE g.deleted_at IS NULL AND g.block_id=".$filter['block_id'];
+//echo $sql;exit;
 		  return $this->db->query($sql)->getResult();
 	}
 }

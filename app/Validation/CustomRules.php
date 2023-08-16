@@ -33,4 +33,15 @@ class CustomRules
         return $query->getNumRows() === 0;
     }
 
+    public function required_if_value(string $field, string $params, array $data) {
+        $params = explode(',',$params);
+        $key = $params[0];
+        $value = $params[1];
+
+        if ($data[$key] == $value && $field == '') {
+            return false;
+        }
+        return true;
+    }
+
 }

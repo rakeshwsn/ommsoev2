@@ -37,11 +37,13 @@ class Mpr extends AdminController
             $data['month_id'] = $this->request->getGet('month');
         }
 
+        $data['districts'] = [];
+
         $data['fund_agency_id'] = $this->user->fund_agency_id?:1;
         if($this->request->getGet('fund_agency_id')){
             $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+            $data['districts'] = [];
         }
-
 
         $data['agency_type_id'] = $this->user->agency?$this->user->agency_type_id:0;
         if($this->user->agency_type_id==$this->settings->district_user){
@@ -66,7 +68,6 @@ class Mpr extends AdminController
             $data['block_id'] = $this->request->getGet('block_id');
             $data['user_group_id']=[6,5];
         }
-
 
         if($this->request->getGet('agency_type_id')){
             $data['agency_type_id'] = $data['user_group_id']=$this->request->getGet('agency_type_id');
@@ -182,8 +183,10 @@ class Mpr extends AdminController
             exit;
         }
 
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
-
+        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].
+            '&month='.$data['month_id'].'&district_id='.$data['district_id'].
+            '&agency_type_id='.$data['agency_type_id'].
+            '&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
 
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
 
@@ -891,7 +894,10 @@ class Mpr extends AdminController
             exit;
         }
 
-        $data['download_url'] = Url::abstractMprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&agency_type_id='.$data['agency_type_id'];
+        $data['download_url'] = Url::abstractMprDownload.'?year='.$data['year_id'].
+            '&month='.$data['month_id'].'&district_id='.$data['district_id'].
+            '&agency_type_id='.$data['agency_type_id'].
+            '&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
 
         return $this->template->view('Admin\Reports\Views\abstract_mpr', $data);
     }
