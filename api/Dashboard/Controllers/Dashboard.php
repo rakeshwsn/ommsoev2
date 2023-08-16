@@ -209,7 +209,6 @@ class Dashboard extends ResourceController
 				'district_id'=>(int)$area->district_id,
 				'district'=>$area->district,
 				'total_farmers'=>(int)$area->total_farmer,
-				'intercropping'=>(float)$area->total_intercropping,
 				'practice_area'=>(float)$area->total_area,
 				'total_area'=>(float)$area->total_area,
 
@@ -291,9 +290,6 @@ class Dashboard extends ResourceController
 				'year'=>$achievement->year_id,
 				'total_area_coverage'=>(float)$achievement->total_ach,
 				'total_farmers_coverage'=>(int)$achievement->total_farmers,
-				'total_nursery_beds'=>(float)$achievement->total_nursery,
-				'total_intercropping'=>(float)$achievement->total_intercropping
-
 			];
 		}
 		
@@ -318,7 +314,6 @@ class Dashboard extends ResourceController
 				'total_farmers'=>(int)$mapdata->farmers,
 				'chc'=>(int)$mapdata->chcs,
 				'cmsc'=>(int)$mapdata->cmscs,
-
 			];
 		}
 		// dd($data);
@@ -350,23 +345,21 @@ class Dashboard extends ResourceController
 	}
 
 	public function summary(){
-		$distmapmodel = new DistrictMapModel();;
-		$summerydata = $distmapmodel->summary();
-		$data['data']=[];
-		foreach ($summerydata as $summery) {
-			$data['data'][]=[
-				'year_id'=>$summery->year_id,
-				'year'=>$summery->year,
-				'total_districts'=>(int)$summery->total_districts,
-				'total_blocks'=>(int)$summery->total_blocks,
-				'total_gps'=>(int)$summery->total_gps,
-				'total_villages'=>(int)$summery->total_villages,
-				'total_farmers'=>(int)$summery->total_farmers,
-				'total_chc'=>(int)$summery->total_chc,
-				'total_cmsc'=>(int)$summery->total_cmsc,
-				'total_area'=>(float)$summery->total_area,
-			];
-		}
+		$distmapmodel = new DistrictMapModel();
+		$yearModel = new YearModel();
+        $year = $yearModel->getCurrentYearId();
+
+        $summery = $distmapmodel->getSummary($year-1);
+
+        $data['data']=[
+            'total_districts'=>(int)$summery->total_districts,
+            'total_blocks'=>(int)$summery->total_blocks,
+            'total_gps'=>(int)$summery->total_gps,
+            'total_villages'=>(int)$summery->total_villages,
+            'total_farmers'=>(int)$summery->total_farmers,
+            'total_chc'=>(int)$summery->total_chc,
+            'total_cmsc'=>(int)$summery->total_cmsc
+        ];
 		//heading
 		$data['heading'] = 'Summary Data';
 		
