@@ -316,7 +316,7 @@ LEFT JOIN (
             aafu.crop_coverage_id
     ) fup ON acc.id = fup.crop_coverage_id
     WHERE
-        acc.deleted_at IS NULL";
+        acc.deleted_at IS NULL AND acc.status = 1";
 
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(acc.season) = '" . $filter['season'] . "'";

@@ -30,8 +30,10 @@ class Grampanchayat extends AdminController
 
 		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
 
-			$id = $this->grampanchayatModel->insert($this->request->getPost());
 
+			$id = $this->grampanchayatModel->insert($this->request->getPost());
+			// printr($this->request->getPost());
+			// exit;
 			$this->session->setFlashdata('message', 'Grampanchayat Saved Successfully.');
 
 			return redirect()->to(base_url('admin/areacoverage/grampanchayat'));
@@ -44,6 +46,8 @@ class Grampanchayat extends AdminController
 		$this->template->set_meta_title(lang('Grampanchayat.heading_title'));
 
 		if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
+			// printr($_POST);
+			// exit;
 			$id = $this->uri->getSegment(4);
 
 			$this->grampanchayatModel->update($id, $this->request->getPost());
