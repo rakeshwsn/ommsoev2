@@ -334,7 +334,7 @@ LEFT JOIN (
         $sql .= "
     GROUP BY
         acc.district_id
-) ach ON ach.district_id = sd.id";
+) ach ON ach.district_id = sd.id ORDER BY district";
 
         return $this->db->query($sql)->getResultArray();
 
