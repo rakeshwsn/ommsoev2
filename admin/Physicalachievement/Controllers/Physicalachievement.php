@@ -216,7 +216,7 @@ class Physicalachievement extends AdminController
             $this->pcmachieve->addPhysicalachData($this->request->getPost());
             $this->session->setFlashdata('message', 'Physical Targets added Successfully.');
 
-            return redirect()->to(base_url('admin/physicalachievement'));
+            return redirect()->to(base_url('admin/phyachtraining'));
         }
         $this->getForm();
     }
