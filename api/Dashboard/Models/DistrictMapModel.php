@@ -82,7 +82,7 @@ FROM soe_districts sd
       year_id,
       SUM(achievement) demo_area
     FROM dashboard_areacoverage
-    WHERE deleted_at IS NULL) ac
+    WHERE deleted_at IS NULL GROUP BY year_id) ac
     ON ac.year_id = dm.year_id
 WHERE dm.deleted_at IS NULL
 AND dm.year_id =$year_id";
