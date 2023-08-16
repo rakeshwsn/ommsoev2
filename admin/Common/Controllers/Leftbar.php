@@ -549,7 +549,7 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission("phyachtraining")) {
             $mprcomponent[] = [
-                "name" => "MPR Ach Training",
+                "name" => "MPR Ach Training Report",
                 "href" => admin_url("phyachtraining"),
                 "heading" => 0,
                 "children" => [],
@@ -557,7 +557,7 @@ class Leftbar extends AdminController
         }
         if ($this->user->hasPermission("phyachenterprise")) {
             $mprcomponent[] = [
-                "name" => "MPR Ach Enterprises",
+                "name" => "MPR Ach Enterprises Report",
                 "href" => admin_url("phyachenterprise"),
                 "heading" => 0,
                 "children" => [],
