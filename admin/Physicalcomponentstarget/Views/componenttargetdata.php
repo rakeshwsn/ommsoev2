@@ -59,7 +59,7 @@ $user  = service('user');
             </div>
             <div class="block-content block-content-full">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id">
                         <?php foreach($allYears as $allYear){?>
@@ -67,9 +67,15 @@ $user  = service('user');
                                 <?php } ?>
                         </select>
                     </div>
-                    <div class="col-md-2" style="margin: 23px;">
+                    <div class="col-md-4" style="margin: 23px;">
                         <button id="btn-filter" class="btn btn-outline btn-primary"><i class="fa fa-filter"></i> Filter</button>
                     </div>
+                    <?php if ($user->district_id && $checkExists!=0) { ?>
+
+                    <div class="col-md-3" style="margin: 23px;">
+                    <a href="<?php echo $addachForm; ?>" data-toggle="tooltip" title="Add" class="btn btn-outline btn-primary"><i class="fa fa-plus"></i> Add Achivements</a>
+                    </div>
+                    <?php } ?>
                 </div>
             </div>
         </div>
