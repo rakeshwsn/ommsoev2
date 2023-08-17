@@ -70,13 +70,19 @@ $validation = \Config\Services::validation();
                 } else {
                     $main = "";
                 }
+
                 ?>
                 <div class="budgetplan">
                     <?php $user  = service('user'); ?>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="input-category">District</label>
                         <div class="col-sm-10">
-                            <?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name', array("0" => "select District")), set_value('district_id', $user->district_id), "id='district_id' class='form-control select2' $main"); ?>
+
+                            <select name="district_id" id="district_id" class='form-control select2' <?php echo $main; ?>>
+                                <?php foreach ($districts as $district) : ?>
+                                    <option value="<?php echo $district->district_id ?>" data-fundagency="<?php echo $district->fund_agency_id ?>" <?php echo ($district->district_id == $user->district_id && $district->fund_agency_id == $user->fund_agency_id) ? 'selected="selected"' : '' ?>><?php echo $district->district_formatted ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -159,6 +165,7 @@ $validation = \Config\Services::validation();
         // Handle change event on district and year select elements
         $('#district_id, #year_id, #month_id').change(function() {
             var districtId = $('#district_id').val();
+            var fundAgencyId = $('#district_id option:selected').data('fundagency');
             var yearId = $('#year_id').val();
             var monthId = $('#month_id').val();
             var monthName = $("#month_id option:selected").text().trim();
@@ -169,6 +176,7 @@ $validation = \Config\Services::validation();
                 method: 'POST',
                 data: {
                     district_id: districtId,
+                    fund_agency_id: fundAgencyId,
                     year_id: yearId,
                     month_id: monthId,
                     month_name: monthName,
@@ -176,7 +184,7 @@ $validation = \Config\Services::validation();
                 },
                 success: function(response) {
 
-                    //console.log("hello");
+                    //  console.log(fundAgencyId);
                     $('#datatable').html(response);
                     $('.currentMonth').trigger('input');
 
@@ -221,35 +229,35 @@ $validation = \Config\Services::validation();
         });
 
         $(document).on('input', '.fwsg', function() {
-            var that=$(this);
+            var that = $(this);
             var $row = $(this).closest('tr');
             var currentMonthValue = $row.find(".currentMonth").val();
             var fpo = $row.find(".fpo");
             var wshg = $row.find(".wshg");
             var fpoValue = parseFloat(fpo.val());
             var wshgValue = parseFloat(wshg.val());
-            var thatt = parseInt(that.val().replace(/[^\d.]/g, '')) || 0 ;
-            fposhg=parseInt($(fpo).val())+parseInt($(wshg).val());
+            var thatt = parseInt(that.val().replace(/[^\d.]/g, '')) || 0;
+            fposhg = parseInt($(fpo).val()) + parseInt($(wshg).val());
 
-            $(fpo).val(fpoValue) ;
-             $(wshg).val(wshgValue) ;
+            $(fpo).val(fpoValue);
+            $(wshg).val(wshgValue);
 
-            if(thatt > currentMonthValue){
-               $(fpo).val(0) ;
-               $(wshg).val(0) ; // = 0;
+            if (thatt > currentMonthValue) {
+                $(fpo).val(0);
+                $(wshg).val(0); // = 0;
 
             }
 
             if (that.is(fpo)) {
-                fpoval=currentMonthValue-$(fpo).val();
+                fpoval = currentMonthValue - $(fpo).val();
                 $(wshg).val(fpoval);
-            }else{
-                wshgval=currentMonthValue-$(wshg).val();
+            } else {
+                wshgval = currentMonthValue - $(wshg).val();
                 $(fpo).val(wshgval);
             }
 
 
-           // $row.find('.fpo').val(fpo);
+            // $row.find('.fpo').val(fpo);
             //$row.find('.cumulative').val(cumulativeTotal);
         });
 
