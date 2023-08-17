@@ -124,6 +124,7 @@ class PhysicalachievementModel extends Model
               ON mctd.mprcomponents_master_id = mctm.id
           WHERE mctm.district_id = " . $filter['district_id'] . "
           AND mctm.year_id = " . $filter['year_id'] . "
+          AND mctm.fund_agency_id = " . $filter['fund_agency_id'] . "
         ) target ON target.mpr_component_id = mc.id
         LEFT JOIN (
           SELECT
@@ -159,7 +160,7 @@ class PhysicalachievementModel extends Model
         $nextYearAprilMonth = 4;
 
         $sql = "SELECT
-        dist.id AS district_id,
+        dist.district_id AS district_id,
         dist.district,
         dist.total_block";
         $componets=$this->getMprComponents($data['year_id']);
@@ -167,20 +168,27 @@ class PhysicalachievementModel extends Model
         $sql .= " , comp_target{$comp['id']}.target{$comp['id']},upto_ach{$comp['id']}.upto_ach{$comp['id']},curr_ach{$comp['id']}.cur_ach{$comp['id']} ";
         }
         $sql .= " FROM (SELECT
-          sd.id,
-          sd.name AS district,
-          COUNT(sb.id) total_block
-        FROM soe_districts sd
-          LEFT JOIN soe_blocks sb
-            ON sb.district_id = sd.id where 1=1";
+        sd.district_id district_id,
+        CASE WHEN sd.fund_agency_id > 1 THEN CONCAT(sd.district, ' DMF') ELSE sd.district END AS district,
+        sd.fund_agency_id,
+        COALESCE(COUNT(sb.id), 0) total_block
+      FROM vw_district_fund_agency sd
+        LEFT JOIN soe_blocks sb
+          ON sb.district_id = sd.district_id
+      WHERE sb.fund_agency_id = sd.fund_agency_id";
             if (!empty($data['district_id'])) {
                 $sql .= " and sb.district_id = " . $data['district_id'];
             }
+            if (!empty($data['fund_agency_id'])) {
+              $sql .= " and sb.fund_agency_id = " . $data['fund_agency_id'];
+          }
             $sql .= "
-        GROUP BY sb.district_id) dist";
+            GROUP BY sd.district_id,
+           sd.fund_agency_id) dist";
 
           foreach($componets as $comp){
             $sql.=" LEFT JOIN (SELECT
+            mctm.fund_agency_id,
             mctm.district_id,
             SUM(mctd.no_total) AS target{$comp['id']}
           FROM mpr_components_target_master mctm
@@ -188,9 +196,10 @@ class PhysicalachievementModel extends Model
               ON mctm.id = mctd.mprcomponents_master_id
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mctd.mpr_component_id = {$comp['id']}
-          GROUP BY mctm.district_id) comp_target{$comp['id']}
-          ON comp_target{$comp['id']}.district_id = dist.id
+          GROUP BY mctm.fund_agency_id,mctm.district_id) comp_target{$comp['id']}
+          ON comp_target{$comp['id']}.district_id = dist.district_id AND comp_target{$comp['id']}.fund_agency_id = dist.fund_agency_id
          LEFT JOIN (SELECT
+         mctm.fund_agency_id,
             mctm.district_id,
             SUM(mcad.no_total) AS upto_ach{$comp['id']}
           FROM mpr_components_target_master mctm
@@ -199,9 +208,10 @@ class PhysicalachievementModel extends Model
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mcad.mpr_component_id = {$comp['id']}
           AND mcad.month_id BETWEEN 4 AND " . $preMonth . "
-          GROUP BY mctm.district_id) upto_ach{$comp['id']}
-          ON upto_ach{$comp['id']}.district_id = dist.id
+          GROUP BY mctm.fund_agency_id,mctm.district_id) upto_ach{$comp['id']}
+          ON upto_ach{$comp['id']}.district_id = dist.district_id AND upto_ach{$comp['id']}.fund_agency_id = dist.fund_agency_id
         LEFT JOIN (SELECT
+        mctm.fund_agency_id,
             mctm.district_id,
             SUM(mcad.no_total) AS cur_ach{$comp['id']}
           FROM mpr_components_target_master mctm
@@ -210,8 +220,8 @@ class PhysicalachievementModel extends Model
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mcad.mpr_component_id = {$comp['id']}
           AND mcad.month_id = " . $data['month_id'] . "
-          GROUP BY mctm.district_id) curr_ach{$comp['id']}
-          ON curr_ach{$comp['id']}.district_id = dist.id";
+          GROUP BY mctm.fund_agency_id,mctm.district_id) curr_ach{$comp['id']}
+          ON curr_ach{$comp['id']}.district_id = dist.district_id AND curr_ach{$comp['id']}.fund_agency_id = dist.fund_agency_id";
         }
         $sql .= " ORDER BY dist.district ASC";
        // echo $sql; exit;
@@ -238,7 +248,7 @@ class PhysicalachievementModel extends Model
         $nextYearAprilMonth = 4;
 
         $sql = "SELECT
-        dist.id AS district_id,
+        dist.district_id AS district_id,
         dist.district,
         dist.total_block";
         $componets=$this->getMprComponentsEnt($data['year_id']);
@@ -246,20 +256,27 @@ class PhysicalachievementModel extends Model
         $sql .= " , comp_target{$comp['id']}.target{$comp['id']},upto_ach{$comp['id']}.upto_fpo{$comp['id']},upto_ach{$comp['id']}.upto_wshg{$comp['id']},curr_ach{$comp['id']}.cur_fpo{$comp['id']}, curr_ach{$comp['id']}.cur_wshg{$comp['id']} ";
         }
         $sql .= " FROM (SELECT
-          sd.id,
-          sd.name AS district,
-          COUNT(sb.id) total_block
-        FROM soe_districts sd
-          LEFT JOIN soe_blocks sb
-            ON sb.district_id = sd.id where 1=1";
+        sd.district_id district_id,
+        CASE WHEN sd.fund_agency_id > 1 THEN CONCAT(sd.district, ' DMF') ELSE sd.district END AS district,
+        sd.fund_agency_id,
+        COALESCE(COUNT(sb.id), 0) total_block
+      FROM vw_district_fund_agency sd
+        LEFT JOIN soe_blocks sb
+          ON sb.district_id = sd.district_id
+      WHERE sb.fund_agency_id = sd.fund_agency_id";
             if (!empty($data['district_id'])) {
                 $sql .= " and sb.district_id = " . $data['district_id'];
             }
+            if (!empty($data['fund_agency_id'])) {
+              $sql .= " and sb.fund_agency_id = " . $data['fund_agency_id'];
+          }
             $sql .= "
-        GROUP BY sb.district_id) dist";
+            GROUP BY sd.district_id,
+            sd.fund_agency_id) dist";
 
           foreach($componets as $comp){
             $sql.=" LEFT JOIN (SELECT
+            mctm.fund_agency_id,
             mctm.district_id,
             SUM(mctd.no_total) AS target{$comp['id']}
           FROM mpr_components_target_master mctm
@@ -267,9 +284,10 @@ class PhysicalachievementModel extends Model
               ON mctm.id = mctd.mprcomponents_master_id
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mctd.mpr_component_id = {$comp['id']}
-          GROUP BY mctm.district_id) comp_target{$comp['id']}
-          ON comp_target{$comp['id']}.district_id = dist.id
+          GROUP BY mctm.district_id,mctm.fund_agency_id) comp_target{$comp['id']}
+          ON comp_target{$comp['id']}.district_id = dist.district_id AND comp_target{$comp['id']}.fund_agency_id = dist.fund_agency_id
          LEFT JOIN (SELECT
+         mctm.fund_agency_id,
             mctm.district_id,
             SUM(mcad.wshg) AS upto_wshg{$comp['id']},
             SUM(mcad.fpo) AS upto_fpo{$comp['id']}
@@ -279,9 +297,10 @@ class PhysicalachievementModel extends Model
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mcad.mpr_component_id = {$comp['id']}
           AND mcad.month_id BETWEEN 4 AND " . $preMonth . "
-          GROUP BY mctm.district_id) upto_ach{$comp['id']}
-          ON upto_ach{$comp['id']}.district_id = dist.id
+          GROUP BY mctm.district_id,mctm.fund_agency_id) upto_ach{$comp['id']}
+          ON upto_ach{$comp['id']}.district_id = dist.district_id AND upto_ach{$comp['id']}.fund_agency_id = dist.fund_agency_id
         LEFT JOIN (SELECT
+        mctm.fund_agency_id,
             mctm.district_id,
             SUM(mcad.fpo) AS cur_fpo{$comp['id']},
             SUM(mcad.wshg) AS cur_wshg{$comp['id']}
@@ -291,11 +310,11 @@ class PhysicalachievementModel extends Model
           WHERE mctm.year_id = " . $data['year_id'] . "
           AND mcad.mpr_component_id = {$comp['id']}
           AND mcad.month_id = " . $data['month_id'] . "
-          GROUP BY mctm.district_id) curr_ach{$comp['id']}
-          ON curr_ach{$comp['id']}.district_id = dist.id";
+          GROUP BY mctm.district_id,mctm.fund_agency_id) curr_ach{$comp['id']}
+          ON curr_ach{$comp['id']}.district_id = dist.district_id AND curr_ach{$comp['id']}.fund_agency_id = dist.fund_agency_id";
         }
         $sql .= " ORDER BY dist.district ASC";
-        // echo $sql; exit;
+      //  echo $sql; exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -361,6 +380,9 @@ class PhysicalachievementModel extends Model
         if (isset($filter['district_id'])) {
             $builder->where('mpr_components_target_master.district_id', $filter['district_id']);
         }
+        if (isset($filter['fund_agency_id'])) {
+          $builder->where('mpr_components_target_master.fund_agency_id', $filter['fund_agency_id']);
+      }
         if (isset($filter['year_id'])) {
             $builder->where('mpr_components_target_master.year_id', $filter['year_id']);
         }
