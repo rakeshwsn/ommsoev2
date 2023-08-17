@@ -123,16 +123,16 @@
                             <td>
                                 <?= $data["KODO_MILLET_FOLLOWUP"]; ?>
                             </td>
-                            <td id="ragi">
+                            <td id="ragi" class="ragi">
                                 <?= $data["RAGI_SMI"] + $data["RAGI_LT"] + $data["RAGI_LS"]; ?>
                             </td>
-                            <td id="non-ragi">
+                            <td id="non-ragi" class="non-ragi">
                                 <?= $data["LITTLE_MILLET_LT"] + $data["LITTLE_MILLET_LS"] + $data["FOXTAIL_MILLET_LS"] + $data["SORGHUM_LS"] + $data["PEARL_MILLET_LS"] + $data["BARNYARD_MILLET_LS"] + $data["KODO_MILLET_LS"]; ?>
                             </td>
-                            <td id="follow-up">
+                            <td id="follow-up" class="follow-up">
                                 <?= $data["RAGI_FOLLOWUP"] + $data["LITTLE_MILLET_FOLLOWUP"] + $data["FOXTAIL_MILLET_FOLLOWUP"] + $data["SORGHUM_FOLLOWUP"] + $data["PEARL_MILLET_FOLLOWUP"] + $data["BARNYARD_MILLET_FOLLOWUP"] + $data["KODO_MILLET_FOLLOWUP"]; ?>
                             </td>
-                            <td id="sum-crop"> </td>
+                            <td id="sum-crop" class="sum-crop"> </td>
                             <td>
                                 <div class="btn-group btn-group-sm pull-right">
                                     <a class="btn btn-sm btn-primary"
@@ -142,40 +142,37 @@
                             </td>
 
                         </tr>
+
                     <?php } ?>
                     <tr>
                         <td colspan="18" class="text-right">Total District Target</td>
-                        <td colspan="3"></td>
-                        <td id="total-sum-crop"></td>
+                        <td colspan="5" class="all-total"></td>
+
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 <script>
-    // Get the values from the previous columns and calculate the sum
-    var column1Value = parseFloat(document.getElementById("ragi").textContent);
-    var column2Value = parseFloat(document.getElementById("non-ragi").textContent);
-    var column3Value = parseFloat(document.getElementById("follow-up").textContent);
+    $(document).ready(function () {
+        $('tr').not(':last-child').each(function () {
+            var row = $(this);
+            var column1Value = parseFloat(row.find('.ragi').text());
+            var column2Value = parseFloat(row.find('.non-ragi').text());
+            var column3Value = parseFloat(row.find('.follow-up').text());
 
-    var sum = column1Value + column2Value + column3Value;
+            var sum = column1Value + column2Value + column3Value;
 
-    // Display the calculated sum in the sumColumn
-    document.getElementById("sum-crop").textContent = sum;
+            row.find('.sum-crop').text(sum);
+        });
+
+        var totalSum = 0;
+        $('.sum-crop').each(function () {
+            totalSum += parseFloat($(this).text());
+        });
+
+        $('.all-total').text(totalSum);
+    });
 </script>
-
-// Initialize the total sum
-var totalSumCrop = 0;
-
-// Iterate through all the "sum-crop" elements and accumulate their values
-var sumCropElements = document.querySelectorAll("#sum-crop");
-sumCropElements.forEach(function(element) {
-var value = parseFloat(element.textContent);
-console.log("Value:", value); // Debug statement
-totalSumCrop += value;
-});
-
-// Display the total sum of "sum-crop" values in the last row
-var totalSumCell = document.querySelector("#total-sum-crop");
-totalSumCell.textContent = totalSumCrop;
