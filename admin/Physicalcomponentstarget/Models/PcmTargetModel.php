@@ -105,35 +105,45 @@ class PcmTargetModel extends Model
     public function addPhysicaltargetdata($data)
     {
         $yearid = $data['year_id'];
+        $checkyear = $this->db->table('mpr_components_target_master')
+            ->where('year_id', $yearid)
+            ->get()
+            ->getRow();
 
+        if ($checkyear) {
+            return 0;
+        } else {
 
-        if (isset($data['component'])) {
-            $masterTableData = array();
-            $targetData = array();
+            if (isset($data['component'])) {
+                $masterTableData = array();
+                $targetData = array();
 
-            foreach ($data['component'] as $districtId => $targetMultiple) {
-                $masterTableData = array(
-                    "year_id" => $yearid,
-                    "district_id" => $districtId,
-                );
-
-                // $masterTableId = array();
-
-                $this->db->table("mpr_components_target_master")->insert($masterTableData);
-                $masterTableId =  $this->db->insertID();
-
-                foreach ($targetMultiple as $componentId => $targetValue) {
-                    $targetData = array(
-                        "mprcomponents_master_id" => $masterTableId,
-                        "mpr_component_id" => $componentId,
-                        "no_total" => $targetValue ? $targetValue : 0,
+                foreach ($data['component'] as  $targetMultiple) {
+                    $masterTableData = array(
+                        "year_id" => $yearid,
+                        "district_id" => $targetMultiple['district_id'],
+                        "fund_agency_id" => $targetMultiple['fund_agency_id'],
                     );
-                    $targetTable = $this->db->table("mpr_components_target_data")->insert($targetData);
+
+                    // $masterTableId = array();
+
+                    $this->db->table("mpr_components_target_master")->insert($masterTableData);
+                    $masterTableId =  $this->db->insertID();
+
+                    foreach ($targetMultiple['data'] as $componentId => $targetValue) {
+                        $targetData = array(
+                            "mprcomponents_master_id" => $masterTableId,
+                            "mpr_component_id" => $componentId,
+                            "no_total" => $targetValue ? $targetValue : 0,
+                        );
+                        $targetTable = $this->db->table("mpr_components_target_data")->insert($targetData);
+                    }
                 }
             }
         }
 
-        //  printr($masterTableData); exit;
+
+        // printr($masterTableData); exit;
     }
 
     public function updateMasterData($data)
@@ -141,8 +151,8 @@ class PcmTargetModel extends Model
         $yearId = $data['year_id'];
 
         if (isset($data['component'])) {
-            foreach ($data['component'] as $districtId => $targetMultiple) {
-                $masterTableIds = $this->getMasterDataId($yearId, $districtId);
+            foreach ($data['component'] as $targetMultiple) {
+                $masterTableIds = $this->getMasterDataId($yearId, $targetMultiple['district_id'], $targetMultiple['fund_agency_id']);
 
                 // Delete existing data for each master table ID
                 foreach ($masterTableIds as $masterTableId) {
@@ -152,12 +162,12 @@ class PcmTargetModel extends Model
                 }
 
                 // Insert new data
-                foreach ($targetMultiple as $componentId => $targetValue) {
+                foreach ($targetMultiple['data'] as $componentId => $targetValue) {
                     foreach ($masterTableIds as $masterTableId) {
                         $insertData = array(
                             'mprcomponents_master_id' => $masterTableId,
                             'mpr_component_id' => $componentId,
-                            'no_total' => $targetValue ?: 0,
+                            'no_total' => $targetValue ? $targetValue : 0,
                         );
 
                         $this->db->table('mpr_components_target_data')
@@ -169,12 +179,13 @@ class PcmTargetModel extends Model
     }
 
 
-    public function getMasterDataId($yearId, $districtId)
+    public function getMasterDataId($yearId, $districtId, $fund_agency_id)
     {
         $results = $this->db->table('mpr_components_target_master')
             ->select('id')
             ->where('year_id', $yearId)
             ->where('district_id', $districtId)
+            ->where('fund_agency_id', $fund_agency_id)
             ->get()
             ->getResult();
 
@@ -193,20 +204,24 @@ class PcmTargetModel extends Model
     {
         $sql = "SELECT
         mc_dist.district_id,
-        mc_dist.district,
-        mc_dist.mc_id,
-        mc_dist.description,
-        mcm.year_id,
-        mctd.mprcomponents_master_id,
-        CASE WHEN mctd.no_total IS NULL THEN 0 ELSE mctd.no_total END AS total
+  mc_dist.district,
+  mc_dist.mc_id,
+  mc_dist.description,
+  mcm.year_id,
+  mctd.mprcomponents_master_id,
+  CASE WHEN mctd.no_total IS NULL THEN 0 ELSE mctd.no_total END AS total
       FROM (SELECT
-          sd.id district_id,
-          sd.name district,
-          mc.id mc_id,
-          mc.year_id,
-          mc.description
-        FROM soe_districts sd
-          CROSS JOIN mpr_components mc WHERE mc.year_id <= " . $filter['year_id'] . ") mc_dist
+    sd.district_id,
+    CASE WHEN sd.fund_agency_id > 1
+         THEN CONCAT(sd.district, ' DMF')
+         ELSE sd.district
+    END AS district,
+    sd.fund_agency_id,
+    mc.id mc_id,
+    mc.year_id,
+    mc.description
+  FROM vw_district_fund_agency sd
+    CROSS JOIN mpr_components mc WHERE mc.year_id <= " . $filter['year_id'] . ") mc_dist
         LEFT JOIN (SELECT * FROM mpr_components_target_master mctm ";
 
         if (empty($filter['district_id'])) {
@@ -214,18 +229,31 @@ class PcmTargetModel extends Model
         }
 
         $sql .= ") mcm
-          ON mc_dist.district_id = mcm.district_id
+          ON mc_dist.district_id = mcm.district_id AND mc_dist.fund_agency_id=mcm.fund_agency_id
         LEFT JOIN mpr_components_target_data mctd
           ON mctd.mprcomponents_master_id = mcm.id
           AND mctd.mpr_component_id = mc_dist.mc_id
       WHERE mcm.deleted_at IS NULL ";
         if ($filter['district_id']) {
-            $sql .= " AND mc_dist.district_id = " . $filter['district_id'] . " AND mcm.year_id = " . $filter['year_id'];
+            $sql .= " AND mc_dist.district_id = " . $filter['district_id'] . " AND mcm.year_id = " . $filter['year_id'] . " AND mc_dist.fund_agency_id = " . $filter['fund_agency_id'];
         }
         $sql .= " ORDER BY mc_dist.district ASC, mc_dist.mc_id ASC";
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResultArray();
     }
 
+
+    public function showTargetDistrict($filter = [])
+    {
+        $sql = "SELECT *,CASE WHEN fund_agency_id > 1 THEN CONCAT(district, ' DMF') ELSE district
+        END AS district_formatted
+    FROM vw_district_fund_agency";
+        $sql .= " ORDER BY district_formatted ASC";
+        // echo $sql;
+        // exit;
+        return $this->db->query($sql)->getResult();
+    }
 
     public function getTargetcomponent($filter = [])
     {
@@ -233,25 +261,28 @@ class PcmTargetModel extends Model
         mc_dist.district_id,
         mc_dist.district,
         mc_dist.mc_id,
+        mc_dist.fund_agency_id,
         mc_dist.description,
         mcm.year_id,
         mctd.mprcomponents_master_id,
         CASE WHEN mctd.no_total IS NULL THEN 0 ELSE mctd.no_total END AS total
       FROM (SELECT
-          sd.id district_id,
-          sd.name district,
+      sd.district_id district_id,
+    sd.district district,
+      sd.fund_agency_id,
           mc.id mc_id,
           mc.year_id,
           mc.description
-        FROM soe_districts sd
+        FROM vw_district_fund_agency sd
           CROSS JOIN mpr_components mc) mc_dist
         LEFT JOIN mpr_components_target_master mcm
-          ON mc_dist.district_id = mcm.district_id
+          ON mc_dist.district_id = mcm.district_id AND mc_dist.fund_agency_id=mcm.fund_agency_id
         LEFT JOIN mpr_components_target_data mctd
           ON mctd.mprcomponents_master_id = mcm.id
           AND mctd.mpr_component_id = mc_dist.mc_id
       WHERE mcm.deleted_at IS NULL AND mcm.year_id = " . $filter['year_id'] . "
       ORDER BY mc_dist.district ASC, mc_dist.description ASC";
+        //echo $sql ; exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -273,6 +304,10 @@ class PcmTargetModel extends Model
             $builder->where('district_id', $filter['district_id']);
         }
 
+        if (isset($filter['fund_agency_id'])) {
+            $builder->where('fund_agency_id', $filter['fund_agency_id']);
+        }
+
         if (isset($filter['year_id'])) {
             $builder->where('year_id', $filter['year_id']);
         }
@@ -287,6 +322,10 @@ class PcmTargetModel extends Model
 
         if (isset($filter['district_id'])) {
             $builder->where('district_id', $filter['district_id']);
+        }
+
+        if (isset($filter['fund_agency_id'])) {
+            $builder->where('fund_agency_id', $filter['fund_agency_id']);
         }
 
         if (isset($filter['year_id'])) {
