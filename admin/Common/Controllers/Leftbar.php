@@ -516,6 +516,15 @@ class Leftbar extends AdminController
             ];
         }
 
+        if ($this->user->hasPermission("areacoverage/delete")) {
+            $areacoverage[] = [
+                "name" => 'Delete Area Coverage',
+                "href" => admin_url("areacoverage/delete"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
         if ($areacoverage) {
             $data["menus"][] = [
                 "id" => "menu-areacoverage",

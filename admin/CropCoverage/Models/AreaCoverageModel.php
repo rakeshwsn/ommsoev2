@@ -233,7 +233,7 @@ FROM ac_crop_practices acp
             }
 
         } else if (!empty($filter['district_id'])) {
-            $sql = "SELECT ac.*,
+            $sql = "SELECT ac.*,b.id block_id,
   b.name block,bgps.gps total_gps FROM soe_blocks b 
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc 
@@ -505,5 +505,22 @@ FROM vw_districtwise_blocks_gps vdbg
     ON ac.district_id = vdbg.district_id ORDER BY vdbg.district";
 
         return $this->db->query($sql)->getResult();
+    }
+
+    public function deleteAll($filter=null)
+    {
+        $b = $this->db->table($this->table);
+        $ac = $b->where($filter)->get()->getResult();
+
+        foreach ($ac as $item) {
+            $b = $this->db->table($this->table);
+            $b->where('id',$item->id)->delete();
+            $b = $this->db->table('ac_area_follow_up');
+            $b->where('crop_coverage_id',$item->id)->delete();
+            $b = $this->db->table('ac_area_practices');
+            $b->where('crop_coverage_id',$item->id)->delete();
+            $b = $this->db->table('ac_nursery');
+            $b->where('crop_coverage_id',$item->id)->delete();
+        }
     }
 }
