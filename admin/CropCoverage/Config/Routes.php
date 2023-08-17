@@ -19,6 +19,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('areacoverage/download', 'CropCoverage\Controllers\AreaCoverage::download');
     $routes->add('areacoverage/upload', 'CropCoverage\Controllers\AreaCoverage::upload');
     $routes->add('areacoverage/edit', 'CropCoverage\Controllers\AreaCoverage::edit');
+    $routes->add('areacoverage/delete', 'CropCoverage\Controllers\AreaCoverage::delete');
     $routes->get('areacoverage/approve', 'CropCoverage\Controllers\Approve::index');
     $routes->add('areacoverage/approve/block', 'CropCoverage\Controllers\Approve::block');
     $routes->get('areacoverage/dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
