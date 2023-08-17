@@ -75,15 +75,14 @@ FROM soe_districts sd
 		SUM(tentative_farmers) total_farmers,
 		SUM(chcs) total_chc,
 		SUM(cmscs) total_cmsc,
-        demo_area
+        SUM(demo_area) demo_area
 	  FROM dashboard_district_map dm
 	  LEFT JOIN dashboard_years y ON dm.year_id=y.id 
   LEFT JOIN (SELECT
       year_id,
       SUM(achievement) demo_area
     FROM dashboard_areacoverage
-    WHERE deleted_at IS NULL
-    GROUP BY year_id) ac
+    WHERE deleted_at IS NULL GROUP BY year_id) ac
     ON ac.year_id = dm.year_id
 WHERE dm.deleted_at IS NULL
 AND dm.year_id =$year_id";

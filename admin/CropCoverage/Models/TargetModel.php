@@ -255,6 +255,7 @@ FROM ac_crops ac
         return $query->getResultArray();
 
     }
+
     public function getDistrictWiseTarget($filter)
     {
         $year_id = $filter['year_id'];
