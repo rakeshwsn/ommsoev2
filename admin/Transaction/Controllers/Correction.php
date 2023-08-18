@@ -107,42 +107,46 @@ class Correction extends AdminController {
 
         $data['modules'] = (new CommonModel())->getModules();
 
-        foreach ($data['upload_statuses'] as &$status) {
-            if($status->status==0){
-                $status->status = '<label class="badge badge-warning">'.$this->statuses[$status->status].'</label>';
+        foreach ($data['upload_statuses'] as &$upload_status) {
+            $status = $upload_status->status;
+            if($upload_status->status==0){
+                $upload_status->status = '<label class="badge badge-warning">'.$this->statuses[$upload_status->status].'</label>';
             }
-            if($status->status==1){
-                $status->status = '<label class="badge badge-success">'.$this->statuses[$status->status].'</label>';
+            if($upload_status->status==1){
+                $upload_status->status = '<label class="badge badge-success">'.$this->statuses[$upload_status->status].'</label>';
             }
-            if($status->status==2){
-                $status->status = '<label class="badge badge-danger">'.$this->statuses[$status->status].'</label>';
+            if($upload_status->status==2){
+                $upload_status->status = '<label class="badge badge-danger">'.$this->statuses[$upload_status->status].'</label>';
             }
-            if($status->status==3){
-                $status->status = '<label class="badge badge-info">'.$this->statuses[$status->status].'</label>';
-            }
-
-            $status->action = '';
-            $url_params = '?txn_type='.$status->transaction_type
-                .'&txn_id='.$status->txn_id
-                .'&year='.$status->year_id
-                .'&month='.$status->month_id
-                .'&block_id='.$status->block_id
-                .'&agency_type_id='.$status->agency_type_id
-                .'&fund_agency_id='.$status->fund_agency_id;
-            if($status->transaction_type=='fund_receipt' || $status->transaction_type=='expense'){
-                $status->action = site_url(Url::correctionTransaction.$url_params);
-            }
-            if($status->transaction_type=='other_receipt'){
-                $status->action = site_url(Url::correctionOtherReceipt.$url_params);
-            }
-            if($status->transaction_type=='closing_balance'){
-                $status->action = site_url(Url::correctionClosingBalance.$url_params);
-            }
-            if($status->transaction_type=='mis'){
-                $status->action = site_url(Url::correctionMIS.$url_params);
+            if($upload_status->status==3){
+                $upload_status->status = '<label class="badge badge-info">'.$this->statuses[$upload_status->status].'</label>';
             }
 
-            $status->created_at = $status->created_at ? ymdToDmy($status->created_at):'-';
+            $upload_status->action = '';
+            $url_params = '?txn_type='.$upload_status->transaction_type
+                .'&txn_id='.$upload_status->txn_id
+                .'&year='.$upload_status->year_id
+                .'&month='.$upload_status->month_id
+                .'&block_id='.$upload_status->block_id
+                .'&agency_type_id='.$upload_status->agency_type_id
+                .'&fund_agency_id='.$upload_status->fund_agency_id;
+            $upload_status->action = '';
+            if($status != 3) {
+                if ($upload_status->transaction_type == 'fund_receipt' || $upload_status->transaction_type == 'expense') {
+                    $upload_status->action = site_url(Url::correctionTransaction . $url_params);
+                }
+                if ($upload_status->transaction_type == 'other_receipt') {
+                    $upload_status->action = site_url(Url::correctionOtherReceipt . $url_params);
+                }
+                if ($upload_status->transaction_type == 'closing_balance') {
+                    $upload_status->action = site_url(Url::correctionClosingBalance . $url_params);
+                }
+                if ($upload_status->transaction_type == 'mis') {
+                    $upload_status->action = site_url(Url::correctionMIS . $url_params);
+                }
+            }
+
+            $upload_status->created_at = $upload_status->created_at ? ymdToDmy($upload_status->created_at):'-';
         }
 
         return $this->template->view('Admin\Transaction\Views\correction', $data);
@@ -267,6 +271,7 @@ class Correction extends AdminController {
     public function otherReceipt() {
         helper('form');
         $txnModel = new MisctransactionModel();
+        $txnAmtModel = new MisctxnamtModel();
 
         $txn_id = $this->request->getGet('txn_id');
         $txn_type = $this->request->getGet('txn_type');
@@ -274,12 +279,23 @@ class Correction extends AdminController {
         $txn = $txnModel->find($txn_id);
 
         if($this->request->getMethod(1)=='POST'){
-            $txn_data = [
-                'status' => $this->request->getPost('status'),
-                'status_user' => $this->user->user_id,
-                'remarks' => $this->request->getPost('remarks')
-            ];
-            $txnModel->update($txn->id,$txn_data);
+            $head_data = [];
+
+            //delete existing
+            $txnAmtModel->where('txn_id',$txn_id)->delete();
+
+            //add new
+            foreach ($this->request->getPost('head') as $head_id => $head) {
+                $head_data[] = [
+                    'txn_id' => $txn_id,
+                    'head_id' => $head_id,
+                    'amount' => $head,
+                ];
+            }
+
+            if($head_data){
+                $txnAmtModel->insertBatch($head_data);
+            }
 
             $this->session->setFlashdata('message','Your changes have been saved.');
             $url_params = $this->getUrlParam();
@@ -330,9 +346,9 @@ class Correction extends AdminController {
 
         $data['approval'] = false;
 
-        $form_data = $this->getForm();
+        $data['approve_form'] = '';
 
-        $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
+        $data['correction'] = true;
 
         return $this->template->view('\Admin\Transaction\Views\approve_other_receipt', $data);
     }
@@ -359,14 +375,28 @@ class Correction extends AdminController {
 
         if($this->request->getMethod(1)=='POST'){
 
+            $cbModel->delete($cb->id);
+
             //insert
             $data = [
-                'status' => (int)$this->request->getPost('status'),
-                'status_user' => (int)$this->user->user_id,
-                'remarks' => (int)$this->request->getPost('remarks'),
+                'user_id' => $cb->user_id,
+                'month' => $cb->month,
+                'year' => $cb->year,
+                'block_id' =>$cb->block_id,
+                'district_id' => $cb->district_id,
+                'agency_type_id' => $cb->agency_type_id,
+                'fund_agency_id' => $cb->fund_agency_id,
+                'status' => $cb->status
             ];
 
-            $cbModel->update($cb->id,$data);
+            $data['advance'] = (float)$this->request->getPost('advance');
+            $data['advance_file'] = $cb->advance_file;
+            $data['bank'] = (float)$this->request->getPost('bank');
+            $data['bank_file'] = $cb->bank_file;
+            $data['cash'] = (float)$this->request->getPost('cash');
+            $data['cash_file'] = $cb->cash_file;
+
+            $cbModel->save($data);
 
             $this->session->setFlashdata('message','Your changes have been saved.');
             $url_params = $this->getUrlParam();
@@ -406,10 +436,11 @@ class Correction extends AdminController {
             $data['cash_file_url'] = anchor(base_url('uploads/cb/'.$cb->cash_file),$cb->cash_file,'target="_blank"');
         }
 
-        $data['approval'] = true;
+        $data['approval'] = false;
 
-        $form_data = $this->getForm();
-        $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
+        $data['approve_form'] = '';
+
+        $data['correction'] = true;
 
         return $this->template->view('\Admin\Transaction\Views\approve_closing_balance', $data);
     }
@@ -565,7 +596,8 @@ class Correction extends AdminController {
         $agency_type_id = $this->request->getGet('agency_type_id');
         $txn_type = $this->request->getGet('txn_type');
         $fund_agency_id = $this->request->getGet('fund_agency_id');
-        $block_id = $this->request->getGet('block_id');
+//        $block_id = $this->request->getGet('block_id');
+        $block_id = '';
         return '?year=' . $year
             . '&month=' . $month
             . '&year=' . $year

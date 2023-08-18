@@ -1248,7 +1248,7 @@ AND scb.month <= $month GROUP BY scb.block_id";
 
     }
 
-    public function getBlockUploadStatus() {
+    public function getBlockUploadStatus($filter=[]) {
 
         $sql = "SELECT
   bmym.district_id,
@@ -1258,7 +1258,7 @@ AND scb.month <= $month GROUP BY scb.block_id";
   sts.id txn_id,
   sts.created_at,
   bmym.module,
-  sts.transaction_type,
+  bmym.modulecode transaction_type,
   IFNULL(sts.status, 3) status,
   bmym.year_id,
   bmym.year,
@@ -1271,7 +1271,10 @@ AND scb.month <= $month GROUP BY scb.block_id";
 FROM (SELECT
     *
   FROM vw_block_modules
-    CROSS JOIN vw_all_year_month vaym
+    CROSS JOIN (SELECT
+        *
+      FROM vw_all_year_month
+      WHERE year_id = ".$filter['year_id']." AND month_id = ".$filter['month_id'].") vaym
     CROSS JOIN (SELECT
         ug.id agency_type_id,
         ug.name agency_type
@@ -1284,12 +1287,9 @@ FROM (SELECT
         if(!empty($filter['block_id'])){
             $sql .= " AND block_id = ".$filter['block_id'];
         }
-        if(!empty($filter['year_id'])){
-            $sql .= " AND year_id = ".$filter['year_id'];
-        }
-        if(!empty($filter['year_id']) && !empty($filter['month_id'])){
-            $sql .= " AND month_id = ".$filter['month_id'];
-        }
+//        if(!empty($filter['year_id']) && !empty($filter['month_id'])){
+//            $sql .= " AND month_id = ".$filter['month_id'];
+//        }
         $sql .= " ) bmym
   LEFT JOIN (SELECT
       st.id,
