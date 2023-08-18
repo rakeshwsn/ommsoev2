@@ -145,10 +145,21 @@ class Leftbar extends AdminController
             ];
         }
 
+        if ($this->user->hasPermission("correction")) {
+            $data["menus"][] = [
+                "id" => "menu-correction",
+                "icon" => "si si-folder-alt",
+                "name" => 'Correction',
+                "heading" => 0,
+                "href" => admin_url("correction"),
+                "children" => [],
+            ];
+        }
+
         if ($this->user->hasPermission("approve")) {
             $data["menus"][] = [
                 "id" => "menu-approve",
-                "icon" => "md-account-child",
+                "icon" => "si si-check",
                 "name" => lang("Leftbar.text_soe_approve"),
                 "heading" => 0,
                 "href" => admin_url("approve"),
