@@ -517,6 +517,16 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if (
+            $this->user->hasPermission("reports/areacoverage/blockWiseGetUploadStatus")
+        ) {
+            $areacoverage[] = [
+                "name" => "Block Wise Area Coverage Upload Status",
+                "href" => admin_url("reports/areacoverage/blockWiseGetUploadStatus"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("cropcoverage/crops")) {
             $areacoverage[] = [
