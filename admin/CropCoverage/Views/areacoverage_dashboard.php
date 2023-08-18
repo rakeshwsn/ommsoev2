@@ -187,7 +187,7 @@
             }
         },
         tooltip: {
-            valueSuffix: ' (some unit)'
+            valueSuffix: ''
         },
         plotOptions: {
             column: {

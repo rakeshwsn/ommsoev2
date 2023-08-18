@@ -134,29 +134,28 @@ class Transaction extends AdminController {
 
         $filter_search = $requestData['search']['value'];
 
-        $order_columns = array(
-            't.id','t.month','t.year','t.date_added','t.txn_type','t.agency_type_id'
-        );
-        $filter_data = array(
+        $order_columns = [
+            't.id','t.date_added','t.year','t.month','t.txn_type','t.agency_type_id'
+        ];
+        $filter_data = [
             'user_id' => $this->user->user_id,
             'filter_search' => $filter_search,
             'order' => $requestData['order'][0]['dir'],
             'sort' => $order_columns[$requestData['order'][0]['column']],
             'start' => $requestData['start'],
             'limit' => $requestData['length']
-        );
+        ];
 //        $totalFiltered = 0;
         $totalFiltered = $txnModel->getTotal($filter_data);
 
         $filteredData = $txnModel->getAll($filter_data);
 
-        $datatable=array();
+        $datatable = [];
 
         foreach($filteredData as $result) {
 
             $action  = '<div class="btn-group">';
             $action .= '<a class="btn btn-sm btn-primary" href="' . Url::transactionEdit.'/'.$result->id . '"><i class="fa fa-pencil"></i></a>';
-//            $action .= '<a class="btn btn-sm btn-danger btn-delete" href="' . Url::transactionDelete.'/'.$result->id . '"><i class="fa fa-trash"></i></a>';
             $action .= '</div>';
 
             if($result->status==0){
@@ -177,9 +176,9 @@ class Transaction extends AdminController {
 
             $datatable[]=array(
                 $result->id,
-                $result->month,
-                $result->year,
                 ymdToDmy($result->date_added),
+                $result->year,
+                $result->month,
                 $txn_type,
                 $result->agency_type,
                 $result->block,

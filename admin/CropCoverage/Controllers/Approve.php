@@ -71,6 +71,8 @@ class Approve extends AdminController
         } else {
             $data['district_id'] = $district_id = $this->user->district_id;
         }
+        $data['currentDay'] = date('l');
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
 
         $week_dates = $this->areacoveragemodel->getWeekDate();
 
@@ -82,15 +84,15 @@ class Approve extends AdminController
 
         $acModel = new AreaCoverageModel();
         //update status
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
             $acModel->where('district_id', $district_id)
                 ->where('start_date', $start_date)->set($status)->update();
-            return redirect()->to(admin_url('areacoverage/approve/district?district_id='.$district_id.'&start_date='.$start_date))
-                ->with('message','Status has been updated.');
+            return redirect()->to(admin_url('areacoverage/approve/district?district_id=' . $district_id . '&start_date=' . $start_date))
+                ->with('message', 'Status has been updated.');
         }
 
         $filter = [
@@ -247,13 +249,13 @@ class Approve extends AdminController
             }
         }
 
-        $district_status = $acModel->where('district_id',$district_id)
-            ->where('start_date',$start_date)->first();
+        $district_status = $acModel->where('district_id', $district_id)
+            ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
         $data['remarks'] = '';
         $data['status_color'] = '';
-        if($district_status){
+        if ($district_status) {
             $data['status'] = $this->statuses[$district_status->status];
             $data['status_color'] = $this->colors[$district_status->status];
             $data['remarks'] = $district_status->remarks;
@@ -279,6 +281,8 @@ class Approve extends AdminController
         $start_date = $this->request->getGet('start_date');
 
         $dates = $this->areacoveragemodel->getWeekDate($start_date);
+        $data['currentDay'] = date('l');
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
 
         if ($this->request->getMethod(1) == 'POST') {
             $filter = [
@@ -295,15 +299,15 @@ class Approve extends AdminController
 
         $acModel = new AreaCoverageModel();
         //update status
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
             $acModel->where('block_id', $block_id)
                 ->where('start_date', $start_date)->set($status)->update();
-            return redirect()->to(admin_url('areacoverage/approve/block?block_id='.$block_id.'&start_date='.$start_date))
-                ->with('message','Status has been updated.');
+            return redirect()->to(admin_url('areacoverage/approve/block?block_id=' . $block_id . '&start_date=' . $start_date))
+                ->with('message', 'Status has been updated.');
         }
 
         $filter = [
@@ -398,7 +402,7 @@ class Approve extends AdminController
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
 
-            $data['approved'] = $block->status==1;
+            $data['approved'] = $block->status == 1;
         }
 
         $data['blocks'][] = [
@@ -465,13 +469,13 @@ class Approve extends AdminController
 
         $data['week_start_date'] = $week_start_date;
 
-        $district_status = $acModel->where('block_id',$block_id)
-            ->where('start_date',$start_date)->first();
+        $district_status = $acModel->where('block_id', $block_id)
+            ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
         $data['remarks'] = '';
         $data['status_color'] = '';
-        if($district_status){
+        if ($district_status) {
             $data['status'] = $this->statuses[$district_status->status];
             $data['status_color'] = $this->colors[$district_status->status];
             $data['remarks'] = $district_status->remarks;

@@ -116,9 +116,9 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Month</th>
-                    <th>Year</th>
                     <th>Date Added</th>
+                    <th>Year</th>
+                    <th>Month</th>
                     <th>Txn Type</th>
                     <th>Agency Type</th>
                     <th>Block</th>
@@ -166,7 +166,7 @@
                 { targets: [5,6,7,8], orderable: false },
                 { targets: [0], visible: false },
             ],
-            order: [[1, 'desc'], [2, 'desc']],
+            order: [[1, 'desc']],
             "ajax":{
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 url :"<?=$datatable_url?>", // json datasource

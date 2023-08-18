@@ -1,6 +1,7 @@
 <?php
 namespace Admin\CropCoverage\Controllers;
 
+use Admin\Common\Models\YearModel;
 use Admin\CropCoverage\Models\AreaCoverageModel;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
@@ -19,8 +20,12 @@ class AreaCoverageTarget extends AdminController
 	private $cropsModel;
 	private $practicesModel;
 
+	private $acModel;
+
+
 	function __construct()
 	{
+		$this->acModel = new AreaCoverageModel();
 		$this->targetModel = new TargetModel();
 		$this->blockModel = new BlockModel();
 		$this->districtModel = new DistrictModel();
@@ -32,6 +37,106 @@ class AreaCoverageTarget extends AdminController
 
 		$this->template->set_meta_title(lang('Grampanchayat.heading_title'));
 		return $this->getList();
+	}
+	private function _allblocks($blocks, &$data)
+	{
+
+		$total_farmers_covered = $total_nursery_raised = $total_balance_smi =
+			$total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+			$total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+			$total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+			$total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+
+		$data['rows'] = [];
+		$gps = 0;
+		foreach ($blocks as $block) {
+			$total_area = $block->fc_area +
+				$block->ragi_smi +
+				$block->ragi_lt +
+				$block->ragi_ls +
+				$block->little_millet_lt +
+				$block->little_millet_ls +
+				$block->foxtail_ls +
+				$block->sorghum_ls +
+				$block->kodo_ls +
+				$block->barnyard_ls +
+				$block->pearl_ls;
+			$total_ragi = $block->ragi_smi +
+				$block->ragi_lt +
+				$block->ragi_ls;
+			$total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+			$data['rows'][] = [
+				'district' => $block->district,
+				'block' => $block->block,
+				'gps' => $block->total_gps,
+				'farmers_covered' => $block->farmers_covered,
+				'nursery_raised' => $block->nursery_raised,
+				'balance_smi' => $block->balance_smi,
+				'balance_lt' => $block->balance_lt,
+				'ragi_smi' => $block->ragi_smi,
+				'ragi_lt' => $block->ragi_lt,
+				'ragi_ls' => $block->ragi_ls,
+				'little_millet_lt' => $block->little_millet_lt,
+				'little_millet_ls' => $block->little_millet_ls,
+				'foxtail_ls' => $block->foxtail_ls,
+				'sorghum_ls' => $block->sorghum_ls,
+				'kodo_ls' => $block->kodo_ls,
+				'barnyard_ls' => $block->barnyard_ls,
+				'pearl_ls' => $block->pearl_ls,
+				'total_ragi' => $total_ragi,
+				'total_non_ragi' => $total_non_ragi,
+				'total_fc' => $block->fc_area,
+				'total_area' => $total_area
+			];
+
+			//calc total
+			$total_farmers_covered += $block->farmers_covered;
+			$total_nursery_raised += $block->nursery_raised;
+			$total_balance_smi += $block->balance_smi;
+			$total_balance_lt += $block->balance_lt;
+			$total_ragi_smi += $block->ragi_smi;
+			$total_ragi_lt += $block->ragi_lt;
+			$total_ragi_ls += $block->ragi_ls;
+			$total_little_millet_lt += $block->little_millet_lt;
+			$total_little_millet_ls += $block->little_millet_ls;
+			$total_foxtail_ls += $block->foxtail_ls;
+			$total_sorghum_ls += $block->sorghum_ls;
+			$total_kodo_ls += $block->kodo_ls;
+			$total_barnyard_ls += $block->barnyard_ls;
+			$total_pearl_ls += $block->pearl_ls;
+			$total_total_ragi += $total_ragi;
+			$total_total_non_ragi += $total_non_ragi;
+			$total_fc_area += $block->fc_area;
+			$total_total_area += $total_area;
+
+			$gps += $block->total_gps;
+
+		}
+
+		$data['rows'][] = [
+			'district' => '<strong>Total</strong>',
+			'block' => '',
+			'gps' => $gps,
+			'farmers_covered' => $total_farmers_covered,
+			'nursery_raised' => $total_nursery_raised,
+			'balance_smi' => $total_balance_smi,
+			'balance_lt' => $total_balance_lt,
+			'ragi_smi' => $total_ragi_smi,
+			'ragi_lt' => $total_ragi_lt,
+			'ragi_ls' => $total_ragi_ls,
+			'little_millet_lt' => $total_little_millet_lt,
+			'little_millet_ls' => $total_little_millet_ls,
+			'foxtail_ls' => $total_foxtail_ls,
+			'sorghum_ls' => $total_sorghum_ls,
+			'kodo_ls' => $total_kodo_ls,
+			'barnyard_ls' => $total_barnyard_ls,
+			'pearl_ls' => $total_pearl_ls,
+			'total_ragi' => $total_total_ragi,
+			'total_non_ragi' => $total_total_non_ragi,
+			'total_fc' => $total_fc_area,
+			'total_area' => $total_total_area
+		];
 	}
 	protected function getList()
 	{
@@ -49,7 +154,8 @@ class AreaCoverageTarget extends AdminController
 		$data['heading_title'] = lang('Area Coverage Target');
 		$data['button_add'] = lang('Add Target');
 		$data['button_edit'] = lang('Edit Target');
-
+		$data['years'] = getAllYears();
+		$data['seasons'] = $this->acModel->getSeasons();
 
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
@@ -70,17 +176,42 @@ class AreaCoverageTarget extends AdminController
 
 
 		$data['practicedata'] = $practicedata;
+		if ($this->user->block_id) {
+			$data['block_id'] = $filter['block_id'] = $this->user->block_id;
+			$data['districts'] = $this->districtModel->where('id', $this->user->district_id)->asArray()->find();
+		} else if ($this->user->district_id) {
+			$data['district_id'] = $filter['district_id'] = $this->user->district_id;
+			$data['districts'] = $this->districtModel->where('id', $this->user->district_id)->asArray()->find();
+		} else {
+			$data['districts'] = $this->districtModel->asArray()->find();
+		}
+		$data['current_season'] = strtolower(getCurrentSeason());
+		$data['year_id'] = getCurrentYearId();
+		$filter = [
+			'year_id' => $data['year_id'],
+			'season' => $data['current_season']
+		];
+		$blocks = $this->acModel->getByDistrict($filter);
+		$this->_allblocks($blocks, $data);
+		$data['blocks'] = [];
+		if ($data['district_id']) {
+			$data['blocks'] = $this->blockModel->where('district_id', $data['district_id'])
+				->asArray()->findAll();
+		}
+
 
 
 		$data['year_id'] = date('Y');
 
-		$currentMonth = date('n');
-		if ($currentMonth >= 6 && $currentMonth <= 10) {
-			$season = 'Kharif';
-		} elseif ($currentMonth >= 11 && $currentMonth <= 4) {
-			$season = 'Rabi';
-		}
-		$data['season'] = $season;
+		// $currentMonth = date('n');
+		// if ($currentMonth >= 6 && $currentMonth <= 10) {
+		// 	$season = 'Kharif';
+		// } elseif ($currentMonth >= 11 && $currentMonth <= 4) {
+		// 	$season = 'Rabi';
+		// }
+
+		$data['current_season'] = strtolower(getCurrentSeason());
+
 
 		//for heading
 		$crops = [];
@@ -96,6 +227,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['heading'] = $crops;
 
+		$data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
@@ -221,7 +353,7 @@ class AreaCoverageTarget extends AdminController
 		}
 		$data['districts'] = $this->districtModel->getAll();
 
-		$data['blocks'] = (new BlockModel())->getBlocksByDistrict($data['district_id']);
+		$data['blocks'] = $this->blockModel->getBlocksByDistrict($data['district_id']);
 		$data['block_id'] = $this->user->block_id;
 
 
