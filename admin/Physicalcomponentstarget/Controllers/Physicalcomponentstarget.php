@@ -47,6 +47,7 @@ class Physicalcomponentstarget extends AdminController
         $filter = [
             'year_id' => $data['year_id'],
             'district_id' => $user->district_id,
+            'fund_agency_id' => $user->fund_agency_id,
 
         ];
         $data['selectedYear'] = 1;
@@ -59,7 +60,7 @@ class Physicalcomponentstarget extends AdminController
         //printr($data['componentsAll']); exit;
         $this->getTableHeaders($data);
         $results = $this->pcmTarget->showTargetComponents($filter);
-        // printr($results); exit;
+         //printr($results); exit;
         foreach ($results as  $result) {
             $data['target_data'][$result['district']][] = [
                 'name' => $result['description'],
@@ -69,6 +70,8 @@ class Physicalcomponentstarget extends AdminController
 
             ];
         }
+// printr($data['target_data']); exit;
+
 
         return $this->template->view('Admin\Physicalcomponentstarget\Views\componenttargetdata', $data);
     }
@@ -90,8 +93,17 @@ class Physicalcomponentstarget extends AdminController
     {
         $this->template->set_meta_title('Physical Components Target');
         if ($this->request->getMethod(1) === 'POST') {
-            $this->pcmTarget->addPhysicaltargetdata($this->request->getPost());
+            // printr($this->request->getPost());
+            // exit;
+
+           $dataExist =  $this->pcmTarget->addPhysicaltargetdata($this->request->getPost());
+           //echo $dataExist; exit;
+           if($dataExist == 0){
+            $this->session->setFlashdata('message', 'Physical Targets added already exists Please Edit.');
+           } else {
             $this->session->setFlashdata('message', 'Physical Targets added Successfully.');
+           }
+
 
             return redirect()->to(base_url('admin/physicalcomponentstarget'));
         }
@@ -103,6 +115,8 @@ class Physicalcomponentstarget extends AdminController
         $this->template->set_meta_title('Components');
 
         if ($this->request->getMethod(1) === 'POST') {
+             // printr($this->request->getPost());
+            // exit;
             $this->pcmTarget->updateMasterData($this->request->getPost());
             $this->session->setFlashdata('message', 'Physicalcomponents Updated Successfully.');
             return redirect()->to(base_url('admin/physicalcomponentstarget'));
@@ -159,7 +173,7 @@ class Physicalcomponentstarget extends AdminController
         $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $masterInfo =  $this->pcmTarget->find($this->uri->getSegment(4));
-
+            //printr($masterInfo); exit;
             $data['editYear'] = $masterInfo->year_id;
 
             //printr($data['editYear']); exit;
@@ -177,9 +191,13 @@ class Physicalcomponentstarget extends AdminController
 
         $components = $this->physicalcomponents->getAllComponentData($filter);
         $districtModel = new DistrictModel();
-        $districts_main = $districtModel->getAll();
-        $main_master  = $this->pcmTarget->getTargetcomponent($filter);
-        // printr($main_master); exit;
+        $districts_main =  $this->pcmTarget->showTargetDistrict();
+        $main_masters  = $this->pcmTarget->getTargetcomponent($filter);
+        $temp_district = [];
+
+      // printr($main_masters); exit;
+
+
         $tableHeaderHtml = '<thead><tr>
         <td>District</td>';
         foreach ($components as $component) {
@@ -187,18 +205,20 @@ class Physicalcomponentstarget extends AdminController
         }
         $tableHeaderHtml .= '<td height="101">Total</td></tr></thead>';
         $tableBodyHtml = '';
-        foreach ($districts_main as $districts_mains) {
+        foreach ($districts_main as $key => $districts_mains) {
             $tableBodyHtml .= '<tr>';
-            $tableBodyHtml .= '<td>' . $districts_mains->name . '</td>';
+            $tableBodyHtml .= '<td><input type="hidden" name="component['. $key .'][district_id]"  value="' . $districts_mains->district_id . '"><input type="hidden" name="component['. $key .'][fund_agency_id]"  value="' . $districts_mains->fund_agency_id . '">' . $districts_mains->district_formatted . '</td>';
             foreach ($components as $component) {
                 $value = '';
-                foreach ($main_master as $item) {
-                    if ($item['district_id'] == $districts_mains->id && $item['mc_id'] == $component['id']) {
-                        $value = $item['total'];
-                        break;
-                    }
+                foreach ($main_masters as $item) {
+                    if ($item['district_id'] == $districts_mains->district_id &&
+                $item['mc_id'] == $component['id'] &&
+                $item['fund_agency_id'] == $districts_mains->fund_agency_id) {
+                $value = $item['total'];
+                break;
+            }
                 }
-                $tableBodyHtml .= '<td><input type="number" name="component[' . $districts_mains->id . '][' . $component['id'] . ']" class="crop-input form-control" oninput="calculateTotals()" value="' . $value . '"></td>';
+                $tableBodyHtml .= '<td><input type="number" name="component['. $key .'][data][' . $component['id'] . ']" class="crop-input form-control" oninput="calculateTotals()" value="' . $value . '"></td>';
             }
             $tableBodyHtml .= '<td><span class="total-value"></span></td>';
             $tableBodyHtml .= '</tr>';
