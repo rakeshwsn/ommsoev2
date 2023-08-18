@@ -16,14 +16,24 @@
                     <input type="text" readonly value="<?= $to_date ?>" class="form-control">
                 </div>
                 <div class="col-md-2 mt-4">
-                    <a href="<?= $download_url ?>" class="btn btn-square btn-info min-width-125 mb-10"><i
-                            class="fa fa-download mr-5"></i> Download</a>
+                    <?php
+                    if ($isActiveDay) {
+                        echo '<a href="' . $download_url . '" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>';
+                    } else {
+                        echo '<button class="btn btn-square btn-danger min-width-125 mb-10" disabled><i class="fa fa-download mr-5"></i> Download</button>';
+                    }
+                    ?>
+
                 </div>
                 <div class="col-md-2 mt-4">
                     <form class="dm-uploader" id="uploader">
-                        <div role="button" class="btn btn-outline btn-warning">
+                        <div role="button" class="btn btn-outline <?= $isActiveDay ? 'btn-warning' : 'btn-danger'; ?>">
                             <i class="fa fa-folder-o fa-fw"></i> Upload Excel
-                            <input type="file" title="Click to add Files">
+                            <?php if ($isActiveDay): ?>
+                                <input type="file" title="Click to add Files">
+                            <?php else: ?>
+                                <input type="file" title="File upload is disabled" disabled>
+                            <?php endif; ?>
                         </div>
                         <div class="status"></div>
                     </form>
@@ -207,4 +217,6 @@
         $('#progress-percent').text(percent + '%')
     }
 </script>
+
+
 <?php js_end(); ?>
