@@ -149,7 +149,7 @@ class Leftbar extends AdminController
             $data["menus"][] = [
                 "id" => "menu-correction",
                 "icon" => "si si-folder-alt",
-                "name" => 'Correction',
+                "name" => 'FA Correction',
                 "heading" => 0,
                 "href" => admin_url("correction"),
                 "children" => [],
