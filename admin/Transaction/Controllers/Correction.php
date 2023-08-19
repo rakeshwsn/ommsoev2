@@ -1,6 +1,7 @@
 <?php 
 namespace Admin\Transaction\Controllers;
 
+use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
 use Admin\Component\Models\ComponentModel;
 use Admin\Components\Models\ComponentsModel;
@@ -102,52 +103,73 @@ class Correction extends AdminController {
             'district_id' => $data['district_id'],
             'user_id' => $this->user->user_id,
         ];
+        $data['upload_statuses'] = [];
 
-        $data['upload_statuses'] = (new TransactionModel())->getBlockUploadStatus($filter);
+        $upload_enabled = true;
+        if(env('soe.uploadDateValidation') && $this->user->user_id > 1 ){
+
+            $upload_model = new AllowuploadModel();
+
+            $ufilter = [
+                'user_id' => $this->user->user_id
+            ];
+
+            $upload = $upload_model->getByDate($ufilter);
+
+            $months = [];
+            foreach ($upload as $item) {
+                $months[] = $item['month'];
+            }
+
+            $upload_enabled = in_array(getCurrentMonthId(),$months);
+        }
+
+        if($upload_enabled){
+            $data['upload_statuses'] = (new TransactionModel())->getBlockUploadStatus($filter);
+            foreach ($data['upload_statuses'] as &$upload_status) {
+                $status = $upload_status->status;
+                if($upload_status->status==0){
+                    $upload_status->status = '<label class="badge badge-warning">'.$this->statuses[$upload_status->status].'</label>';
+                }
+                if($upload_status->status==1){
+                    $upload_status->status = '<label class="badge badge-success">'.$this->statuses[$upload_status->status].'</label>';
+                }
+                if($upload_status->status==2){
+                    $upload_status->status = '<label class="badge badge-danger">'.$this->statuses[$upload_status->status].'</label>';
+                }
+                if($upload_status->status==3){
+                    $upload_status->status = '<label class="badge badge-info">'.$this->statuses[$upload_status->status].'</label>';
+                }
+
+                $upload_status->action = '';
+                $url_params = '?txn_type='.$upload_status->transaction_type
+                    .'&txn_id='.$upload_status->txn_id
+                    .'&year='.$upload_status->year_id
+                    .'&month='.$upload_status->month_id
+                    .'&block_id='.$upload_status->block_id
+                    .'&agency_type_id='.$upload_status->agency_type_id
+                    .'&fund_agency_id='.$upload_status->fund_agency_id;
+                $upload_status->action = '';
+                if($status != 3) {
+                    if ($upload_status->transaction_type == 'fund_receipt' || $upload_status->transaction_type == 'expense') {
+                        $upload_status->action = site_url(Url::correctionTransaction . $url_params);
+                    }
+                    if ($upload_status->transaction_type == 'other_receipt') {
+                        $upload_status->action = site_url(Url::correctionOtherReceipt . $url_params);
+                    }
+                    if ($upload_status->transaction_type == 'closing_balance') {
+                        $upload_status->action = site_url(Url::correctionClosingBalance . $url_params);
+                    }
+                    if ($upload_status->transaction_type == 'mis') {
+                        $upload_status->action = site_url(Url::correctionMIS . $url_params);
+                    }
+                }
+
+                $upload_status->created_at = $upload_status->created_at ? ymdToDmy($upload_status->created_at):'-';
+            }
+        }
 
         $data['modules'] = (new CommonModel())->getModules();
-
-        foreach ($data['upload_statuses'] as &$upload_status) {
-            $status = $upload_status->status;
-            if($upload_status->status==0){
-                $upload_status->status = '<label class="badge badge-warning">'.$this->statuses[$upload_status->status].'</label>';
-            }
-            if($upload_status->status==1){
-                $upload_status->status = '<label class="badge badge-success">'.$this->statuses[$upload_status->status].'</label>';
-            }
-            if($upload_status->status==2){
-                $upload_status->status = '<label class="badge badge-danger">'.$this->statuses[$upload_status->status].'</label>';
-            }
-            if($upload_status->status==3){
-                $upload_status->status = '<label class="badge badge-info">'.$this->statuses[$upload_status->status].'</label>';
-            }
-
-            $upload_status->action = '';
-            $url_params = '?txn_type='.$upload_status->transaction_type
-                .'&txn_id='.$upload_status->txn_id
-                .'&year='.$upload_status->year_id
-                .'&month='.$upload_status->month_id
-                .'&block_id='.$upload_status->block_id
-                .'&agency_type_id='.$upload_status->agency_type_id
-                .'&fund_agency_id='.$upload_status->fund_agency_id;
-            $upload_status->action = '';
-            if($status != 3) {
-                if ($upload_status->transaction_type == 'fund_receipt' || $upload_status->transaction_type == 'expense') {
-                    $upload_status->action = site_url(Url::correctionTransaction . $url_params);
-                }
-                if ($upload_status->transaction_type == 'other_receipt') {
-                    $upload_status->action = site_url(Url::correctionOtherReceipt . $url_params);
-                }
-                if ($upload_status->transaction_type == 'closing_balance') {
-                    $upload_status->action = site_url(Url::correctionClosingBalance . $url_params);
-                }
-                if ($upload_status->transaction_type == 'mis') {
-                    $upload_status->action = site_url(Url::correctionMIS . $url_params);
-                }
-            }
-
-            $upload_status->created_at = $upload_status->created_at ? ymdToDmy($upload_status->created_at):'-';
-        }
 
         return $this->template->view('Admin\Transaction\Views\correction', $data);
     }
