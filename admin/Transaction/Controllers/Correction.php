@@ -106,7 +106,7 @@ class Correction extends AdminController {
         $data['upload_statuses'] = [];
 
         $upload_enabled = true;
-        if(env('soe.uploadDateValidation')){
+        if(env('soe.uploadDateValidation') && $this->user->user_id > 1 ){
 
             $upload_model = new AllowuploadModel();
 
