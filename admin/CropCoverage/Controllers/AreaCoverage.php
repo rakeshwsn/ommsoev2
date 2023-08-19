@@ -666,23 +666,23 @@ class AreaCoverage extends AdminController
         ];
 
         //update status
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             //delete
             $filter['block_id'] = $this->request->getPost('blocks');
             $this->areacoveragemodel->deleteAll($filter);
 
-            return redirect()->to(admin_url('areacoverage/delete?district_id='.$district_id.'&start_date='.$start_date))
-                ->with('message','The records have been deleted.');
+            return redirect()->to(admin_url('areacoverage/delete?district_id=' . $district_id . '&start_date=' . $start_date))
+                ->with('message', 'The records have been deleted.');
         }
 
         $blocks = [];
-        if($district_id){
+        if ($district_id) {
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
         }
 
         $data['blocks'] = [];
         $week_text = '';
-        if($blocks) {
+        if ($blocks) {
             foreach ($blocks as $block) {
                 $action = '';
                 if ($block->start_date) {
@@ -753,13 +753,13 @@ class AreaCoverage extends AdminController
             $data['districts'][$district->id] = $district->name;
         }
 
-        $district_status = $acModel->where('district_id',$district_id)
-            ->where('start_date',$start_date)->first();
+        $district_status = $acModel->where('district_id', $district_id)
+            ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
         $data['remarks'] = '';
         $data['status_color'] = '';
-        if($district_status){
+        if ($district_status) {
             $data['status'] = $this->statuses[$district_status->status];
             $data['status_color'] = $this->colors[$district_status->status];
             $data['remarks'] = $district_status->remarks;
