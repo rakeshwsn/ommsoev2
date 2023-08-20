@@ -50,14 +50,30 @@ class AreaCoverage extends AdminController
             $data['block_id'] = $this->request->getGet('block_id');
         }
 
+        $dates = $acModel->getWeekDate();
+
+        $data['start_date'] = '';
+        if ($this->request->getGet('start_date')) {
+            $data['start_date'] = $this->request->getGet('start_date');
+        }
+
         $filter = [
             'year_id' => $data['year_id'],
-            'season' => $data['current_season']
+            'season' => $data['current_season'],
+            'start_date' => $data['start_date']
         ];
+
+        if ($this->request->getGet('start_date')) {
+            $filter['start_date'] = $data['start_date'];
+        }
+
         if ($data['block_id']) {
             $filter['block_id'] = $data['block_id'];
         } else if ($data['district_id']) {
             $filter['district_id'] = $data['district_id'];
+        }
+        if ($this->request->getGet('start_date')) {
+
         }
 
         if ($this->user->block_id) {
@@ -67,7 +83,7 @@ class AreaCoverage extends AdminController
             $data['district_id'] = $filter['district_id'] = $this->user->district_id;
             $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
         } else {
-            $data['districts'] = (new DistrictModel())->asArray()->find();
+            $data['districts'] = (new DistrictModel())->orderBy('name')->asArray()->find();
         }
 
         $blocks = $acModel->getAreaCoverageReport($filter);
@@ -91,7 +107,7 @@ class AreaCoverage extends AdminController
         $data['blocks'] = [];
         if ($data['district_id']) {
             $data['blocks'] = (new BlockModel())->where('district_id', $data['district_id'])
-                ->asArray()->findAll();
+                ->orderBy('name')->asArray()->findAll();
         }
 
         if ($action == 'download') {
@@ -147,21 +163,40 @@ class AreaCoverage extends AdminController
             exit;
         }
 
+        $weeks = $acModel->getWeeks();
+
+        $data['weeks'][0] = 'All weeks';
+        $week_text = '';
+        foreach ($weeks as $week) {
+            //dropdown weeks
+            if (strtotime($week['start_date']) <= strtotime('today')) {
+                $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
+            }
+            //show week text
+            if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
+                $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
+            }
+        }
+
+        $data['week_start_date'] = $data['start_date'];
+
+        $data['week_text'] = $week_text;
+
         $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
         $data['download_url'] = admin_url('reports/areacoverage/download');
         $data['get_blocks'] = Url::getBlocks;
+
 
         return $this->template->view('Admin\Reports\Views\areacoverage', $data);
     }
 
     private function gps($blocks, &$data)
     {
-
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
         $data['rows'] = [];
         foreach ($blocks as $block) {

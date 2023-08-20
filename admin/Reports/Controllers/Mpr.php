@@ -32,7 +32,7 @@ class Mpr extends AdminController
             $data['year_id'] = $this->request->getGet('year');
         }
 
-        $data['month_id'] = getCurrentMonthId();
+        $data['month_id'] = getMonthIdByMonth(date('m'));
         if($this->request->getGet('month')){
             $data['month_id'] = $this->request->getGet('month');
         }

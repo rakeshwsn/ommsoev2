@@ -50,10 +50,6 @@ class AreaCoverage extends AdminController
 
         $data['heading_title'] = lang('Add Area Coverage');
 
-
-
-
-
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
         }
@@ -64,9 +60,6 @@ class AreaCoverage extends AdminController
         $dates = $this->areacoveragemodel->getWeekDate();
         $data['currentDay'] = date('l');
         $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
-
-
-
 
         $data['from_date'] = $dates['start_date'];
         $data['to_date'] = $dates['end_date'];
@@ -534,10 +527,7 @@ class AreaCoverage extends AdminController
         }
 
         $data['show_form'] = false;
-        if (
-            strtotime('today') <= strtotime($cc_info->end_date)
-            && ($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)
-        ) {
+        if (($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)) {
             $data['show_form'] = true;
         }
 
