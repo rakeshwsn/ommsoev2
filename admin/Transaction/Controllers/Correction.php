@@ -32,7 +32,7 @@ class Correction extends AdminController {
         $data['months'] = getMonths();
         $data['years'] = getAllYears();
 
-        $data['month_id'] = getCurrentMonthId();
+        $data['month_id'] = getMonthIdByMonth(date('m'));
         $data['year_id'] = getCurrentYearId();
 
         if($this->request->getGet('year')){
