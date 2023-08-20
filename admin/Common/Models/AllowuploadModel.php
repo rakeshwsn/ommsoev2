@@ -108,9 +108,16 @@ class AllowuploadModel extends Model
     public function getCurrentMonth() {
 	    $date = date('Y-m-d');
 
-        $sql = "SELECT * FROM soe_allow_uploads au WHERE DATE('$date') BETWEEN DATE(au.from_date) AND DATE_ADD(au.from_date,INTERVAL 25 DAY) LIMIT 1";
+        $sql = "SELECT * FROM soe_allow_uploads au 
+WHERE DATE('$date') BETWEEN DATE(au.from_date) 
+AND DATE_ADD(au.from_date,INTERVAL 25 DAY) LIMIT 1";
 
-        return $this->db->query($sql)->getRow()->month;
+        $res = $this->db->query($sql)->getRow();
+        if($res){
+            return $res->month;
+        } else {
+            return false;
+        }
     }
 
     public function extendDate($data=[]){
