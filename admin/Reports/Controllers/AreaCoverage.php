@@ -13,6 +13,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class AreaCoverage extends AdminController
 {
+    private $districtModel;
+    public function __construct()
+    {
+        $this->districtModel = new DistrictModel();
+    }
 
     public function index($action = '')
     {
@@ -693,6 +698,8 @@ class AreaCoverage extends AdminController
         }
 
         $statuses = $acModel->getUploadStatus($data['start_date']);
+        // printr($statuses);
+        // exit;
 
         $data['statuses'] = [];
         $total_blocks = $total_ac_blocks = 0;
@@ -730,7 +737,10 @@ class AreaCoverage extends AdminController
     public function blockWiseGetUploadStatus()
     {
         $data = [];
-
+        $data['districts'] = $this->districtModel->getAll();
+        // print_r($data['districts']);
+        // exit;
+        $this->template->add_package(array('datatable', 'select2'), true);
         $acModel = new AreaCoverageModel();
 
         $data['seasons'] = $acModel->getSeasons();
