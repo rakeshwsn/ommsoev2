@@ -19,14 +19,8 @@
                     </div>
                     <div class="col-md-2">
                         <label>Season</label>
-                        <select class="form-control" id="season" name="season">
-                            <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
-                                      echo 'selected';
-                                  } ?>>
-                                    <?= $season ?></option>
-                            <?php } ?>
-                        </select>
+                        <?= form_dropdown('season', $seasons, $current_season, "class='form-control' id='filter_season'") ?>
+
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group mg-b-10-force">
