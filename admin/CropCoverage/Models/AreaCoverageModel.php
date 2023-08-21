@@ -231,6 +231,7 @@ FROM ac_crop_practices acp
             if(!empty($filter['start_date'])){
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date']."')";
             }
+            $sql .= " ORDER BY date(cc.start_date) DESC,gp.name ASC";
 
         } else if (!empty($filter['district_id'])) {
             $sql = "SELECT ac.*,b.id block_id,
@@ -281,7 +282,7 @@ FROM soe_districts sd
     $sql .= ") ac
     ON ac.district_id = sd.id";
     $sql .=" LEFT JOIN vw_districtwise_blocks_gps dbg 
-    ON sd.id=dbg.district_id WHERE 1=1";
+    ON sd.id=dbg.district_id ORDER BY sd.name";
         }
 //            echo $sql;exit;
 

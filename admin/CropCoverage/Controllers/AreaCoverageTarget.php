@@ -167,6 +167,12 @@ class AreaCoverageTarget extends AdminController
 			$data['district_id'] = $this->user->district_id;
 		}
 
+		if ($this->request->getGet('block_id')) {
+			$data['block_id'] = (array) $this->request->getGet('block_id');
+		} else {
+			$data['block_id'] = '';
+		}
+
 		$croppractices = $this->targetModel->getPractices();
 
 
