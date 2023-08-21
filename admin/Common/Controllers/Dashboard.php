@@ -299,22 +299,17 @@ class Dashboard extends AdminController
 
         $frcModel = new FRCheckModel();
         $check_type = $this->request->getGet('check_type') ?: $check_type;
+        $data = [
+            'month' => getCurrentMonthId(),
+            'year' => getCurrentYearId(),
+            'district_id' => $this->user->district_id,
+            'block_id' => $this->user->block_id,
+            'fund_agency_id' => $this->user->fund_agency_id,
+            'agency_type_id' => $this->user->agency_type_id,
+            'check_type' => $check_type
+        ];
 
-        $fr = null;
-
-        //dont ask for fr_check if upload date is not reached.
-        if(getCurrentMonthId()){
-            $data = [
-                'month' => getCurrentMonthId(),
-                'year' => getCurrentYearId(),
-                'district_id' => $this->user->district_id,
-                'block_id' => $this->user->block_id,
-                'fund_agency_id' => $this->user->fund_agency_id,
-                'agency_type_id' => $this->user->agency_type_id,
-                'check_type' => $check_type
-            ];
-            $fr = $frcModel->where($data)->first();
-        }
+        $fr = $frcModel->where($data)->first();
 
         if ($this->request->isAJAX()) {
             $choice = $this->request->getGet('choice');
@@ -334,9 +329,7 @@ class Dashboard extends AdminController
 
         }
 
-        if($fr){
-            return false;
-        }
+        return !$fr;
     }
 
 
@@ -353,6 +346,7 @@ class Dashboard extends AdminController
 
         //$filter['month'] = getMonthIdByMonth(date('m'));
         $filter['year'] = getCurrentYearId();
+
 
         $data['components'] = [];
         $data['chart_url'] = admin_url('dashboard/chart');
