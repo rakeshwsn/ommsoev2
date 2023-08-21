@@ -167,6 +167,12 @@ class AreaCoverageTarget extends AdminController
 			$data['district_id'] = $this->user->district_id;
 		}
 
+		if ($this->request->getGet('block_id')) {
+			$data['block_id'] = (array) $this->request->getGet('block_id');
+		} else {
+			$data['block_id'] = '';
+		}
+
 		$croppractices = $this->targetModel->getPractices();
 
 
@@ -199,8 +205,6 @@ class AreaCoverageTarget extends AdminController
 				->asArray()->findAll();
 		}
 
-
-
 		$data['year_id'] = date('Y');
 
 		// $currentMonth = date('n');
@@ -211,7 +215,6 @@ class AreaCoverageTarget extends AdminController
 		// }
 
 		$data['current_season'] = strtolower(getCurrentSeason());
-
 
 		//for heading
 		$crops = [];
@@ -227,7 +230,7 @@ class AreaCoverageTarget extends AdminController
 
 		$data['heading'] = $crops;
 
-		$data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
+		$data['filter_panel'] = view('Admin\CropCoverage\Views\target_filter', $data);
 
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
