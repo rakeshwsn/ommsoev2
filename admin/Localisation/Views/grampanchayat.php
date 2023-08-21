@@ -18,13 +18,13 @@
 							<label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
 							<?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='filter_district' class='form-control js-select2'" . ($district_id ? " disabled" : "")); ?>
 						</div>
-					</div><!-- col-4 -->
+					</div>
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Block: <span class="tx-danger">*</span></label>
 							<?= form_dropdown('block_id', array(), set_value('block_id', $block_id), "id='filter_block' class='form-control js-select2'" . ($block_id ? " disabled" : "")); ?>
 						</div>
-					</div><!-- col-4 -->
+					</div>
 
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
@@ -33,15 +33,15 @@
 								id="filter_gp" />
 						</div>
 					</div>
-					<!-- col-4 -->
+
 					<div class="col-lg-3 center">
 						<label class="form-control-label">&nbsp;</label>
 						<div class="form-layout-footer">
 							<button type="button" id="btn-filter" class="btn btn-primary">Filter</button>
 							<button type="button" id="btn-reset" class="btn btn-secondary">Reset</button>
-						</div><!-- form-layout-footer -->
+						</div>
 					</div>
-				</div><!-- row -->
+				</div>
 			</div>
 		</form>
 
@@ -63,51 +63,51 @@
 	</div>
 </div>
 <?php js_start(); ?>
-<script type="text/javascript"><!--
-$(document).ready(function() {
-	var blockId = "<?= $block_id; ?>"
-	$('select[name=\'district_id\']').bind('change', function () {
-		$.ajax({
-			url: '<?= admin_url("district/block"); ?>/' + this.value,
-			dataType: 'json',
-			beforeSend: function () {
-				//$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
-			},
-			complete: function () {
-				//$('.wait').remove();
-			},
-			success: function (json) {
-				//console.log(blockId);
+<script type="text/javascript">
+	$(document).ready(function () {
+		var blockId = "<?= $block_id; ?>"
+		$('select[name=\'district_id\']').bind('change', function () {
+			$.ajax({
+				url: '<?= admin_url("district/block"); ?>/' + this.value,
+				dataType: 'json',
+				beforeSend: function () {
+					//$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
+				},
+				complete: function () {
+					//$('.wait').remove();
+				},
+				success: function (json) {
+					//console.log(blockId);
 
-				html = '<option value="">Select Block</option>';
+					html = '<option value="">Select Block</option>';
 
-				if (json != '') {
-					for (var i = 0; i < json.length; i++) {
+					if (json != '') {
+						for (var i = 0; i < json.length; i++) {
 
-						html += '<option value="' + json[i]['id'] + '"';
+							html += '<option value="' + json[i]['id'] + '"';
 
-						if (blockId == json[i]['id']) {
-							html += ' selected';
+							if (blockId == json[i]['id']) {
+								html += ' selected';
+							}
+
+							html += '>' + json[i]['name'] + '</option>';
+
 						}
-
-						html += '>' + json[i]['name'] + '</option>';
-
 					}
-				}
-				else {
-					html += '<option value="0" selected="selected">Select Block</option>';
-				}
+					else {
+						html += '<option value="0" selected="selected">Select Block</option>';
+					}
 
-				$('select[name=\'block_id\']').html(html);
-				$('select[name=\'block_id\']').select2();
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-			}
+					$('select[name=\'block_id\']').html(html);
+					$('select[name=\'block_id\']').select2();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+				}
+			});
 		});
+		$('select[name=\'district_id\']').trigger('change');
 	});
-	$('select[name=\'district_id\']').trigger('change');
-});
 	$(function () {
 		table = $('#datatable').DataTable({
 			"processing": true,
