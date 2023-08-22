@@ -437,6 +437,47 @@ class Leftbar extends AdminController
             ];
         }
 
+        $enterprises = [];
+
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises Transaction',
+                "href" => admin_url("enterprises/transaction"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises Units',
+                "href" => admin_url("enterpriseunit"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises',
+                "href" => admin_url("enterprises"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($enterprises) {
+            $data["menus"][] = [
+                "id" => "menu-enterprises",
+                "icon" => "md-account-child",
+                "name" =>'Enterprises',
+                "heading" => 0,
+                "href" => "",
+                "children" => $enterprises,
+            ];
+        }
+
+
+
         $areacoverage = [];
 
         if ($this->user->hasPermission("areacoverage")) {

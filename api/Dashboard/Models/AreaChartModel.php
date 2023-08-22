@@ -41,9 +41,6 @@ class AreaChartModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 
-
-
-
 	
 	public function getYearwiseFarmerAchievement($filter=[]) {
 		$sql = "SELECT
