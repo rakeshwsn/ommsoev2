@@ -57,7 +57,7 @@ class Dashboard extends ResourceController
 		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
 	}
 	
-	public function procurement2(){
+	public function procurement(){
 		
 		$districtmodel = new DistrictModel();
 
@@ -94,7 +94,7 @@ class Dashboard extends ResourceController
 
 	}
 	
-	public function pds2(){
+	public function pds(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
@@ -219,7 +219,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function pds(){
+	public function pds2(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
@@ -243,7 +243,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function procurement(){
+	public function procurement2(){
 		
 		$districtmodel = new DistrictModel();
 

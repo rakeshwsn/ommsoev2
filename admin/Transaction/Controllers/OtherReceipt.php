@@ -165,9 +165,7 @@ class OtherReceipt extends AdminController
             }
             $txnAmtModel = new MisctxnamtModel();
             $txnAmtModel->insertBatch($txnAmts);
-            $json_data = [
-                'status' => true,
-            ];
+
             $this->session->setFlashData('message','Other receipt added.');
 
         } 

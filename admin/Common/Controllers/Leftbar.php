@@ -145,10 +145,21 @@ class Leftbar extends AdminController
             ];
         }
 
+        if ($this->user->hasPermission("correction")) {
+            $data["menus"][] = [
+                "id" => "menu-correction",
+                "icon" => "si si-folder-alt",
+                "name" => 'FA Correction',
+                "heading" => 0,
+                "href" => admin_url("correction"),
+                "children" => [],
+            ];
+        }
+
         if ($this->user->hasPermission("approve")) {
             $data["menus"][] = [
                 "id" => "menu-approve",
-                "icon" => "md-account-child",
+                "icon" => "si si-check",
                 "name" => lang("Leftbar.text_soe_approve"),
                 "heading" => 0,
                 "href" => admin_url("approve"),
@@ -547,11 +558,30 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if (
+            $this->user->hasPermission("reports/areacoverage/blockWiseGetUploadStatus")
+        ) {
+            $areacoverage[] = [
+                "name" => "Block Wise Area Coverage Upload Status",
+                "href" => admin_url("reports/areacoverage/blockWiseGetUploadStatus"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("cropcoverage/crops")) {
             $areacoverage[] = [
                 "name" => lang("Leftbar.text_crop_add"),
                 "href" => admin_url("cropcoverage/crops"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($this->user->hasPermission("areacoverage/delete")) {
+            $areacoverage[] = [
+                "name" => 'Delete Area Coverage',
+                "href" => admin_url("areacoverage/delete"),
                 "heading" => 0,
                 "children" => [],
             ];
@@ -590,7 +620,7 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission("phyachtraining")) {
             $mprcomponent[] = [
-                "name" => "MPR Ach Training",
+                "name" => "MPR Ach Training Report",
                 "href" => admin_url("phyachtraining"),
                 "heading" => 0,
                 "children" => [],
@@ -598,7 +628,7 @@ class Leftbar extends AdminController
         }
         if ($this->user->hasPermission("phyachenterprise")) {
             $mprcomponent[] = [
-                "name" => "MPR Ach Enterprises",
+                "name" => "MPR Ach Enterprises Report",
                 "href" => admin_url("phyachenterprise"),
                 "heading" => 0,
                 "children" => [],

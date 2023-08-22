@@ -208,13 +208,13 @@ FROM ac_crop_practices acp
 
     public function getWeekDate($date = 'today') {
         $output = $this->getWeeks();
-
+        $date = strtotime($date);
         foreach ($output as $dates) {
-            $today = strtotime($date);
-            if($today >= strtotime($dates['start_date']) && $today <= strtotime($dates['end_date'])){
+            if($date >= strtotime($dates['start_date']) && $date <= strtotime($dates['end_date'])){
                 return $dates;
             }
         }
+        return [];
     }
 
     public function getAreaCoverage($filter = []) {
@@ -231,9 +231,10 @@ FROM ac_crop_practices acp
             if(!empty($filter['start_date'])){
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date']."')";
             }
+            $sql .= " ORDER BY date(cc.start_date) DESC,gp.name ASC";
 
         } else if (!empty($filter['district_id'])) {
-            $sql = "SELECT ac.*,
+            $sql = "SELECT ac.*,b.id block_id,
   b.name block,bgps.gps total_gps FROM soe_blocks b 
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc 
@@ -281,10 +282,9 @@ FROM soe_districts sd
     $sql .= ") ac
     ON ac.district_id = sd.id";
     $sql .=" LEFT JOIN vw_districtwise_blocks_gps dbg 
-    ON sd.id=dbg.district_id WHERE 1=1";
+    ON sd.id=dbg.district_id ORDER BY sd.name";
         }
-//            echo $sql;exit;
-
+//        echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -388,7 +388,7 @@ WHERE (year_id IS NULL";
     public function getAllDistricts($filter=[]) {
 
         $sql = "SELECT
-  district_id,district,total_blocks,total_gps,
+  district_id,district,total_blocks,total_gps,start_date,
   SUM(farmers_covered) AS farmers_covered,
 SUM(nursery_raised) AS nursery_raised,
 SUM(balance_smi) AS balance_smi,
@@ -405,15 +405,19 @@ SUM(kodo_ls) AS kodo_ls,
 SUM(barnyard_ls) AS barnyard_ls,
 SUM(pearl_ls) AS pearl_ls
 FROM vw_area_coverage_report_districtwise vacrd
-WHERE (year_id IS NULL";
+WHERE (vacrd.year_id IS NULL";
         if(!empty($filter['year_id'])){
-            $sql .= " OR year_id = ".$filter['year_id'];
+            $sql .= " OR vacrd.year_id = ".$filter['year_id'];
         }
-        $sql .= " ) AND (season IS NULL";
+        $sql .= " ) AND (vacrd.season IS NULL";
         if(!empty($filter['season'])){
-            $sql .= " OR LOWER(season) = '".strtolower($filter['season'])."'";
+            $sql .= " OR LOWER(vacrd.season) = '".strtolower($filter['season'])."'";
         }
-        $sql .= ") GROUP BY district_id ORDER BY district";
+        $sql .= ")";
+        if(!empty($filter['start_date'])){
+            $sql .= " AND (DATE(vacrd.start_date) = DATE('".$filter['start_date']."') OR vacrd.start_date IS NULL)";
+        }
+        $sql .= " GROUP BY district_id ORDER BY district";
 
         return $this->db->query($sql)->getResult();
     }
@@ -505,5 +509,22 @@ FROM vw_districtwise_blocks_gps vdbg
     ON ac.district_id = vdbg.district_id ORDER BY vdbg.district";
 
         return $this->db->query($sql)->getResult();
+    }
+
+    public function deleteAll($filter=null)
+    {
+        $b = $this->db->table($this->table);
+        $ac = $b->where($filter)->get()->getResult();
+
+        foreach ($ac as $item) {
+            $b = $this->db->table($this->table);
+            $b->where('id',$item->id)->delete();
+            $b = $this->db->table('ac_area_follow_up');
+            $b->where('crop_coverage_id',$item->id)->delete();
+            $b = $this->db->table('ac_area_practices');
+            $b->where('crop_coverage_id',$item->id)->delete();
+            $b = $this->db->table('ac_nursery');
+            $b->where('crop_coverage_id',$item->id)->delete();
+        }
     }
 }

@@ -67,6 +67,7 @@ class Physicalachievement extends AdminController
             'year_id' => $data['year_id'],
             'district_id' => $user->district_id,
             'month_id' => $data['monthId'],
+            'fund_agency_id' => $user->fund_agency_id,
 
         ];
         $data['selectedYear'] = 2;
@@ -77,7 +78,7 @@ class Physicalachievement extends AdminController
         $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsall($filter);
         $this->getTableHeaders($data);
         $data['results'] = $results = $this->pcmachieve->showTargetAchData($filter);
-//printr($compo); exit;
+      //  printr($data['results']); exit;
         $data['target_acv_data'] = array();
 
         foreach ($results as $result) {
@@ -148,6 +149,7 @@ class Physicalachievement extends AdminController
             'year_id' => $data['year_id'],
             'district_id' => $user->district_id,
             'month_id' => $data['monthId'],
+            'fund_agency_id' => $user->fund_agency_id,
 
         ];
         $data['selectedYear'] = 2;
@@ -158,7 +160,7 @@ class Physicalachievement extends AdminController
         $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsallEnt($filter);
         $this->getTableHeaders($data);
         $data['results'] = $results = $this->pcmachieve->showTargetAchDataEnt($filter);
-     //   printr($results); exit;
+        //   printr($results); exit;
         $data['target_acv_data'] = array();
 
         foreach ($results as $result) {
@@ -216,7 +218,7 @@ class Physicalachievement extends AdminController
             $this->pcmachieve->addPhysicalachData($this->request->getPost());
             $this->session->setFlashdata('message', 'Physical Targets added Successfully.');
 
-            return redirect()->to(base_url('admin/physicalachievement'));
+            return redirect()->to(base_url('admin/phyachtraining'));
         }
         $this->getForm();
     }
@@ -263,7 +265,8 @@ class Physicalachievement extends AdminController
         $data['current_year_id'] = 1; //getCurrentYearId();
         $data['get_months'] = getMonths();
         $districtModel = new DistrictModel();
-        $data['districts'] = $districtModel->getAll();
+        $data['districts'] = $this->pcmTarget->showTargetDistrict();
+        // printr($data['districts']); exit;
         $data['districts_main'] = $districtModel->getAll();
         $data['componentsAll'] = $this->physicalcomponents->getAll();
 
@@ -294,6 +297,7 @@ class Physicalachievement extends AdminController
         $usercheck = $user->district_id;
 
         $districtId = $_POST['district_id'];
+        $fund_agency_id = $_POST['fund_agency_id'];
         $yearId = $_POST['year_id'];
         $monthId = $_POST['month_id'];
         $monthName = $_POST['month_name'];
@@ -303,6 +307,7 @@ class Physicalachievement extends AdminController
         $filter = [
             'year_id' => $yearId,
             'district_id' => $districtId,
+            'fund_agency_id' => $fund_agency_id,
             'month_id' => $monthId,
 
         ];

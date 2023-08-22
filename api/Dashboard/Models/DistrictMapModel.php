@@ -46,7 +46,7 @@ class DistrictMapModel extends Model
   ddm.blocks,
   ddm.gps,
   ddm.villages,
-  ddm.tentative_farmers,
+  ddm.tentative_farmers farmers,
   e.total_cmsc chcs,
   e.total_chc cmscs
 FROM soe_districts sd
@@ -74,12 +74,20 @@ FROM soe_districts sd
 		SUM(villages) total_villages,
 		SUM(tentative_farmers) total_farmers,
 		SUM(chcs) total_chc,
-		SUM(cmscs) total_cmsc
+		SUM(cmscs) total_cmsc,
+        SUM(demo_area) demo_area
 	  FROM dashboard_district_map dm
 	  LEFT JOIN dashboard_years y ON dm.year_id=y.id 
-	  WHERE dm.deleted_at IS NULL AND year_id=$year_id";
+  LEFT JOIN (SELECT
+      year_id,
+      SUM(achievement) demo_area
+    FROM dashboard_areacoverage
+    WHERE deleted_at IS NULL GROUP BY year_id) ac
+    ON ac.year_id = dm.year_id
+WHERE dm.deleted_at IS NULL
+AND dm.year_id =$year_id";
 
-		return $this->db->query($sql)->getResult(); 
+		return $this->db->query($sql)->getFirstRow();
 	}
 	
 }

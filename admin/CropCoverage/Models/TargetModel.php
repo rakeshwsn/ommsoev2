@@ -255,6 +255,7 @@ FROM ac_crops ac
         return $query->getResultArray();
 
     }
+
     public function getDistrictWiseTarget($filter)
     {
         $year_id = $filter['year_id'];
@@ -304,7 +305,13 @@ LEFT JOIN (
         COALESCE(SUM(fup.area), 0) AS fup_area
     FROM
         ac_crop_coverage acc
-    LEFT JOIN ac_area_practices aap
+    LEFT JOIN (SELECT
+          crop_coverage_id,
+          SUM(smi) smi,
+          SUM(ls) ls,
+          SUM(lt) lt
+        FROM ac_area_practices
+        GROUP BY crop_coverage_id) aap
         ON acc.id = aap.crop_coverage_id
     LEFT JOIN (
         SELECT
@@ -316,7 +323,7 @@ LEFT JOIN (
             aafu.crop_coverage_id
     ) fup ON acc.id = fup.crop_coverage_id
     WHERE
-        acc.deleted_at IS NULL";
+        acc.deleted_at IS NULL AND status=1";
 
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(acc.season) = '" . $filter['season'] . "'";
@@ -328,10 +335,7 @@ LEFT JOIN (
         $sql .= "
     GROUP BY
         acc.district_id
-) ach ON ach.district_id = sd.id;
-";
-
-
+) ach ON ach.district_id = sd.id ORDER BY district";
 
         return $this->db->query($sql)->getResultArray();
 

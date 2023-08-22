@@ -40,10 +40,6 @@
                             <?php } ?>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label>Week</label>
-                        <?= form_dropdown('start_date', $weeks, $week_start_date, "id='filter_week' class='form-control js-select2'"); ?>
-                    </div>
                     <div class="col-md-2 mt-4">
                         <button id="btn-filter" class="btn btn-outline btn-primary">
                             <i class="fa fa-filter"></i> Filter</button>

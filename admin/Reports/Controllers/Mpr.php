@@ -32,7 +32,7 @@ class Mpr extends AdminController
             $data['year_id'] = $this->request->getGet('year');
         }
 
-        $data['month_id'] = getCurrentMonthId();
+        $data['month_id'] = getMonthIdByMonth(date('m'));
         if($this->request->getGet('month')){
             $data['month_id'] = $this->request->getGet('month');
         }
@@ -88,6 +88,12 @@ class Mpr extends AdminController
             $fund_receipt_agency=$data['user_group_id'];
         }
 
+        //hard code for block user
+        if($this->user->agency_type_id==$this->settings->block_user
+            && $this->request->getGet('agency_type_id')==''){
+            $component_agency = [5,6]; //block user --fa and cbo
+            $fund_receipt_agency = [5,6]; //block user --fa and cbo
+        }
 
         // printr( $data['component_agency']);
 
@@ -183,7 +189,10 @@ class Mpr extends AdminController
             exit;
         }
 
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
+        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].
+            '&month='.$data['month_id'].'&district_id='.$data['district_id'].
+            '&agency_type_id='.$data['agency_type_id'].
+            '&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
 
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
 
@@ -768,7 +777,6 @@ class Mpr extends AdminController
 
         $data['block_id'] = $this->user->block_id;
         if($this->request->getGet('block_id')){
-
             $data['block_id'] = $this->request->getGet('block_id');
             $data['user_group_id']=[6,5];
         }
@@ -891,7 +899,10 @@ class Mpr extends AdminController
             exit;
         }
 
-        $data['download_url'] = Url::abstractMprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&agency_type_id='.$data['agency_type_id'];
+        $data['download_url'] = Url::abstractMprDownload.'?year='.$data['year_id'].
+            '&month='.$data['month_id'].'&district_id='.$data['district_id'].
+            '&agency_type_id='.$data['agency_type_id'].
+            '&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
 
         return $this->template->view('Admin\Reports\Views\abstract_mpr', $data);
     }
@@ -915,6 +926,7 @@ class Mpr extends AdminController
             $data['filter_panel'] = view('Admin\Reports\Views\district_filter_panel',$data);
         }
         if($this->user->agency_type_id==$this->settings->block_user){
+            $data['agency_types']=(new UserGroupModel())->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])->asArray()->findAll();
             $data['filter_panel'] = view('Admin\Reports\Views\block_filter_panel',$data);
         }
         if($this->user->agency_type_id==$this->settings->ps_user){
