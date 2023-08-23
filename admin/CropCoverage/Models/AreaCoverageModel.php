@@ -588,11 +588,13 @@ WHERE
         }
 
         $sql .= "
+GROUP BY sb.id
 ORDER BY
     sd.name ASC, sb.name ASC";
 
         $res = $this->db->query($sql)->getResult();
         return $res;
+
 
 
 
