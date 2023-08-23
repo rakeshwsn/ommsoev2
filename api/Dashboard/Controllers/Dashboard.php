@@ -211,7 +211,6 @@ class Dashboard extends ResourceController
 				'total_farmers'=>(int)$area->total_farmer,
 				'practice_area'=>(float)$area->total_area,
 				'total_area'=>(float)$area->total_area,
-
 			];
 		}
 

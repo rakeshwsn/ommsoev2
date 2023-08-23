@@ -387,7 +387,21 @@ WHERE (year_id IS NULL";
 
     public function getAllDistricts($filter=[]) {
 
-        $sql = "SELECT
+        $sql = "SELECT d.id district_id,d.name district,total_blocks,total_gps,start_date,
+farmers_covered,nursery_raised,balance_smi,
+balance_lt,
+fc_area,
+ragi_smi,
+ragi_lt,
+ragi_ls,
+little_millet_lt,
+little_millet_ls,
+foxtail_ls,
+sorghum_ls,
+kodo_ls,
+barnyard_ls,
+pearl_ls FROM soe_districts d LEFT JOIN
+ (SELECT
   district_id,district,total_blocks,total_gps,start_date,
   SUM(farmers_covered) AS farmers_covered,
 SUM(nursery_raised) AS nursery_raised,
@@ -405,7 +419,7 @@ SUM(kodo_ls) AS kodo_ls,
 SUM(barnyard_ls) AS barnyard_ls,
 SUM(pearl_ls) AS pearl_ls
 FROM vw_area_coverage_report_districtwise vacrd
-WHERE (vacrd.year_id IS NULL";
+WHERE (1=1";
         if(!empty($filter['year_id'])){
             $sql .= " OR vacrd.year_id = ".$filter['year_id'];
         }
@@ -415,10 +429,10 @@ WHERE (vacrd.year_id IS NULL";
         }
         $sql .= ")";
         if(!empty($filter['start_date'])){
-            $sql .= " AND (DATE(vacrd.start_date) = DATE('".$filter['start_date']."') OR vacrd.start_date IS NULL)";
+            $sql .= " AND DATE(vacrd.start_date) = DATE('".$filter['start_date']."')";
         }
-        $sql .= " GROUP BY district_id ORDER BY district";
-
+        $sql .= " GROUP BY district_id) res ON d.id=res.district_id ORDER BY d.name";
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
