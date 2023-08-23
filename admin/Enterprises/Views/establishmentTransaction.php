@@ -167,8 +167,9 @@
             // A file was successfully uploaded server response
             if (data.status) {
                 show_error('File uploaded successfully');
-                $('.dm-uploader .status').addClass('text-success');
-                location.href = data.url;
+                console.log(data.data);
+                // $('.dm-uploader .status').addClass('text-success');
+                // location.href = data.url;
             } else {
                 show_error(data.message)
             }
