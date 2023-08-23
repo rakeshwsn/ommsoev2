@@ -212,7 +212,6 @@ class Dashboard extends ResourceController
 				'intercropping'=>(float)$area->total_intercropping,
 				'practice_area'=>(float)$area->total_area,
 				'total_area'=>(float)$area->total_area,
-
 			];
 		}
 
