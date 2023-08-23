@@ -3,6 +3,7 @@ namespace App\Libraries;
 
 use Config\ExcelStyles;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Export
 {
