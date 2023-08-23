@@ -15,6 +15,7 @@ class AreaCoverage extends AdminController
 {
     private $districtModel;
     private $areaCoverageModel;
+    public $statuses = ['Uploaded', 'Approved', 'Rejected', 'Not Uploaded', 'Not Required'];
     public $colors_ac = [
         'warning',
         'success',
@@ -828,22 +829,22 @@ class AreaCoverage extends AdminController
             if (!isset($status)) {
                 $status = 3;
             }
-             $actionTaken = '';
-    if ($status == 0) {
-       $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Pending</label>';
-    } elseif ($status == 1) {
-        $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Approved</label>';
-    } elseif ($status == 2) {
-        $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Rejected</label>';
-    } elseif ($status == 3) {
-        $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Not Uploaded</label>';
-    }
+            $actionTaken = '';
+            if ($status == 0) {
+                $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Pending</label>';
+            } elseif ($status == 1) {
+                $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Approved</label>';
+            } elseif ($status == 2) {
+                $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Rejected</label>';
+            } elseif ($status == 3) {
+                $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Not Uploaded</label>';
+            }
 
             $data['blockstatuses'][] = [
                 'district' => $blockstatus->district_name,
                 'block' => $blockstatus->block_name,
                 'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
-                    'action_taken' => $actionTaken,
+                'action_taken' => $actionTaken,
 
             ];
 
