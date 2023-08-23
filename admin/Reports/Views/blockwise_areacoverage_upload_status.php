@@ -69,7 +69,7 @@
                                 <?= $blockstatus['status'] ?>
                             </td>
                             <td>
-                                <?= $blockstatus['status'] ?>
+                                <?= $blockstatus['action_taken'] ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

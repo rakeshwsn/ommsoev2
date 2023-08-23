@@ -549,40 +549,38 @@ FROM vw_districtwise_blocks_gps vdbg
         $sql = "SELECT
     sd.name AS district_name,
     sb.name AS block_name,
-    CASE
-        WHEN acc.status IS NULL THEN 'NULL'
-        ELSE acc.status
-    END AS status
+    COALESCE(acc.status, 3) AS status
 FROM
     soe_blocks sb
 LEFT JOIN
-    ac_crop_coverage acc ON acc.block_id = sb.id AND DATE(acc.start_date) = DATE('" . $filter['start_date'] . "')
+    ac_crop_coverage acc ON acc.block_id = sb.id 
+        AND DATE(acc.start_date) = DATE('" . $filter['start_date'] . "')
+        AND acc.deleted_at IS NULL
+        AND (acc.status = 0 OR acc.status = 1)
 LEFT JOIN
     soe_districts sd ON sb.district_id = sd.id
 WHERE
-    acc.deleted_at IS NULL
-    AND (acc.status = 0 OR acc.status = 1)";
+    1 = 1"; // No need for this condition, can be omitted
 
         if (isset($filter['district_id'])) {
             $sql .= " AND sd.id = " . $filter['district_id'];
         }
 
         if (isset($filter['season'])) {
-            $sql .= " AND acc.season = '" . $filter['season'] . "'"; // Replace with your actual column name
+            $sql .= " AND acc.season = '" . $filter['season'] . "'";
         }
 
         if (isset($filter['year_id'])) {
-            $sql .= " AND acc.year_id = " . $filter['year_id']; // Replace with your actual column name
+            $sql .= " AND acc.year_id = " . $filter['year_id'];
         }
 
         $sql .= "
-GROUP BY sb.id
 ORDER BY
-    sd.name ASC";
-
+    sd.name ASC, sb.name ASC";
 
         $res = $this->db->query($sql)->getResult();
         return $res;
+
     }
 
 
