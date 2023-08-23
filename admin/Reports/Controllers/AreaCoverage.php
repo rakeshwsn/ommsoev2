@@ -14,9 +14,18 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class AreaCoverage extends AdminController
 {
     private $districtModel;
+    private $areaCoverageModel;
+    public $colors_ac = [
+        'warning',
+        'success',
+        'danger',
+        'secondary',
+        'primary',
+    ];
     public function __construct()
     {
         $this->districtModel = new DistrictModel();
+        $this->areaCoverageModel = new AreaCoverageModel();
     }
 
     public function index($action = '')
@@ -193,10 +202,10 @@ class AreaCoverage extends AdminController
     private function gps($blocks, &$data)
     {
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
         $data['rows'] = [];
         foreach ($blocks as $block) {
@@ -771,56 +780,60 @@ class AreaCoverage extends AdminController
     }
     public function blockWiseGetUploadStatus()
     {
+
         $data = [];
         $data['districts'] = $this->districtModel->getAll();
-        // print_r($data['districts']);
-        // exit;
+
         $this->template->add_package(array('datatable', 'select2'), true);
         $acModel = new AreaCoverageModel();
 
         $data['seasons'] = $acModel->getSeasons();
-
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['year_id'] = getCurrentYearId();
 
         $data['years'] = (new YearModel())->where('id', $data['year_id'])->asArray()->find();
 
-        if ($this->request->getGet('year_id')) {
-            $data['year_id'] = $this->request->getGet('year_id');
-        }
 
         $week_dates = $acModel->getWeekDate();
+        $filter = array();
+        // print_r($filter);
+        // exit;
+
+        if ($this->request->getGet('district_id')) {
+            $filter['district_id'] = $this->request->getGet('district_id');
+        }
+
+
+        if ($this->request->getGet('year_id')) {
+            $filter['year_id'] = $this->request->getGet('year_id');
+        }
 
         if ($this->request->getGet('start_date')) {
-            $data['start_date'] = $start_date = $this->request->getGet('start_date');
+            $filter['start_date'] = $start_date = $this->request->getGet('start_date');
         } else {
-            $data['start_date'] = $week_dates['start_date'];
+            $filter['start_date'] = $week_dates['start_date'];
         }
-
         if ($this->request->getGet('season')) {
-            $data['current_season'] = $this->request->getGet('season');
+            $filter['current_season'] = $this->request->getGet('season');
         }
+        // print_r($filter);
+        // exit;
+        $blockstatuses = $this->areaCoverageModel->getBlockWiseStatus($filter);
+        // dd($blockstatuses);
+        // exit;
 
-        $statuses = $acModel->getUploadStatus($data['start_date']);
+        $data['blockstatuses'] = [];
+        foreach ($blockstatuses as $blockstatus) {
+            $status = $blockstatus->status;
+            $data['blockstatuses'][] = [
+                'district' => $blockstatus->district_name,
+                'block' => $blockstatus->block_name,
+                'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
 
-        $data['statuses'] = [];
-        $total_blocks = $total_ac_blocks = 0;
-        foreach ($statuses as $status) {
-            $data['statuses'][] = [
-                'district' => $status->district,
-                'total_blocks' => $status->total_blocks,
-                'total_ac_blocks' => $status->total_ac_blocks,
-                'remaining' => ($status->total_blocks - $status->total_ac_blocks),
             ];
-            $total_blocks += $status->total_blocks;
-            $total_ac_blocks += $status->total_ac_blocks;
+
         }
-        $data['statuses'][] = [
-            'district' => '<strong>Total</strong>',
-            'total_blocks' => $total_blocks,
-            'total_ac_blocks' => $total_ac_blocks,
-            'remaining' => ($total_blocks - $total_ac_blocks),
-        ];
+
 
         $weeks = $acModel->getWeeks();
         $data['weeks'] = [];
@@ -831,11 +844,17 @@ class AreaCoverage extends AdminController
                 $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
             }
         }
+        $data['filtered_data_url'] = admin_url('reports/areacoverage/blockWiseGetUploadStatus/filtered');
 
-        $data['week_start_date'] = $data['start_date'];
+        $data['week_start_date'] = $filter['start_date'];
 
         return $this->template->view('Admin\Reports\Views\blockwise_areacoverage_upload_status', $data);
     }
+
+
+
+
+
 
 
 }
