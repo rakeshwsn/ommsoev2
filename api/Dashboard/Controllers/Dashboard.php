@@ -57,7 +57,7 @@ class Dashboard extends ResourceController
 		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
 	}
 	
-	public function procurement2(){
+	public function procurement(){
 		
 		$districtmodel = new DistrictModel();
 
@@ -94,7 +94,7 @@ class Dashboard extends ResourceController
 
 	}
 	
-	public function pds2(){
+	public function pds(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
@@ -209,6 +209,7 @@ class Dashboard extends ResourceController
 				'district_id'=>(int)$area->district_id,
 				'district'=>$area->district,
 				'total_farmers'=>(int)$area->total_farmer,
+				'intercropping'=>(float)$area->total_intercropping,
 				'practice_area'=>(float)$area->total_area,
 				'total_area'=>(float)$area->total_area,
 
@@ -218,7 +219,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function pds(){
+	public function pds2(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
@@ -242,7 +243,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function procurement(){
+	public function procurement2(){
 		
 		$districtmodel = new DistrictModel();
 
@@ -290,6 +291,9 @@ class Dashboard extends ResourceController
 				'year'=>$achievement->year_id,
 				'total_area_coverage'=>(float)$achievement->total_ach,
 				'total_farmers_coverage'=>(int)$achievement->total_farmers,
+				'total_nursery_beds'=>(float)$achievement->total_nursery,
+				'total_intercropping'=>(float)$achievement->total_intercropping
+
 			];
 		}
 		
@@ -314,6 +318,7 @@ class Dashboard extends ResourceController
 				'total_farmers'=>(int)$mapdata->farmers,
 				'chc'=>(int)$mapdata->chcs,
 				'cmsc'=>(int)$mapdata->cmscs,
+
 			];
 		}
 		// dd($data);
@@ -347,20 +352,19 @@ class Dashboard extends ResourceController
 	public function summary(){
 		$distmapmodel = new DistrictMapModel();
 		$yearModel = new YearModel();
-        $year = $yearModel->getCurrentYearId();
-
-        $summery = $distmapmodel->getSummary($year-1);
-
-        $data['data']=[
-            'total_districts'=>(int)$summery->total_districts,
-            'total_blocks'=>(int)$summery->total_blocks,
-            'total_gps'=>(int)$summery->total_gps,
-            'total_villages'=>(int)$summery->total_villages,
-            'total_farmers'=>(int)$summery->total_farmers,
-            'total_chc'=>(int)$summery->total_chc,
-            'total_cmsc'=>(int)$summery->total_cmsc,
-            'demo_area'=>(int)$summery->demo_area
-        ];
+		$summerydata = $distmapmodel->getSummary($yearModel->getCurrentYearId());
+		$data['data']=[];
+		foreach ($summerydata as $summery) {
+			$data['data'][]=[
+				'total_districts'=>(int)$summery->total_districts,
+				'total_blocks'=>(int)$summery->total_blocks,
+				'total_gps'=>(int)$summery->total_gps,
+				'total_villages'=>(int)$summery->total_villages,
+				'total_farmers'=>(int)$summery->total_farmers,
+				'total_chc'=>(int)$summery->total_chc,
+				'total_cmsc'=>(int)$summery->total_cmsc
+			];
+		}
 		//heading
 		$data['heading'] = 'Summary Data';
 		

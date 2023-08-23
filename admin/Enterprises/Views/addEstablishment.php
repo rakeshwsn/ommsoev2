@@ -56,7 +56,7 @@ $validation = \Config\Services::validation();
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('contact_mobile') ? 'is-invalid' : '' ?>">
                     <label for="Contact Mobile">Contact Mobile</label>
-                    <input type="text" name="contact_mobile" class="form-control" id="exampleInputPassword1" placeholder="Mobile" value="<?= set_value('contact_mobile', $contact_mobile) ?>">
+                    <input type="text" name="contact_mobile" class="form-control" id="exampleInputPassword1" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_mobile'); ?></div>
 
                 </div>
@@ -137,8 +137,8 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <button type="reset" class="btn btn-primary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>         
+                    <a href="admin/enterprises/cancel" class="btn btn-primary">Cancel</a>
                 </div>
             </div>
         </div>

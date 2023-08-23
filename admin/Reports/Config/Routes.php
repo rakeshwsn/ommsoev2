@@ -30,6 +30,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('reports/areacoverage/allblocks/download', 'Reports\Controllers\AreaCoverage::allblocks/download');
     $routes->get('reports/areacoverage/getUploadStatus', 'Reports\Controllers\AreaCoverage::getUploadStatus');
     $routes->get('reports/areacoverage/blockWiseGetUploadStatus', 'Reports\Controllers\AreaCoverage::blockWiseGetUploadStatus');
+    $routes->get('reports/areacoverage/blockWiseGetUploadStatus/filtered', 'Reports\Controllers\AreaCoverage::blockWiseGetUploadStatus');
 
 });
 

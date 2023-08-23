@@ -68,6 +68,7 @@ class Enterprises extends AdminController
 				'date_estd' => $row->date_estd,
 				'mou_date' => $row->mou_date,
 				'edit_url' => admin_url('enterprises/edit?id=' . $row->id),
+				
 			];
 		}
 
@@ -319,6 +320,7 @@ class Enterprises extends AdminController
 		//  dd($data);
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}
+
 
 	protected function validateForm()
 	{
