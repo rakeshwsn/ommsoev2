@@ -209,7 +209,7 @@ class Dashboard extends ResourceController
 				'district_id'=>(int)$area->district_id,
 				'district'=>$area->district,
 				'total_farmers'=>(int)$area->total_farmer,
-				'intercropping'=>(float)$area->total_intercropping,
+//				'intercropping'=>(float)$area->total_intercropping,
 				'practice_area'=>(float)$area->total_area,
 				'total_area'=>(float)$area->total_area,
 			];
