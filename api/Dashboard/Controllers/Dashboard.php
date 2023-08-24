@@ -47,14 +47,14 @@ class Dashboard extends ResourceController
 
 		foreach ($achievements as $achievement) {
 			$data['areayears'][] = $achievement->year;
-			$data['areafarmers'][] = $achievement->total_farmers;
-			$data['areaachievements'][] = $achievement->total_ach;
+			$data['areafarmers'][] = (int)$achievement->total_farmers;
+			$data['areaachievements'][] = (float)$achievement->total_ach;
 		}
 		$data['heading'] = 'AREA COVERAGE CHART';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
 	public function procurement(){
@@ -99,18 +99,17 @@ class Dashboard extends ResourceController
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
 
-		$data['pdsyear'] = [];
-		$data['pdsquantity'] = [];
-		$data['card_holders_benifited'] = [];
+		$data['year'] = [];
+		$data['quantity'] = [];
+		$data['card_holders_benefited'] = [];
 
 		foreach ($pdses as $pds) {
-			$data['pdsyear'][] = $pds->year;
-			$data['pdsquantity'][] = $pds->total_quantity;
-			$data['card_holders_benifited'][] = $pds->total_chb;
+			$data['pdsyear'][] = (int)$pds->year;
+			$data['pdsquantity'][] = (int)$pds->total_quantity;
+			$data['card_holders_benefited'][] = (int)$pds->total_chb;
 		}
 
-
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
 	public function establishment(){
@@ -127,12 +126,12 @@ class Dashboard extends ResourceController
 
 		foreach ($establishes as $establish) {
 			$data['estdistrict'][] = $establish->district;
-			$data['chc'][] = $establish->chc;
-			$data['cmsc'][] = $establish->cmsc;
-			$data['blocks'][] = $establish->blocks;
+			$data['chc'][] = (int)$establish->chc;
+			$data['cmsc'][] = (int)$establish->cmsc;
+			$data['blocks'][] = (int)$establish->blocks;
 		}
 		// dd($data);
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
 	public function enterprise(){
@@ -185,9 +184,6 @@ class Dashboard extends ResourceController
 		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
 	}
 
-
-
-
 	public function districtarea(){
 		$districtmodel = new DistrictModel();
 		$areamodel = new AreaChartModel();
@@ -234,7 +230,6 @@ class Dashboard extends ResourceController
 				'districts'=>(int)$pds->total_district,
 				'ration_card_holders'=>(int)$pds->total_chb,
 				'qty_supply_pds'=>(float)$pds->total_quantity
-
 			];
 		}
 
@@ -292,7 +287,6 @@ class Dashboard extends ResourceController
 				'total_farmers_coverage'=>(int)$achievement->total_farmers,
 				'total_nursery_beds'=>(float)$achievement->total_nursery,
 				'total_intercropping'=>(float)$achievement->total_intercropping
-
 			];
 		}
 		
@@ -327,7 +321,6 @@ class Dashboard extends ResourceController
 	public function enterprises(){
 		$enterprisemodel = new EnterpriseChartModel();;
 		$filter = [];
-		
 
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
 		$data['data']=[];
