@@ -351,7 +351,8 @@ class Dashboard extends ResourceController
 	public function summary(){
 		$distmapmodel = new DistrictMapModel();
 		$yearModel = new YearModel();
-		$summerydata = $distmapmodel->getSummary($yearModel->getCurrentYearId());
+		$summerydata = $distmapmodel->getSummary();
+
 		$data['data']=[];
 		foreach ($summerydata as $summery) {
 			$data['data'][]=[

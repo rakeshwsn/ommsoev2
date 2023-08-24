@@ -64,7 +64,7 @@ FROM soe_districts sd
 		 return $this->db->query($sql)->getResult(); 
 	}
 
-	public function getSummary($year_id){
+	public function getSummary($year_id=''){
 		$sql="SELECT
         y.id year_id,
         y.name year,
@@ -84,8 +84,10 @@ FROM soe_districts sd
     FROM dashboard_areacoverage
     WHERE deleted_at IS NULL GROUP BY year_id) ac
     ON ac.year_id = dm.year_id
-WHERE dm.deleted_at IS NULL
-AND dm.year_id =$year_id";
+WHERE dm.deleted_at IS NULL";
+		if($year_id){
+            $sql .= " AND dm.year_id =$year_id";
+        }
 
 		return $this->db->query($sql)->getFirstRow();
 	}

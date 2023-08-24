@@ -304,7 +304,7 @@
 
         },
         xAxis: {
-            categories: []
+            categories: [],
         },
         tooltip: {
             crosshairs: true,
@@ -349,7 +349,7 @@
 
         },
         xAxis: {
-            categories: []
+            categories: [],
         },
         tooltip: {
             crosshairs: true,

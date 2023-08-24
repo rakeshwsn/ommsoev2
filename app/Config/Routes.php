@@ -80,7 +80,7 @@ $routes->group(env('app.adminRoute'), ['namespace' => 'front', 'filter' => 'logi
 
 });
 $routes->group('', ['namespace' => 'Front'], function($routes){
-  $routes->get('dashboardtest', 'Pages\Controllers\Dashboard::index');
+  $routes->get('dashboard', 'Pages\Controllers\Dashboard::index');
 });
 
 /*
