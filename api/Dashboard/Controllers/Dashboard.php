@@ -360,7 +360,8 @@ class Dashboard extends ResourceController
             'total_villages'=>(int)$summery->total_villages,
             'total_farmers'=>(int)$summery->total_farmers,
             'total_chc'=>(int)$summery->total_chc,
-            'total_cmsc'=>(int)$summery->total_cmsc
+            'total_cmsc'=>(int)$summery->total_cmsc,
+            'demo_area'=>(int)$summery->demo_area
         ];
 		//heading
 		$data['heading'] = 'Summary Data';
