@@ -657,7 +657,7 @@
             success: function(response) {
                 pdschart.xAxis[0].setCategories(response.pdsyear);
                 pdschart.series[0].setData(response.pdsquantity);
-                pdschart.series[1].setData(response.card_holders_benifited);
+                pdschart.series[1].setData(response.card_holders_benefited);
 
             }
 

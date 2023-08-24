@@ -37,10 +37,10 @@ class Dashboard extends BaseController
 
 
 		$data['area_url'] = site_url('api/areacoverage');
-		$data['procure_url'] = site_url('api/procurement');
-		$data['pds_url'] = site_url('api/pds');
+		$data['procure_url'] = site_url('api/procurement_c');
+		$data['pds_url'] = site_url('api/pds_c');
 		$data['establish_url'] = site_url('api/establishment');
-		$data['enterprise_url'] = site_url('api/enterprises');
+		$data['enterprise_url'] = site_url('api/enterprises2');
 		$data['odishamap_url'] = site_url('api/odishamap');
 		
 		$this->template->set_layout('default');
