@@ -1,10 +1,11 @@
 <?php
+
 namespace Front\Pages\Controllers;
 
 use Front\Api\Models\YearModel;
 use Front\Api\Models\DistrictModel;
 use Front\Api\Models\OdMapModel;
-use Admin\Pages\Models\PagesModel;
+// use Admin\Pages\Models\PagesModel;
 use App\Controllers\BaseController;
 
 class Dashboard extends BaseController
