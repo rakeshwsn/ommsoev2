@@ -557,8 +557,6 @@ FROM vw_districtwise_blocks_gps vdbg
     }
     public function getBlockWiseStatus($filter)
     {
-
-
         $sql = "SELECT
     sd.name AS district_name,
     sb.name AS block_name,
@@ -569,7 +567,7 @@ LEFT JOIN
     ac_crop_coverage acc ON acc.block_id = sb.id 
         AND DATE(acc.start_date) = DATE('" . $filter['start_date'] . "')
         AND acc.deleted_at IS NULL
-        AND (acc.status = 0 OR acc.status = 1)
+        AND (acc.status = 0 OR acc.status = 1 OR acc.status = 2)
 LEFT JOIN
     soe_districts sd ON sb.district_id = sd.id
 WHERE
@@ -594,9 +592,5 @@ ORDER BY
 
         $res = $this->db->query($sql)->getResult();
         return $res;
-
-
-
-
     }
 }
