@@ -59,6 +59,7 @@ class Autoload extends AutoloadConfig
 		'Config'      => APPPATH . 'Config',
 		'Admin' => ROOTPATH. 'admin', // here we have added.,
 		'Api' => ROOTPATH. 'api', // here we have added.,
+		'Front' => ROOTPATH. 'front', // here we have added.,
 	];
 
 	/**

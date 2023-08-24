@@ -7,4 +7,5 @@ if(!isset($routes))
 
 $routes->group('dashboard', ['namespace' => 'Front'], function($routes){
     
+    
 });
