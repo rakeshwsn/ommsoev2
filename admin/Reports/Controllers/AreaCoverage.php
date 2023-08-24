@@ -829,6 +829,7 @@ class AreaCoverage extends AdminController
             if (!isset($status)) {
                 $status = 3;
             }
+
             $actionTaken = '';
             if ($status == 0) {
                 $actionTaken = '<label class="badge badge-' . $this->colors_ac[$status] . '">Pending</label>';
