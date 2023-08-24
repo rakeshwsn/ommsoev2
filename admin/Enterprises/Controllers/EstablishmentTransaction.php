@@ -134,155 +134,46 @@ class EstablishmentTransaction extends AdminController
             ]
         ]);
 
-        //         if (!$input) {
-        //             return $this->response->setJSON([
-        //                 'status' => false,
-        //                 'message' => 'Invalid file',
-        //                 'errors' => $this->validator->getErrors()
-        //             ]);
-        //         } else {
-
-        //             $file = $this->request->getFile('file');
-
-        //             try {
-        //                 $reader = IOFactory::createReader('Xlsx');
-        //                 $spreadsheet = $reader->load($file);
-        //             } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-        //                 return $this->response->setJSON([
-        //                     'status' => false,
-        //                     'message' => 'Invalid file.'
-        //                 ]);
-        //             }
-
-        //             $activesheet = $spreadsheet->getSheet(0);
-
-        //             $row_data = $activesheet->toArray();
-        // printr($row_data);
-        // exit;
-
-        $config['upload_path'] = 'assets/uploads';
-        $config['allowed_types'] = 'xls|xlsx';
-        $this->load->library('upload', $config);
-        $var = 'ob_file';
-        $tradatadetails = [];
-        $tradata = [];
-        $this->load->library('upload', $config);
-        if (!$this->upload->do_upload($var)) {
-            $this->session->set_flashdata('upload_error', $this->upload->display_errors());
-            redirect('enterprises/transaction');
+        if (!$input) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
+            ]);
         } else {
-            $data = $this->upload->data();
-            //printr($data);
-            //exit;
-            if (strpos($data['file_name'], 'EnterpriseTransaction-' . $this->agency->district_id) === false) {
-                unlink($data['full_path']);
 
-                $this->session->set_flashdata('error_message', 'Invalid File');
-                redirect('enterprises/transaction');
-            } else if ($data['file_name']) {
-                $file = $data['full_path'];
+            $file = $this->request->getFile('file');
 
-                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            try {
+                $reader = IOFactory::createReader('Xlsx');
                 $spreadsheet = $reader->load($file);
-                $sheetCount = $spreadsheet->getSheetCount();
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Invalid file.'
+                ]);
+            }
 
+            $activesheet = $spreadsheet->getSheet(0);
 
-                for ($i = 0; $i < $sheetCount; $i++) {
-                    $sheet = $spreadsheet->getSheet($i);
-                    $sheetData = $sheet->toArray(null, true, true, true);
-                    //printr($sheetData);
-                    //exit;
-                    array_shift($sheetData);
-                    //array_shift($sheetData);
-                    //array_shift($sheetData);
-                    //printr($sheetData);
-                    //exit;
-                    foreach ($sheetData as $sheet) {
-                        if ($i == 0) {
-                            //echo $sheet['A'];
-                            if (is_numeric($sheet['A']) && !is_numeric($sheet['B'])) {
-                                $unit_id = $sheet['A'];
-                                $tradata[$unit_id] = array(
-                                    'unit_id' => $unit_id,
-                                    'year_id' => $year_id,
-                                    'month_id' => $month_id,
-                                    'period' => $period,
-                                    'district_id' => $this->agency->district_id,
-                                    'date_added' => date('Y-m-d')
-                                );
-                            }
-                            if (is_numeric($sheet['A']) && is_numeric($sheet['B'])) {
-                                $enterprise_id = $sheet['A'];
-                                $enterprise = $this->$establishmentransaction->get($enterprise_id);
-                                $tradata[$unit_id]['details'][] = array(
-                                    'enterprise_id' => $enterprise_id,
-                                    'block_id' => $enterprise->block_id,
-                                    'gp_id' => $enterprise->gp_id,
-                                    'village_id' => $enterprise->village_id,
-                                    'no_of_days_functional' => $sheet['G'],
-                                    'produced' => removeComma($sheet['H']),
-                                    'charges_per_qtl' => removeComma($sheet['I']),
-                                    'total_expend' => removeComma($sheet['J']),
-                                    'total_turnover' => removeComma($sheet['K']),
-                                    'date_added' => date('Y-m-d')
-                                );
-                            }
-                        } else if ($i == 1) {
-                            //echo $sheet['A'];
-                            if (is_numeric($sheet['A']) && !is_numeric($sheet['B'])) {
-                                $unit_id = $sheet['A'];
-                                $tradata[$unit_id] = array(
-                                    'unit_id' => $unit_id,
-                                    'year_id' => $year_id,
-                                    'month_id' => $month_id,
-                                    'period' => $period,
-                                    'district_id' => $this->agency->district_id,
-                                    'date_added' => date('Y-m-d')
-                                );
-                            }
-                            if (is_numeric($sheet['A']) && is_numeric($sheet['B'])) {
+            $row_data = $activesheet->toArray();
+        }
+        foreach ($row_data as $transaction) {
+            //only rows with gp_id
+            if (is_numeric($transaction[0])) {
+                $transaction_data = [
+                    'managing_unit_name' => $transaction[0],
+                    'unit_name' => $transaction[1],
+                    'block' => $transaction[2],
+                    'grampanchayat' => $transaction[3],
+                    'season' => $transaction[4],
+                    'villages' => $transaction[5],
+                   
+                ];
 
-                                $enterprise_id = $sheet['A'];
-                                $enterprise = $this->$establishmentransaction->get($enterprise_id);
-                                $tradata[$unit_id]['details'][] = array(
-                                    'enterprise_id' => $enterprise_id,
-                                    'block_id' => $enterprise->block_id,
-                                    'gp_id' => $enterprise->gp_id,
-                                    'village_id' => $enterprise->village_id,
-                                    'no_of_days_functional' => $sheet['G'],
-                                    'produced' => '',
-                                    'charges_per_qtl' => '',
-                                    'total_expend' => removeComma($sheet['H']),
-                                    'total_turnover' => removeComma($sheet['I']),
-                                    'date_added' => date('Y-m-d')
-                                );
-                            }
-                        }
-                    }
-                }   
-                //printr($tradata);
-                //exit;
-                foreach ($tradata as $tdata) {
-                    $filter = [
-                        'district_id' => $tdata['district_id'],
-                        'year_id' => $tdata['year_id'],
-                        'month_id' => $tdata['month_id'],
-                        'period' => $tdata['period'],
-                        'unit_id' => $tdata['unit_id'],
-                    ];
-                    $transaction = $this->$establishmentransaction->getCheckEnterpriseTransaction($filter);
-                    //printr($transaction);
-                    if ($transaction) {
-                        $this->$establishmentransaction->editTransaction($transaction['id'], $tdata);
-                    } else {
-                        $this->$establishmentransaction->addTransaction($tdata);
-                    }
-                }
-                $this->session->set_flashdata('message', 'Upload successfully');
-                redirect('enterprises/transaction');
-                /*$this->session->set_userdata('ob_file', $data);
-                $this->session->set_userdata('year_id', $year_id);
-                $this->session->set_userdata('month_id', $month_id);*/
+                //                        $ac_crop_coverage_id = 0;
+                $transactions = $establishmentransaction->insert($transaction_data);
+                dd($transactions);
             }
         }
     }
