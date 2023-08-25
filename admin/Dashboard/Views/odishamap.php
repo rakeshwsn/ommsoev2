@@ -102,7 +102,7 @@
 </style>
 <div class="block" id="tentative_map">
     <div class="block-header block-header-default">
-        <h3 class="block-title">ESTABLISHMENT MAP</h3>
+        <h3 class="block-title">Scale of Odisha Millets Mission</h3>
     </div>
     <div class="block-content block-content-full tentative_map_content">
         <div class="map-section">
