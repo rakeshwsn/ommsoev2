@@ -50,7 +50,7 @@ class Dashboard extends ResourceController
 			$data['areafarmers'][] = (int)$achievement->total_farmers;
 			$data['areaachievements'][] = (float)$achievement->total_ach;
 		}
-		$data['heading'] = 'AREA COVERAGE CHART';
+		$data['heading'] = 'Millet Demonstration Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
@@ -85,7 +85,7 @@ class Dashboard extends ResourceController
 			$data['pquantity'][] = $procure->total_quantity;
 			$data['ptotal_amount'][] = $procure->total_amount;
 		}
-		$data['heading'] = 'PROCUREMENT';
+		$data['heading'] = 'Ragi Procurement Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
@@ -169,7 +169,7 @@ class Dashboard extends ResourceController
 		}
 
 		//heading
-		$data['heading'] = 'Enterprise Chart';
+		$data['heading'] = 'Progress on Millet based Enterprise Establishment';
 		if ($year_id) {
 			$data['heading'] .= ' for year ' . $yearmodel->find($year_id)->name;
 		}

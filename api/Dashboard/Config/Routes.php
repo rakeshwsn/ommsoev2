@@ -10,6 +10,7 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->get('establishment', 'Dashboard\Controllers\Dashboard::establishment');
     $routes->get('enterprises2', 'Dashboard\Controllers\Dashboard::enterprise');
 
+    //api
     $routes->get('areacoverage', 'Dashboard\Controllers\Dashboard::areacoverage');
     $routes->get('districtarea', 'Dashboard\Controllers\Dashboard::districtarea');
     $routes->get('procurement', 'Dashboard\Controllers\Dashboard::procurement2');
