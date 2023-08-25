@@ -146,7 +146,9 @@ class Transaction extends AdminController {
             'limit' => $requestData['length']
         ];
 //        $totalFiltered = 0;
-        $totalFiltered = $txnModel->getTotal($filter_data);
+
+
+$totalFiltered = $txnModel->getTotal($filter_data);
 
         $filteredData = $txnModel->getAll($filter_data);
 

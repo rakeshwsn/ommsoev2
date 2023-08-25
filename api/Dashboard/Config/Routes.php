@@ -10,6 +10,9 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->add('establishment', 'Dashboard\Controllers\Dashboard::establishment');
     $routes->add('enterprises2', 'Dashboard\Controllers\Dashboard::enterprises');
 
+
+
+//api
     $routes->add('districtarea', 'Dashboard\Controllers\Dashboard::districtarea');
     $routes->add('procurement', 'Dashboard\Controllers\Dashboard::procurement');
     $routes->add('pds', 'Dashboard\Controllers\Dashboard::pds');

@@ -231,7 +231,7 @@
 
 <div class="block" id="tentative_map">
     <div class="block-header block-header-default">
-        <h3 class="block-title">ESTABLISHMENT MAP</h3>
+        <h3 class="block-title">Scale of Odisha Millets Mission</h3>
     </div>
     <div class="block-content block-content-full tentative_map_content">
         <div class="map-section">
@@ -258,8 +258,8 @@
                             <tr>
                                 <th scope="col">District</th>
                                 <th scope="col">Total Block</th>
-                                <th scope="col">Total CHC</th>
-                                <th scope="col">Total CMSC</th>
+                                <th scope="col">No. of GPs </th>
+                                <th scope="col">No. of Villages </th>
                                 <th scope="col">Total Farmer</th>
                             </tr>
                         </thead>
@@ -291,6 +291,12 @@
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <script src="<?php echo theme_url('assets/js/snap.svg-min.js') ?>"></script>
 
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
 <script>
     //AREACOVERAGE START
 
@@ -299,7 +305,7 @@
             type: 'line'
         },
         title: {
-            text: 'AREA COVERAGE (FARMERS VS ACHIEVEMNET)',
+            text: 'Millet Demonstration Progress',
 
 
         },
@@ -322,14 +328,14 @@
         },
 
         series: [{
-            name: 'Farmers',
+            name: 'Farmers (in number)',
             marker: {
                 symbol: 'square',
             },
             data: [],
             color: '#ff0000'
         }, {
-            name: 'Achievement',
+            name: 'Area Demonstration (in Hectare)',
             marker: {
                 symbol: 'circle'
             },
@@ -345,7 +351,7 @@
             type: 'line'
         },
         title: {
-            text: 'PROCUREMENT'
+            text: 'Ragi Procurement Progress'
 
         },
         xAxis: {
@@ -364,7 +370,7 @@
             }
         },
         series: [{
-            name: 'Farmers',
+            name: 'Farmer covered (in Number)',
             marker: {
                 symbol: 'triangle'
             },
@@ -372,7 +378,7 @@
             color: '#cb0ce8'
 
         }, {
-            name: 'Quantity',
+            name: 'Quantity of Ragi Procures (in Quintals) ',
             marker: {
                 symbol: 'diamond'
             },
@@ -390,7 +396,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'PDS',
+            text: 'Ragi Distributed in PDS',
             // color:'#085c19',
             align: 'center'
         },
@@ -407,14 +413,14 @@
                 }
             },
             title: {
-                text: 'Quantity',
+                text: 'Quantity (in Quintals)',
                 style: {
                     color: Highcharts.getOptions().colors[1]
                 }
             }
         }, { // Secondary yAxis
             title: {
-                text: 'Benificiary',
+                text: 'Card Holders Benefited (in Number) ',
                 style: {
                     color: Highcharts.getOptions().colors[0]
                 }
@@ -435,7 +441,7 @@
                 'rgba(255,255,255,0.25)'
         },
         series: [{
-            name: 'Quantiry',
+            name: 'Quantity (in Quintals)',
             type: 'column',
             yAxis: 1,
             data: [],
@@ -445,7 +451,7 @@
             }
 
         }, {
-            name: 'Benificiary',
+            name: 'Card Holders Benefited (in Number) ',
             type: 'spline',
             data: [],
             color: '#1e820c',
@@ -463,7 +469,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'ESTABLISHMENT',
+            text: 'CHC and CMS Establishment Progress',
             align: 'center'
         },
 
@@ -507,7 +513,7 @@
                 'rgba(255,255,255,0.25)'
         },
         series: [{
-                name: 'Total Blocks',
+                name: 'Programme Blocks (in number)',
                 type: 'column',
                 yAxis: 1,
                 data: [],
@@ -516,7 +522,7 @@
                 }
 
             }, {
-                name: 'Total CHC',
+                name: 'CHC (in Number)',
                 type: 'spline',
                 data: [],
                 tooltip: {
@@ -524,7 +530,7 @@
                 }
             },
             {
-                name: 'Total CMSC',
+                name: 'CMSC (in number)',
                 type: 'spline',
                 data: [],
                 tooltip: {
@@ -537,26 +543,34 @@
 
     // ESTABLISHMENT END
 
+    // Data retrieved from https://yearbook.enerdata.net/electricity/world-electricity-production-statistics.html
 
-    //ENTERPRISE START
     var chartOptions = {
-
         chart: {
-            type: 'column'
+            type: 'column',
+            options3d: {
+                enabled: true,
+                alpha: 0,
+                beta: 0,
+                viewDistance: 10,
+                depth: 40
+            }
         },
 
         title: {
-            text: 'Enterprise Chart ',
-
+            text: 'Progress on Millet based Enterprise Establishment',
             align: 'center'
         },
 
         xAxis: {
+            labels: {
+                skew3d: true,
+                style: {
+                    fontSize: '11x'
+                }
+            },
             categories: []
-        },
-        tooltip: {
-            crosshairs: true,
-            shared: true
+
         },
 
         yAxis: {
@@ -568,29 +582,85 @@
         },
 
         tooltip: {
-            format: '<b>{key}</b><br/>{series.name}: {y}<br/>' +
-                'Total: {point.stackTotal}'
+            headerFormat: '<b>{point.key}</b><br>',
+            pointFormat: '<span style="color:{series.color}">\u25CF</span> {series.name}: {point.y} / {point.stackTotal}'
         },
 
         plotOptions: {
+
             column: {
-                stacking: 'normal'
+                stacking: 'normal',
+                depth: 40
             }
         },
 
         series: [{
-            name: ' SHG',
+            name: 'Enterprises with WSHGs',
             data: [],
             color: '#085c19',
-            stack: 'North America'
+
         }, {
-            name: 'FPO',
+            name: 'Enterprises with FPOs',
             data: [],
             color: '#26d128',
-            stack: 'North America'
+
         }]
     };
     var chart = Highcharts.chart('container', chartOptions);
+
+    //ENTERPRISE START
+    // var chartOptions = {
+
+    //     chart: {
+    //         type: 'column'
+    //     },
+
+    //     title: {
+    //         text: 'Progress on Millet based Enterprise Establishment ',
+
+    //         align: 'center'
+    //     },
+
+    //     xAxis: {
+    //         categories: []
+    //     },
+    //     tooltip: {
+    //         crosshairs: true,
+    //         shared: true
+    //     },
+
+    //     yAxis: {
+    //         allowDecimals: false,
+    //         min: 0,
+    //         title: {
+    //             text: 'Total Units '
+    //         }
+    //     },
+
+    //     tooltip: {
+    //         format: '<b>{key}</b><br/>{series.name}: {y}<br/>' +
+    //             'Total: {point.stackTotal}'
+    //     },
+
+    //     plotOptions: {
+    //         column: {
+    //             stacking: 'normal'
+    //         }
+    //     },
+
+    //     series: [{
+    //         name: ' SHG',
+    //         data: [],
+    //         color: '#085c19',
+    //         stack: 'North America'
+    //     }, {
+    //         name: 'FPO',
+    //         data: [],
+    //         color: '#26d128',
+    //         stack: 'North America'
+    //     }]
+    // };
+    // var chart = Highcharts.chart('container', chartOptions);
     // ENTERPRISE END
 
     $(function() {
