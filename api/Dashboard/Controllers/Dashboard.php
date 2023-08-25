@@ -282,7 +282,7 @@ class Dashboard extends ResourceController
 		foreach ($achievements as $achievement) {
 			$data['data'][] =[
 				'year_id'=>(int)$achievement->year_id,
-				'year'=>$achievement->year_id,
+				'year'=> $achievement->year,
 				'total_area_coverage'=>(float)$achievement->total_ach,
 				'total_farmers_coverage'=>(int)$achievement->total_farmers,
 				'total_nursery_beds'=>(float)$achievement->total_nursery,
