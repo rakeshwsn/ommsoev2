@@ -46,7 +46,9 @@ class AreaChartModel extends Model
 		a.year_id,
 		y.name `year`,
 		SUM(a.farmers) total_farmers,
-		SUM(a.achievement) total_ach
+		SUM(a.achievement) total_ach,
+		SUM(a.nursery_beds) total_nursery,
+		SUM(a.intercropping) total_intercropping
 	  FROM dashboard_areacoverage a LEFT JOIN dashboard_years y ON y.id=a.year_id
 	  WHERE a.deleted_at IS NULL";
 	  if(!empty($filter['district_id'])){
