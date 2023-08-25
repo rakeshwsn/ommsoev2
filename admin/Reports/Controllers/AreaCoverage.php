@@ -193,9 +193,15 @@ class AreaCoverage extends AdminController
         $data['week_text'] = $week_text;
 
         $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
-        $data['download_url'] = admin_url('reports/areacoverage/download');
-        $data['get_blocks'] = Url::getBlocks;
 
+        $params = 'year_id='.$data['year_id'];
+        $params .= '&season='.$data['current_season'];
+        $params .= '&district_id='.$data['district_id'];
+        $params .= '&block_id='.$data['block_id'];
+        $params .= '&start_date='.$data['start_date'];
+
+        $data['download_url'] = admin_url('reports/areacoverage/download?'.$params);
+        $data['get_blocks'] = Url::getBlocks;
 
         return $this->template->view('Admin\Reports\Views\areacoverage', $data);
     }
