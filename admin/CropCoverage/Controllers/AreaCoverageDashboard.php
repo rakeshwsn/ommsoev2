@@ -19,7 +19,7 @@ class AreaCoverageDashboard extends AdminController
         $data['chart_url'] = admin_url('areacoverage/dashboard/chart');
         $data['milletchart_url'] = admin_url('areacoverage/dashboard/milletchart');
 
-        $data['years'] = getAllYears();
+        $data['years'] = (getAllYears());
 
         $seasons = array(
             array(

@@ -793,8 +793,6 @@ class AreaCoverage extends AdminController
         $data['year_id'] = getCurrentYearId();
 
         $data['years'] = (new YearModel())->where('id', $data['year_id'])->asArray()->find();
-
-
         $week_dates = $acModel->getWeekDate();
         $filter = array();
         // print_r($filter);
@@ -850,8 +848,6 @@ class AreaCoverage extends AdminController
             ];
 
         }
-
-
         $weeks = $acModel->getWeeks();
         $data['weeks'] = [];
         $week_start_date = '';
@@ -867,11 +863,4 @@ class AreaCoverage extends AdminController
 
         return $this->template->view('Admin\Reports\Views\blockwise_areacoverage_upload_status', $data);
     }
-
-
-
-
-
-
-
 }
