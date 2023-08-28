@@ -118,17 +118,23 @@ $user  = service('user');
                 ?>
                     <tbody>
                         <?php
-                        $sum = 0;
+                        $column_sums = array_fill(0, count($headers) - 3, 0); // Initialize an array to store column sums
                         foreach ($target_data as $key => $targetDatas) : ?>
                             <tr>
                                 <td><?php echo $serino++; ?></td>
                                 <td><?php echo $key; ?></td>
-                                <?php $sum = 0; ?>
-                                <?php foreach ($targetDatas as $row) : ?>
+                                <?php
+                                $row_total = 0; // Initialize row total for each row
+                                $col_index = 0; // Initialize column index
+                                foreach ($targetDatas as $row) : ?>
                                     <td class="totaldata"><?php echo $row['total']; ?></td>
-                                    <?php $sum += $row['total']; ?>
+                                    <?php
+                                    $row_total += $row['total'];
+                                    $column_sums[$col_index] += $row['total']; // Update column sum
+                                    $col_index++;
+                                    ?>
                                 <?php endforeach; ?>
-                                <td><?php echo $sum; ?></td>
+                                <td><?php echo $row_total; ?></td>
                                 <?php if (!$user->district_id) { ?>
                                     <td>
                                         <?php if ($row['mprcomponents_master_id']) { ?>
@@ -137,11 +143,15 @@ $user  = service('user');
                                     </td>
                                 <?php } ?>
                             </tr>
-
-
                         <?php endforeach; ?>
-                    </tbody>
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <?php foreach ($column_sums as $sum) : ?>
+                                <td><?php echo $sum; ?></td>
+                            <?php endforeach; ?>
 
+                        </tr>
+                    </tbody>
                 <?php
                 } else {
                     echo "<h1>No data available.</h1>";
