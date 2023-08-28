@@ -310,8 +310,7 @@ FROM soe_districts sd
 
         }
     }
-
-    public function getByDistrict($filter = [])
+public function getByDistrict($filter = [])
     {
 
         $sql = "SELECT
@@ -571,7 +570,7 @@ LEFT JOIN
 LEFT JOIN
     soe_districts sd ON sb.district_id = sd.id
 WHERE
-    1 = 1"; // No need for this condition, can be omitted
+    1 = 1";
 
         if (isset($filter['district_id'])) {
             $sql .= " AND sd.id = " . $filter['district_id'];
