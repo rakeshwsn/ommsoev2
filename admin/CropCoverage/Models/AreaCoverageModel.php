@@ -310,7 +310,7 @@ FROM soe_districts sd
 
         }
     }
-public function getByDistrict($filter = [])
+    public function getByDistrict($filter = [])
     {
 
         $sql = "SELECT
