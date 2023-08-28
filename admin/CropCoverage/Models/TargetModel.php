@@ -91,7 +91,8 @@ class TargetModel extends Model
         }
     }
 
-    public function getAll($filter = array()){
+    public function getAll($filter = array())
+    {
 
         $district_id = 0;
         if (!empty($filter['district_id'])) {
@@ -173,13 +174,14 @@ class TargetModel extends Model
         FROM ac_target_followup_crop
         GROUP BY target_id
     ) followup ON block_target.target_id = followup.target_id
-    WHERE sb.district_id = $district_id";
+    WHERE sb.district_id = $district_id AND atm.deleted_at IS NULL";
         //echo $sql;
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getDistrictWiseData($filter = []){
-        $sql="SELECT
+    public function getDistrictWiseData($filter = [])
+    {
+        $sql = "SELECT
   sd.name AS district,
   sd.id AS district_id,
   sd.no_of_block,
@@ -254,19 +256,19 @@ FROM (SELECT
   LEFT JOIN (SELECT
       fc.target_id,
       atm.district_id,
-      MAX(CASE WHEN fc.crop_id = 1 THEN followup END) AS RAGI,
-      MAX(CASE WHEN fc.crop_id = 2 THEN followup END) AS LITTLE_MILLET,
-      MAX(CASE WHEN fc.crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
-      MAX(CASE WHEN fc.crop_id = 4 THEN followup END) AS SORGHUM,
-      MAX(CASE WHEN fc.crop_id = 5 THEN followup END) AS PEARL_MILLET,
-      MAX(CASE WHEN fc.crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
-      MAX(CASE WHEN fc.crop_id = 7 THEN followup END) AS KODO_MILLET
+      sum(CASE WHEN fc.crop_id = 1 THEN followup END) AS RAGI,
+      sum(CASE WHEN fc.crop_id = 2 THEN followup END) AS LITTLE_MILLET,
+      sum(CASE WHEN fc.crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
+      sum(CASE WHEN fc.crop_id = 4 THEN followup END) AS SORGHUM,
+      sum(CASE WHEN fc.crop_id = 5 THEN followup END) AS PEARL_MILLET,
+      sum(CASE WHEN fc.crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
+      sum(CASE WHEN fc.crop_id = 7 THEN followup END) AS KODO_MILLET
     FROM ac_target_followup_crop fc
       LEFT JOIN ac_target_master atm
         ON fc.target_id = atm.id
     GROUP BY atm.district_id) followup
     ON followup.district_id=sd.id";
-    return $this->db->query($sql)->getResultArray();
+        return $this->db->query($sql)->getResultArray();
     }
 
     public function getBlockTargets($filter = [])
@@ -434,59 +436,56 @@ LEFT JOIN (
     {
         $year_id = $filter['year_id'];
         $season = $filter['season'];
-
-        $sql = "SELECT
-      ac.id AS crop_id,
-      ac.crops AS crop,
-      COALESCE(tar.total, 0) + COALESCE(tar.total_fup, 0) AS target_area,
-      COALESCE(ach.smi, 0) + COALESCE(ach.lt, 0) + COALESCE(ach.ls, 0) AS achievement_area
-    FROM ac_crops ac
-    LEFT JOIN (
-        SELECT
-            ata.crop_id,
-            (ata.smi + ata.lt + ata.ls) AS total,
-            SUM(fup.followup) AS total_fup
-        FROM ac_target_area ata
-        LEFT JOIN ac_target_master atm ON ata.target_id = atm.id
-        LEFT JOIN ac_target_followup_crop fup ON ata.target_id = fup.target_id AND ata.crop_id = fup.crop_id";
+        $sql = "
+SELECT
+  ac.id AS crop_id,
+  ac.crops AS crop,
+  COALESCE(tar.total, 0) + COALESCE(tar.total_fup, 0) AS target_area,
+  COALESCE(ach.smi, 0) + COALESCE(ach.lt, 0) + COALESCE(ach.ls, 0) AS achievement_area
+FROM ac_crops ac
+LEFT JOIN (
+    SELECT
+      ata.crop_id,
+      SUM(ata.smi + ata.lt + ata.ls) AS total,
+      COALESCE(SUM(fup.followup), 0) AS total_fup
+    FROM ac_target_area ata
+    LEFT JOIN ac_target_followup_crop fup ON ata.target_id = fup.target_id AND ata.crop_id = fup.crop_id
+    LEFT JOIN ac_target_master atm ON ata.target_id = atm.id
+    WHERE atm.deleted_at IS NULL";
 
         if (!empty($filter['season'])) {
-            $sql .= " WHERE LOWER(atm.season) = '" . $filter['season'] . "'";
+            $sql .= " AND LOWER(atm.season) = '" . $filter['season'] . "'";
         }
         if (!empty($filter['year_id'])) {
-            if (!empty($filter['season'])) {
-                $sql .= " AND";
-            } else {
-                $sql .= " WHERE";
-            }
-            $sql .= " atm.year_id = " . $filter['year_id'];
+            $sql .= " AND atm.year_id = " . $filter['year_id'];
         }
+
         $sql .= " GROUP BY ata.crop_id
-    ) tar ON ac.id = tar.crop_id
-    LEFT JOIN (
-        SELECT
-            aap.crop_id,
-            SUM(aap.smi) AS smi,
-            SUM(aap.lt) AS lt,
-            SUM(aap.ls) AS ls
-        FROM ac_area_practices aap
-        LEFT JOIN ac_crop_coverage acc ON aap.crop_coverage_id = acc.id";
+) tar ON ac.id = tar.crop_id
+LEFT JOIN (
+    SELECT
+        aap.crop_id,
+        COALESCE(SUM(aap.smi), 0) AS smi,
+        COALESCE(SUM(aap.lt), 0) AS lt,
+        COALESCE(SUM(aap.ls), 0) AS ls
+    FROM ac_area_practices aap
+    LEFT JOIN ac_crop_coverage acc ON aap.crop_coverage_id = acc.id
+    WHERE acc.deleted_at IS NULL";
 
-        if (!empty($filter['season']) || !empty($filter['year_id'])) {
-            $sql .= " WHERE";
-        }
         if (!empty($filter['season'])) {
-            $sql .= " acc.season = '" . $filter['season'] . "'";
+            $sql .= " AND LOWER(acc.season) = '" . $filter['season'] . "'";
         }
         if (!empty($filter['year_id'])) {
-            if (!empty($filter['season'])) {
-                $sql .= " AND";
-            }
-            $sql .= " acc.year_id = " . $filter['year_id'];
+            $sql .= " AND acc.year_id = " . $filter['year_id'];
         }
-        $sql .= " AND acc.status = 1";
-        $sql .= " GROUP BY aap.crop_id
-    ) ach ON ac.id = ach.crop_id";
+
+        $sql .= " AND acc.status = 1
+    GROUP BY aap.crop_id
+) ach ON ac.id = ach.crop_id;
+";
+
+        // Execute $sql query
+
 
         return $this->db->query($sql)->getResultArray();
     }
