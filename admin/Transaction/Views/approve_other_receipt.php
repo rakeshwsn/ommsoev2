@@ -44,27 +44,39 @@
             </div>
         </div>
         <div class="block">
-            <div class="block-header block-header-default">
-                <h3 class="block-title">Details</h3>
-            </div>
+            <form method="post" action="">
             <div class="block-content">
-                <table class="table table-bordered table-vcenter">
-                    <thead>
-                    <tr>
+                <div class="block-header block-header-default">
+                    <h3 class="block-title">Details</h3>
+                    <?php if(isset($correction)){ ?>
+                    <div class="block-options"><button class="btn btn-primary"><i class="fa fa-save"></i> Save</button></div>
+                    <?php } ?>
+                </div>
+                    <table class="table table-bordered table-vcenter">
+                        <thead>
+                        <tr>
+                            <th>Particulars</th>
+                            <th>Amount</th>
+                        </tr>
+                        </thead>
+                        <tbody>
                         <?php foreach ($heads as $head) : ?>
-                        <th><?=$head['name']?></th>
+                            <tr>
+                                <th><strong><?=$head['name']?></strong></th>
+                                <?php if(isset($correction)){ ?>
+                                <td>
+                                    <input type="text" class="form-control" name="head[<?=$head['id']?>]"
+                                           value="<?=$head['value']?>" >
+                                </td>
+                                <?php } else { ?>
+                                <td><?=$head['value']?></td>
+                                <?php } ?>
+                            </tr>
                         <?php endforeach; ?>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <?php foreach ($heads as $head) : ?>
-                        <td><?=$head['value']?></td>
-                        <?php endforeach; ?>
-                    </tr>
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
             </div>
+            </form>
         </div>
 
     </section>

@@ -32,7 +32,7 @@ class Mpr extends AdminController
             $data['year_id'] = $this->request->getGet('year');
         }
 
-        $data['month_id'] = getCurrentMonthId();
+        $data['month_id'] = getMonthIdByMonth(date('m'));
         if($this->request->getGet('month')){
             $data['month_id'] = $this->request->getGet('month');
         }
@@ -88,6 +88,12 @@ class Mpr extends AdminController
             $fund_receipt_agency=$data['user_group_id'];
         }
 
+        //hard code for block user
+        if($this->user->agency_type_id==$this->settings->block_user
+            && $this->request->getGet('agency_type_id')==''){
+            $component_agency = [5,6]; //block user --fa and cbo
+            $fund_receipt_agency = [5,6]; //block user --fa and cbo
+        }
 
         // printr( $data['component_agency']);
 
@@ -771,7 +777,6 @@ class Mpr extends AdminController
 
         $data['block_id'] = $this->user->block_id;
         if($this->request->getGet('block_id')){
-
             $data['block_id'] = $this->request->getGet('block_id');
             $data['user_group_id']=[6,5];
         }
@@ -921,6 +926,7 @@ class Mpr extends AdminController
             $data['filter_panel'] = view('Admin\Reports\Views\district_filter_panel',$data);
         }
         if($this->user->agency_type_id==$this->settings->block_user){
+            $data['agency_types']=(new UserGroupModel())->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])->asArray()->findAll();
             $data['filter_panel'] = view('Admin\Reports\Views\block_filter_panel',$data);
         }
         if($this->user->agency_type_id==$this->settings->ps_user){

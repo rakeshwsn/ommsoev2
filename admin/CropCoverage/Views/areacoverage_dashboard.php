@@ -59,7 +59,7 @@
 <div class="content1">
     <div class="row mb-3">
         <div class="col-md-2">
-            <select name="year" id="year" class="form-control">
+            <select name="year" id="year" class="form-control"disabled>
                 <?php foreach ($years as $year) { ?>
                     <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
                           echo 'selected';
@@ -187,7 +187,7 @@
             }
         },
         tooltip: {
-            valueSuffix: ' (some unit)'
+            valueSuffix: ''
         },
         plotOptions: {
             column: {

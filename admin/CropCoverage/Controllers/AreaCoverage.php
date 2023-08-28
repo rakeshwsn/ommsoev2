@@ -37,29 +37,18 @@ class AreaCoverage extends AdminController
     }
     public function index()
     {
-
         $this->template->set_meta_title(lang('Seasons Data.heading_title'));
 
         return $this->getList();
-
     }
     protected function getList()
     {
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 
-        $data['add'] = admin_url('areacoverage/gp/add');
-        $data['delete'] = admin_url('grampanchayat/delete');
+
         $data['download_url'] = admin_url('areacoverage/download');
 
         $data['heading_title'] = lang('Add Area Coverage');
-
-        $data['text_list'] = lang('Grampanchayat.text_list');
-        $data['text_no_results'] = lang('Grampanchayat.text_no_results');
-        $data['text_confirm'] = lang('Grampanchayat.text_confirm');
-
-        $data['button_add'] = lang('Grampanchayat.button_add');
-        $data['button_edit'] = lang('Grampanchayat.button_edit');
-        $data['button_delete'] = lang('Grampanchayat.button_delete');
 
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
@@ -69,6 +58,8 @@ class AreaCoverage extends AdminController
         $data['districts'] = $districtModel->getAll();
 
         $dates = $this->areacoveragemodel->getWeekDate();
+        $data['currentDay'] = date('l');
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
 
         $data['from_date'] = $dates['start_date'];
         $data['to_date'] = $dates['end_date'];
@@ -328,7 +319,7 @@ class AreaCoverage extends AdminController
                     'message' => 'Invalid file.'
                 ]);
             }
-
+         
             $activesheet = $spreadsheet->getSheet(0);
 
             $row_data = $activesheet->toArray();
@@ -536,11 +527,8 @@ class AreaCoverage extends AdminController
         }
 
         $data['show_form'] = false;
-        if ((strtotime('today') <= strtotime($cc_info->end_date)) || ($cc_info->status != 1)) {
+        if (($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)) {
             $data['show_form'] = true;
-        }
-        if($cc_info->block_id != $this->user->block_id){
-            $data['show_form'] = false;
         }
 
         $data['district'] = (new DistrictModel())->find($cc_info->district_id)->name;
@@ -616,6 +604,158 @@ class AreaCoverage extends AdminController
         }
 
         return $this->template->view('Admin\CropCoverage\Views\areacoverage_edit', $data);
+    }
+
+    public function delete()
+    {
+        $this->template->set_meta_title('Delete area coverage');
+
+        $data['breadcrumbs'] = array();
+        $data['breadcrumbs'][] = array(
+            'text' => 'Delete area coverage',
+            'href' => admin_url('areacoverage/delete')
+        );
+
+        $this->template->add_package(array('datatable', 'select2'), true);
+
+        $data['heading_title'] = 'Area Coverage Delete';
+
+        $data['text_list'] = lang('Approve.text_list');
+        $data['text_no_results'] = lang('Approve.text_no_results');
+        $data['text_confirm'] = lang('Approve.text_confirm');
+
+        $data['button_add'] = lang('Add Target');
+        $data['button_edit'] = lang('Edit Target');
+        $data['button_delete'] = lang('Approve.button_delete');
+
+        if (isset($this->error['warning'])) {
+            $data['error'] = $this->error['warning'];
+        }
+
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $district_id = $this->request->getGet('district_id');
+        } else {
+            $data['district_id'] = $district_id = 0;
+        }
+
+        $week_dates = $this->areacoveragemodel->getWeekDate();
+
+        if ($this->request->getGet('start_date')) {
+            $data['start_date'] = $start_date = $this->request->getGet('start_date');
+        } else {
+            $data['start_date'] = $start_date = $week_dates['start_date'];
+        }
+
+        $acModel = new AreaCoverageModel();
+
+        $filter = [
+            'district_id' => $district_id,
+            'year_id' => getCurrentYearId(),
+            'season' => getCurrentSeason(),
+            'start_date' => $data['start_date']
+        ];
+
+        //update status
+        if ($this->request->getMethod(1) == 'POST') {
+            //delete
+            $filter['block_id'] = $this->request->getPost('blocks');
+            $this->areacoveragemodel->deleteAll($filter);
+
+            return redirect()->to(admin_url('areacoverage/delete?district_id=' . $district_id . '&start_date=' . $start_date))
+                ->with('message', 'The records have been deleted.');
+        }
+
+        $blocks = [];
+        if ($district_id) {
+            $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        }
+
+        $data['blocks'] = [];
+        $week_text = '';
+        if ($blocks) {
+            foreach ($blocks as $block) {
+                $action = '';
+                if ($block->start_date) {
+                    $week_text = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
+                }
+                $status = $block->status;
+                if (!isset($status)) {
+                    $status = 3;
+                }
+                $total_area = $block->fc_area +
+                    $block->ragi_smi +
+                    $block->ragi_lt +
+                    $block->ragi_ls +
+                    $block->little_millet_lt +
+                    $block->little_millet_ls +
+                    $block->foxtail_ls +
+                    $block->sorghum_ls +
+                    $block->kodo_ls +
+                    $block->barnyard_ls +
+                    $block->pearl_ls;
+                $total_ragi = $block->ragi_smi +
+                    $block->ragi_lt +
+                    $block->ragi_ls;
+                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+                $data['blocks'][] = [
+                    'block_id' => $block->block_id,
+                    'block' => $block->block,
+                    'gps' => $block->total_gps,
+                    'farmers_covered' => $block->farmers_covered,
+                    'nursery_raised' => $block->nursery_raised,
+                    'balance_smi' => $block->balance_smi,
+                    'balance_lt' => $block->balance_lt,
+                    'total_ragi' => $total_ragi,
+                    'total_non_ragi' => $total_non_ragi,
+                    'total_fc' => $block->fc_area,
+                    'total_area' => $total_area,
+                    'status' => $this->statuses[$status],
+                    'action' => $action,
+                ];
+
+            }
+        }
+
+        $weeks = $this->areacoveragemodel->getWeeks();
+
+        $data['weeks'] = [];
+        $week_start_date = '';
+        foreach ($weeks as $week) {
+            //dropdown weeks
+            if (strtotime($week['start_date']) <= strtotime('today')) {
+                $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
+            }
+            //show week text
+            if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
+                $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
+            }
+        }
+
+        $data['week_start_date'] = $data['start_date'];
+
+        $data['week_text'] = $week_text;
+
+        $data['districts'] = [];
+        $districts = (new DistrictModel())->orderBy('name')->findAll();
+
+        $data['districts'][0] = 'Select District';
+        foreach ($districts as $district) {
+            $data['districts'][$district->id] = $district->name;
+        }
+
+        $district_status = $acModel->where('district_id', $district_id)
+            ->where('start_date', $start_date)->first();
+
+        $data['status'] = '';
+        $data['remarks'] = '';
+        $data['status_color'] = '';
+        if ($district_status) {
+            $data['status'] = $this->statuses[$district_status->status];
+            $data['status_color'] = $this->colors[$district_status->status];
+            $data['remarks'] = $district_status->remarks;
+        }
+
+        return $this->template->view('Admin\CropCoverage\Views\delete_district', $data);
     }
 
 }

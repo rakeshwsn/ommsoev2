@@ -47,7 +47,7 @@ class Dashboard extends ResourceController
 			$data['areafarmers'][] = $achievement->total_farmers;
 			$data['areaachievements'][] = $achievement->total_ach;
 		}
-		$data['heading'] = 'AREA COVERAGE CHART';
+		$data['heading'] = 'Millet Demonstration Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
@@ -55,6 +55,7 @@ class Dashboard extends ResourceController
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
+
 	public function procurement()
 	{
 		$districtmodel = new DistrictModel();
@@ -83,7 +84,7 @@ class Dashboard extends ResourceController
 			$data['pquantity'][] = $procure->total_quantity;
 			$data['ptotal_amount'][] = $procure->total_amount;
 		}
-		$data['heading'] = 'PROCUREMENT';
+		$data['heading'] = 'Ragi Procurement Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
@@ -91,9 +92,9 @@ class Dashboard extends ResourceController
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
+
 	public function pds()
 	{
-
 		$pdsmodel = new PdsChartModel();		
 		$pdses = $pdsmodel->getYearwisepds();
 
@@ -104,10 +105,8 @@ class Dashboard extends ResourceController
 		foreach ($pdses as $pds) {
 			$data['pdsyear'][] = $pds->year;
 			$data['pdsquantity'][] = $pds->total_quantity;
-			$data['card_holders_benifited'][] = $pds->total_chb;
+			$data['card_holders_benefited'][] = $pds->total_chb;
 		}
-		
-
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
@@ -171,7 +170,7 @@ class Dashboard extends ResourceController
 		}
 
 		//heading
-		$data['heading'] = 'Enterprise Chart';
+		$data['heading'] = 'Progress on Millet based Enterprise Establishment';
 		if ($year_id) {
 			$data['heading'] .= ' for year ' . $yearmodel->find($year_id)->name;
 		}

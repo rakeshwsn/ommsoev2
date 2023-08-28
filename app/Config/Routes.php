@@ -67,6 +67,7 @@ $routes->group('/', ['namespace' => 'Admin'], function ($routes) {
 });
 */
 //$routes->get('api', 'Api::index');
+
 /*$routes->group('api', static function ($routes) {
     $routes->group('v1', static function ($routes) {
         $routes->get('/', 'Api::index');
@@ -74,10 +75,12 @@ $routes->group('/', ['namespace' => 'Admin'], function ($routes) {
     });
 });*/
 
-//$routes->get('/', 'Admin\Common\Controllers\Dashboard::index',['filter' => 'login']);
+// $routes->get('dashboardtest', 'Front\Pages\Controllers\Dashboard::index');
+$routes->group(env('app.adminRoute'), ['namespace' => 'front', 'filter' => 'login'], function ($routes) {
 
+});
 $routes->group('', ['namespace' => 'Front'], function($routes){
-  $routes->add('dashboard', 'Pages\Controllers\Dashboard::index');
+  $routes->get('dashboard', 'Pages\Controllers\Dashboard::index');
 });
 
 /*

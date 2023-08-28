@@ -117,6 +117,7 @@ class Grampanchayat extends AdminController
 	{
 		$requestData = $_REQUEST;
 		$totalData = $this->grampanchayatModel->getTotals();
+
 		$totalFiltered = $totalData;
 
 		//For filtering at block level
@@ -129,7 +130,7 @@ class Grampanchayat extends AdminController
 
 		$filter_data = array(
 			'filter_search' => $requestData['search']['value'],
-//			'filter_district' => $requestData['district'],
+			//			'filter_district' => $requestData['district'],
 			'filter_block' => $requestData['block'],
 			'filter_grampanchayat' => $requestData['grampanchayat'],
 			'order' => $requestData['order'][0]['dir'],

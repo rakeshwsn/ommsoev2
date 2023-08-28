@@ -47,17 +47,17 @@ class Dashboard extends ResourceController
 
 		foreach ($achievements as $achievement) {
 			$data['areayears'][] = $achievement->year;
-			$data['areafarmers'][] = $achievement->total_farmers;
-			$data['areaachievements'][] = $achievement->total_ach;
+			$data['areafarmers'][] = (int)$achievement->total_farmers;
+			$data['areaachievements'][] = (float)$achievement->total_ach;
 		}
-		$data['heading'] = 'AREA COVERAGE CHART';
+		$data['heading'] = 'Millet Demonstration Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
-	public function procurement2(){
+	public function procurement(){
 		
 		$districtmodel = new DistrictModel();
 
@@ -85,7 +85,7 @@ class Dashboard extends ResourceController
 			$data['pquantity'][] = $procure->total_quantity;
 			$data['ptotal_amount'][] = $procure->total_amount;
 		}
-		$data['heading'] = 'PROCUREMENT';
+		$data['heading'] = 'Ragi Procurement Progress';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
@@ -94,23 +94,22 @@ class Dashboard extends ResourceController
 
 	}
 	
-	public function pds2(){
+	public function pds(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
 
-		$data['pdsyear'] = [];
-		$data['pdsquantity'] = [];
-		$data['card_holders_benifited'] = [];
+		$data['year'] = [];
+		$data['quantity'] = [];
+		$data['card_holders_benefited'] = [];
 
 		foreach ($pdses as $pds) {
-			$data['pdsyear'][] = $pds->year;
-			$data['pdsquantity'][] = $pds->total_quantity;
-			$data['card_holders_benifited'][] = $pds->total_chb;
+			$data['pdsyear'][] = (int)$pds->year;
+			$data['pdsquantity'][] = (int)$pds->total_quantity;
+			$data['card_holders_benefited'][] = (int)$pds->total_chb;
 		}
 
-
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
 	public function establishment(){
@@ -127,12 +126,12 @@ class Dashboard extends ResourceController
 
 		foreach ($establishes as $establish) {
 			$data['estdistrict'][] = $establish->district;
-			$data['chc'][] = $establish->chc;
-			$data['cmsc'][] = $establish->cmsc;
-			$data['blocks'][] = $establish->blocks;
+			$data['chc'][] = (int)$establish->chc;
+			$data['cmsc'][] = (int)$establish->cmsc;
+			$data['blocks'][] = (int)$establish->blocks;
 		}
 		// dd($data);
-		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
+		return $this->respond($data);
 	}
 	
 	public function enterprise(){
@@ -165,12 +164,12 @@ class Dashboard extends ResourceController
 			$data['year'][] = $enterprise->year;
 			$data['district'][] = $enterprise->district;
 			$data['unit_name'][] = $enterprise->unit_name;
-			$data['wshg'][] = $enterprise->total_wshg;
-			$data['fpos'][] = $enterprise->total_fpos;
+			$data['wshg'][] = (int)$enterprise->total_wshg;
+			$data['fpos'][] = (int)$enterprise->total_fpos;
 		}
 
 		//heading
-		$data['heading'] = 'Enterprise Chart';
+		$data['heading'] = 'Progress on Millet based Enterprise Establishment';
 		if ($year_id) {
 			$data['heading'] .= ' for year ' . $yearmodel->find($year_id)->name;
 		}
@@ -184,9 +183,6 @@ class Dashboard extends ResourceController
 
 		return $this->respond(json_encode($data,JSON_NUMERIC_CHECK));
 	}
-
-
-
 
 	public function districtarea(){
 		$districtmodel = new DistrictModel();
@@ -204,21 +200,21 @@ class Dashboard extends ResourceController
 		$data['data']=[];
 		foreach ($areas as $area) {
 			$data['data'][]=[
-				'year_id'=>(int)$area->year_id,
+				'year_id'=> $area->year_id,
 				'year'=>$area->year,
-				'district_id'=>(int)$area->district_id,
+				'district_id'=> $area->district_id,
 				'district'=>$area->district,
-				'total_farmers'=>(int)$area->total_farmer,
-				'practice_area'=>(float)$area->total_area,
-				'total_area'=>(float)$area->total_area,
-
+				'total_farmers'=> $area->total_farmer,
+//				'intercropping'=>(float)$area->total_intercropping,
+				'practice_area'=> $area->total_area,
+				'total_area'=> $area->total_area,
 			];
 		}
 
 		return $this->respond($data);
 	}
 
-	public function pds(){
+	public function pds2(){
 
 		$pdsmodel = new PdsChartModel();
 		$pdses = $pdsmodel->getYearwisepds();
@@ -229,12 +225,11 @@ class Dashboard extends ResourceController
 		$data['data']=[];
 		foreach ($pdses as $pds) {
 			$data['data'][]=[
-				'year_id'=>(int)$pds->distributed_year_id,
+				'year_id'=> $pds->distributed_year_id,
 				'year'=>$pds->year,
-				'districts'=>(int)$pds->total_district,
-				'ration_card_holders'=>(int)$pds->total_chb,
-				'qty_supply_pds'=>(float)$pds->total_quantity
-
+				'districts'=> $pds->total_district,
+				'ration_card_holders'=> $pds->total_chb,
+				'qty_supply_pds'=> $pds->total_quantity
 			];
 		}
 
@@ -242,7 +237,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
-	public function procurement(){
+	public function procurement2(){
 		
 		$districtmodel = new DistrictModel();
 
@@ -256,12 +251,12 @@ class Dashboard extends ResourceController
 		$procure= $procuremodel->getYearwisedata($filter);
 		foreach($procure as $proc){
 			$data['data'][]=[
-				'districts'=>(int)$proc->total_districts,
-				'qty_proc'=>(int)$proc->total_quantity,
-				'total_amt'=>(float)$proc->total_amount,
-				'total_farmers'=>(int)$proc->total_farmers,
+				'districts'=> $proc->total_districts,
+				'qty_proc'=> $proc->total_quantity,
+				'total_amt'=> $proc->total_amount,
+				'total_farmers'=> $proc->total_farmers,
 				'year'=>$proc->year,
-				'year_id'=>(int)$proc->year_id,
+				'year_id'=> $proc->year_id,
 			];
 		}
 		$data['heading'] = 'Procurement Details';
@@ -286,10 +281,12 @@ class Dashboard extends ResourceController
 		$data['data'] =[];
 		foreach ($achievements as $achievement) {
 			$data['data'][] =[
-				'year_id'=>(int)$achievement->year_id,
-				'year'=>$achievement->year_id,
-				'total_area_coverage'=>(float)$achievement->total_ach,
-				'total_farmers_coverage'=>(int)$achievement->total_farmers,
+				'year_id'=> $achievement->year_id,
+				'year'=> $achievement->year,
+				'total_area_coverage'=> $achievement->total_ach,
+				'total_farmers_coverage'=> $achievement->total_farmers,
+				'total_nursery_beds'=> $achievement->total_nursery,
+				'total_intercropping'=> $achievement->total_intercropping
 			];
 		}
 		
@@ -306,14 +303,15 @@ class Dashboard extends ResourceController
 		$data['data'] =[];
 		foreach ($mapdatas as $mapdata) {
 			$data['data'][] =[
-				'district_id'=>(int)$mapdata->district_id,
+				'district_id'=> $mapdata->district_id,
 				'district'=>$mapdata->district,
-				'total_blocks'=>(int)$mapdata->blocks,
-				'total_gps'=>(int)$mapdata->gps,
-				'total_villages'=>(int)$mapdata->villages,
-				'total_farmers'=>(int)$mapdata->farmers,
-				'chc'=>(int)$mapdata->chcs,
-				'cmsc'=>(int)$mapdata->cmscs,
+				'total_blocks'=> $mapdata->blocks,
+				'total_gps'=> $mapdata->gps,
+				'total_villages'=> $mapdata->villages,
+				'total_farmers'=> $mapdata->farmers,
+				'chc'=> $mapdata->chcs,
+				'cmsc'=> $mapdata->cmscs,
+
 			];
 		}
 		// dd($data);
@@ -323,7 +321,6 @@ class Dashboard extends ResourceController
 	public function enterprises(){
 		$enterprisemodel = new EnterpriseChartModel();;
 		$filter = [];
-		
 
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
 		$data['data']=[];
@@ -347,19 +344,17 @@ class Dashboard extends ResourceController
 	public function summary(){
 		$distmapmodel = new DistrictMapModel();
 		$yearModel = new YearModel();
-        $year = $yearModel->getCurrentYearId();
-
-        $summery = $distmapmodel->getSummary($year-1);
+        $summery = $distmapmodel->getSummary();
 
         $data['data']=[
-            'total_districts'=>(int)$summery->total_districts,
-            'total_blocks'=>(int)$summery->total_blocks,
-            'total_gps'=>(int)$summery->total_gps,
-            'total_villages'=>(int)$summery->total_villages,
-            'total_farmers'=>(int)$summery->total_farmers,
-            'total_chc'=>(int)$summery->total_chc,
-            'total_cmsc'=>(int)$summery->total_cmsc,
-            'demo_area'=>(int)$summery->demo_area
+            'total_districts'=> $summery->total_districts,
+            'total_blocks'=> $summery->total_blocks,
+            'total_gps'=> $summery->total_gps,
+            'total_villages'=> $summery->total_villages,
+            'total_farmers'=> $summery->total_farmers,
+            'total_chc'=> $summery->total_chc,
+            'total_cmsc'=> $summery->total_cmsc,
+            'demo_area'=> $summery->demo_area
         ];
 		//heading
 		$data['heading'] = 'Summary Data';

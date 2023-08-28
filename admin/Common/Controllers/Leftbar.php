@@ -145,10 +145,21 @@ class Leftbar extends AdminController
             ];
         }
 
+        if ($this->user->hasPermission("correction")) {
+            $data["menus"][] = [
+                "id" => "menu-correction",
+                "icon" => "si si-folder-alt",
+                "name" => 'FA Correction',
+                "heading" => 0,
+                "href" => admin_url("correction"),
+                "children" => [],
+            ];
+        }
+
         if ($this->user->hasPermission("approve")) {
             $data["menus"][] = [
                 "id" => "menu-approve",
-                "icon" => "md-account-child",
+                "icon" => "si si-check",
                 "name" => lang("Leftbar.text_soe_approve"),
                 "heading" => 0,
                 "href" => admin_url("approve"),
@@ -437,6 +448,47 @@ class Leftbar extends AdminController
             ];
         }
 
+        $enterprises = [];
+
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises Transaction',
+                "href" => admin_url("enterprises/transaction"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises Units',
+                "href" => admin_url("enterpriseunit"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($this->user->hasPermission("enterprises")) {
+            $enterprises[] = [
+                "name" => 'Enterprises',
+                "href" => admin_url("enterprises"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($enterprises) {
+            $data["menus"][] = [
+                "id" => "menu-enterprises",
+                "icon" => "md-account-child",
+                "name" =>'Enterprises',
+                "heading" => 0,
+                "href" => "",
+                "children" => $enterprises,
+            ];
+        }
+
+
+
         $areacoverage = [];
 
         if ($this->user->hasPermission("areacoverage")) {
@@ -506,11 +558,30 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if (
+            $this->user->hasPermission("reports/areacoverage/blockWiseGetUploadStatus")
+        ) {
+            $areacoverage[] = [
+                "name" => "Block Wise Area Coverage Upload Status",
+                "href" => admin_url("reports/areacoverage/blockWiseGetUploadStatus"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("cropcoverage/crops")) {
             $areacoverage[] = [
                 "name" => lang("Leftbar.text_crop_add"),
                 "href" => admin_url("cropcoverage/crops"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+
+        if ($this->user->hasPermission("areacoverage/delete")) {
+            $areacoverage[] = [
+                "name" => 'Delete Area Coverage',
+                "href" => admin_url("areacoverage/delete"),
                 "heading" => 0,
                 "children" => [],
             ];

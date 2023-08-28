@@ -47,12 +47,19 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">
-                <?= $heading_title; ?> [<?= $week ?>]
+                <?= $heading_title; ?> [
+                <?= $week ?>]
             </h3>
             <?php if (!$approved) { ?>
                 <div class="block-options">
-                    <a data-toggle="tooltip" title="" id="btn-action" class="btn btn-success btn-approve"><i
-                            class="fa fa-check"></i> Approve/Reject</a>
+                    <?php
+                    if ($isActiveDay) {
+                        echo '<a data-toggle="tooltip" title="" id="btn-action" class="btn btn-square btn-success min-width-125 mb-10 btn-approve"><i class="fa fa-check"></i> Approve/Reject</a>';
+                    } else {
+                        echo '<button data-toggle="tooltip" title="" id="btn-action" class="btn btn-square btn-danger min-width-125 mb-10 btn-approve" disabled><i class="fa fa-check"></i> Approve/Reject</button>';
+                    }
+                    ?>
+
                 </div>
             <?php } ?>
         </div>
@@ -63,12 +70,18 @@
                     <th>Remarks</th>
                 </tr>
                 <tr>
-                    <td><?php if($status): ?><label class="badge badge-<?=$status_color?>"><?=$status?></label><?php endif; ?></td>
-                    <td><?=$remarks?></td>
+                    <td>
+                        <?php if ($status): ?><label class="badge badge-<?= $status_color ?>"><?= $status ?></label>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?= $remarks ?>
+                    </td>
                 </tr>
             </table>
 
-            <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive custom-table">
+            <table id="block-coverage"
+                class="table table-bordered table-striped table-vcenter table-responsive custom-table">
                 <thead>
                     <tr class="highlight-heading1">
                         <th rowspan="3">#</th>

@@ -4,17 +4,19 @@ if (!isset($routes)) {
     $routes = \Config\Services::routes(true);
 }
 $routes->group('api', ['namespace' => 'Api'], function ($routes) {
-    $routes->add('areacoverage', 'Dashboard\Controllers\Dashboard::areacoverage');
-    $routes->add('procurement2', 'Dashboard\Controllers\Dashboard::procurement2');
-    $routes->add('pds2', 'Dashboard\Controllers\Dashboard::pds2');
-    $routes->add('establishment', 'Dashboard\Controllers\Dashboard::establishment');
-    $routes->add('enterprises2', 'Dashboard\Controllers\Dashboard::enterprise');
+    $routes->get('areacoverage_c', 'Dashboard\Controllers\Dashboard::areacoverage');
+    $routes->get('procurement_c', 'Dashboard\Controllers\Dashboard::procurement');
+    $routes->get('pds_c', 'Dashboard\Controllers\Dashboard::pds');
+    $routes->get('establishment', 'Dashboard\Controllers\Dashboard::establishment');
+    $routes->get('enterprises2', 'Dashboard\Controllers\Dashboard::enterprise');
 
-    $routes->add('districtarea', 'Dashboard\Controllers\Dashboard::districtarea');
-    $routes->add('procurement', 'Dashboard\Controllers\Dashboard::procurement');
-    $routes->add('pds', 'Dashboard\Controllers\Dashboard::pds');
-    $routes->add('farmerarea', 'Dashboard\Controllers\Dashboard::farmerareayear');
-    $routes->add('mapdata', 'Dashboard\Controllers\Dashboard::mapdata');
-    $routes->add('enterprises', 'Dashboard\Controllers\Dashboard::enterprises');
-    $routes->add('summary', 'Dashboard\Controllers\Dashboard::summary');
+    //api
+    $routes->get('areacoverage', 'Dashboard\Controllers\Dashboard::areacoverage');
+    $routes->get('districtarea', 'Dashboard\Controllers\Dashboard::districtarea');
+    $routes->get('procurement', 'Dashboard\Controllers\Dashboard::procurement2');
+    $routes->get('pds', 'Dashboard\Controllers\Dashboard::pds2');
+    $routes->get('farmerarea', 'Dashboard\Controllers\Dashboard::farmerareayear');
+    $routes->get('mapdata', 'Dashboard\Controllers\Dashboard::mapdata');
+    $routes->get('enterprises', 'Dashboard\Controllers\Dashboard::enterprises');
+    $routes->get('summary', 'Dashboard\Controllers\Dashboard::summary');
 });
