@@ -20,8 +20,9 @@ $user = service('user');
     show = '<?= $show_old_portal ?>';
     $(function () {
         if (show == false) {
-        $('.old-portal-login').hide();
-    }
+    //      $('.old-portal-login').hide();
+            $('#menu-old-portal-login').hide();
+        }
     });
 </script>
 <!--<script type="text/javascript">

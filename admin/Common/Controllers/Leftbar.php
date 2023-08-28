@@ -373,7 +373,7 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission("transaction/refund")) {
             $data["menus"][] = [
-                "id" => "menu-ucsubmit",
+                "id" => "menu-refund",
                 "icon" => "md-account-child",
                 "name" => lang("Leftbar.text_trefund"),
                 "heading" => 0,
@@ -384,7 +384,7 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission("oldportallogin")) {
             $data["menus"][] = [
-                "id" => "menu-ucsubmit",
+                "id" => "menu-old-portal-login",
                 "icon" => "md-account-child",
                 "name" => lang("Leftbar.text_oldportal"),
                 "heading" => 0,
