@@ -59,7 +59,7 @@
                     <th colspan="7" class="cl-head">Follow Up Crops (with out incentive)(in Ha)</th>
                     <th rowspan="2" class="cl-head">Total Ragi</th>
                     <th rowspan="2" class="cl-head">Total Non-Ragi</th>
-                    <th rowspan="2" class="cl-head">Total Non-Ragi</th>
+
                     <th rowspan="2" class="cl-head">Total Follow up Crops</th>
                     <th rowspan="2" class="cl-head">Total Target</th>
 
