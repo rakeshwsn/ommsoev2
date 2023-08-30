@@ -2,7 +2,6 @@
 
 namespace Api\Dashboard\Controllers;
 
-use Api\Dashboard\Models\YearModel;
 use Api\Dashboard\Models\AreaChartModel;
 use Api\Dashboard\Models\DistrictMapModel;
 use Api\Dashboard\Models\EstablishmentChartModel;
@@ -10,7 +9,7 @@ use Api\Dashboard\Models\PdsChartModel;
 use Api\Dashboard\Models\ProcurementChartModel;
 use Api\Dashboard\Models\EnterpriseChartModel;
 use Api\Dashboard\Models\DistrictModel;
-use Api\Dashboard\Models\OdMapModel;
+use Api\Dashboard\Models\YearModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 
@@ -319,9 +318,18 @@ class Dashboard extends ResourceController
 	}
 
 	public function enterprises(){
-		$enterprisemodel = new EnterpriseChartModel();;
+		$enterprisemodel = new EnterpriseChartModel();
+		$yearModel = new YearModel();
 		$filter = [];
 
+        $filter['year_id'] = $yearModel->getCurrentYearId();
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+
+            $filter['year_id'] = $this->request->getGet('year_id');
+            $year_id = $this->request->getGet('year_id');
+        }
+        
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
 		$data['data']=[];
 		foreach ($enterprises as $enterprise) {

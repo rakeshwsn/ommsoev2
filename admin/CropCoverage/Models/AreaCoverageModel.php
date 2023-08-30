@@ -311,6 +311,7 @@ FROM soe_districts sd
 
         }
     }
+
     public function getByDistrict($filter = [])
     {
 
