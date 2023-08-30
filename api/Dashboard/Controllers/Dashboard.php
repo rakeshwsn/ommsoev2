@@ -322,6 +322,13 @@ class Dashboard extends ResourceController
 		$enterprisemodel = new EnterpriseChartModel();;
 		$filter = [];
 
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+
+            $filter['year_id'] = $this->request->getGet('year_id');
+            $year_id = $this->request->getGet('year_id');
+        }
+        
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
 		$data['data']=[];
 		foreach ($enterprises as $enterprise) {
