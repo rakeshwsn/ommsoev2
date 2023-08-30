@@ -2,7 +2,6 @@
 
 namespace Api\Dashboard\Controllers;
 
-use Admin\Common\Models\YearModel;
 use Api\Dashboard\Models\AreaChartModel;
 use Api\Dashboard\Models\DistrictMapModel;
 use Api\Dashboard\Models\EstablishmentChartModel;
@@ -10,6 +9,7 @@ use Api\Dashboard\Models\PdsChartModel;
 use Api\Dashboard\Models\ProcurementChartModel;
 use Api\Dashboard\Models\EnterpriseChartModel;
 use Api\Dashboard\Models\DistrictModel;
+use Api\Dashboard\Models\YearModel;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 
