@@ -20,7 +20,7 @@ class Grampanchayat extends AdminController
 	}
 	public function index()
 	{
-		$this->template->set_meta_title(lang('Grampanchayat.heading_title'));
+		$this->template->set_meta_title(lang('Grampanchayat|Millets'));
 		return $this->getList();
 	}
 	public function add()
