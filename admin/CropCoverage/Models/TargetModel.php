@@ -440,6 +440,7 @@ LEFT JOIN (
     {
         $year_id = $filter['year_id'];
         $season = $filter['season'];
+        $block_id = isset($filter['block_id']) ? $filter['block_id'] : null;
         $sql = "
 SELECT
   ac.id AS crop_id,
@@ -463,6 +464,9 @@ LEFT JOIN (
         if (!empty($filter['year_id'])) {
             $sql .= " AND atm.year_id = " . $filter['year_id'];
         }
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND atm.block_id = " . $filter['block_id'];
+        }
 
         $sql .= " GROUP BY ata.crop_id
 ) tar ON ac.id = tar.crop_id
@@ -482,16 +486,34 @@ LEFT JOIN (
         if (!empty($filter['year_id'])) {
             $sql .= " AND acc.year_id = " . $filter['year_id'];
         }
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND acc.block_id = " . $filter['block_id'];
+        }
 
         $sql .= " AND acc.status = 1
     GROUP BY aap.crop_id
-) ach ON ac.id = ach.crop_id;
+) ach ON ac.id = ach.crop_id
 ";
 
-        // Execute $sql query
-
+        // echo $sql;
+        // exit;
 
         return $this->db->query($sql)->getResultArray();
+    }
+    public function getBlockTargetVsAchievement($filter)
+    {
+        $year_id = $filter['year_id'];
+        $season = $filter['season'];
+        $block_id = $filter['block_id'];
+        // $sql = "";
+        // return $this->db->query($sql)->getResultArray();
+    }
+    public function getDistrictTargetVsAchievement($filter)
+    {
+        $year_id = $filter['year_id'];
+        $season = $filter['season'];
+        $district_id = $filter['$district_id'];
+        $sql = "";
     }
 
 

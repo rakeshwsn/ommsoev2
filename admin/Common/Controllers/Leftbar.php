@@ -480,7 +480,7 @@ class Leftbar extends AdminController
             $data["menus"][] = [
                 "id" => "menu-enterprises",
                 "icon" => "md-account-child",
-                "name" =>'Enterprises',
+                "name" => 'Enterprises',
                 "heading" => 0,
                 "href" => "",
                 "children" => $enterprises,
@@ -564,6 +564,16 @@ class Leftbar extends AdminController
             $areacoverage[] = [
                 "name" => "Block Wise Area Coverage Upload Status",
                 "href" => admin_url("reports/areacoverage/blockWiseGetUploadStatus"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+        if (
+            $this->user->hasPermission("areacoverage/targetVsAchievement")
+        ) {
+            $areacoverage[] = [
+                "name" => "Target Vs Achievement",
+                "href" => admin_url("areacoverage/targetVsAchievement"),
                 "heading" => 0,
                 "children" => [],
             ];

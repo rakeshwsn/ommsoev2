@@ -80,7 +80,6 @@ class AreaCoverageTarget extends AdminController
 		$croppractices = $this->targetModel->getPractices();
 
 
-
 		if ($data['district_id'] === 0) {
 			$districtdata = $this->targetModel->getDistrictWiseData([]);
 			// dd($districtdata);
@@ -113,7 +112,10 @@ class AreaCoverageTarget extends AdminController
 			'year_id' => $data['year_id'],
 			'season' => $data['current_season']
 		];
+		// printr($filter);
+		// exit;
 		$blocks = $this->acModel->getByDistrict($filter);
+
 		$this->_allblocks($blocks, $data);
 		$data['blocks'] = [];
 		if ($data['district_id']) {
