@@ -867,6 +867,8 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $data['remarks'] = '-';
 
+        $data['allow_negative_amount'] = $txn_type=='fund_receipt';
+
         $data['txn_type_text'] = $txn_type=='expense'?'Expense':'Fund Receipt';
 
         $filter = [
