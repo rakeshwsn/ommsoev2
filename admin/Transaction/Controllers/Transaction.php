@@ -400,6 +400,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $data['date_added'] = ymdToDmy($txn->date_added);
         $data['phy'] = $txn->physical;
         $data['fin'] = $txn->financial;
+        $data['allow_negative_amount'] = $txn->transaction_type=='fund_receipt';
 
         $data['status'] = $this->statuses[$txn->status];
 
