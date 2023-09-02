@@ -82,9 +82,6 @@ class AreaCoverage extends AdminController
         } else if ($data['district_id']) {
             $filter['district_id'] = $data['district_id'];
         }
-        if ($this->request->getGet('start_date')) {
-
-        }
 
         if ($this->user->block_id) {
             $data['block_id'] = $filter['block_id'] = $this->user->block_id;
