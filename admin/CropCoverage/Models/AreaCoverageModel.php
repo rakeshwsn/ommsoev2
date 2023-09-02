@@ -321,7 +321,7 @@ AS
     FROM vw_area_coverage_report_blockwise
     WHERE 1=1";
         if(!empty($filter['start_date'])){
-            $sql .= " AND DATE(start_date) = DATE(".$filter['start_date'].")";
+            $sql .= " AND DATE(start_date) = DATE('".$filter['start_date']."')";
         }
         if(!empty($filter['year_id'])){
             $sql .= " AND year_id = ".$filter['year_id'];
@@ -334,41 +334,55 @@ AS
         }
         $sql .= " )";
 $sql .= " SELECT
-  vacrb.*,
-  vacng.nursery_raised,
-  vacng.balance_smi,
-  vacng.balance_lt
-FROM (SELECT
-    main.district_id,
-    main.block_id,
-    block,
-    gps total_gps,
-    year_id,
-    season,
-    start_date,
-    farmers_covered,
-    fc_area,
-    ragi_smi,
-    ragi_lt,
-    ragi_ls,
-    little_millet_lt,
-    little_millet_ls,
-    foxtail_ls,
-    sorghum_ls,
-    kodo_ls,
-    barnyard_ls,
-    pearl_ls
-  FROM vw_blockwise_gps vbg LEFT JOIN main ON vbg.block_id = main.block_id
-    JOIN (SELECT
-        block_id,
-        MAX(start_date) AS max_start_date
+  main.district_id,
+  bgp.block_id,
+  bgp.block,
+  bgp.gps total_gps,
+  year_id,
+  season,
+  main.start_date,
+  nur.nursery_raised,
+  nur.balance_smi,
+  nur.balance_lt,
+  SUM(farmers_covered) farmers_covered,
+  SUM(fc_area) fc_area,
+  SUM(ragi_smi) ragi_smi,
+  SUM(ragi_lt) ragi_lt,
+  SUM(ragi_ls) ragi_ls,
+  SUM(little_millet_lt) little_millet_lt,
+  SUM(little_millet_ls) little_millet_ls,
+  SUM(foxtail_ls) foxtail_ls,
+  SUM(sorghum_ls) sorghum_ls,
+  SUM(kodo_ls) kodo_ls,
+  SUM(barnyard_ls) barnyard_ls,
+  SUM(pearl_ls) pearl_ls
+FROM main
+  LEFT JOIN (SELECT
+      main_max_date.block_id,
+      main_max_date.start_date,
+      vacng.nursery_raised,
+      vacng.balance_smi,
+      vacng.balance_lt
+    FROM (SELECT
+        main.block_id,
+        start_date
       FROM main
-      GROUP BY block_id) t2
-      ON main.block_id = t2.block_id
-      AND start_date = t2.max_start_date) vacrb
-  JOIN vw_area_coverage_nur_blockwise vacng
-    ON vacrb.start_date = vacng.start_date
-    AND vacrb.block_id = vacng.block_id ORDER BY block";
+        JOIN (SELECT
+            block_id,
+            MAX(start_date) AS max_start_date
+          FROM main
+          GROUP BY block_id) t2
+          ON main.block_id = t2.block_id
+          AND start_date = t2.max_start_date) main_max_date
+      JOIN vw_area_coverage_nur_blockwise vacng
+        ON main_max_date.start_date = vacng.start_date
+        AND main_max_date.block_id = vacng.block_id) nur
+    ON main.block_id = nur.block_id
+    AND main.start_date = nur.start_date
+  LEFT JOIN vw_blockwise_gps bgp
+    ON main.block_id = bgp.block_id
+GROUP BY main.block_id
+ORDER BY block";
 
         return $this->db->query($sql)->getResult();
     }
@@ -515,44 +529,55 @@ WHERE (year_id IS NULL";
             $sql .= " AND DATE(start_date) = DATE('" . $filter['start_date'] . "')";
         }
         $sql .= ")";
-        $sql .= "SELECT
-  vacrb.*,
-  vacnd.nursery_raised,
-  vacnd.balance_smi,
-  vacnd.balance_lt
-FROM (SELECT
-    vbg.district_id,
-    vbg.district,
-    vbg.total_blocks,
-    vbg.total_gps,
-    year_id,
-    season,
-    start_date,
-    farmers_covered,
-    fc_area,
-    ragi_smi,
-    ragi_lt,
-    ragi_ls,
-    little_millet_lt,
-    little_millet_ls,
-    foxtail_ls,
-    sorghum_ls,
-    kodo_ls,
-    barnyard_ls,
-    pearl_ls
-  FROM vw_districtwise_blocks_gps vbg
-    LEFT JOIN main
-      ON vbg.district_id = main.district_id
-    JOIN (SELECT
-        district_id,
-        MAX(start_date) AS max_start_date
+        $sql .= " SELECT
+  bgp.district_id,
+  bgp.district,
+  bgp.total_blocks,
+  bgp.total_gps,
+  year_id,
+  season,
+  main.start_date,
+  nur.nursery_raised,
+  nur.balance_smi,
+  nur.balance_lt,
+  SUM(farmers_covered) farmers_covered,
+  SUM(fc_area) fc_area,
+  SUM(ragi_smi) ragi_smi,
+  SUM(ragi_lt) ragi_lt,
+  SUM(ragi_ls) ragi_ls,
+  SUM(little_millet_lt) little_millet_lt,
+  SUM(little_millet_ls) little_millet_ls,
+  SUM(foxtail_ls) foxtail_ls,
+  SUM(sorghum_ls) sorghum_ls,
+  SUM(kodo_ls) kodo_ls,
+  SUM(barnyard_ls) barnyard_ls,
+  SUM(pearl_ls) pearl_ls
+FROM main
+  LEFT JOIN (SELECT
+      main_max_date.district_id,
+      main_max_date.start_date,
+      vacng.nursery_raised,
+      vacng.balance_smi,
+      vacng.balance_lt
+    FROM (SELECT
+        main.district_id,
+        start_date
       FROM main
-      GROUP BY district_id) t2
-      ON main.district_id = t2.district_id
-      AND start_date = t2.max_start_date) vacrb
-  JOIN vw_area_coverage_nur_districtwise vacnd
-    ON vacrb.start_date = vacnd.start_date
-    AND vacrb.district_id = vacnd.district_id ORDER BY district";
+        JOIN (SELECT
+            district_id,
+            MAX(start_date) AS max_start_date
+          FROM main
+          GROUP BY district_id) t2
+          ON main.district_id = t2.district_id
+          AND start_date = t2.max_start_date) main_max_date
+      JOIN vw_area_coverage_nur_districtwise vacng
+        ON main_max_date.start_date = vacng.start_date
+        AND main_max_date.district_id = vacng.district_id) nur
+    ON main.district_id = nur.district_id
+    AND main.start_date = nur.start_date
+  LEFT JOIN vw_districtwise_blocks_gps bgp
+    ON main.district_id = bgp.district_id
+    GROUP BY main.district_id ORDER BY district";
 
         return $this->db->query($sql)->getResult();
     }
