@@ -222,7 +222,7 @@
             var keyCode = event.which;
 
             // Allow decimal point (.) and numbers (48-57) only
-            if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
+            if (keyCode !== 46 && keyCode !== 45 && (keyCode < 48 || keyCode > 57)) {
                 // Prevent the input if the key is not a number or decimal point
                 event.preventDefault();
             }
@@ -235,6 +235,13 @@
             // Disallow comma (,)
             if (keyCode === 44) {
                 // Prevent the input if the key is a comma
+                event.preventDefault();
+            }
+            // Prevent the input if the key is not a number, decimal point or negative sign
+            console.log(keyCode);
+            // Allow only one negative sign at the beginning
+            if (keyCode === 45 && $(this).val().indexOf('-') !== -1) {
+                // Prevent the input if there is already a negative sign
                 event.preventDefault();
             }
         });
