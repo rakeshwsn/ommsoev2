@@ -27,8 +27,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('areacoverage/dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
     $routes->get('areacoverage/dashboard/milletchart', 'CropCoverage\Controllers\AreaCoverageDashboard::milletChart');
     $routes->add('areacoverage/approve/district', 'CropCoverage\Controllers\Approve::district');
-    //    $routes->post('areacoverage/approve/reject', 'CropCoverage\Controllers\Approve::reject');
     $routes->get('dashboard/chart', 'CropCoverage\Controllers\AreaCoverageDashboard::chart');
+    $routes->match(['get', 'post'], 'areacoverage/targetVsAchievement', 'CropCoverage\Controllers\TargetVsAchievement::index');
+    $routes->match(['get', 'post'], 'areacoverage/targetVsAchievement/milletchart', 'CropCoverage\Controllers\TargetVsAchievement::milletChart');
+
 
 
 });

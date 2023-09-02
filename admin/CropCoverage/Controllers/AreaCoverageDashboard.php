@@ -92,10 +92,7 @@ class AreaCoverageDashboard extends AdminController
         $data['xaxis'] = $millets;
 
 
-        /*$data['series'] = [
-            ['name' => 'Millet Target', 'data' => $series_target],
-            ['name' => 'Millet Achievement', 'data' => $series_achievement]
-        ];*/
+
         $data['series_target'] = $series_target;
         $data['series_achievement'] = $series_achievement;
 
