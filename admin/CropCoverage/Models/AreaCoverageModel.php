@@ -389,7 +389,6 @@ ORDER BY block";
 
     public function getByDistrict($filter = [])
     {
-
         $sql = "SELECT
   district_id,
   d.name district,
@@ -746,6 +745,7 @@ FROM vw_districtwise_blocks_gps vdbg
             $b->where('crop_coverage_id', $item->id)->delete();
         }
     }
+
     public function getBlockWiseStatus($filter)
     {
         $sql = "SELECT
