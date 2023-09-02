@@ -174,9 +174,13 @@ class TargetModel extends Model
         FROM ac_target_followup_crop
         GROUP BY target_id
     ) followup ON block_target.target_id = followup.target_id
+    LEFT JOIN ac_target_master atm ON block_target.target_id = atm.id
     WHERE sb.district_id = $district_id AND atm.deleted_at IS NULL";
-        //echo $sql;
-        return $this->db->query($sql)->getResultArray();
+        // echo $sql;
+        // exit;
+        return $result = $this->db->query($sql)->getResultArray();
+        // printr($result);
+        // exit;
     }
 
     public function getDistrictWiseData($filter = [])
