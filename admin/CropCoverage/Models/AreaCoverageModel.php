@@ -335,6 +335,7 @@ AS
         $sql .= " )";
         $sql .= " SELECT
   main.district_id,
+  d.name district,
   bgp.block_id,
   bgp.block,
   bgp.gps total_gps,
@@ -380,9 +381,9 @@ FROM main
     ON main.block_id = nur.block_id
     AND main.start_date = nur.start_date
   LEFT JOIN vw_blockwise_gps bgp
-    ON main.block_id = bgp.block_id
+    ON main.block_id = bgp.block_id LEFT JOIN soe_districts d ON d.id=main.district_id
 GROUP BY main.block_id
-ORDER BY block";
+ORDER BY district,block";
 
         return $this->db->query($sql)->getResult();
     }

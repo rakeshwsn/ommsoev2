@@ -340,7 +340,7 @@ FROM (SELECT
     }
 
     //validation for adding transaction
-    public function pendingUploads($filter = []) {
+    public function pendingUploadsOld($filter = []) {
 
         $district_id = isset($filter['district_id']) ? $filter['district_id']:0;
         $block_id = isset($filter['block_id']) ? $filter['block_id']:0;
@@ -367,16 +367,17 @@ AND st.month < $month";
             //check if pending expenses from blocks
             $sql = "SELECT
   scb.block_id,
+  agency_type_id,
   COUNT(id) total
 FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
 AND scb.transaction_type = 'expense'
 AND scb.month > 0
-AND scb.agency_type_id = 5
+AND scb.agency_type_id IN (5,6)
 AND scb.year = $year
 AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND scb.month < $month
-GROUP BY scb.block_id";
+GROUP BY scb.block_id,agency_type_id";
 
             $data['block_cbs'] = $this->db->query($sql)->getResult();
 
@@ -403,10 +404,104 @@ FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
 AND scb.transaction_type = 'expense'
 AND scb.month > 0
-AND scb.agency_type_id = 5 AND fund_agency_id = $fund_agency_id
+AND scb.agency_type_id IN (5,6) AND fund_agency_id = $fund_agency_id
 AND scb.year = $year
 AND scb.district_id = $district_id AND scb.status != 1 
-AND scb.month <= $month GROUP BY scb.block_id";
+AND scb.month <= $month GROUP BY scb.block_id,agency_type_id";
+
+            $data['pending_cbs'] = $this->db->query($sql)->getResult();
+
+            return $data;
+
+        }
+
+    }
+
+    public function pendingUploads($filter = []) {
+
+        $district_id = isset($filter['district_id']) ? $filter['district_id']:0;
+        $block_id = isset($filter['block_id']) ? $filter['block_id']:0;
+        $year = isset($filter['year']) ? $filter['year']:0;
+        $month = isset($filter['month']) ? $filter['month']:0;
+        $agency_type = isset($filter['agency_type']) ? $filter['agency_type']:0;
+        $fund_agency_id = isset($filter['fund_agency_id']) ? $filter['fund_agency_id']:0;
+
+        if($agency_type == $this->settings->block_user){
+            //check if pending transactions
+            $sql = "SELECT
+  COUNT(id) total
+FROM soe_transactions st
+WHERE st.deleted_at IS NULL
+AND st.agency_type_id = 5
+AND st.transaction_type = 'expense'
+AND st.block_id=$block_id AND fund_agency_id = $fund_agency_id
+AND st.year=$year
+AND st.month < $month";
+
+            return $this->db->query($sql)->getFirstRow();
+
+        } else if($agency_type == $this->settings->district_user){
+            //check if pending expenses from blocks
+            $sql = "SELECT
+  scb.block_id,
+  agency_type_id,
+  COUNT(id) total
+FROM soe_transactions scb
+WHERE scb.deleted_at IS NULL
+AND scb.transaction_type = 'expense'
+AND scb.month > 0
+AND scb.agency_type_id IN (5,6)
+AND scb.year = $year
+AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
+AND scb.month < $month
+GROUP BY scb.block_id,agency_type_id";
+
+            $data['block_cbs'] = $this->db->query($sql)->getResult();
+
+            //check if pending cb at ATMA
+            $sql = "SELECT
+  COUNT(id) total
+FROM soe_transactions scb
+WHERE scb.deleted_at IS NULL
+AND scb.transaction_type = 'expense'
+AND scb.month > 0
+AND scb.agency_type_id = 7 AND fund_agency_id = $fund_agency_id
+AND scb.year = $year
+AND scb.district_id = $district_id
+AND scb.month <= $month";
+
+            $data['district_cbs'] = $this->db->query($sql)->getFirstRow()->total;
+
+            //check if pending status from blocks
+
+            $sql = "SELECT
+  users.block_id,
+  users.agency_type_id,
+  scb.approved,
+  scb.pending,
+  scb.approved + scb.pending total_cbs
+FROM (SELECT
+    u.block_id,
+    u.user_group_id agency_type_id,
+    u.fund_agency_id
+  FROM user u
+  WHERE u.district_id = $district_id
+  AND u.user_group_id IN (5, 6)) users
+  LEFT JOIN (SELECT
+      *,
+      SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS approved,
+      SUM(CASE WHEN status != 1 THEN 1 ELSE 0 END) AS pending
+    FROM soe_transactions
+    WHERE deleted_at is NULL
+    AND transaction_type = 'expense'
+    AND `year` = $year
+    AND fund_agency_id = $fund_agency_id
+    GROUP BY block_id,
+             agency_type_id) scb
+    ON scb.block_id = users.block_id
+    AND scb.agency_type_id = users.agency_type_id
+GROUP BY users.block_id,
+         users.agency_type_id";
 
             $data['pending_cbs'] = $this->db->query($sql)->getResult();
 
