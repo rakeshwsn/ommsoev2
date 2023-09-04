@@ -814,11 +814,15 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 }
 
                 //check if total cbs for each block is equal to month
-                if ($pending_transactions['pending_cbs']) {
+                if (isset($pending_transactions['pending_cbs'])) {
                     foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
-                        if($pending_cb->total_cbs != $month){
+                        if($pending_cb->total_cbs < $month){
                             $this->session->setFlashdata('message', 'Cannot add transaction. Blocks closing 
-                            balance submissions and approvals are pending');
+                            balance not submitted');
+                            return redirect()->to(Url::transaction);
+                        } else if($pending_cb->pending>0){
+                            $this->session->setFlashdata('message', 'Cannot add transaction. Blocks closing 
+                            balance is not approved');
                             return redirect()->to(Url::transaction);
                         }
                     }

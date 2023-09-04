@@ -249,8 +249,8 @@ class ClosingBalance extends AdminController {
                     }
                 }
             }
-            if(isset($pending_transactions['district_cbs']) && $pending_transactions['district_cbs'] < ($month - 1)){
-                $data['error'] = 'Cannot add closing balance. Please check for pending uploads in the previous months!!';
+            if(isset($pending_transactions['district_cbs']) && $pending_transactions['district_cbs'] < ($month)){
+                $data['error'] = 'Cannot add closing balance. Please check for pending submissions!!';
                 $data['can_edit'] = false;
             }
             if(isset($pending_transactions['pending_cbs']) && $pending_transactions['pending_cbs']){
