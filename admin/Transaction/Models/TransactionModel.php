@@ -1205,7 +1205,7 @@ AND sfrc.month = $month AND sfrc.status=1";
 FROM soe_closing_balances scb
 WHERE scb.deleted_at IS NULL
 AND scb.month > 0
-AND scb.agency_type_id = 5
+AND scb.agency_type_id IN (5,6)
 AND scb.fund_agency_id = $fund_agency_id
 AND scb.year = $year
 AND scb.district_id = $district_id

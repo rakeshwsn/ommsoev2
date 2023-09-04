@@ -633,7 +633,7 @@ class AreaCoverage extends AdminController
             'season' => $data['current_season']
         ];
 
-        $blocks = $acModel->getByDistrict($filter);
+        $blocks = $acModel->getByDistrictNew($filter);
 
         $this->_allblocks($blocks, $data);
 
@@ -780,6 +780,7 @@ class AreaCoverage extends AdminController
 
         return $this->template->view('Admin\Reports\Views\areacoverage_upload_status', $data);
     }
+
     public function blockWiseGetUploadStatus()
     {
 
