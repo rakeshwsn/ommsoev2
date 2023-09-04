@@ -320,20 +320,20 @@ AS
       *
     FROM vw_area_coverage_report_blockwise
     WHERE 1=1";
-        if(!empty($filter['start_date'])){
-            $sql .= " AND DATE(start_date) = DATE('".$filter['start_date']."')";
+        if (!empty($filter['start_date'])) {
+            $sql .= " AND DATE(start_date) = DATE('" . $filter['start_date'] . "')";
         }
-        if(!empty($filter['year_id'])){
-            $sql .= " AND year_id = ".$filter['year_id'];
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND year_id = " . $filter['year_id'];
         }
-        if(!empty($filter['district_id'])){
-            $sql .= " AND district_id = ".$filter['district_id'];
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND district_id = " . $filter['district_id'];
         }
-        if(!empty($filter['season'])){
-            $sql .= " AND LOWER(season) = '".strtolower($filter['season'])."'";
+        if (!empty($filter['season'])) {
+            $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
         }
         $sql .= " )";
-$sql .= " SELECT
+        $sql .= " SELECT
   main.district_id,
   d.name district,
   bgp.block_id,
@@ -425,7 +425,8 @@ WHERE (year_id IS NULL";
             $sql .= " AND vacrd.district_id=" . $filter['district_id'];
         }
         $sql .= " GROUP BY block_id ORDER BY district_id,block";
-
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -451,8 +452,8 @@ WHERE (year_id IS NULL";
   SUM(barnyard_ls) AS barnyard_ls,
   SUM(pearl_ls) AS pearl_ls
 FROM (SELECT * FROM vw_area_coverage_report_gpwise WHERE 1=1";
-        if(!empty($filter['start_date'])){
-            $sql .= " AND DATE(start_date)=DATE('".$filter['start_date']."')";
+        if (!empty($filter['start_date'])) {
+            $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
         }
         $sql .= ") vacrd 
 RIGHT JOIN vw_area_coverage_nur_gpwise vacng
@@ -514,7 +515,8 @@ WHERE (year_id IS NULL";
         return $this->db->query($sql)->getResult();
     }
 
-    public function getAllDistrictsNew($filter = []) {
+    public function getAllDistrictsNew($filter = [])
+    {
         $sql = "WITH main AS
 (SELECT
       *

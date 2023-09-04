@@ -14,19 +14,27 @@
         <div class="row mg-b-25">
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
-                    <label class="form-control-label">Year:*
-
-                        <?= $year_id; ?>
-                    </label>
+                    <select name="year" id="year" class="form-control" disabled>
+                        <?php foreach ($years as $year) { ?>
+                            <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
+                                  echo 'selected';
+                              } ?>><?= $year['name'] ?>
+                            </option>
+                        <?php } ?>
+                    </select>
 
                 </div>
             </div>
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
-                    <label class="form-control-label">Season:*
-                        <?= $current_season; ?>
-
-                    </label>
+                    <select name="season" id="season" class="form-control" disabled>
+                        <?php foreach ($seasons as $season) { ?>
+                            <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
+                                  echo 'selected';
+                              } ?>><?= $season['name']; ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
             </div>
         </div>
@@ -82,76 +90,76 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($districtdata as $distdata) { ?>
+                <?php foreach ($distwisetarget as $disttarget) { ?>
                     <tr>
                         <td>
-                            <?= $distdata["district"]; ?>
+                            <?= $disttarget["district"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["no_of_block"]; ?>
-                        </td>
-
-                        <td>
-                            <?= $distdata["RAGI_SMI"]; ?>
-                        </td>
-                        <td>
-                            <?= $distdata["RAGI_LT"]; ?>
-                        </td>
-                        <td>
-                            <?= $distdata["RAGI_LS"]; ?>
+                            <?= $disttarget["no_of_block"]; ?>
                         </td>
 
                         <td>
-                            <?= $distdata["LITTLE_MILLET_LT"]; ?>
+                            <?= $disttarget["RAGI_SMI"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["LITTLE_MILLET_LS"]; ?>
+                            <?= $disttarget["RAGI_LT"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["FOXTAIL_MILLET_LS"]; ?>
+                            <?= $disttarget["RAGI_LS"]; ?>
+                        </td>
+
+                        <td>
+                            <?= $disttarget["LITTLE_MILLET_LT"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["SORGHUM_LS"]; ?>
+                            <?= $disttarget["LITTLE_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["PEARL_MILLET_LS"]; ?>
+                            <?= $disttarget["FOXTAIL_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["BARNYARD_MILLET_LS"]; ?>
+                            <?= $disttarget["SORGHUM_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["KODO_MILLET_LS"]; ?>
+                            <?= $disttarget["PEARL_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["RAGI_FOLLOWUP"]; ?>
+                            <?= $disttarget["BARNYARD_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["LITTLE_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["KODO_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["FOXTAIL_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["RAGI_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["SORGHUM_FOLLOWUP"]; ?>
+                            <?= $disttarget["LITTLE_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["PEARL_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["FOXTAIL_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["BARNYARD_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["SORGHUM_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $distdata["KODO_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["PEARL_MILLET_FOLLOWUP"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["BARNYARD_MILLET_FOLLOWUP"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["KODO_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td id="dist-ragi" class="dist-ragi">
-                            <?= $distdata["RAGI_SMI"] + $distdata["RAGI_LT"] + $distdata["RAGI_LS"]; ?>
+                            <?= $disttarget["RAGI_SMI"] + $disttarget["RAGI_LT"] + $disttarget["RAGI_LS"]; ?>
 
                         </td>
                         <td id="dist-non-ragi" class="dist-non-ragi">
-                            <?= $distdata["LITTLE_MILLET_LT"] + $distdata["LITTLE_MILLET_LS"] + $distdata["FOXTAIL_MILLET_LS"] + $distdata["SORGHUM_LS"] + $distdata["PEARL_MILLET_LS"] + $distdata["BARNYARD_MILLET_LS"] + $distdata["KODO_MILLET_LS"]; ?>
+                            <?= $disttarget["LITTLE_MILLET_LT"] + $disttarget["LITTLE_MILLET_LS"] + $disttarget["FOXTAIL_MILLET_LS"] + $disttarget["SORGHUM_LS"] + $disttarget["PEARL_MILLET_LS"] + $disttarget["BARNYARD_MILLET_LS"] + $disttarget["KODO_MILLET_LS"]; ?>
                         </td>
                         <td id="dist-follow-up" class="dist-follow-up">
-                            <?= $distdata["RAGI_FOLLOWUP"] + $distdata["LITTLE_MILLET_FOLLOWUP"] + $distdata["FOXTAIL_MILLET_FOLLOWUP"] + $distdata["SORGHUM_FOLLOWUP"] + $distdata["PEARL_MILLET_FOLLOWUP"] + $distdata["BARNYARD_MILLET_FOLLOWUP"] + $distdata["KODO_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["RAGI_FOLLOWUP"] + $disttarget["LITTLE_MILLET_FOLLOWUP"] + $disttarget["FOXTAIL_MILLET_FOLLOWUP"] + $disttarget["SORGHUM_FOLLOWUP"] + $disttarget["PEARL_MILLET_FOLLOWUP"] + $disttarget["BARNYARD_MILLET_FOLLOWUP"] + $disttarget["KODO_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td id="dist-sum-crop" class="dist-sum-crop"> </td>
 
@@ -165,9 +173,9 @@
                     <td colspan="3" class="total-ragi cl-head">
                         <?php
                         $totalRagiSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Ragi values for each row
-                            $ragiSum = $distdata["RAGI_SMI"] + $distdata["RAGI_LT"] + $distdata["RAGI_LS"];
+                            $ragiSum = $disttarget["RAGI_SMI"] + $disttarget["RAGI_LT"] + $disttarget["RAGI_LS"];
                             $totalRagiSum += $ragiSum;
                         }
                         echo $totalRagiSum; // Display the total Ragi sum
@@ -176,9 +184,9 @@
                     <td colspan="2" class="total-little-millet cl-head">
                         <?php
                         $totalLittleMilletSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Little Millet values for each row
-                            $littleMilletSum = $distdata["LITTLE_MILLET_LT"] + $distdata["LITTLE_MILLET_LS"];
+                            $littleMilletSum = $disttarget["LITTLE_MILLET_LT"] + $disttarget["LITTLE_MILLET_LS"];
                             $totalLittleMilletSum += $littleMilletSum;
                         }
                         echo $totalLittleMilletSum; // Display the total Little Millet sum
@@ -187,9 +195,9 @@
                     <td class="total-foxtail-millet cl-head">
                         <?php
                         $totalFoxtailMilletSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Foxtail Millet ls values for each row
-                            $foxtailMilletSum = $distdata["FOXTAIL_MILLET_LS"];
+                            $foxtailMilletSum = $disttarget["FOXTAIL_MILLET_LS"];
                             $totalFoxtailMilletSum += $foxtailMilletSum;
                         }
                         echo $totalFoxtailMilletSum;
@@ -199,9 +207,9 @@
                     <td class="total-sorghum cl-head">
                         <?php
                         $totalSorghumSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
 
-                            $sorghumSum = $distdata["SORGHUM_LS"];
+                            $sorghumSum = $disttarget["SORGHUM_LS"];
                             $totalSorghumSum += $sorghumSum;
                         }
                         echo $totalSorghumSum;
@@ -210,9 +218,9 @@
                     <td class="total-kodo-millet cl-head">
                         <?php
                         $totalKodoMilletSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Kodo Millet ls values for each row
-                            $kodoMilletSum = $distdata["KODO_MILLET_LS"];
+                            $kodoMilletSum = $disttarget["KODO_MILLET_LS"];
                             $totalKodoMilletSum += $kodoMilletSum;
                         }
                         echo $totalKodoMilletSum; // Display the total Kodo Millet sum
@@ -221,9 +229,9 @@
                     <td class="total-barnyard-millet cl-head">
                         <?php
                         $totalBarnyardMilletSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Barnyard Millet ls values for each row
-                            $barnyardMilletSum = $distdata["BARNYARD_MILLET_LS"];
+                            $barnyardMilletSum = $disttarget["BARNYARD_MILLET_LS"];
                             $totalBarnyardMilletSum += $barnyardMilletSum;
                         }
                         echo $totalBarnyardMilletSum; // Display the total Barnyard Millet sum
@@ -232,9 +240,9 @@
                     <td class="total-pearl-millet cl-head">
                         <?php
                         $totalPearlMilletSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of Pearl Millet ls values for each row
-                            $pearlMilletSum = $distdata["PEARL_MILLET_LS"];
+                            $pearlMilletSum = $disttarget["PEARL_MILLET_LS"];
                             $totalPearlMilletSum += $pearlMilletSum;
                         }
                         echo $totalPearlMilletSum; // Display the total Pearl Millet sum
@@ -243,9 +251,9 @@
                     <td class="total-ragi-followup cl-head">
                         <?php
                         $totalRagiFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of RAGI_FOLLOWUP values for each row
-                            $ragiFollowupSum = $distdata["RAGI_FOLLOWUP"];
+                            $ragiFollowupSum = $disttarget["RAGI_FOLLOWUP"];
                             $totalRagiFollowupSum += $ragiFollowupSum;
                         }
                         echo $totalRagiFollowupSum; // Display the total RAGI_FOLLOWUP sum
@@ -254,9 +262,9 @@
                     <td class="total-little-millet-followup cl-head">
                         <?php
                         $totalLittleMilletFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of LITTLE_MILLET_FOLLOWUP values for each row
-                            $littleMilletFollowupSum = $distdata["LITTLE_MILLET_FOLLOWUP"];
+                            $littleMilletFollowupSum = $disttarget["LITTLE_MILLET_FOLLOWUP"];
                             $totalLittleMilletFollowupSum += $littleMilletFollowupSum;
                         }
                         echo $totalLittleMilletFollowupSum; // Display the total LITTLE_MILLET_FOLLOWUP sum
@@ -266,9 +274,9 @@
                     <td class="total-foxtail-millet-followup cl-head">
                         <?php
                         $totalFoxtailMilletFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of FOXTAIL_MILLET_FOLLOWUP values for each row
-                            $foxtailMilletFollowupSum = $distdata["FOXTAIL_MILLET_FOLLOWUP"];
+                            $foxtailMilletFollowupSum = $disttarget["FOXTAIL_MILLET_FOLLOWUP"];
                             $totalFoxtailMilletFollowupSum += $foxtailMilletFollowupSum;
                         }
                         echo $totalFoxtailMilletFollowupSum; // Display the total FOXTAIL_MILLET_FOLLOWUP sum
@@ -278,9 +286,9 @@
                     <td class="total-sorghum-followup cl-head">
                         <?php
                         $totalSorghumFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of SORGHUM_FOLLOWUP values for each row
-                            $sorghumFollowupSum = $distdata["SORGHUM_FOLLOWUP"];
+                            $sorghumFollowupSum = $disttarget["SORGHUM_FOLLOWUP"];
                             $totalSorghumFollowupSum += $sorghumFollowupSum;
                         }
                         echo $totalSorghumFollowupSum; // Display the total SORGHUM_FOLLOWUP sum
@@ -290,9 +298,9 @@
                     <td class="total-pearl-millet-followup cl-head">
                         <?php
                         $totalPearlMilletFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of PEARL_MILLET_FOLLOWUP values for each row
-                            $pearlMilletFollowupSum = $distdata["PEARL_MILLET_FOLLOWUP"];
+                            $pearlMilletFollowupSum = $disttarget["PEARL_MILLET_FOLLOWUP"];
                             $totalPearlMilletFollowupSum += $pearlMilletFollowupSum;
                         }
                         echo $totalPearlMilletFollowupSum; // Display the total PEARL_MILLET_FOLLOWUP sum
@@ -302,9 +310,9 @@
                     <td class="total-barnyard-millet-followup cl-head">
                         <?php
                         $totalBarnyardMilletFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of BARNYARD_MILLET_FOLLOWUP values for each row
-                            $barnyardMilletFollowupSum = $distdata["BARNYARD_MILLET_FOLLOWUP"];
+                            $barnyardMilletFollowupSum = $disttarget["BARNYARD_MILLET_FOLLOWUP"];
                             $totalBarnyardMilletFollowupSum += $barnyardMilletFollowupSum;
                         }
                         echo $totalBarnyardMilletFollowupSum; // Display the total BARNYARD_MILLET_FOLLOWUP sum
@@ -314,9 +322,9 @@
                     <td class="total-kodo-millet-followup cl-head">
                         <?php
                         $totalKodoMilletFollowupSum = 0;
-                        foreach ($districtdata as $distdata) {
+                        foreach ($distwisetarget as $disttarget) {
                             // Calculate the sum of KODO_MILLET_FOLLOWUP values for each row
-                            $kodoMilletFollowupSum = $distdata["KODO_MILLET_FOLLOWUP"];
+                            $kodoMilletFollowupSum = $disttarget["KODO_MILLET_FOLLOWUP"];
                             $totalKodoMilletFollowupSum += $kodoMilletFollowupSum;
                         }
                         echo $totalKodoMilletFollowupSum; // Display the total KODO_MILLET_FOLLOWUP sum
