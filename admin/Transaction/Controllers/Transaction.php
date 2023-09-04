@@ -812,9 +812,16 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                     $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending uploads in the previous months!!');
                     return redirect()->to(Url::transaction);
                 }
+
+                //check if total cbs for each block is equal to month
                 if ($pending_transactions['pending_cbs']) {
-                    $this->session->setFlashdata('message', 'Cannot add transaction. Blocks status are pending');
-                    return redirect()->to(Url::transaction);
+                    foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
+                        if($pending_cb->total_cbs != $month){
+                            $this->session->setFlashdata('message', 'Cannot add transaction. Blocks closing 
+                            balance submissions and approvals are pending');
+                            return redirect()->to(Url::transaction);
+                        }
+                    }
                 }
             }
         }

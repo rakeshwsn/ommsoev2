@@ -376,7 +376,7 @@ AND scb.agency_type_id IN (5,6)
 AND scb.year = $year
 AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND scb.month < $month
-GROUP BY scb.block_id,agency_type_id";
+GROUP BY scb.block_id,agency_type_id"; echo $sql;exit;
 
             $data['block_cbs'] = $this->db->query($sql)->getResult();
 
