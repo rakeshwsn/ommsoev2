@@ -1244,7 +1244,7 @@ FROM (SELECT
       SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS approved,
       SUM(CASE WHEN status != 1 THEN 1 ELSE 0 END) AS pending
     FROM soe_closing_balances
-    WHERE month > 0
+    WHERE deleted_at is NULL AND month > 0
     AND year = $year
     AND fund_agency_id = $fund_agency_id
     GROUP BY block_id,
