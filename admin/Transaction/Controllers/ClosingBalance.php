@@ -245,13 +245,27 @@ class ClosingBalance extends AdminController {
                     }
                 }
             }
+
             if(isset($pending_transactions['district_cbs']) && $pending_transactions['district_cbs'] < ($month)){
                 $data['error'] = 'Cannot add closing balance. Please check for pending submissions!!';
                 $data['can_edit'] = false;
             }
-            if(isset($pending_transactions['pending_cbs']) && $pending_transactions['pending_cbs']){
+
+            /*if(isset($pending_transactions['pending_cbs']) && $pending_transactions['pending_cbs']){
                 $data['error'] = 'Cannot add closing balance. Blocks status are pending';
                 $data['can_edit'] = false;
+            }*/
+
+            if (isset($pending_transactions['pending_cbs'])) {
+                foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
+                    if($pending_cb->total_cbs < $month){
+                        $data['message'] = 'Cannot add closing balance. Blocks transactions are not submitted';
+                        $data['can_edit'] = false;
+                    } else if($pending_cb->pending>0){
+                        $data['message'] = 'Cannot add closing balance. Blocks transactions are not approved';
+                        $data['can_edit'] = false;
+                    }
+                }
             }
         }
     }
