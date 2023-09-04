@@ -367,6 +367,7 @@ AND st.month < $month";
             //check if pending expenses from blocks
             $sql = "SELECT
   scb.block_id,
+  agency_type_id,
   COUNT(id) total
 FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
@@ -376,7 +377,7 @@ AND scb.agency_type_id IN (5,6)
 AND scb.year = $year
 AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND scb.month < $month
-GROUP BY scb.block_id,agency_type_id"; echo $sql;exit;
+GROUP BY scb.block_id,agency_type_id";
 
             $data['block_cbs'] = $this->db->query($sql)->getResult();
 
