@@ -1196,8 +1196,6 @@ AND sfrc.year = $year
 AND sfrc.month = $month AND sfrc.status=1";
 //            $fr_check = $this->db->query($sql)->getResult();
 
-
-
             //check if pending closing balances from blocks
             $sql = "SELECT
   scb.block_id,
@@ -1210,7 +1208,7 @@ AND scb.fund_agency_id = $fund_agency_id
 AND scb.year = $year
 AND scb.district_id = $district_id
 AND scb.month < $month
-GROUP BY scb.block_id";
+GROUP BY scb.block_id,agency_type_id";
 
             $data['block_cbs'] = $this->db->query($sql)->getResult();
 
@@ -1235,10 +1233,10 @@ AND scb.month < $month";
 FROM soe_closing_balances scb
 WHERE scb.deleted_at IS NULL
 AND scb.month > 0
-AND scb.agency_type_id = 5
+AND scb.agency_type_id IN (5,6)
 AND scb.year = $year
 AND scb.district_id = $district_id AND scb.status != 1 AND scb.fund_agency_id = $fund_agency_id
-AND scb.month <= $month GROUP BY scb.block_id";
+AND scb.month <= $month GROUP BY scb.block_id,agency_type_id";
 
             $data['pending_cbs'] = $this->db->query($sql)->getResult();
 

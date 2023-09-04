@@ -173,6 +173,12 @@ class ClosingBalance extends AdminController {
             return redirect()->to(Url::closingBalance)->with('message','Closing balance submitted for approval');
         }
 
+        $this->validateUpload($year,$month,$data);
+
+        if(!empty($data['error'])){
+            return redirect()->to(Url::closingBalance)->with('message',$data['error']);
+        }
+
         $filter['fund_agency_id'] = $fund_agency_id;
         $ledger =  $this->cbModel->getLedgerReport($filter,'array');
 
@@ -185,8 +191,6 @@ class ClosingBalance extends AdminController {
         } else {
             $data['summary']['status'] = $this->statuses[3];
         }
-
-        $this->validateUpload($year,$month,$data);
 
         foreach($this->cbModel->getFieldNames() as $field){
             if($this->request->getPost($field)){
