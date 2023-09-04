@@ -363,11 +363,11 @@ AND st.month < $month";
 
             return $this->db->query($sql)->getFirstRow();
 
-        }
-        else if($this->settings->district_user == $agency_type){
+        } else if($this->settings->district_user == $agency_type){
             //check if pending expenses from blocks
             $sql = "SELECT
   scb.block_id,
+  agency_type_id,
   COUNT(id) total
 FROM soe_transactions scb
 WHERE scb.deleted_at IS NULL
@@ -379,7 +379,7 @@ AND scb.district_id = $district_id AND fund_agency_id = $fund_agency_id
 AND scb.month < $month
 GROUP BY scb.block_id,agency_type_id";
 
-                $data['block_cbs'] = $this->db->query($sql)->getResult();
+            $data['block_cbs'] = $this->db->query($sql)->getResult();
 
             //check if pending cb at ATMA
             $sql = "SELECT

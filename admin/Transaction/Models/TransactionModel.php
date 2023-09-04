@@ -1225,18 +1225,34 @@ AND scb.month < $month";
 
             $data['district_cbs'] = $this->db->query($sql)->getFirstRow()->total;
 
-            //check if pending status from blocks
-
+            //check if pending status from blocks --new
             $sql = "SELECT
-  scb.block_id,
-  COUNT(id) total
-FROM soe_closing_balances scb
-WHERE scb.deleted_at IS NULL
-AND scb.month > 0
-AND scb.agency_type_id IN (5,6)
-AND scb.year = $year
-AND scb.district_id = $district_id AND scb.status != 1 AND scb.fund_agency_id = $fund_agency_id
-AND scb.month <= $month GROUP BY scb.block_id,agency_type_id";
+  users.block_id,
+  users.agency_type_id,
+  scb.approved,
+  scb.pending,
+  scb.approved + scb.pending total_cbs
+FROM (SELECT
+    u.block_id,
+    u.user_group_id agency_type_id,
+    u.fund_agency_id
+  FROM user u
+  WHERE u.district_id = $district_id
+  AND u.user_group_id IN (5, 6)) users
+  LEFT JOIN (SELECT
+      *,
+      SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS approved,
+      SUM(CASE WHEN status != 1 THEN 1 ELSE 0 END) AS pending
+    FROM soe_closing_balances
+    WHERE month > 0
+    AND year = $year
+    AND fund_agency_id = $fund_agency_id
+    GROUP BY block_id,
+             agency_type_id) scb
+    ON scb.block_id = users.block_id
+    AND scb.agency_type_id = users.agency_type_id
+GROUP BY users.block_id,
+         users.agency_type_id";
 
             $data['pending_cbs'] = $this->db->query($sql)->getResult();
 
