@@ -136,7 +136,7 @@ class ClosingBalance extends AdminController {
 
         //for test env
         $data['can_edit'] = true;
-        if(env('soe.uploadDateValidation') && $cb->status!=2){
+        if(env('soe.uploadDateValidation') && (isset($cb) && $cb->status!=2)){
             $data['can_edit'] = in_array($month,$months);
             if(!$data['can_edit']){ //if rjected
                 $data['error'] = 'Closing balance upload date has ended';
