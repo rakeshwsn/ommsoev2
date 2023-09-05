@@ -1,3 +1,6 @@
+<?php
+$user = service('user');
+?>
 <style>
     #container {
         height: 500px;
@@ -83,10 +86,7 @@
 </div>
 <figure class="highcharts-figure">
     <div id="container"></div>
-    <!-- <p class="highcharts-description">
-        Comparative Variwide charts showing Labor Costs in Europe for two different years, 2016 and 2017.
-        The column width is proportional to the country's GDP.
-    </p> -->
+
 </figure>
 <script>
     var chartOptions = {
@@ -94,7 +94,7 @@
             type: 'column'
         },
         title: {
-            text: 'District Wise Millet Target vs Achievement'
+            text: 'Block Wise Millet Target vs Achievement'
         },
 
         xAxis: {
@@ -115,7 +115,7 @@
         },
         series: [
             {
-                name: 'District Target',
+                name: 'Block Target',
                 data: [], // Replace this value with the millet target for the one district
                 color: 'rgba(165,170,217,1)',
                 borderRadius: 3,
@@ -123,7 +123,7 @@
                 borderWidth: 0
             },
             {
-                name: 'District Achievement',
+                name: 'Block Achievement',
                 data: [], // Replace this value with the millet achievement for the one district
                 color: 'rgba(126,86,134,.9)',
                 borderRadius: 3,
@@ -137,8 +137,9 @@
         $('[name="year"],[name="season"]').on('change', function () {
             year_id = $('#year').val();
             season = $('#season').val();
+
             $.ajax({
-                url: '<?= $chart_url ?>',
+                url: '<?= $distchart_url ?>',
                 data: { year_id: year_id, season: season },
                 type: 'GET',
                 dataType: 'JSON',

@@ -796,20 +796,23 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
             if (isset($pending_transactions->total)) {
                 if ($pending_transactions->total < ($month - 1)) {
-                    $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending closing balance of the previous months!!');
+                    $this->session->setFlashdata('message', 'Cannot add transaction. 
+                    Please check for pending closing balance of the previous months!!');
                     return redirect()->to(Url::transaction);
                 }
             } else {
                 if ($pending_transactions['block_cbs']) {
                     foreach ($pending_transactions['block_cbs'] as $block_cb) {
                         if ($block_cb->total != ($month - 1)) {
-                            $this->session->setFlashdata('message', 'Cannot add transaction. Block level uploads are pending in the previous months!!');
+                            $this->session->setFlashdata('message', 'Cannot add transaction. 
+                            Block level uploads are pending in the previous months!!');
                             return redirect()->to(Url::transaction);
                         }
                     }
                 }
                 if ($pending_transactions['district_cbs'] < ($month - 1)) {
-                    $this->session->setFlashdata('message', 'Cannot add transaction. Please check for pending uploads in the previous months!!');
+                    $this->session->setFlashdata('message', 'Cannot add transaction. 
+                    Please check for pending uploads in the previous months!!');
                     return redirect()->to(Url::transaction);
                 }
 
@@ -817,12 +820,12 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 if (isset($pending_transactions['pending_cbs'])) {
                     foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
                         if($pending_cb->total_cbs < $month){
-                            $this->session->setFlashdata('message', 'Cannot add transaction. Blocks closing 
-                            balance not submitted');
+                            $this->session->setFlashdata('message', 'Cannot add transaction. 
+                            Blocks closing balance not submitted');
                             return redirect()->to(Url::transaction);
                         } else if($pending_cb->pending>0){
-                            $this->session->setFlashdata('message', 'Cannot add transaction. Blocks closing 
-                            balance is not approved');
+                            $this->session->setFlashdata('message', 'Cannot add transaction. 
+                            Blocks closing balance is not approved');
                             return redirect()->to(Url::transaction);
                         }
                     }
