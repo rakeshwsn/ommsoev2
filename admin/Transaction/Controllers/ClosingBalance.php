@@ -193,6 +193,7 @@ class ClosingBalance extends AdminController {
 //            return redirect()->to(Url::closingBalance)->with('message',$data['error']);
         }
 
+        //set error message to display if any
         if(!empty($data['error'])){
             $session = service('session');
             $session->setFlashdata('message',$data['error']);
