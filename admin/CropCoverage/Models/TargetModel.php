@@ -2,6 +2,7 @@
 namespace Admin\CropCoverage\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class TargetModel extends Model
 {
@@ -440,6 +441,7 @@ LEFT JOIN (
     {
         $year_id = $filter['year_id'];
         $season = $filter['season'];
+
         $block_id = isset($filter['block_id']) ? $filter['block_id'] : null;
         $sql = "
 SELECT
@@ -468,6 +470,7 @@ LEFT JOIN (
             $sql .= " AND atm.block_id = " . $filter['block_id'];
         }
 
+
         $sql .= " GROUP BY ata.crop_id
 ) tar ON ac.id = tar.crop_id
 LEFT JOIN (
@@ -495,25 +498,106 @@ LEFT JOIN (
 ) ach ON ac.id = ach.crop_id
 ";
 
-        // echo $sql;
-        // exit;
+        // Execute $sql query
+
 
         return $this->db->query($sql)->getResultArray();
     }
-    public function getBlockTargetVsAchievement($filter)
+    public function getDistTargetVsAchievement($filter)
     {
         $year_id = $filter['year_id'];
         $season = $filter['season'];
-        $block_id = $filter['block_id'];
-        // $sql = "";
-        // return $this->db->query($sql)->getResultArray();
-    }
-    public function getDistrictTargetVsAchievement($filter)
-    {
-        $year_id = $filter['year_id'];
-        $season = $filter['season'];
-        $district_id = $filter['$district_id'];
-        $sql = "";
+        $district_id = $filter['district_id'];
+
+        $sql = "SELECT
+    sb.id AS block_id,
+    sb.name AS block,
+    COALESCE(tar.area_ + tar.fup, 0) AS target_area,
+    COALESCE((ach.smi + ach.lt + ach.ls + ach.fup_area), 0) AS ach_area
+FROM
+    soe_blocks sb
+LEFT JOIN (
+    SELECT
+        atm.block_id,
+        SUM(ar.area_) AS area_,
+        SUM(fup.area_) AS fup
+    FROM
+        ac_target_master atm
+    LEFT JOIN (
+        SELECT
+            ata.target_id,
+            SUM(ata.smi + ata.lt + ata.ls) AS area_
+        FROM
+            ac_target_area ata
+        GROUP BY
+            ata.target_id
+    ) ar ON ar.target_id = atm.id
+    LEFT JOIN (
+        SELECT
+            atfc.target_id,
+            SUM(atfc.followup) AS area_
+        FROM
+            ac_target_followup_crop atfc
+        GROUP BY
+            atfc.target_id
+    ) fup ON atm.id = fup.target_id
+    WHERE
+        atm.deleted_at IS NULL";
+
+        if (!empty($filter['season'])) {
+            $sql .= " AND LOWER(atm.season) = '" . $filter['season'] . "'";
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND atm.year_id = " . $filter['year_id'];
+        }
+
+        $sql .= "GROUP BY
+    atm.block_id
+) tar ON tar.block_id = sb.id
+LEFT JOIN (
+    SELECT
+        acc.block_id,
+        SUM(aap.smi) AS smi,
+        SUM(aap.lt) AS lt,
+        SUM(ls) AS ls,
+        COALESCE(SUM(fup.area), 0) AS fup_area
+    FROM
+        ac_crop_coverage acc
+    LEFT JOIN (
+        SELECT
+            crop_coverage_id,
+            SUM(smi) smi,
+            SUM(ls) ls,
+            SUM(lt) lt
+        FROM ac_area_practices
+        GROUP BY crop_coverage_id
+    ) aap ON acc.id = aap.crop_coverage_id
+    LEFT JOIN (
+        SELECT
+            aafu.crop_coverage_id,
+            SUM(aafu.area) AS area
+        FROM
+            ac_area_follow_up aafu
+        GROUP BY
+            aafu.crop_coverage_id
+    ) fup ON acc.id = fup.crop_coverage_id
+    WHERE
+        acc.deleted_at IS NULL AND acc.status = 1";
+
+        if (!empty($filter['season'])) {
+            $sql .= " AND LOWER(acc.season) = '" . $filter['season'] . "'";
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND acc.year_id = " . $filter['year_id'];
+        }
+
+        $sql .= " AND sb.district_id = " . $filter['district_id'];
+
+        $sql .= " ORDER BY block;";
+
+
+        return $this->db->query($sql)->getResultArray();
+
     }
 
 

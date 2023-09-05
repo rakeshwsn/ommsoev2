@@ -270,7 +270,7 @@ class Approve extends AdminController
 
         $dates = $this->areacoveragemodel->getWeekDate($start_date);
         $data['currentDay'] = date('l');
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday', 'Tuesday'));
 
         if ($this->request->getMethod(1) == 'POST') {
             $filter = [
@@ -667,7 +667,7 @@ class Approve extends AdminController
         $start_date = $this->request->getPost('start_date');
 
         $updated = (new AreaCoverageModel())->where('district_id', $district_id)
-            ->where('start_date', $start_date)->set(['status' => 0])->update();
+            ->where('start_date', $start_date)->set(['status' => 2])->update();
         $redirect = '';
         $status = false;
         if ($updated) {
@@ -683,25 +683,25 @@ class Approve extends AdminController
 
     private function calcTotals(&$block)
     {
-        $block->total_area = (double)$block->fc_area +
-            (double)$block->ragi_smi +
-            (double)$block->ragi_lt +
-            (double)$block->ragi_ls +
-            (double)$block->little_millet_lt +
-            (double)$block->little_millet_ls +
-            (double)$block->foxtail_ls +
-            (double)$block->sorghum_ls +
-            (double)$block->kodo_ls +
-            (double)$block->barnyard_ls +
-            (double)$block->pearl_ls;
+        $block->total_area = (double) $block->fc_area +
+            (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls +
+            (double) $block->little_millet_lt +
+            (double) $block->little_millet_ls +
+            (double) $block->foxtail_ls +
+            (double) $block->sorghum_ls +
+            (double) $block->kodo_ls +
+            (double) $block->barnyard_ls +
+            (double) $block->pearl_ls;
 
-        $block->total_ragi = (double)$block->ragi_smi +
-            (double)$block->ragi_lt +
-            (double)$block->ragi_ls;
+        $block->total_ragi = (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls;
 
         $block->fc_area = doubleval($block->fc_area);
 
-        $block->total_non_ragi = bcsub(bcsub($block->total_area,$block->total_ragi,2), $block->fc_area,2);
+        $block->total_non_ragi = bcsub(bcsub($block->total_area, $block->total_ragi, 2), $block->fc_area, 2);
     }
 }
 
