@@ -440,7 +440,8 @@ AND st.month < $month";
 
             return $this->db->query($sql)->getFirstRow();
 
-        } else if($agency_type == $this->settings->district_user){
+        }
+        else if($agency_type == $this->settings->district_user){
             //check if pending expenses from blocks
             $sql = "SELECT
   scb.block_id,

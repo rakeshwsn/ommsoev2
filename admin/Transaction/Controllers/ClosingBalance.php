@@ -232,14 +232,16 @@ class ClosingBalance extends AdminController {
 
         if(isset($pending_transactions->total)) {
             if ($pending_transactions->total != ($month - 1)) {
-                $data['error'] = 'Cannot add closing balance. Please check for pending uploads in the previous months!!';
+                $data['error'] = 'Cannot add closing balance. 
+                Please check for pending uploads in the previous months!!';
                 $data['can_edit'] = false;
             }
         } else {
             if(isset($pending_transactions['block_cbs'])){
                 foreach ($pending_transactions['block_cbs'] as $block_cb) {
                     if($block_cb->total != ($month-1)){
-                        $data['error'] = 'Cannot add closing balance. There are pending uploads at block level!!';
+                        $data['error'] = 'Cannot add closing balance. 
+                        There are pending uploads at block level!!';
                         $data['can_edit'] = false;
                         break;
                     }
