@@ -136,7 +136,7 @@ class ClosingBalance extends AdminController {
 
         //for test env
         $data['can_edit'] = true;
-        if(env('soe.uploadDateValidation') && (isset($cb) && $cb->status!=2)){
+        if(env('soe.uploadDateValidation') && ($cb && $cb->status!=2)){
             $data['can_edit'] = in_array($month,$months);
             if(!$data['can_edit']){ //if rjected
                 $data['error'] = 'Closing balance upload date has ended';
@@ -182,7 +182,7 @@ class ClosingBalance extends AdminController {
         $data['summary'] = $ledger[$key];
         if($cb) {
             $data['summary']['status'] = $this->statuses[$cb->status];
-            $data['can_edit'] = ($cb->status==0 || $cb->status==2);
+            $data['can_edit'] = $cb->status != 1;
         } else {
             $data['summary']['status'] = $this->statuses[3];
         }
@@ -264,18 +264,13 @@ class ClosingBalance extends AdminController {
                 $data['can_edit'] = false;
             }
 
-            /*if(isset($pending_transactions['pending_cbs']) && $pending_transactions['pending_cbs']){
-                $data['error'] = 'Cannot add closing balance. Blocks status are pending';
-                $data['can_edit'] = false;
-            }*/
-
             if (isset($pending_transactions['pending_cbs'])) {
                 foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
                     if($pending_cb->total_cbs < $month){
-                        $data['message'] = 'Cannot add closing balance. Blocks transactions are not submitted';
+                        $data['error'] = 'Cannot add closing balance. Blocks transactions are not submitted';
                         $data['can_edit'] = false;
                     } else if($pending_cb->pending>0){
-                        $data['message'] = 'Cannot add closing balance. Blocks transactions are not approved';
+                        $data['error'] = 'Cannot add closing balance. Blocks transactions are not approved';
                         $data['can_edit'] = false;
                     }
                 }
