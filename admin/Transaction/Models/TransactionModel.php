@@ -1237,7 +1237,7 @@ FROM (SELECT
     u.user_group_id agency_type_id,
     u.fund_agency_id
   FROM user u
-  WHERE u.district_id = $district_id
+  WHERE u.district_id = $district_id AND fund_agency_id = $fund_agency_id
   AND u.user_group_id IN (5, 6)) users
   LEFT JOIN (SELECT
       *,

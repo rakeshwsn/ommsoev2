@@ -10,6 +10,7 @@ use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 use App\Controllers\AdminController;
+use CodeIgniter\Session\Session;
 use Config\Url;
 
 class ClosingBalance extends AdminController {
@@ -135,9 +136,9 @@ class ClosingBalance extends AdminController {
 
         //for test env
         $data['can_edit'] = true;
-        if(env('soe.uploadDateValidation')){
+        if(env('soe.uploadDateValidation') && $cb->status!=2){
             $data['can_edit'] = in_array($month,$months);
-            if(!$data['can_edit']){
+            if(!$data['can_edit']){ //if rjected
                 $data['error'] = 'Closing balance upload date has ended';
             }
         }
@@ -188,6 +189,16 @@ class ClosingBalance extends AdminController {
 
         $this->validateUpload($year,$month,$data);
 
+        if(!empty($data['error'])){
+//            return redirect()->to(Url::closingBalance)->with('message',$data['error']);
+        }
+
+        //set error message to display if any
+        if(!empty($data['error'])){
+            $session = service('session');
+            $session->setFlashdata('message',$data['error']);
+        }
+
         foreach($this->cbModel->getFieldNames() as $field){
             if($this->request->getPost($field)){
                 $data[$field] = $this->request->getPost($field);
@@ -232,14 +243,16 @@ class ClosingBalance extends AdminController {
 
         if(isset($pending_transactions->total)) {
             if ($pending_transactions->total != ($month - 1)) {
-                $data['error'] = 'Cannot add closing balance. Please check for pending uploads in the previous months!!';
+                $data['error'] = 'Cannot add closing balance. 
+                Please check for pending uploads in the previous months!!';
                 $data['can_edit'] = false;
             }
         } else {
             if(isset($pending_transactions['block_cbs'])){
                 foreach ($pending_transactions['block_cbs'] as $block_cb) {
                     if($block_cb->total != ($month-1)){
-                        $data['error'] = 'Cannot add closing balance. There are pending uploads at block level!!';
+                        $data['error'] = 'Cannot add closing balance. 
+                        There are pending uploads at block level!!';
                         $data['can_edit'] = false;
                         break;
                     }
