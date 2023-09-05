@@ -471,7 +471,8 @@ WHERE (year_id IS NULL";
             $sql .= " AND vacrd.block_id=" . $filter['block_id'];
         }
         $sql .= " GROUP BY gp_id ORDER BY gp";
-
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResult();
     }
 
