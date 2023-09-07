@@ -270,7 +270,7 @@ class Approve extends AdminController
 
         $dates = $this->areacoveragemodel->getWeekDate($start_date);
         $data['currentDay'] = date('l');
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday', 'Tuesday'));
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
 
         if ($this->request->getMethod(1) == 'POST') {
             $filter = [
