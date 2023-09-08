@@ -672,8 +672,8 @@ class AreaCoverage extends AdminController
 
         $data['show_form'] = false;
         //there is submit button open after approved
-        //code by HKS
-        if (($cc_info->status != 1) && ($cc_info->block_id == $this->user->block_id)) {
+        //code by Hemanta
+        if (($cc_info->status = 1) && ($cc_info->block_id == $this->user->block_id)) {
             $data['show_form'] = true;
         }
 
