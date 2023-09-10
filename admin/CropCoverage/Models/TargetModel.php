@@ -495,7 +495,7 @@ LEFT JOIN (
 
         $sql .= " AND acc.status = 1
     GROUP BY aap.crop_id
-) ach ON ac.id = ach.crop_id
+) ach ON ac.id = ach.crop_id;
 ";
 
         // Execute $sql query
@@ -508,7 +508,6 @@ LEFT JOIN (
         $year_id = $filter['year_id'];
         $season = $filter['season'];
         $district_id = $filter['district_id'];
-
         $sql = "SELECT
     sb.id AS block_id,
     sb.name AS block,
@@ -541,8 +540,7 @@ LEFT JOIN (
         GROUP BY
             atfc.target_id
     ) fup ON atm.id = fup.target_id
-    WHERE
-        atm.deleted_at IS NULL";
+    WHERE atm.deleted_at IS NULL";
 
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(atm.season) = '" . $filter['season'] . "'";
@@ -551,7 +549,7 @@ LEFT JOIN (
             $sql .= " AND atm.year_id = " . $filter['year_id'];
         }
 
-        $sql .= "GROUP BY
+        $sql .= " GROUP BY
     atm.block_id
 ) tar ON tar.block_id = sb.id
 LEFT JOIN (
@@ -591,10 +589,18 @@ LEFT JOIN (
             $sql .= " AND acc.year_id = " . $filter['year_id'];
         }
 
-        $sql .= " AND sb.district_id = " . $filter['district_id'];
+        $sql .= " GROUP BY
+    acc.block_id
+) ach ON ach.block_id = sb.id
+WHERE";
+        if (!empty($filter['district_id'])) {
+            $sql .= "  sb.district_id = " . $filter['district_id'];
+        }
 
         $sql .= " ORDER BY block;";
 
+        // echo $sql;
+        // exit;
 
         return $this->db->query($sql)->getResultArray();
 
