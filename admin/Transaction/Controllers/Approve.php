@@ -231,7 +231,7 @@ class Approve extends AdminController {
         $form_data = $this->getForm();
         $data['approve_form'] = view('\Admin\Transaction\Views\approve_form',$form_data);
 
-        return $this->template->view('Admin\Transaction\Views\edit', $data);
+        return $this->template->view('Admin\Transaction\Views\approve_transaction', $data);
     }
 
     private function getUrlParam()

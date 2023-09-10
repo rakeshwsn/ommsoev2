@@ -40,9 +40,6 @@ class AreaCoverageTarget extends AdminController
 	protected function getList()
 	{
 
-		// printr($this);
-		// exit;
-
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			//'text' => lang('Grampanchayat.heading_title'),
@@ -57,7 +54,19 @@ class AreaCoverageTarget extends AdminController
 		$data['button_add'] = lang('Add Target');
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
-		$data['seasons'] = $this->acModel->getSeasons();
+
+		$seasons = array(
+			array(
+				'id' => '1',
+				'name' => 'Rabi'
+			),
+			array(
+				'id' => '2',
+				'name' => 'Kharif'
+			)
+		);
+		$data['seasons'] = $seasons;
+		// $data['seasons'] = $this->acModel->getSeasons();
 
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
@@ -71,19 +80,14 @@ class AreaCoverageTarget extends AdminController
 			$data['district_id'] = 0;
 		}
 
-		if ($this->request->getGet('block_id')) {
-			$data['block_id'] = (array) $this->request->getGet('block_id');
-		} else {
-			$data['block_id'] = '';
-		}
+
 
 		$croppractices = $this->targetModel->getPractices();
 
 
-
 		if ($data['district_id'] === 0) {
-			$districtdata = $this->targetModel->getDistrictWiseData([]);
-			// dd($districtdata);
+			$distwisetarget = $this->targetModel->getDistrictWiseData([]);
+			// dd($distwisetarget);
 			// exit;
 		} else {
 			$practicedata = $this->targetModel->getAll([
@@ -91,48 +95,11 @@ class AreaCoverageTarget extends AdminController
 			]);
 		}
 		if ($data['district_id'] === 0) {
-			$data['districtdata'] = $districtdata;
+			$data['distwisetarget'] = $distwisetarget;
 		} else {
 			$data['practicedata'] = $practicedata;
 		}
 
-
-
-		if ($this->user->block_id) {
-			$data['block_id'] = $filter['block_id'] = $this->user->block_id;
-			$data['districts'] = $this->districtModel->where('id', $this->user->district_id)->asArray()->find();
-		} else if ($this->user->district_id) {
-			$data['district_id'] = $filter['district_id'] = $this->user->district_id;
-			$data['districts'] = $this->districtModel->where('id', $this->user->district_id)->asArray()->find();
-		} else {
-			$data['districts'] = $this->districtModel->asArray()->find();
-		}
-		$data['current_season'] = strtolower(getCurrentSeason());
-		$data['year_id'] = getCurrentYearId();
-		$filter = [
-			'year_id' => $data['year_id'],
-			'season' => $data['current_season']
-		];
-		$blocks = $this->acModel->getByDistrict($filter);
-		$this->_allblocks($blocks, $data);
-		$data['blocks'] = [];
-		if ($data['district_id']) {
-			$data['blocks'] = $this->blockModel->where('district_id', $data['district_id'])
-				->asArray()->findAll();
-		}
-
-		$data['year_id'] = date('Y');
-
-		// $currentMonth = date('n');
-		// if ($currentMonth >= 6 && $currentMonth <= 10) {
-		// 	$season = 'Kharif';
-		// } elseif ($currentMonth >= 11 && $currentMonth <= 4) {
-		// 	$season = 'Rabi';
-		// }
-
-		$data['current_season'] = strtolower(getCurrentSeason());
-
-		//for heading
 		$crops = [];
 		foreach ($croppractices as $cp) {
 			$_crops = $cp['crops'];
@@ -145,9 +112,6 @@ class AreaCoverageTarget extends AdminController
 		}
 
 		$data['heading'] = $crops;
-
-		$data['filter_panel'] = view('Admin\CropCoverage\Views\target_filter', $data);
-
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
 
