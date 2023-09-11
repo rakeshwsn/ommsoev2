@@ -432,6 +432,7 @@ WHERE (year_id IS NULL";
 
     public function getByBlockNew($filter = [])
     {
+
         $sql = "SELECT
   vacng.block_id,
   vacng.gp_id,
