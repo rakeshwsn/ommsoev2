@@ -100,5 +100,6 @@ FROM (SELECT
 
 		return $this->db->query($sql)->getFirstRow();
 	}
-	
+
+
 }
