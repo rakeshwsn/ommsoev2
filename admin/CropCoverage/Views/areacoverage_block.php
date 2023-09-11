@@ -84,92 +84,92 @@
         </div>
     <?php } ?>
 
-    <div class="col-xl-12">
-        <div class="block">
-            <div class="block-header block-header-default  bg-primary">
-                <h3 class="block-title"> Area Coverage History</h3>
-            </div>
 
-            <div class="block-content">
+    <div class="block">
+        <div class="block-header block-header-default  bg-primary">
+            <h3 class="block-title"> Area Coverage History</h3>
+        </div>
+
+        <div class="block-content">
 
 
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Week</th>
-                            <th>GP</th>
-                            <th>Total Farmer</th>
-                            <th>Nursery Raised</th>
-                            <th>Balance SMI</th>
-                            <th>Balance LT</th>
-                            <th>Total Ragi</th>
-                            <th>Total Non Ragi</th>
-                            <th>Total Followup Crop</th>
-                            <th>Total Area</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <?php
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>GP</th>
+                        <th>Total Farmer</th>
+                        <th>Nursery Raised</th>
+                        <th>Balance SMI</th>
+                        <th>Balance LT</th>
+                        <th>Total Ragi</th>
+                        <th>Total Non Ragi</th>
+                        <th>Total Followup Crop</th>
+                        <th>Total Area</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <?php
 
-                        if (!empty($blocks)) {
-                            foreach ($blocks as $block) {
+                    if (!empty($blocks)) {
+                        foreach ($blocks as $block) {
 
-                                ?>
-                                <tr>
-                                    <td>
-                                        <?= $block['week'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['gp'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['farmers_covered'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['nursery_raised'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['balance_smi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['balance_lt'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_ragi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_non_ragi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_fc'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_area'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['status'] ?>
-                                    </td>
-                                    <td style="display: flex;">
-                                        <div class="btn-group btn-group-sm pull-right">
-                                            <?= $block['action'] ?>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php
-                            }
-                        } else {
-                            echo "Data is not available.";
+                            ?>
+                            <tr>
+                                <td>
+                                    <?= $block['week'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['gp'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['farmers_covered'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['nursery_raised'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['balance_smi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['balance_lt'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_ragi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_non_ragi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_fc'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_area'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['status'] ?>
+                                </td>
+                                <td style="display: flex;">
+                                    <div class="btn-group btn-group-sm pull-right">
+                                        <?= $block['action'] ?>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php
                         }
-                        ?>
-                    </tbody>
+                    } else {
+                        echo "Data is not available.";
+                    }
+                    ?>
+                </tbody>
 
-                </table>
+            </table>
 
-            </div>
         </div>
     </div>
+
 </div>
 <div id="loading-overlay">
     <div class="progress" style="width: 100%">

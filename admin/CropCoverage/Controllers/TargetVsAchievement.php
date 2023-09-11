@@ -4,7 +4,6 @@ namespace Admin\CropCoverage\Controllers;
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
 
-
 class TargetVsAchievement extends AdminController
 {
     private $targetModel;
@@ -15,9 +14,8 @@ class TargetVsAchievement extends AdminController
     }
     public function index()
     {
-
         $this->template->set_meta_title(lang('TargetVsAchievement'));
-        $data['years'] = (getAllYears());
+        $data['years'] = getAllYears();
 
         $seasons = array(
             array(
@@ -31,37 +29,14 @@ class TargetVsAchievement extends AdminController
         );
         $data['seasons'] = $seasons;
 
+        $data['milletchart_url'] = admin_url('areacoverage/targetVsAchievement/milletchart');
+        $data['distchart_url'] = admin_url('areacoverage/targetVsAchievement/distChart');
+        $data['block_id'] = $this->user->block_id;
+        $data['district_id'] = $this->user->district_id;
 
-        return $this->getChart();
+        return $this->template->view('Admin\CropCoverage\Views\target_vs_achievement', $data);
     }
-    public function getChart()
-    {
-        $data['years'] = getAllYears();
-        $seasons = [
-            ['id' => '1', 'name' => 'Rabi'],
-            ['id' => '2', 'name' => 'Kharif']
-        ];
-        $data['seasons'] = $seasons;
 
-        $view = '';
-
-        if ($this->user->block_id) {
-
-            $data['milletchart_url'] = admin_url('areacoverage/targetVsAchievement/milletchart');
-
-            $view = 'target_vs_achievement_block';
-
-        } elseif ($this->user->district_id) {
-
-            $data['distchart_url'] = admin_url('areacoverage/targetVsAchievement/distChart');
-
-
-
-            $view = 'target_vs_achievement_district';
-        }
-
-        return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
-    }
     public function milletChart()
     {
         $filter = [
@@ -91,7 +66,6 @@ class TargetVsAchievement extends AdminController
             header('Content-Type: application/json');
             echo json_encode($data, JSON_NUMERIC_CHECK);
 
-
         }
     }
     public function distTarVsAchChart()
@@ -102,8 +76,6 @@ class TargetVsAchievement extends AdminController
             'year_id' => getCurrentYearId(),
             'season' => getCurrentSeason()
         ];
-        // printr($filter);
-        // exit;
 
         $blockwisetarvsach = $this->targetModel->getDistTargetVsAchievement($filter);
         if (!empty($blockwisetarvsach)) {
