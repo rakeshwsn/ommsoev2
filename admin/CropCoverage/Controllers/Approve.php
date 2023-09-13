@@ -72,7 +72,7 @@ class Approve extends AdminController
             $data['district_id'] = $district_id = $this->user->district_id;
         }
         $data['currentDay'] = date('l');
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
+        // $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday',));
 
         $week_dates = $this->areacoveragemodel->getWeekDate();
 
