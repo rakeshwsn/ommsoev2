@@ -134,6 +134,7 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 	
+	
 	public function enterprise(){
 		$yearmodel = new YearModel();
 		$districtmodel = new DistrictModel();
@@ -177,7 +178,7 @@ class Dashboard extends ResourceController
 		if ($district_id) {
 			$data['heading'] .= ' for district ' . $districtmodel->find($district_id)->name;
 		}
-
+		
 		//generate table
 		$data['table'] = view('Api\Dashboard\Views\dashboardTable', $data);
 
