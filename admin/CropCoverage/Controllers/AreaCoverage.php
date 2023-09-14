@@ -42,6 +42,7 @@ class AreaCoverage extends AdminController
 
         return $this->getList();
     }
+
     protected function getList()
     {
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
@@ -63,8 +64,7 @@ class AreaCoverage extends AdminController
         $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
 
         $data['from_date'] = $dates['start_date'];
-        // print_r($data['from_date']);
-        // exit;
+
         $data['to_date'] = $dates['end_date'];
         $data['upload_url'] = Url::areaCoverageUpload;
 
@@ -77,9 +77,6 @@ class AreaCoverage extends AdminController
                 'season' => getCurrentSeason(),
                 'start_date' => $this->request->getGet('start_date'),
             ];
-
-            // printr($filter);
-            // exit;
 
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
             //dd($blocks);
@@ -94,9 +91,9 @@ class AreaCoverage extends AdminController
                     $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
                 }
                 //show week text
-                if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
-                    $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
-                }
+//                if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
+//                    $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
+//                }
             }
             $data['week_start_date'] = $data['start_date'];
             $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
@@ -106,8 +103,7 @@ class AreaCoverage extends AdminController
                 $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
             $data['blocks'] = [];
-            // dd($blocks);
-            // exit;
+//            dd($blocks);
             foreach ($blocks as $block) {
                 $status = $block->status;
                 if (!isset($status)) {
@@ -121,7 +117,6 @@ class AreaCoverage extends AdminController
                                             <i class="fa fa-list"></i></a>';
                     $week = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
                 }
-                // if($block->start_date == )
 
                 $total_area = $block->fc_area +
                     $block->ragi_smi +
@@ -137,7 +132,11 @@ class AreaCoverage extends AdminController
                 $total_ragi = $block->ragi_smi +
                     $block->ragi_lt +
                     $block->ragi_ls;
-                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+//echo 'total_area:'.$total_area.' total_ragi:'.$total_ragi.' fc_area:'.$block->fc_area.'<br>';
+
+//                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+                //subtraction issue for float values
+                $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
                 $data['blocks'][] = [
                     'week' => $week,
@@ -213,13 +212,13 @@ class AreaCoverage extends AdminController
 
             $view = 'areacoverage_block';
         } else if ($this->user->district_id) {
-            $filter = [
-                'district_id' => $this->user->district_id,
-                'year_id' => getCurrentYearId(),
-                'season' => getCurrentSeason()
-            ];
+//            $filter = [
+//                'district_id' => $this->user->district_id,
+//                'year_id' => getCurrentYearId(),
+//                'season' => getCurrentSeason()
+//            ];
 
-            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
+//            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
             $view = 'areacoverage_district';
         }
 
@@ -227,119 +226,6 @@ class AreaCoverage extends AdminController
         //exit;
 
         return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
-    }
-    public function weekWiseFilterdData()
-    {
-
-
-        $filter = array();
-        if ($this->request->getGet('week')) {
-            $filter['week'] = $this->request->getGet('week');
-        }
-
-
-        $data['blocks'] = $this->areacoveragemodel->getAreaCoverage($filter);
-        $total_area = $block->fc_area +
-            $block->ragi_smi +
-            $block->ragi_lt +
-            $block->ragi_ls +
-            $block->little_millet_lt +
-            $block->little_millet_ls +
-            $block->foxtail_ls +
-            $block->sorghum_ls +
-            $block->kodo_ls +
-            $block->barnyard_ls +
-            $block->pearl_ls;
-        $total_ragi = $block->ragi_smi +
-            $block->ragi_lt +
-            $block->ragi_ls;
-        $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
-
-        $data['blocks'][] = [
-            'week' => $week,
-            'gp' => $block->gp,
-            'farmers_covered' => $block->farmers_covered,
-            'nursery_raised' => $block->nursery_raised,
-            'balance_smi' => $block->balance_smi,
-            'balance_lt' => $block->balance_lt,
-            'ragi_smi' => $block->ragi_smi,
-            'ragi_lt' => $block->ragi_lt,
-            'ragi_ls' => $block->ragi_ls,
-            'little_millet_lt' => $block->little_millet_lt,
-            'little_millet_ls' => $block->little_millet_ls,
-            'foxtail_ls' => $block->foxtail_ls,
-            'sorghum_ls' => $block->sorghum_ls,
-            'kodo_ls' => $block->kodo_ls,
-            'barnyard_ls' => $block->barnyard_ls,
-            'pearl_ls' => $block->pearl_ls,
-            'total_ragi' => $total_ragi,
-            'total_non_ragi' => $total_non_ragi,
-            'total_fc' => $block->fc_area,
-            'total_area' => $total_area,
-            // 'status' => $this->statuses[$status],
-            'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
-            'action' => $action,
-        ];
-
-        //calc total
-        $total_farmers_covered += $block->farmers_covered;
-        $total_nursery_raised += $block->nursery_raised;
-        $total_balance_smi += $block->balance_smi;
-        $total_balance_lt += $block->balance_lt;
-        $total_ragi_smi += $block->ragi_smi;
-        $total_ragi_lt += $block->ragi_lt;
-        $total_ragi_ls += $block->ragi_ls;
-        $total_little_millet_lt += $block->little_millet_lt;
-        $total_little_millet_ls += $block->little_millet_ls;
-        $total_foxtail_ls += $block->foxtail_ls;
-        $total_sorghum_ls += $block->sorghum_ls;
-        $total_kodo_ls += $block->kodo_ls;
-        $total_barnyard_ls += $block->barnyard_ls;
-        $total_pearl_ls += $block->pearl_ls;
-        $total_total_ragi += $total_ragi;
-        $total_total_non_ragi += $total_non_ragi;
-        $total_fc_area += $block->fc_area;
-        $total_total_area += $total_area;
-
-
-        $data['blocks'][] = [
-            'week' => '',
-            'gp' => '<strong>Total</strong>',
-            'farmers_covered' => $total_farmers_covered,
-            'nursery_raised' => $total_nursery_raised,
-            'balance_smi' => $total_balance_smi,
-            'balance_lt' => $total_balance_lt,
-            'ragi_smi' => $total_ragi_smi,
-            'ragi_lt' => $total_ragi_lt,
-            'ragi_ls' => $total_ragi_ls,
-            'little_millet_lt' => $total_little_millet_lt,
-            'little_millet_ls' => $total_little_millet_ls,
-            'foxtail_ls' => $total_foxtail_ls,
-            'sorghum_ls' => $total_sorghum_ls,
-            'kodo_ls' => $total_kodo_ls,
-            'barnyard_ls' => $total_barnyard_ls,
-            'pearl_ls' => $total_pearl_ls,
-            'total_ragi' => $total_total_ragi,
-            'total_non_ragi' => $total_total_non_ragi,
-            'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area,
-            'status' => '',
-            'action' => ''
-        ];
-
-        $jsonResponse = json_encode($data['blocks']);
-
-        // Set the response content type to JSON
-        $this->response->setContentType('application/json');
-
-        // Send the JSON response
-        return $this->response->setJSON($jsonResponse);
-
-        // echo json_encode($data);
-        // exit;
-
-        // return $this->template->view('Admin\CropCoverage\Views\areacoverage_block', $data);
-
     }
 
     public function download()
