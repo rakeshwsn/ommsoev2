@@ -129,8 +129,8 @@
                             <tr>
                                 <th scope="col">District</th>
                                 <th scope="col">Total Block</th>
-                                <th scope="col">Total CHC</th>
-                                <th scope="col">Total CMSC</th>
+                                <th scope="col">Total GP</th>
+                                <th scope="col">Total Villages</th>
                                 <th scope="col">Total Farmer</th>
                             </tr>
                         </thead>
@@ -138,9 +138,9 @@
                             <?php foreach ($maps as $map) { ?>
                                 <tr data-dist="<?= $map->district_id ?>">
                                     <td><?= $map->district ?></td>
-                                    <td><?= $map->blocks ?></td>
-                                    <td><?= $map->chc ?></td>
-                                    <td><?= $map->cmsc ?></td>
+                                    <td><?= $map->total_blocks ?></td>
+                                    <td><?= $map->total_gps ?></td>
+                                    <td><?= $map->total_villages ?></td>
                                     <td><?= $map->total_farmer ?></td>
                                 </tr>
                             <?php  } ?>

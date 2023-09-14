@@ -41,48 +41,54 @@ class EstablishmentTransactionModel extends Model
   protected $afterDelete          = [];
 
 
-  public function getAll($unit_id,$district_id)
+  public function getAll($unit_id, $district_id)
   {
     $sql = "SELECT
     e.id,
-  e.managing_unit_name shg_name,
-  eu.name unit_name,
-  sb.name block,
-  g.name grampanchayat,
-  v.name villages,
-  e.district_id
-FROM enterprises e
-  LEFT JOIN soe_blocks sb
-    ON e.block_id = sb.id
-  LEFT JOIN grampanchayat g
-    ON e.gp_id = g.id
-  LEFT JOIN villages v
-    ON e.village_id = v.id 
-    LEFT JOIN enterprises_units eu ON e.unit_id = eu.id where e.unit_id = $unit_id and e.district_id= $district_id
-   " ;
+    e.unit_id,
+    e.block_id,
+    e.district_id,
+    e.gp_id,
+    e.village_id,
+    e.managing_unit_name shg_name,
+    eu.name unit_name,
+    sb.name block,
+    g.name grampanchayat,
+    v.name villages,
+    e.district_id
+  FROM enterprises e
+    LEFT JOIN soe_blocks sb
+      ON e.block_id = sb.id
+    LEFT JOIN grampanchayat g
+      ON e.gp_id = g.id
+    LEFT JOIN villages v
+      ON e.village_id = v.id
+    LEFT JOIN enterprises_units eu
+      ON e.unit_id = eu.id where e.unit_id = $unit_id and e.district_id= $district_id ";
     return $this->db->query($sql)->getResult();
   }
-  
-	public function getCheckEnterpriseTransaction($data=[]){
-		$this->db->select("*");
-		$this->db->from("enterprises e");
-		
-		if (!empty($data['district_id'])) {
-			$this->db->where("e.district_id",$data['district_id']);				
-		}
-		if (!empty($data['year_id'])) {
-			$this->db->where("e.year_id",$data['year_id']);				
-		}
-		if (!empty($data['month_id'])) {
-			$this->db->where("e.month_id",$data['month_id']);				
-		}
-		if (!empty($data['period'])) {
-			$this->db->where("e.period",$data['period']);				
-		}
-	
-		
-		$res = $this->db->get()->row_array();
 
-		return $res;
-	}
+  public function getCheckEnterpriseTransaction($data = [])
+  {
+    $this->db->select("*");
+    $this->db->from("enterprises e");
+
+    if (!empty($data['district_id'])) {
+      $this->db->where("e.district_id", $data['district_id']);
+    }
+    if (!empty($data['year_id'])) {
+      $this->db->where("e.year_id", $data['year_id']);
+    }
+    if (!empty($data['month_id'])) {
+      $this->db->where("e.month_id", $data['month_id']);
+    }
+    if (!empty($data['period'])) {
+      $this->db->where("e.period", $data['period']);
+    }
+
+
+    $res = $this->db->get()->row_array();
+
+    return $res;
+  }
 }

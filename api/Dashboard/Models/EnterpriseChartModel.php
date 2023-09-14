@@ -45,31 +45,30 @@ class EnterpriseChartModel extends Model
 	public function getYearwisedata($filter = [])
 	{
 		$sql = "SELECT
-  y.name year,
-  y.id year_id,
-  d.name district,
-  SUM(de.wshg) total_wshg,
-  SUM(de.fpos) total_fpos,
-  e.id unit_id,
-  e.enterprises_name unit_name,
-  de.district_id
-FROM enterprises e
-  LEFT JOIN dashboard_enterprises de
-    ON e.id = de.unit_id
-  LEFT JOIN dashboard_years y
-    ON y.id = de.year_id
-  LEFT JOIN soe_districts d
-    ON d.id = de.district_id
-WHERE de.deleted_at IS NULL";
+		e.year_id,
+		y.name year,
+		y.id ,
+        d.name district,
+		SUM(e.wshg) total_wshg,
+		SUM(e.fpos) total_fpos,
+		e.unit_id,
+		e.unit_name,
+		e.district_id
+	  FROM dashboard_enterprises e
+		LEFT JOIN dashboard_years y
+		  ON y.id = e.year_id
+		LEFT JOIN soe_districts d
+		  ON d.id = e.district_id
+		  WHERE e.deleted_at IS NULL";
 		if (!empty($filter['district_id'])) {
 			$sql .= " AND district_id=" . $filter['district_id'];
 		}
 		if (!empty($filter['year_id'])) {
 			$sql .= " AND year_id=" . $filter['year_id'];
 		}
-		$sql .= " GROUP BY de.unit_id,de.year_id
-		HAVING de.district_id IS NOT NULL AND (total_wshg>0 OR total_fpos>0)
-	   ORDER BY de.year_id";
+		$sql .= " GROUP BY e.unit_name
+		HAVING total_wshg>0 OR total_fpos>0
+	   ORDER BY e.year_id";
 		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}

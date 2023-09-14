@@ -145,19 +145,6 @@ class AreaCoverage extends AdminController
                     $cell->getStyle()->getAlignment()->setWrapText(true);
                 }
 
-                /*
-                // Get the highest row index in the column
-                $highestRow = $worksheet->getHighestRow();
-
-                // Apply word wrap to each cell in column B
-                $columnIndex = 'B'; // Change this to the desired column index
-                for ($row = 1; $row <= $highestRow; $row++) {
-                    $cell = $worksheet->getCell($columnIndex . $row);
-                    $cell->getStyle()->getAlignment()->setWrapText(true);
-                }
-
-                $worksheet->getColumnDimension($columnIndex)->setWidth(20);*/
-
                 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 header('Content-Disposition: attachment;filename="' . $filename . '"');
                 header('Cache-Control: max-age=0');
@@ -227,7 +214,10 @@ class AreaCoverage extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+//            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+            //subtraction issue for float values
+            $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
             $data['rows'][] = [
                 'gp' => $block->gp,
@@ -322,7 +312,9 @@ class AreaCoverage extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+//            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+            //subtraction issue for float values
+            $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
             $data['rows'][] = [
                 'block' => $block->block,
@@ -420,7 +412,10 @@ class AreaCoverage extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+//            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+            //subtraction issue for float values
+            $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
             $data['rows'][] = [
                 'district' => $block->district,
@@ -520,7 +515,10 @@ class AreaCoverage extends AdminController
             $total_ragi = $block->ragi_smi +
                 $block->ragi_lt +
                 $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+//            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+            //subtraction issue for float values
+            $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
             $data['rows'][] = [
                 'district' => $block->district,
