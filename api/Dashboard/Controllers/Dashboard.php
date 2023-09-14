@@ -133,13 +133,16 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 	
+	
 	public function enterprise(){
-		$yearmodel = new YearModel();
+		$yearModel = new YearModel();
 		$districtmodel = new DistrictModel();
 
-		$enterprisemodel = new EnterpriseChartModel();;
+		$enterprisemodel = new EnterpriseChartModel();
+
+        $filter['year_id'] = $year_id = $yearModel->getCurrentYearId();
 		$filter = [];
-		$year_id = $district_id = 0;
+		$district_id = 0;
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
 			$filter['district_id'] = $this->request->getGet('district_id');
@@ -153,6 +156,7 @@ class Dashboard extends ResourceController
 		}
 
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
+
 		$data['enterprises'] = $enterprises;
 		$data['year'] = [];
 		$data['district'] = [];
@@ -170,13 +174,13 @@ class Dashboard extends ResourceController
 		//heading
 		$data['heading'] = 'Progress on Millet based Enterprise Establishment';
 		if ($year_id) {
-			$data['heading'] .= ' for year ' . $yearmodel->find($year_id)->name;
+			$data['heading'] .= ' for year ' . $yearModel->find($year_id)->name;
 		}
 
 		if ($district_id) {
 			$data['heading'] .= ' for district ' . $districtmodel->find($district_id)->name;
 		}
-
+		
 		//generate table
 		$data['table'] = view('Api\Dashboard\Views\dashboardTable', $data);
 
@@ -331,6 +335,7 @@ class Dashboard extends ResourceController
         }
         
 		$enterprises = $enterprisemodel->getYearwisedata($filter);
+		
 		$data['data']=[];
 		foreach ($enterprises as $enterprise) {
 			$data['data'][]=[

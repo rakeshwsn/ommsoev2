@@ -2,9 +2,9 @@
 
 namespace Front\Pages\Controllers;
 
-use Front\Api\Models\YearModel;
-use Front\Api\Models\DistrictModel;
-use Front\Api\Models\OdMapModel;
+use Api\Dashboard\Models\DistrictModel;
+use Api\Dashboard\Models\OdMapModel;
+use Api\Dashboard\Models\YearModel;
 // use Admin\Pages\Models\PagesModel;
 use App\Controllers\BaseController;
 
@@ -32,7 +32,7 @@ class Dashboard extends BaseController
 		foreach ($years as $year) {
 			$data['years'][$year->id] = $year->name;
 		}
-		$odmapmodel = new OdMapModel;
+		$odmapmodel = new OdMapModel();
 		$data['maps'] = $odmapmodel->getestablishmentmap();
 
 

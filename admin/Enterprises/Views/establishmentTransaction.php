@@ -2,7 +2,6 @@
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Filter</h3>
-
         </div>
         <div class="block-content block-content-full">
             <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -11,29 +10,32 @@
                 <div class="row">
                     <div class="col-2">
                         <label class="form-label">Year</label>
-                        <?php echo form_dropdown('year_id', $years, set_value('year_id', $year_id), ['class' => 'form-control mb-3', 'id' => 'years']); ?>
+                        <?php echo form_dropdown('year_id', $years, set_value('year_id', $year_id), ['class' => 'form-control mb-3', 'id' => 'year']); ?>
+                        <span id="em1" class="text-danger"></span>
 
                     </div>
                     <div class="col-2">
                         <label class="form-label">District</label>
                         <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+                        <span id="em2" class="text-danger"></span>
 
                     </div>
                     <div class="col-2">
                         <label class="form-label">Months</label>
-                        <?php echo form_dropdown('month_id', $months, set_value('month_id', $month_id), ['class' => 'form-control mb-3', 'id' => 'momths']); ?>
+                        <?php echo form_dropdown('month_id', $months, set_value('month_id', $month_id), ['class' => 'form-control mb-3', 'id' => 'month']); ?>
+                        <span id="em3" class="text-danger"></span>
 
                     </div>
                     <div class="col-2">
                         <label class="form-label">Fortnight</label>
-                        <select class="form-control" name="period" id="fortnight">
+                        <select class="form-control" name="period" id="period">
                             <option value="all">all</option>
                             <option value="1" <?= $period == "1" ? 'selected' : ''; ?>>1st fortnight</option>
                             <option value="2" <?= $period == "2" ? 'selected' : ''; ?>>2nd fortnight</option>
 
                         </select>
+                        <span id="em" class="text-danger"></span>
                     </div>
-
                     <div class="col-4 mt-4">
                         <button class="btn btn-primary">Filter</button>
                     </div>
@@ -45,13 +47,12 @@
     </div>
 </div>
 
-
 <div class="block">
     <div class="block-header block-header-default">
         <h3 class="block-title">Data List</h3>
         <div class="block-options d-flex">
             <div>
-                <a href="<?= $excel_link ?>" id="btn-excel" onclick="" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
+                <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
             </div>
             <div class="ml-3">
                 <form class="dm-uploader" id="uploader">
@@ -75,6 +76,10 @@
                             <tr>
                                 <th>Date Upload</th>
                                 <th>Unit Type</th>
+                                <th>District</th>
+                                <th>Block</th>
+                                <th>GP</th>
+                                <th>Village</th>
                                 <th>Month</th>
                                 <th>Financial Year</th>
                                 <th>Fortnight</th>
@@ -82,25 +87,27 @@
                             </tr>
                         </thead>
                         <tbody>
-
-                            <tr class="odd">
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td>
-                                    <div class="btn-group btn-group pull-right"><a class="btn btn-sm btn-primary" href=""><i class="fa fa-pencil"></i></a></div>
-                                </td>
-                            </tr>
-
+                            <?php foreach ($trans as $tran) { ?>
+                                <tr class="odd">
+                                    <td><?= $tran['created_at'] ?></td>
+                                    <td><?= $tran['units'] ?></td>
+                                    <td><?= $tran['districts'] ?></td>
+                                    <td><?= $tran['blocks'] ?></td>
+                                    <td><?= $tran['gp'] ?></td>
+                                    <td><?= $tran['villages'] ?></td>
+                                    <td><?= $tran['month'] ?></td>
+                                    <td><?= $tran['years'] ?></td>
+                                    <td><?= $tran['period'] ?></td>
+                                    <td>
+                                        <div class="btn-group btn-group pull-right"><a class="btn btn-sm btn-primary" href="<?= $tran['edit_url'] ?>"><i class="fa fa-pencil"></i></a></div>
+                                    </td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
-
                     </table>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -117,6 +124,7 @@
         background: rgb(255 255 255 / 80%);
         display: flex;
         align-items: center;
+
         justify-content: center;
         text-align: center;
         z-index: 9999;
@@ -125,6 +133,96 @@
 <?php js_start(); ?>
 
 <script type="text/javascript">
+    var download_url = "http://ommsoev2.local/admin/enterprises/download";
+    // $(function() {
+    //     var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+
+    //     $('#districts').on('change', function() {
+    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+    //         $('#btn-excel').attr('href', href);
+    //     })
+
+    //     $('#month').on('change', function() {
+    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+    //         $('#btn-excel').attr('href', href);
+    //     })
+    //     $('#year').on('change', function() {
+    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+    //         $('#btn-excel').attr('href', href);
+    //     })
+    //     $('#period').on('change', function() {
+    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+    //         $('#btn-excel').attr('href', href);
+    //     })
+    //     $('#btn-excel').attr('href', href);
+    // });
+    $(function() {
+        function main() {
+            var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
+            $('#btn-excel').attr('href', href);
+        }
+        $('#districts, #month, #year, #period').on('change', main);
+        main();
+    });
+
+
+    var download_url = "<?= $excel_link ?>";
+
+    $(document).ready(function() {
+        var table = $('#page_list').DataTable({
+            "paging": true,
+            "pageLength": 10
+        });
+        $("#btn-excel").click(function() {
+
+            if ($("#year").val() === "0") {
+                $("#em1").html("This field could not be empty!");
+                $("#year").css("border-color", "red");
+                $("#year").focus();
+                return false;
+            }
+            if ($("#districts").val() === "0") {
+                $("#em2").html("This field could not be empty!");
+                $("#districts").css("border-color", "red");
+                $("#districts").focus();
+                return false;
+            }
+            if ($("#month").val() === "0") {
+                $("#em3").html("This field could not be empty!");
+                $("#month").css("border-color", "red");
+                $("#month").focus();
+                return false;
+            }
+            if ($("#period").val() === "all") {
+                $("#em").html("This field could not be empty!");
+                $("#period").css("border-color", "red");
+                $("#period").focus();
+                return false;
+            }
+        })
+
+        $("#year").change(function() {
+            $("#em1").hide();
+            $("#year").css("border-color", "green");
+
+        })
+        $("#districts").change(function() {
+            $("#em2").hide();
+            $("#districts").css("border-color", "green");
+
+        })
+        $("#month").change(function() {
+            $("#em3").hide();
+            $("#month").css("border-color", "green");
+
+        })
+        $("#period").change(function() {
+            $("#em").hide();
+            $("#period").css("border-color", "green");
+        })
+    })
+
+
     $('#uploader').dmUploader({
         dnd: false,
         url: '<?= $upload_url ?>',
@@ -168,8 +266,8 @@
             if (data.status) {
                 show_error('File uploaded successfully');
                 console.log(data.data);
-                // $('.dm-uploader .status').addClass('text-success');
-                // location.href = data.url;
+                $('.dm-uploader .status').addClass('text-success');
+                location.href = data.url;
             } else {
                 show_error(data.message)
             }
