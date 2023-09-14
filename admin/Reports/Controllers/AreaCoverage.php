@@ -82,9 +82,6 @@ class AreaCoverage extends AdminController
         } else if ($data['district_id']) {
             $filter['district_id'] = $data['district_id'];
         }
-        if ($this->request->getGet('start_date')) {
-
-        }
 
         if ($this->user->block_id) {
             $data['block_id'] = $filter['block_id'] = $this->user->block_id;
@@ -193,9 +190,15 @@ class AreaCoverage extends AdminController
         $data['week_text'] = $week_text;
 
         $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter', $data);
-        $data['download_url'] = admin_url('reports/areacoverage/download');
-        $data['get_blocks'] = Url::getBlocks;
 
+        $params = 'year_id='.$data['year_id'];
+        $params .= '&season='.$data['current_season'];
+        $params .= '&district_id='.$data['district_id'];
+        $params .= '&block_id='.$data['block_id'];
+        $params .= '&start_date='.$data['start_date'];
+
+        $data['download_url'] = admin_url('reports/areacoverage/download?'.$params);
+        $data['get_blocks'] = Url::getBlocks;
 
         return $this->template->view('Admin\Reports\Views\areacoverage', $data);
     }
@@ -394,12 +397,11 @@ class AreaCoverage extends AdminController
 
     private function _allblocks($blocks, &$data)
     {
-
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+        $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+        $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+        $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+        $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
         $data['rows'] = [];
         $gps = 0;
@@ -495,7 +497,6 @@ class AreaCoverage extends AdminController
 
     private function districts($blocks, &$data)
     {
-
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
@@ -632,7 +633,7 @@ class AreaCoverage extends AdminController
             'season' => $data['current_season']
         ];
 
-        $blocks = $acModel->getByDistrict($filter);
+        $blocks = $acModel->getByDistrictNew($filter);
 
         $this->_allblocks($blocks, $data);
 
@@ -779,6 +780,7 @@ class AreaCoverage extends AdminController
 
         return $this->template->view('Admin\Reports\Views\areacoverage_upload_status', $data);
     }
+
     public function blockWiseGetUploadStatus()
     {
 
@@ -793,8 +795,6 @@ class AreaCoverage extends AdminController
         $data['year_id'] = getCurrentYearId();
 
         $data['years'] = (new YearModel())->where('id', $data['year_id'])->asArray()->find();
-
-
         $week_dates = $acModel->getWeekDate();
         $filter = array();
         // print_r($filter);
@@ -850,8 +850,6 @@ class AreaCoverage extends AdminController
             ];
 
         }
-
-
         $weeks = $acModel->getWeeks();
         $data['weeks'] = [];
         $week_start_date = '';
@@ -867,11 +865,4 @@ class AreaCoverage extends AdminController
 
         return $this->template->view('Admin\Reports\Views\blockwise_areacoverage_upload_status', $data);
     }
-
-
-
-
-
-
-
 }

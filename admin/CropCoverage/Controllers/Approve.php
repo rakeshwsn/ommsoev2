@@ -72,7 +72,7 @@ class Approve extends AdminController
             $data['district_id'] = $district_id = $this->user->district_id;
         }
         $data['currentDay'] = date('l');
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
+        // $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday',));
 
         $week_dates = $this->areacoveragemodel->getWeekDate();
 
@@ -113,6 +113,7 @@ class Approve extends AdminController
 
         $data['blocks'] = [];
         $week_text = '';
+
         foreach ($blocks as $block) {
             $action = '';
             if ($block->start_date) {
@@ -125,21 +126,8 @@ class Approve extends AdminController
             if (!isset($status)) {
                 $status = 3;
             }
-            $total_area = $block->fc_area +
-                $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls +
-                $block->little_millet_lt +
-                $block->little_millet_ls +
-                $block->foxtail_ls +
-                $block->sorghum_ls +
-                $block->kodo_ls +
-                $block->barnyard_ls +
-                $block->pearl_ls;
-            $total_ragi = $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+            $this->calcTotals($block);
+
             $data['blocks'][] = [
                 'block' => $block->block,
                 'gps' => $block->total_gps,
@@ -157,10 +145,10 @@ class Approve extends AdminController
                 'kodo_ls' => $block->kodo_ls,
                 'barnyard_ls' => $block->barnyard_ls,
                 'pearl_ls' => $block->pearl_ls,
-                'total_ragi' => $total_ragi,
-                'total_non_ragi' => $total_non_ragi,
+                'total_ragi' => $block->total_ragi,
+                'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area,
+                'total_area' => $block->total_area,
                 'status' => $this->statuses[$status],
                 'action' => $action,
             ];
@@ -181,10 +169,10 @@ class Approve extends AdminController
             $total_kodo_ls += $block->kodo_ls;
             $total_barnyard_ls += $block->barnyard_ls;
             $total_pearl_ls += $block->pearl_ls;
-            $total_total_ragi += $total_ragi;
-            $total_total_non_ragi += $total_non_ragi;
+            $total_total_ragi += $block->total_ragi;
+            $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
-            $total_total_area += $total_area;
+            $total_total_area += $block->total_area;
 
         }
 
@@ -342,21 +330,9 @@ class Approve extends AdminController
             if (!isset($status)) {
                 $status = 3;
             }
-            $total_area = $block->fc_area +
-                $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls +
-                $block->little_millet_lt +
-                $block->little_millet_ls +
-                $block->foxtail_ls +
-                $block->sorghum_ls +
-                $block->kodo_ls +
-                $block->barnyard_ls +
-                $block->pearl_ls;
-            $total_ragi = $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+            $this->calcTotals($block);
+
             $data['blocks'][] = [
                 'slno' => $slno++,
                 'cc_id' => $block->cc_id,
@@ -375,10 +351,10 @@ class Approve extends AdminController
                 'kodo_ls' => $block->kodo_ls,
                 'barnyard_ls' => $block->barnyard_ls,
                 'pearl_ls' => $block->pearl_ls,
-                'total_ragi' => $total_ragi,
-                'total_non_ragi' => $total_non_ragi,
+                'total_ragi' => $block->total_ragi,
+                'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area,
+                'total_area' => $block->total_area,
                 'action' => $action,
             ];
 
@@ -397,10 +373,10 @@ class Approve extends AdminController
             $total_kodo_ls += $block->kodo_ls;
             $total_barnyard_ls += $block->barnyard_ls;
             $total_pearl_ls += $block->pearl_ls;
-            $total_total_ragi += $total_ragi;
-            $total_total_non_ragi += $total_non_ragi;
+            $total_total_ragi += $block->total_ragi;
+            $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
-            $total_total_area += $total_area;
+            $total_total_area += $block->total_area;
 
             $data['approved'] = $block->status == 1;
         }
@@ -577,21 +553,9 @@ class Approve extends AdminController
             if (!isset($status)) {
                 $status = 3;
             }
-            $total_area = $block->fc_area +
-                $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls +
-                $block->little_millet_lt +
-                $block->little_millet_ls +
-                $block->foxtail_ls +
-                $block->sorghum_ls +
-                $block->kodo_ls +
-                $block->barnyard_ls +
-                $block->pearl_ls;
-            $total_ragi = $block->ragi_smi +
-                $block->ragi_lt +
-                $block->ragi_ls;
-            $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+
+            $this->calcTotals($block);
+
             $data['districts'][] = [
                 'district' => $block->district,
                 'blocks' => $block->total_blocks,
@@ -610,10 +574,10 @@ class Approve extends AdminController
                 'kodo_ls' => $block->kodo_ls,
                 'barnyard_ls' => $block->barnyard_ls,
                 'pearl_ls' => $block->pearl_ls,
-                'total_ragi' => $total_ragi,
-                'total_non_ragi' => $total_non_ragi,
+                'total_ragi' => $block->total_ragi,
+                'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area,
+                'total_area' => $block->total_area,
                 'status' => $this->statuses[$status],
                 'action' => $action,
             ];
@@ -635,10 +599,10 @@ class Approve extends AdminController
             $total_kodo_ls += $block->kodo_ls;
             $total_barnyard_ls += $block->barnyard_ls;
             $total_pearl_ls += $block->pearl_ls;
-            $total_total_ragi += $total_ragi;
-            $total_total_non_ragi += $total_non_ragi;
+            $total_total_ragi += $block->total_ragi;
+            $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
-            $total_total_area += $total_area;
+            $total_total_area += $block->total_area;
 
         }
 
@@ -703,7 +667,7 @@ class Approve extends AdminController
         $start_date = $this->request->getPost('start_date');
 
         $updated = (new AreaCoverageModel())->where('district_id', $district_id)
-            ->where('start_date', $start_date)->set(['status' => 0])->update();
+            ->where('start_date', $start_date)->set(['status' => 2])->update();
         $redirect = '';
         $status = false;
         if ($updated) {
@@ -715,6 +679,29 @@ class Approve extends AdminController
             'status' => $status,
             'redirect' => $redirect
         ]);
+    }
+
+    private function calcTotals(&$block)
+    {
+        $block->total_area = (double) $block->fc_area +
+            (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls +
+            (double) $block->little_millet_lt +
+            (double) $block->little_millet_ls +
+            (double) $block->foxtail_ls +
+            (double) $block->sorghum_ls +
+            (double) $block->kodo_ls +
+            (double) $block->barnyard_ls +
+            (double) $block->pearl_ls;
+
+        $block->total_ragi = (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls;
+
+        $block->fc_area = doubleval($block->fc_area);
+
+        $block->total_non_ragi = bcsub(bcsub($block->total_area, $block->total_ragi, 2), $block->fc_area, 2);
     }
 }
 

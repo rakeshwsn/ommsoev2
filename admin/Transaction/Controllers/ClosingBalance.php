@@ -10,6 +10,7 @@ use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 use App\Controllers\AdminController;
+use CodeIgniter\Session\Session;
 use Config\Url;
 
 class ClosingBalance extends AdminController {
@@ -134,12 +135,14 @@ class ClosingBalance extends AdminController {
         }
 
         //for test env
-        $data['can_edit'] = true;
-        if(env('soe.uploadDateValidation')){
-            $data['can_edit'] = in_array($month,$months);
-            if(!$data['can_edit']){
-                $data['error'] = 'Closing balance upload date has ended';
-            }
+
+        $data['can_edit'] = in_array($month, $months);
+
+        $error = null;
+        if (env('soe.uploadDateValidation') && $cb && $cb->status != 2) {
+            $data['can_edit'] = true;
+        } else if(!$data['can_edit']){
+            $data['error'] = 'Closing balance upload date has ended';
         }
 
         if($this->request->getMethod(1)=='POST'){
@@ -181,12 +184,22 @@ class ClosingBalance extends AdminController {
         $data['summary'] = $ledger[$key];
         if($cb) {
             $data['summary']['status'] = $this->statuses[$cb->status];
-            $data['can_edit'] = ($cb->status==0 || $cb->status==2);
+            $data['can_edit'] = $cb->status != 1;
         } else {
             $data['summary']['status'] = $this->statuses[3];
         }
 
         $this->validateUpload($year,$month,$data);
+
+        if(!empty($data['error'])){
+//            return redirect()->to(Url::closingBalance)->with('message',$data['error']);
+        }
+
+        //set error message to display if any
+        if(!empty($data['error'])){
+            $session = service('session');
+            $session->setFlashdata('message',$data['error']);
+        }
 
         foreach($this->cbModel->getFieldNames() as $field){
             if($this->request->getPost($field)){
@@ -232,26 +245,37 @@ class ClosingBalance extends AdminController {
 
         if(isset($pending_transactions->total)) {
             if ($pending_transactions->total != ($month - 1)) {
-                $data['error'] = 'Cannot add closing balance. Please check for pending uploads in the previous months!!';
+                $data['error'] = 'Cannot add closing balance. 
+                Please check for pending uploads in the previous months!!';
                 $data['can_edit'] = false;
             }
         } else {
             if(isset($pending_transactions['block_cbs'])){
                 foreach ($pending_transactions['block_cbs'] as $block_cb) {
                     if($block_cb->total != ($month-1)){
-                        $data['error'] = 'Cannot add closing balance. There are pending uploads at block level!!';
+                        $data['error'] = 'Cannot add closing balance. 
+                        There are pending uploads at block level!!';
                         $data['can_edit'] = false;
                         break;
                     }
                 }
             }
-            if(isset($pending_transactions['district_cbs']) && $pending_transactions['district_cbs'] < ($month - 1)){
-                $data['error'] = 'Cannot add closing balance. Please check for pending uploads in the previous months!!';
+
+            if(isset($pending_transactions['district_cbs']) && $pending_transactions['district_cbs'] < ($month)){
+                $data['error'] = 'Cannot add closing balance. Please check for pending submissions!!';
                 $data['can_edit'] = false;
             }
-            if(isset($pending_transactions['pending_cbs']) && $pending_transactions['pending_cbs']){
-                $data['error'] = 'Cannot add closing balance. Blocks status are pending';
-                $data['can_edit'] = false;
+
+            if (isset($pending_transactions['pending_cbs'])) {
+                foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
+                    if($pending_cb->total_cbs < $month){
+                        $data['error'] = 'Cannot add closing balance. Blocks transactions are not submitted';
+                        $data['can_edit'] = false;
+                    } else if($pending_cb->pending>0){
+                        $data['error'] = 'Cannot add closing balance. Blocks transactions are not approved';
+                        $data['can_edit'] = false;
+                    }
+                }
             }
         }
     }

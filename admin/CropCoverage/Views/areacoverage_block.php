@@ -1,3 +1,13 @@
+<style>
+    #loading-overlay {
+        background: rgb(255 255 255 / 80%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 9999;
+    }
+</style>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
@@ -41,85 +51,125 @@
             </div>
 
         </div>
-    </div>
-    <div class="col-xl-12">
-        <div class="block">
-            <div class="block-header block-header-default  bg-primary">
-                <h3 class="block-title"> Area Coverage History</h3>
-            </div>
 
-            <div class="block-content">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Week</th>
-                            <th>GP</th>
-                            <th>Total Farmer</th>
-                            <th>Nursery Raised</th>
-                            <th>Balance SMI</th>
-                            <th>Balance LT</th>
-                            <th>Total Ragi</th>
-                            <th>Total Non Ragi</th>
-                            <th>Total Followup Crop</th>
-                            <th>Total Area</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($blocks))
-                            foreach ($blocks as $block) { ?>
-                                <tr>
-                                    <td>
-                                        <?= $block['week'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['gp'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['farmers_covered'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['nursery_raised'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['balance_smi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['balance_lt'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_ragi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_non_ragi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_fc'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['total_area'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $block['status'] ?>
-                                    </td>
-                                    <td style="display: flex;">
-                                        <div class="btn-group btn-group-sm pull-right">
-                                            <?= $block['action'] ?>
-                                        </div>
-                                    </td>
-                                </tr>
+        <?php if (!empty($blocks)) { ?>
 
-                            <?php } else { ?>
+            <form action="">
+
+
+                <div class="block">
+                    <div class="block-header block-header-default bg-warning">
+                        <h3 class="block-title">
+                            Area Coverage WeekWise
+                        </h3>
+                    </div>
+                    <div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
+                        <div class="col-lg-3">
+                            <div class="form-group mg-b-10-force">
+                                <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
+                                <?= form_dropdown('start_date', $weeks, $week_start_date, "id='filter_Start_date' class='form-control js-select2'"); ?>
+                            </div>
+                        </div><!-- col-4 -->
+                        <div class="col-lg-3 center">
+                            <label class="form-control-label">&nbsp;</label>
+                            <div class="form-layout-footer">
+                                <button id="btn-filter" type="submit" class="btn btn-primary">Filter</button>
+                            </div><!-- form-layout-footer -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+    <?php } ?>
+
+
+    <div class="block">
+        <div class="block-header block-header-default  bg-primary">
+            <h3 class="block-title"> Area Coverage History</h3>
+        </div>
+
+        <div class="block-content">
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>GP</th>
+                        <th>Total Farmer</th>
+                        <th>Nursery Raised</th>
+                        <th>Balance SMI</th>
+                        <th>Balance LT</th>
+                        <th>Total Ragi</th>
+                        <th>Total Non Ragi</th>
+                        <th>Total Followup Crop</th>
+                        <th>Total Area</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    <?php
+
+                    if (!empty($blocks)) {
+                        foreach ($blocks as $block) {
+
+                            ?>
                             <tr>
-                                <td colspan="12">Data not available.</td>
+                                <td>
+                                    <?= $block['week'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['gp'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['farmers_covered'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['nursery_raised'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['balance_smi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['balance_lt'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_ragi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_non_ragi'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_fc'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['total_area'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['status'] ?>
+                                </td>
+                                <td style="display: flex;">
+                                    <div class="btn-group btn-group-sm pull-right">
+                                        <?= $block['action'] ?>
+                                    </div>
+                                </td>
                             </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+                            <?php
+                        }
+                    } else {
+                        echo "Data is not available.";
+                    }
+                    ?>
+                </tbody>
+
+            </table>
+
         </div>
     </div>
+
 </div>
 <div id="loading-overlay">
     <div class="progress" style="width: 100%">
@@ -128,16 +178,7 @@
         </div>
     </div>
 </div>
-<style>
-    #loading-overlay {
-        background: rgb(255 255 255 / 80%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        z-index: 9999;
-    }
-</style>
+
 <?php js_start(); ?>
 
 <script type="text/javascript">
@@ -217,6 +258,7 @@
         $('#progress-percent').text(percent + '%')
     }
 </script>
+
 
 
 <?php js_end(); ?>

@@ -179,7 +179,7 @@ class PhysicalachievementModel extends Model
             if (!empty($data['district_id'])) {
                 $sql .= " and sb.district_id = " . $data['district_id'];
             }
-            if (!empty($data['fund_agency_id'])) {
+            if (!empty($data['district_id']) && !empty($data['fund_agency_id'])) {
               $sql .= " and sb.fund_agency_id = " . $data['fund_agency_id'];
           }
             $sql .= "
@@ -224,7 +224,7 @@ class PhysicalachievementModel extends Model
           ON curr_ach{$comp['id']}.district_id = dist.district_id AND curr_ach{$comp['id']}.fund_agency_id = dist.fund_agency_id";
         }
         $sql .= " ORDER BY dist.district ASC";
-       // echo $sql; exit;
+     //  echo $sql; exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -267,7 +267,7 @@ class PhysicalachievementModel extends Model
             if (!empty($data['district_id'])) {
                 $sql .= " and sb.district_id = " . $data['district_id'];
             }
-            if (!empty($data['fund_agency_id'])) {
+            if (!empty($data['district_id']) && !empty($data['fund_agency_id'])) {
               $sql .= " and sb.fund_agency_id = " . $data['fund_agency_id'];
           }
             $sql .= "

@@ -59,7 +59,7 @@
 <div class="content1">
     <div class="row mb-3">
         <div class="col-md-2">
-            <select name="year" id="year" class="form-control"disabled>
+            <select name="year" id="year" class="form-control" disabled>
                 <?php foreach ($years as $year) { ?>
                     <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
                           echo 'selected';
@@ -69,11 +69,11 @@
             </select>
         </div>
         <div class="col-md-2">
-            <select name="season" id="season" class="form-control">
+            <select name="season" id="season" class="form-control" disabled>
                 <?php foreach ($seasons as $season) { ?>
                     <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
                           echo 'selected';
-                      } ?>><?= $season['name'] ?>
+                      } ?>><?= $season['name']; ?>
                     </option>
                 <?php } ?>
             </select>
@@ -81,87 +81,26 @@
 
     </div>
 </div>
-<figure class="highcharts-figure">
-    <div id="container"></div>
-    <!-- <p class="highcharts-description">
-        Comparative Variwide charts showing Labor Costs in Europe for two different years, 2016 and 2017.
-        The column width is proportional to the country's GDP.
-    </p> -->
-</figure>
-<figure class="highcharts-figure">
-    <div id="milletContainer"></div>
-    <p class="highcharts-description">
+<?php if ($block_id) { ?>
+    <figure class="highcharts-figure">
+        <div id="milletContainer"></div>
+        <p class="highcharts-description">
 
-    </p>
-</figure>
+        </p>
+    </figure>
+<?php } elseif ($district_id) { ?>
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+
+    </figure>
+<?php } else {
+    echo "Data is in dashboard of all district";
+} ?>
+
+
 
 <script>
-    var chartOptions = {
-        chart: {
-            type: 'column'
-        },
-        title: {
-            text: 'District Wise Millet Target vs Achievement'
-        },
-
-        xAxis: {
-            categories: [],
-            crosshair: true
-        },
-
-        yAxis: {
-            title: {
-                text: 'Millet Target and Achievement'
-            },
-            labels: {
-                format: '{value}'
-            }
-        },
-        legend: {
-            enabled: true
-        },
-        series: [
-            {
-                name: 'District Target',
-                data: [], // Replace this value with the millet target for the one district
-                color: 'rgba(165,170,217,1)',
-                borderRadius: 3,
-                pointPadding: 0.2,
-                borderWidth: 0
-            },
-            {
-                name: 'District Achievement',
-                data: [], // Replace this value with the millet achievement for the one district
-                color: 'rgba(126,86,134,.9)',
-                borderRadius: 3,
-                pointPadding: 0.2,
-                borderWidth: 0
-            }
-        ]
-    };
-    var achart = Highcharts.chart('container', chartOptions);
-    $(document).ready(function () {
-        $('[name="year"],[name="season"]').on('change', function () {
-            year_id = $('#year').val();
-            season = $('#season').val();
-            $.ajax({
-                url: '<?= $chart_url ?>',
-                data: { year_id: year_id, season: season },
-                type: 'GET',
-                dataType: 'JSON',
-                success: function (response) {
-                    achart.xAxis[0].setCategories(response.xaxis);
-                    achart.series[0].setData(response.series_target);
-                    achart.series[1].setData(response.series_achievement);
-                }
-
-            });
-        });
-        $('[name="year"]').trigger('change');
-    });
-</script>
-<script>
-        var milletChartOptions = {
+    var milletChartOptions = {
         chart: {
             type: 'column'
         },
@@ -206,7 +145,7 @@
             }
         ]
     };
-        var bchart = Highcharts.chart('milletContainer',  milletChartOptions);
+    var bchart = Highcharts.chart('milletContainer', milletChartOptions);
     $(document).ready(function () {
         $('[name="year"],[name="season"]').on('change', function () {
             year_id = $('#year').val();
@@ -217,9 +156,76 @@
                 type: 'GET',
                 dataType: 'JSON',
                 success: function (response) {
+                    console.log(response);
                     bchart.xAxis[0].setCategories(response.xaxis);
                     bchart.series[0].setData(response.series_target);
                     bchart.series[1].setData(response.series_achievement);
+                }
+
+            });
+        });
+        $('[name="year"]').trigger('change');
+    });
+</script>
+<script>
+    var chartOptions = {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Block Wise Millet Target vs Achievement'
+        },
+
+        xAxis: {
+            categories: [],
+            crosshair: true
+        },
+
+        yAxis: {
+            title: {
+                text: 'Millet Target Vs Achievement(Area in Hectare)'
+            },
+            labels: {
+                format: '{value}'
+            }
+        },
+        legend: {
+            enabled: true
+        },
+        series: [
+            {
+                name: 'Block Target(In Hect)',
+                data: [], // Replace this value with the millet target for the one district
+                color: 'rgba(165,170,217,1)',
+                borderRadius: 3,
+                pointPadding: 0.2,
+                borderWidth: 0
+            },
+            {
+                name: 'Block Achievement(In Hect)',
+                data: [], // Replace this value with the millet achievement for the one district
+                color: 'rgba(126,86,134,.9)',
+                borderRadius: 3,
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        ]
+    };
+    var achart = Highcharts.chart('container', chartOptions);
+    $(document).ready(function () {
+        $('[name="year"],[name="season"]').on('change', function () {
+            year_id = $('#year').val();
+            season = $('#season').val();
+
+            $.ajax({
+                url: '<?= $distchart_url ?>',
+                data: { year_id: year_id, season: season },
+                type: 'GET',
+                dataType: 'JSON',
+                success: function (response) {
+                    achart.xAxis[0].setCategories(response.xaxis);
+                    achart.series[0].setData(response.series_target);
+                    achart.series[1].setData(response.series_achievement);
                 }
 
             });

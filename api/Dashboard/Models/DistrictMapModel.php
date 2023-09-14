@@ -66,30 +66,40 @@ FROM soe_districts sd
 
 	public function getSummary($year_id=''){
 		$sql="SELECT
-        y.id year_id,
-        y.name year,
-		COUNT(district_id) total_districts,
-		SUM(blocks) total_blocks,
-		SUM(gps) total_gps,
-		SUM(villages) total_villages,
-		SUM(tentative_farmers) total_farmers,
-		SUM(chcs) total_chc,
-		SUM(cmscs) total_cmsc,
-        SUM(demo_area) demo_area
-	  FROM dashboard_district_map dm
-	  LEFT JOIN dashboard_years y ON dm.year_id=y.id 
-  LEFT JOIN (SELECT
-      year_id,
+  dm.total_districts,
+  dm.total_blocks,
+  dm.total_gps,
+  dm.total_villages,
+  dm.total_farmers,
+  dm.total_chc,
+  dm.total_cmsc,
+  SUM(ac.demo_area) demo_area
+FROM (SELECT
+    year_id,
+    COUNT(district_id) total_districts,
+    SUM(blocks) total_blocks,
+    SUM(gps) total_gps,
+    SUM(villages) total_villages,
+    SUM(tentative_farmers) total_farmers,
+    SUM(chcs) total_chc,
+    SUM(cmscs) total_cmsc
+  FROM dashboard_district_map
+  WHERE deleted_at IS NULL";
+        if($year_id){
+            $sql .= " AND year_id =$year_id";
+        }
+		$sql .= " ) dm
+  JOIN (SELECT
       SUM(achievement) demo_area
     FROM dashboard_areacoverage
-    WHERE deleted_at IS NULL GROUP BY year_id) ac
-    ON ac.year_id = dm.year_id
-WHERE dm.deleted_at IS NULL";
+    WHERE deleted_at IS NULL";
 		if($year_id){
-            $sql .= " AND dm.year_id =$year_id";
+            $sql .= " AND year_id =$year_id";
         }
+        $sql .= ") ac";
 
 		return $this->db->query($sql)->getFirstRow();
 	}
-	
+
+
 }

@@ -221,27 +221,11 @@
             // Get the key code of the pressed key
             var keyCode = event.which;
 
-            <?php if(isset($allow_negative_amount) && $allow_negative_amount){ ?>
-                // Allow decimal point (.) and (-) and numbers (48-57) only
-                // Prevent the input if the key is not a number or decimal point
-                if (keyCode !== 46 && keyCode !== 45 && (keyCode < 48 || keyCode > 57)) {
-                    event.preventDefault();
-                }
-            <?php } else { ?>
-                // Allow decimal point (.) and numbers (48-57) only
-                // Prevent the input if the key is not a number or decimal point
-                if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
-                    event.preventDefault();
-                }
-            <?php } ?>
-
-            <?php if(isset($allow_negative_amount) && $allow_negative_amount){ ?>
-            // Allow only one negative sign at the beginning
-            // Prevent the input if there is already a negative sign
-            if (keyCode === 45 && $(this).val().indexOf('-') !== -1) {
+            // Allow decimal point (.) and numbers (48-57) only
+            // Prevent the input if the key is not a number or decimal point
+            if (keyCode !== 46 && (keyCode < 48 || keyCode > 57)) {
                 event.preventDefault();
             }
-            <?php } ?>
 
             // Allow only one decimal point
             // Prevent the input if there is already a decimal point

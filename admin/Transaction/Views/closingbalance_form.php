@@ -3,6 +3,9 @@ $readonly = ' readonly';
 if($can_edit){
     $readonly = '';
 }
+if(isset($error)){
+    $readonly = ' readonly';
+}
 ?>
 <div class="block">
     <div class="block-header block-header-default">
