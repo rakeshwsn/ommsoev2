@@ -280,9 +280,9 @@ FROM soe_districts sd
   LEFT JOIN (SELECT
       *
     FROM vw_area_coverage_districtwise vacd
-    WHERE vacd.status = 1";
+    WHERE";
             if (!empty($filter['start_date'])) {
-                $sql .= " AND DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
+                $sql .= " DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
             }
             $sql .= ") ac
     ON ac.district_id = sd.id";
@@ -540,7 +540,8 @@ WHERE (year_id IS NULL";
             $sql .= " AND vacrd.block_id=" . $filter['block_id'];
         }
         $sql .= " GROUP BY gp_id ORDER BY gp";
-         echo $sql; exit;
+        echo $sql;
+        exit;
         return $this->db->query($sql)->getResult();
     }
 
