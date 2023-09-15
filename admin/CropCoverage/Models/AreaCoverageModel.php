@@ -280,9 +280,9 @@ FROM soe_districts sd
   LEFT JOIN (SELECT
       *
     FROM vw_area_coverage_districtwise vacd
-    WHERE 1 = 1";
+    WHERE";
             if (!empty($filter['start_date'])) {
-                $sql .= " DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
+                $sql .= "DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
             }
             $sql .= ") ac
     ON ac.district_id = sd.id";
