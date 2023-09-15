@@ -20,7 +20,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::add');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
     $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
-    
+    $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
+
     $routes->add('enterprises/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 
     $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');

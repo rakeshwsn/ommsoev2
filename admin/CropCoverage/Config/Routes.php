@@ -8,7 +8,7 @@ if (!isset($routes)) {
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
     $routes->match(['get', 'post'], 'cropcoverage/crops', 'CropCoverage\Controllers\AreaCoverageCrops::index');
     $routes->add('areacoverage/download', 'CropCoverage\Controllers\AreaCoverage::download');
-    $routes->match(['get', 'post'], 'areacoverage', 'CropCoverage\Controllers\AreaCoverage::Index');
+    $routes->match(['get', 'post'], 'areacoverage', 'CropCoverage\Controllers\AreaCoverage::index');
     $routes->match(['get', 'post'], 'areacoverage/filtered', 'CropCoverage\Controllers\AreaCoverage::weekWiseFilterdData');
 
     $routes->post('areacoverage/search', 'CropCoverage\Controllers\AreaCoverage::search', ['permission' => false]);

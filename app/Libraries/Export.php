@@ -3,6 +3,8 @@ namespace App\Libraries;
 
 use Config\ExcelStyles;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Export
@@ -81,5 +83,13 @@ class Export
             $writer->save('php://output');
             exit();
         }
+    }
+
+    public static function createExcelFromHTML2(String $html,$title){
+
+        
+    
+        return $worksheet;
+        
     }
 }

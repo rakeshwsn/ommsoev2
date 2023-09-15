@@ -585,6 +585,7 @@ class Approve extends AdminController
                 'total_fc' => $block->fc_area,
                 'total_area' => $block->total_area,
                 'status' => $this->statuses[$status],
+                'status_color' => $this->colors[$status],
                 'action' => $action,
             ];
 
@@ -635,6 +636,7 @@ class Approve extends AdminController
             'total_fc' => $total_fc_area,
             'total_area' => $total_total_area,
             'status' => '',
+            'status_color' => '',
             'action' => ''
         ];
 

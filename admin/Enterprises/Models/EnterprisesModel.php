@@ -62,7 +62,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Name/Type of Unit',
-       'greater_than'=> 'Select Unit Type',
+        'greater_than' => 'Select Unit Type',
       ]
     ],
     'management_unit_type' => [
@@ -86,7 +86,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Block name',
-        'greater_than'=> 'Select Block Name'
+        'greater_than' => 'Select Block Name'
       ]
     ],
     'gp_id' =>  [
@@ -94,7 +94,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Grampanchayat name',
-        'greater_than'=> 'Select GramPanchayat Name'
+        'greater_than' => 'Select GramPanchayat Name'
       ]
     ],
     'village_id' => [
@@ -102,7 +102,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Village name',
-         'greater_than'=> 'Select Village Name'
+        'greater_than' => 'Select Village Name'
       ]
     ],
     'budget_fin_yr_id' => [
@@ -110,7 +110,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required|greater_than[0]',
       'errors' => [
         'required' => 'Selelct Financial year ',
-         'greater_than'=> 'Select Financial year'
+        'greater_than' => 'Select Financial year'
       ]
     ],
     'mou_date' =>  [
@@ -126,7 +126,7 @@ class EnterprisesModel extends Model
       'rules'  => 'required',
       'errors' => [
         'required' => 'Select Budget Code',
-        
+
       ]
     ],
     'unit_budget_amount' =>  [
@@ -148,16 +148,16 @@ class EnterprisesModel extends Model
       'rules'  => 'required_if_value[is_support_basis_infr,yes]',
       'errors' => [
         'required_if_value' => 'Select Budget Code',
-        
+
       ]
-    ], 
+    ],
     'support_infr_amount' =>  [
       'label'  => 'support_infr_amount',
       'rules'  => 'required_if_value[is_support_basis_infr,yes]',
       'errors' => [
         'required_if_value' => 'Enter Amount ',
       ]
-    ], 
+    ],
 
   ];
   protected $validationMessages   = [];
@@ -201,7 +201,9 @@ class EnterprisesModel extends Model
     sd.name districts,
     sb.name blocks,
     v.name villages,
-    gp.name gp
+    gp.name gp,
+    eu.name,
+    eu.group_unit
   FROM enterprises e
     LEFT JOIN soe_districts sd
       ON sd.id = e.district_id
@@ -211,6 +213,8 @@ class EnterprisesModel extends Model
       ON v.id = e.village_id
     LEFT JOIN grampanchayat gp
       ON gp.id = e.gp_id
+    LEFT JOIN enterprises_units eu
+      ON eu.id = e.unit_id
   WHERE e.deleted_at IS NULL";
 
     if (isset($filter['district_id'])) {
@@ -219,6 +223,10 @@ class EnterprisesModel extends Model
     if (isset($filter['block_id'])) {
       $sql .= " AND e.block_id = " . $filter['block_id'];
     }
+    if (isset($filter['unit_id'])) {
+      $sql .= " AND e.unit_id = " . $filter['unit_id'];
+    }
     return $this->db->query($sql)->getResult();
   }
+
 }
