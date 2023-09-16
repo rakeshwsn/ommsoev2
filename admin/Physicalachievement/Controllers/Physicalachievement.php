@@ -369,10 +369,10 @@ class Physicalachievement extends AdminController
             $tableBodyHtml .= '<td>' . $component['component'] . '</td>';
             $tableBodyHtml .= '<td class="targettotal">' . $component['targettotal'] . '</td>';
             $tableBodyHtml .= '<td class="achTotal">' . $component['ach_total'] . '</td>';
-            $tableBodyHtml .= '<td><input type="number" name="component[' . $component['id'] . '][data]" class="form-control currentMonth" id="currentMonth" value="' . $component['cur_total'] . '"></td>';
+            $tableBodyHtml .= '<td><input type="number" required name="component[' . $component['id'] . '][data]" class="form-control currentMonth" id="currentMonth" value="' . $component['cur_total'] . '"></td>';
             if ($component['comp_categoryid'] == 1) { // Check the category ID
-                $tableBodyHtml .= '<td><input type="number" name="component[' . $component['id'] . '][fpo]" class="form-control fwsg fpo" id="fpo" value="' . $component['fpo_total'] . '"></td>';
-                $tableBodyHtml .= '<td><input type="number" name="component[' . $component['id'] . '][wshg]" class="form-control fwsg wshg" id="wshg" value="' . $component['wshg_total'] . '"></td>';
+                $tableBodyHtml .= '<td><input type="number" required name="component[' . $component['id'] . '][fpo]" class="form-control fwsg fpo" id="fpo" value="' . $component['fpo_total'] . '"></td>';
+                $tableBodyHtml .= '<td><input type="number" required name="component[' . $component['id'] . '][wshg]" class="form-control fwsg wshg" id="wshg" value="' . $component['wshg_total'] . '"></td>';
             } else {
                 $tableBodyHtml .= '<td></td><td></td>'; // Empty cells if not in category 2
             }
@@ -386,6 +386,66 @@ class Physicalachievement extends AdminController
         $tableBodyHtml .= '<tr class="text-right"><td colspan="7"><button id="submitButton" class="btn btn-alt-primary">Submit</button></td></tr>';
         $tableBodyHtmlfinal = $tableHeaderHtml . '<tbody>' . $tableBodyHtml . '</tbody>';
         echo $tableBodyHtmlfinal;
+    }
+
+
+    public function trackreport()
+    {
+
+        $data = [];
+        $user  = service('user');
+        $data['year_id'] = getCurrentYearId();
+        $data['allYears'] =  $this->years->withDeleted()->where('id >', 1)->findAll();
+        // $data['year_id'] = '';
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+        }
+
+
+        $data['years'] = getAllYears();
+        $districtModel = new DistrictModel();
+        $data['districts_main'] = $districtModel->getAll();
+        //  printr($data); exit;
+        $data['add'] = admin_url('physicalcomponentstarget/add');
+        $data['addachForm'] = admin_url('physicalachievement/add');
+
+        $filter = [
+            'year_id' => $data['year_id'],
+
+        ];
+        $data['selectedYear'] = 1;
+        if ($this->request->getGet('year_id')) {
+            $data['selectedYear'] = $this->request->getGet('year_id');
+        }
+
+        $data['checkExists'] = $this->pcmTarget->showCheckExistsData($filter);
+         $data['get_months'] = getMonths();
+        $this->getTableHeadersMonth($data);
+        $data['monthdata'] = $this->pcmachieve->showTrackreport($filter);
+        //  printr($data['monthdata']); exit;
+        // foreach ($results as  $result) {
+        //     $data['monthdata'][] = [
+        //         'name' => $result['district'],
+        //         'total' => $result['total'],
+        //         'district' => $result['district'],
+        //         'mprcomponents_master_id' => $result['mprcomponents_master_id'],
+
+        //     ];
+        // }
+
+        return $this->template->view('Admin\Physicalachievement\Views\upload_status', $data);
+    }
+
+    private function getTableHeadersMonth(&$data)
+    {
+        $headers = ['Sl No', 'District'];
+        foreach ($data['get_months'] as $row) {
+            $month_name = $row['name'];
+            if (!in_array($month_name, $headers)) {
+                $headers[] = $month_name;
+            }
+        }
+        $data['headers'] = $headers;
     }
 }
 /* End of file hmvc.php */

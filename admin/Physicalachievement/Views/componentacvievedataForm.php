@@ -211,21 +211,21 @@ $validation = \Config\Services::validation();
             // var fpo = parseFloat($(this).val());
             // var wshg = parseFloat($(this).val());
             var cumulativeTotal = achTotal + currentMonthValue;
-            if (currentMonthValue + achTotal > targetTotal) {
-                currentMonthValue = 0;
-                cumulativeTotal = 0;
-            }
+            // if (currentMonthValue + achTotal > targetTotal) {
+            //     currentMonthValue = 0;
+            //     cumulativeTotal = 0;
+            // }
 
             $row.find('.currentMonth').val(currentMonthValue);
             $row.find('.cumulative').val(cumulativeTotal);
 
-            if (cumulativeTotal > targetTotal) {
-                $row.addClass('has-error');
-                $row.find('.message').text('Cumulative total exceeds target total');
-            } else {
-                $row.removeClass('has-error');
-                $row.find('.message').text('');
-            }
+            // if (cumulativeTotal > targetTotal) {
+            //     $row.addClass('has-error');
+            //     $row.find('.message').text('Cumulative total exceeds target total');
+            // } else {
+            //     $row.removeClass('has-error');
+            //     $row.find('.message').text('');
+            // }
         });
 
         $(document).on('input', '.fwsg', function() {
