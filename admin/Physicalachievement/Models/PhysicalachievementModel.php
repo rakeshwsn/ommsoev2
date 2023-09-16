@@ -393,4 +393,42 @@ class PhysicalachievementModel extends Model
         $result = $builder->get()->getRow();
         return $result;
     }
+
+
+    public function showTrackreport($data=[])
+    {
+        $sql = "
+        SELECT
+        main_tbl.district_id,
+        CASE WHEN main_tbl.fund_agency_id > 1 THEN CONCAT(main_tbl.district, ' DMF') ELSE main_tbl.district END AS district,
+        second_tbl.masterid,
+        second_tbl.year_id,
+        COUNT(CASE WHEN second_tbl.month_id=4 THEN main_tbl.district_id END) AS 'April',
+        COUNT(CASE WHEN second_tbl.month_id=5 THEN main_tbl.district_id END) AS 'May',
+        COUNT(CASE WHEN second_tbl.month_id=6 THEN main_tbl.district_id END) AS 'June',
+        COUNT(CASE WHEN second_tbl.month_id=7 THEN main_tbl.district_id END) AS 'July',
+        COUNT(CASE WHEN second_tbl.month_id=8 THEN main_tbl.district_id END) AS 'August',
+        COUNT(CASE WHEN second_tbl.month_id=9 THEN main_tbl.district_id END) AS 'September',
+        COUNT(CASE WHEN second_tbl.month_id=10 THEN main_tbl.district_id END) AS 'October',
+        COUNT(CASE WHEN second_tbl.month_id=11 THEN main_tbl.district_id END) AS 'November',
+        COUNT(CASE WHEN second_tbl.month_id=12 THEN main_tbl.district_id END) AS 'December',
+        COUNT(CASE WHEN second_tbl.month_id=1 THEN main_tbl.district_id END) AS 'January',
+        COUNT(CASE WHEN second_tbl.month_id=2 THEN main_tbl.district_id END) AS 'February',
+        COUNT(CASE WHEN second_tbl.month_id=3 THEN main_tbl.district_id END) AS 'March'
+        FROM vw_district_fund_agency main_tbl
+        LEFT JOIN (
+            SELECT
+                mctm.district_id,
+                mctm.id AS masterid,
+                mcad.month_id,
+                mctm.year_id
+            FROM mpr_components_target_master mctm
+            LEFT  JOIN mpr_components_achive_data mcad ON mctm.id = mcad.mprcomponents_master_id
+            WHERE mctm.year_id = 2
+            GROUP BY mctm.district_id, mcad.month_id
+        ) second_tbl ON main_tbl.district_id = second_tbl.district_id
+        GROUP BY main_tbl.district_id,main_tbl.fund_agency_id  ORDER BY main_tbl.district ASC";
+      //  echo $sql; exit;
+        return $this->db->query($sql)->getResultArray();
+    }
 }
