@@ -266,10 +266,10 @@
                         <tbody>
                             <?php foreach ($maps as $map) { ?>
                                 <tr data-dist="<?= $map->district_id ?>">
-                                    <td><?= $map->district ?></td>
+                                    <td><?= $map->districts ?></td>
                                     <td><?= $map->blocks ?></td>
-                                    <td><?= $map->chc ?></td>
-                                    <td><?= $map->cmsc ?></td>
+                                    <td><?= $map->total_gps ?></td>
+                                    <td><?= $map->total_villages ?></td>
                                     <td><?= $map->total_farmer ?></td>
                                 </tr>
                             <?php  } ?>
@@ -796,7 +796,7 @@
             // Now you can manipulate the SVG elements as needed
             // For example, let's change the color of a path element to red
             mapinfo = <?php echo json_encode($maps); ?>;
-            // console.log(mapinfo);
+             console.log(mapinfo);
             const district = map.selectAll(".dist");
 
             district.forEach(function(obj) {

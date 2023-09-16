@@ -280,17 +280,16 @@ FROM soe_districts sd
   LEFT JOIN (SELECT
       *
     FROM vw_area_coverage_districtwise vacd
-    WHERE vacd.status = 1";
+    WHERE";
             if (!empty($filter['start_date'])) {
-                $sql .= " AND DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
+                $sql .= " DATE(vacd.start_date)=date('" . $filter['start_date'] . "')";
             }
             $sql .= ") ac
     ON ac.district_id = sd.id";
             $sql .= " LEFT JOIN vw_districtwise_blocks_gps dbg 
     ON sd.id=dbg.district_id ORDER BY sd.name";
         }
-        //echo $sql;
-        //exit;
+
         return $this->db->query($sql)->getResult();
     }
 
@@ -433,6 +432,75 @@ WHERE (year_id IS NULL";
     public function getByBlockNew($filter = [])
     {
         $sql = "SELECT
+  main.*,
+  nur.nursery_raised,
+  nur.balance_smi,
+  nur.balance_lt
+FROM (SELECT
+    vacrd.gp_id,
+    gp,
+    MAX(DATE(vacrd.start_date)) start_date,
+    vacrd.year_id,
+    vacrd.season,
+    SUM(farmers_covered) AS farmers_covered,
+    SUM(fc_area) AS fc_area,
+    SUM(ragi_smi) AS ragi_smi,
+    SUM(ragi_lt) AS ragi_lt,
+    SUM(ragi_ls) AS ragi_ls,
+    SUM(little_millet_lt) AS little_millet_lt,
+    SUM(little_millet_ls) AS little_millet_ls,
+    SUM(foxtail_ls) AS foxtail_ls,
+    SUM(sorghum_ls) AS sorghum_ls,
+    SUM(kodo_ls) AS kodo_ls,
+    SUM(barnyard_ls) AS barnyard_ls,
+    SUM(pearl_ls) AS pearl_ls
+  FROM (SELECT
+      *
+    FROM vw_area_coverage_report_gpwise
+    WHERE 1 = 1";
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
+        }
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND block_id=" . $filter['block_id'];
+        }
+        if (!empty($filter['start_date'])) {
+            $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
+        }
+        $sql .= ") vacrd
+  GROUP BY vacrd.gp_id) main
+  LEFT JOIN (SELECT
+      gp_id,
+      acc.year_id,
+      acc.season,
+      an.nursery_raised,
+      an.balance_smi,
+      an.balance_lt,
+      acc.start_date
+    FROM ac_nursery an
+      LEFT JOIN ac_crop_coverage acc
+        ON an.crop_coverage_id = acc.id
+    WHERE acc.deleted_at IS NULL
+    AND acc.status = 1";
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND block_id=" . $filter['block_id'];
+        }
+        $sql .= ") nur
+    ON main.gp_id = nur.gp_id
+    AND main.year_id = nur.year_id
+    AND main.season = nur.season
+    AND DATE(main.start_date) = DATE(nur.start_date) ORDER BY gp";
+
+        return $this->db->query($sql)->getResult();
+    }
+
+    //unexpected result
+    public function getByBlockNew1($filter = [])
+    {
+        $sql = "SELECT
   vacng.block_id,
   vacng.gp_id,
   gp,
@@ -471,8 +539,8 @@ WHERE (year_id IS NULL";
             $sql .= " AND vacrd.block_id=" . $filter['block_id'];
         }
         $sql .= " GROUP BY gp_id ORDER BY gp";
-        // echo $sql;
-        // exit;
+        echo $sql;
+        exit;
         return $this->db->query($sql)->getResult();
     }
 

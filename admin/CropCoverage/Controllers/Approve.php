@@ -72,7 +72,7 @@ class Approve extends AdminController
             $data['district_id'] = $district_id = $this->user->district_id;
         }
         $data['currentDay'] = date('l');
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
+        // $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday',));
 
         $week_dates = $this->areacoveragemodel->getWeekDate();
 
@@ -579,6 +579,7 @@ class Approve extends AdminController
                 'total_fc' => $block->fc_area,
                 'total_area' => $block->total_area,
                 'status' => $this->statuses[$status],
+                'status_color' => $this->colors[$status],
                 'action' => $action,
             ];
 
@@ -629,6 +630,7 @@ class Approve extends AdminController
             'total_fc' => $total_fc_area,
             'total_area' => $total_total_area,
             'status' => '',
+            'status_color' => '',
             'action' => ''
         ];
 

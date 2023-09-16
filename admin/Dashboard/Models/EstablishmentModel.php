@@ -85,35 +85,22 @@ class EstablishmentModel extends Model
     public function getestablishmentmap()
 	{
 		$sql = "SELECT
-		dist.district_id,
-		dist.district,
-		dist.blocks,
-		chc.main_center + chc.sub_center chc ,
-		cmsc.main_center + cmsc.sub_center cmsc,
-		a.total_farmer
-	  FROM (SELECT
-		  d.id district_id,
-		  d.name district,
-		  COUNT(b.id) blocks
-		FROM soe_districts d
-		  LEFT JOIN soe_blocks b
-			ON b.district_id = d.id
-		GROUP BY d.id) dist
-		LEFT JOIN dashboard_establishment chc
-		  ON chc.district_id = dist.district_id
-		LEFT JOIN dashboard_establishment cmsc
-		  ON dist.district_id = cmsc.district_id
+		ddm.district_id,
+		ddm.blocks total_blocks,
+		ddm.gps total_gps,
+		ddm.villages total_villages,
+		sd.name districts,
+		da.total_farmer
+	  FROM dashboard_district_map ddm
+		LEFT JOIN soe_districts sd
+		  ON ddm.district_id = sd.id
 		LEFT JOIN (SELECT
-			a.district_id,
-			SUM(a.farmers) total_farmer
-		  FROM dashboard_areacoverage a
-		  WHERE a.deleted_at IS NULL
-		  GROUP BY a.district_id)  a
-		  ON a.district_id = dist.district_id
-	  WHERE chc.deleted_at IS NULL
-	  AND cmsc.deleted_at IS NULL
-	  AND chc.establishment_type = 'CHC'
-	  AND cmsc.establishment_type = 'CMSC'";
+			da.district_id,
+			SUM(da.farmers) total_farmer
+		  FROM dashboard_areacoverage da
+		  WHERE da.deleted_at IS NULL
+		  GROUP BY da.district_id) da
+		  ON da.district_id = ddm.district_id ";
 
 		return $this->db->query($sql)->getResult();
 	}
