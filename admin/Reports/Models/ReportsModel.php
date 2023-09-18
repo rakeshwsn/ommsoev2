@@ -3505,7 +3505,7 @@ WHERE res.total = 0";
     }
 
     $sql = sprintf($sql, $where, $where);
-
+echo $sql;exit;
     $query = $this->db->query($sql, $params);
     $result = $query->getResultArray();
 
