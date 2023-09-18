@@ -644,6 +644,15 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+
+        if ($this->user->hasPermission("physicalachievement/report")) {
+            $mprcomponent[] = [
+                "name" => "Upload Status",
+                "href" => admin_url("physicalachievement/report"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
         if ($mprcomponent) {
             $data["menus"][] = [
                 "id" => "menu-mprcomponent",
