@@ -497,53 +497,6 @@ FROM (SELECT
         return $this->db->query($sql)->getResult();
     }
 
-    //unexpected result
-    public function getByBlockNew1($filter = [])
-    {
-        $sql = "SELECT
-  vacng.block_id,
-  vacng.gp_id,
-  gp,
-  SUM(farmers_covered) AS farmers_covered,
-  nursery_raised AS nursery_raised,
-  balance_smi AS balance_smi,
-  balance_lt AS balance_lt,
-  SUM(fc_area) AS fc_area,
-  SUM(ragi_smi) AS ragi_smi,
-  SUM(ragi_lt) AS ragi_lt,
-  SUM(ragi_ls) AS ragi_ls,
-  SUM(little_millet_lt) AS little_millet_lt,
-  SUM(little_millet_ls) AS little_millet_ls,
-  SUM(foxtail_ls) AS foxtail_ls,
-  SUM(sorghum_ls) AS sorghum_ls,
-  SUM(kodo_ls) AS kodo_ls,
-  SUM(barnyard_ls) AS barnyard_ls,
-  SUM(pearl_ls) AS pearl_ls
-FROM (SELECT * FROM vw_area_coverage_report_gpwise WHERE 1=1";
-        if (!empty($filter['start_date'])) {
-            $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
-        }
-        $sql .= ") vacrd 
-RIGHT JOIN vw_area_coverage_nur_gpwise vacng
-    ON vacrd.start_date = vacng.start_date AND vacrd.gp_id = vacng.gp_id
-WHERE (year_id IS NULL";
-        if (!empty($filter['year_id'])) {
-            $sql .= " OR year_id = " . $filter['year_id'];
-        }
-        $sql .= " ) AND (season IS NULL";
-        if (!empty($filter['season'])) {
-            $sql .= " OR LOWER(season) = '" . strtolower($filter['season']) . "'";
-        }
-        $sql .= ")";
-        if (!empty($filter['block_id'])) {
-            $sql .= " AND vacrd.block_id=" . $filter['block_id'];
-        }
-        $sql .= " GROUP BY gp_id ORDER BY gp";
-        echo $sql;
-        exit;
-        return $this->db->query($sql)->getResult();
-    }
-
     public function getByBlock($filter = [])
     {
         $sql = "SELECT
