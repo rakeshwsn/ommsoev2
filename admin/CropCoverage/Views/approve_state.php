@@ -91,7 +91,7 @@
                                 <td><?=$district['total_non_ragi']?></td>
                                 <td><?=$district['total_fc']?></td>
                                 <td><?=$district['total_area']?></td>
-                                <td><?=$district['status']?></td>
+                                <td><label class="badge badge-<?=$district['status_color']?>"><?=$district['status']?></label></td>
                                 <td>
                                     <div class="btn-group btn-group-sm pull-right">
                                     <?=$district['action']?>
