@@ -41,7 +41,7 @@
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Quintals of Produce processed</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Charges per Quintal</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Total Expenditure in the fortnight</th>
-                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Total Tourn Over in the fortnight</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Total Turn Over in the fortnight</th>
             </tr>
         </thead>
         <tbody>

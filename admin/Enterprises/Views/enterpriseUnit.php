@@ -35,7 +35,7 @@
 </div>
 
 <?php js_start(); ?>
-<script type="text/javascript"><!--
+<script type="text/javascript">
     $(function(){
         $('#datatable').DataTable({
             "processing": true,
@@ -56,5 +56,5 @@
         });
     });
 
-    //--></script>
+    </script>
 <?php js_end(); ?>

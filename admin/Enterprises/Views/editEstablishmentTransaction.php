@@ -88,12 +88,12 @@
                                 <tbody>
 
                                     <tr class="odd">
-                                        <td><input type="date_create" name="" class="form-control" value="<?= $entranses['created_at']?>"></td>
-                                        <td><input type="text" name="" class="form-control" value="<?= $entranses['no_of_days_functional'] ?>"></td>
-                                        <td><input type="text" name="" class="form-control" value="<?= $entranses['produced'] ?>"></td>
-                                        <td><input type="text" name="" class="form-control" value="<?= $entranses['charges_per_qtl'] ?>"></td>
-                                        <td><input type="text" name="" class="form-control" value="<?= $entranses['total_expend'] ?>"></td>
-                                        <td><input type="text" name="" class="form-control" value="<?= $entranses['total_turnover'] ?>"></td>
+                                        <td><input type="date_create" name="created_at" class="form-control" value="<?= $entranses['created_at']?>"></td>
+                                        <td><input type="text" name="no_of_days_functional" class="form-control" value="<?= $entranses['no_of_days_functional'] ?>"></td>
+                                        <td><input type="text" name="produced" class="form-control" value="<?= $entranses['produced'] ?>"></td>
+                                        <td><input type="text" name="charges_per_qtl" class="form-control" value="<?= $entranses['charges_per_qtl'] ?>"></td>
+                                        <td><input type="text" name="total_expend" class="form-control" value="<?= $entranses['total_expend'] ?>"></td>
+                                        <td><input type="text" name="total_turnover" class="form-control" value="<?= $entranses['total_turnover'] ?>"></td>
                                     </tr>
                                 </tbody>
                             </table>

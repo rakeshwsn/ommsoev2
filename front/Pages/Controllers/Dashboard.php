@@ -34,14 +34,14 @@ class Dashboard extends BaseController
 		}
 		$odmapmodel = new OdMapModel();
 		$data['maps'] = $odmapmodel->getestablishmentmap();
-
+// printr($data['maps']);exit;
 
 		$data['area_url'] = site_url('api/areacoverage');
 		$data['procure_url'] = site_url('api/procurement_c');
 		$data['pds_url'] = site_url('api/pds_c');
 		$data['establish_url'] = site_url('api/establishment');
 		$data['enterprise_url'] = site_url('api/enterprises2');
-		$data['odishamap_url'] = site_url('api/odishamap');
+		$data['odishamap_url'] = site_url('api/odmapdata');
 		
 		$this->template->set_layout('default');
 		$this->template->set('header',false);

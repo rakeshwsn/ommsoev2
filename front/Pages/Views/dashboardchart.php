@@ -264,15 +264,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($maps as $map) { ?>
-                                <tr data-dist="<?= $map->district_id ?>">
-                                    <td><?= $map->districts ?></td>
-                                    <td><?= $map->blocks ?></td>
-                                    <td><?= $map->total_gps ?></td>
-                                    <td><?= $map->total_villages ?></td>
-                                    <td><?= $map->total_farmer ?></td>
-                                </tr>
-                            <?php  } ?>
+                            
                         </tbody>
                     </table>
                     <!-- </div> -->
@@ -783,51 +775,67 @@
 
 
     window.onload = function() {
-        Snap.load("uploads/files/ommodishamap.svg", function(loadedFragment) {
-            // 'loadedFragment' contains the loaded SVG elements
-            var map = loadedFragment.select("svg");
+        $.ajax({
+            url: '<?= $odishamap_url ?>',
+            data: {
 
-            // Get the jQuery element where you want to append the SVG
-            var $element = $("#map-container");
+            },
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(response) {
+                mapinfo = response.data
+                Snap.load("uploads/files/ommodishamap.svg", function(loadedFragment) {
+                    // 'loadedFragment' contains the loaded SVG elements
+                    var map = loadedFragment.select("svg");
 
-            // Append the SVG to the element
-            $element.append(map.node);
+                    // Get the jQuery element where you want to append the SVG
+                    var $element = $("#map-container");
 
-            // Now you can manipulate the SVG elements as needed
-            // For example, let's change the color of a path element to red
-            mapinfo = <?php echo json_encode($maps); ?>;
-             console.log(mapinfo);
-            const district = map.selectAll(".dist");
+                    // Append the SVG to the element
+                    $element.append(map.node);
 
-            district.forEach(function(obj) {
-                var mapid = obj.attr('id');
-                if (mapid) {
+                    // Now you can manipulate the SVG elements as needed
+                    // For example, let's change the color of a path element to red
+                   
+                    console.log(mapinfo);
+                    const district = map.selectAll(".dist");
 
-                    const dist = mapinfo.filter(item => item.district_id === mapid);
+                    district.forEach(function(obj) {
+                        var mapid = obj.attr('id');
+                        if (mapid) {
 
-
-                    if (dist[0].blocks >= 1 && dist[0].blocks <= 3) {
-                        obj.addClass('bg-scale1')
-                    }
-                    if (dist[0].blocks >= 4 && dist[0].blocks <= 5) {
-                        obj.addClass('bg-scale2')
-                    }
-                    if (dist[0].blocks >= 6 && dist[0].blocks <= 8) {
-                        obj.addClass('bg-scale3')
-                    }
-                    if (dist[0].blocks >= 9) {
-                        obj.addClass('bg-scale4')
-                    } else if (dist[0].blocks == 0) {
-                        obj.addClass('bg-scale2')
-                    }
+                            const dist = mapinfo.filter(item => item.district_id === mapid);
 
 
-                }
-                obj.click(clickCallback);
+                            if (dist[0].total_blocks >= 1 && dist[0].total_blocks <= 3) {
+                                obj.addClass('bg-scale1')
+                            }
+                            if (dist[0].total_blocks >= 4 && dist[0].total_blocks <= 5) {
+                                obj.addClass('bg-scale2')
+                            }
+                            if (dist[0].total_blocks >= 6 && dist[0].total_blocks <= 8) {
+                                obj.addClass('bg-scale3')
+                            }
+                            if (dist[0].total_blocks >= 9) {
+                                obj.addClass('bg-scale4')
+                            } else if (dist[0].total_blocks == 0) {
+                                obj.addClass('bg-scale2')
+                            }
 
-            }, "text");
+
+                        }
+                        obj.click(clickCallback);
+
+                    }, "text");
+
+                });
+
+                loadMapTable(mapinfo);
+            }
+
 
         });
+
 
         var clickCallback = function(event) {
             console.log(event);
@@ -849,5 +857,19 @@
         };
 
     };
+
+    function loadMapTable(data){
+        html='';
+        data.forEach(function(obj) {
+            html +='<tr data-dist="'+obj.district_id+'">';
+            html +='<td>'+obj.districts+'</td>';
+            html +='<td>'+obj.total_blocks+'</td>';
+            html +='<td>'+obj.total_gps+'</td>';
+            html +='<td>'+obj.total_villages+'</td>';
+            html +='<td>'+obj.total_farmers+'</td>';
+            html +='</tr>';
+        });
+        $(".maptable tbody").html(html);
+    }
 </script>
 <?php js_end(); ?>
