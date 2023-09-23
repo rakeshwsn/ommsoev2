@@ -24,6 +24,9 @@ class Dashboard extends ResourceController
 	{
 		helper("aio");
 		$this->user = service('user');
+		Header('Access-Control-Allow-Origin: *'); //for allow any domain, insecure
+		Header('Access-Control-Allow-Headers: *'); //for allow any headers, insecure
+		Header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
 	}
 
 	public function areacoverage()
@@ -223,6 +226,63 @@ class Dashboard extends ResourceController
 		return $this->respond($data);
 	}
 
+
+	public function odmapdata()
+	{
+
+		$odmapmodel = new OdMapModel();
+		$odmapdatas = $odmapmodel->getestablishmentmap();
+
+		$data['heading'] = 'Scale of Odisha Millets Mission';
+
+		$data['data'] = [];
+		foreach ($odmapdatas as $mapdata) {
+			$data['data'][] = [
+				'district_id' => $mapdata->district_id,
+				'districts' => $mapdata->districts,
+				'total_blocks' => $mapdata->blocks,
+				'total_gps' => $mapdata->total_gps,
+				'total_villages' => $mapdata->total_villages,
+				'total_farmers' => $mapdata->total_farmers,
+
+			];
+		}
+		// dd($data);
+		return $this->respond($data);
+	}
+	public function enterprises()
+	{
+		$enterprisemodel = new EnterpriseChartModel();
+		$yearModel = new YearModel();
+		$filter = [];
+
+		$filter['year_id'] = $yearModel->getCurrentYearId();
+		if ($this->request->getGet('year_id')) {
+			$data['year_id'] = $this->request->getGet('year_id');
+
+			$filter['year_id'] = $this->request->getGet('year_id');
+			$year_id = $this->request->getGet('year_id');
+		}
+
+		$enterprises = $enterprisemodel->getYearwisedata($filter);
+
+		$data['data'] = [];
+		foreach ($enterprises as $enterprise) {
+			$data['data'][] = [
+				'year_id' => $enterprise->year_id,
+				'year' => $enterprise->year,
+				'unit_id' => $enterprise->unit_id,
+				'unit_name' => $enterprise->unit_name,
+				'total_fpounit' => $enterprise->total_fpos,
+				'total_shgunit' => $enterprise->total_wshg
+			];
+		}
+		//heading
+		$data['heading'] = 'Crop Enterprise';
+
+
+		return $this->respond($data);
+	}
 	public function pds2()
 	{
 
@@ -328,62 +388,6 @@ class Dashboard extends ResourceController
 			];
 		}
 		// dd($data);
-		return $this->respond($data);
-	}
-	public function odmapdata()
-	{
-
-		$odmapmodel = new OdMapModel();
-		$odmapdatas = $odmapmodel->getestablishmentmap();
-
-		$data['heading'] = 'Scale of Odisha Millets Mission';
-
-		$data['data'] = [];
-		foreach ($odmapdatas as $mapdata) {
-			$data['data'][] = [
-				'district_id' => $mapdata->district_id,
-				'districts' => $mapdata->districts,
-				'total_blocks' => $mapdata->blocks,
-				'total_gps' => $mapdata->total_gps,
-				'total_villages' => $mapdata->total_villages,
-				'total_farmers' => $mapdata->total_farmers,
-
-			];
-		}
-		// dd($data);
-		return $this->respond($data);
-	}
-	public function enterprises()
-	{
-		$enterprisemodel = new EnterpriseChartModel();
-		$yearModel = new YearModel();
-		$filter = [];
-
-		$filter['year_id'] = $yearModel->getCurrentYearId();
-		if ($this->request->getGet('year_id')) {
-			$data['year_id'] = $this->request->getGet('year_id');
-
-			$filter['year_id'] = $this->request->getGet('year_id');
-			$year_id = $this->request->getGet('year_id');
-		}
-
-		$enterprises = $enterprisemodel->getYearwisedata($filter);
-
-		$data['data'] = [];
-		foreach ($enterprises as $enterprise) {
-			$data['data'][] = [
-				'year_id' => $enterprise->year_id,
-				'year' => $enterprise->year,
-				'unit_id' => $enterprise->unit_id,
-				'unit_name' => $enterprise->unit_name,
-				'total_fpounit' => $enterprise->total_fpos,
-				'total_shgunit' => $enterprise->total_wshg
-			];
-		}
-		//heading
-		$data['heading'] = 'Crop Enterprise';
-
-
 		return $this->respond($data);
 	}
 

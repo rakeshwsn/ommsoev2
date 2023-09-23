@@ -8,13 +8,14 @@
                 </a>
             </div>
         </div>
+        
         <div class="block-content block-content-full">
             <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
-
+           
             <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
-              
+             
                 <?php echo form_open('', ['method' => 'get']); ?>
-            
+               
                 <div class="row">
                     <div class="col-2">
                         <label class="form-label">District</label>
@@ -37,7 +38,7 @@
                     </div>
                     <div class="col-2">
                         <label class="form-label">DOE</label>
-                        <?php echo form_dropdown('year', $years, set_value('year', $year), ['class' => 'form-control mb-3', 'id' => 'years']); ?>
+                        <?php echo form_dropdown('doeyear', $years, set_value('doeyear', $doeyear), ['class' => 'form-control mb-3', 'id' => 'years']); ?>
 
                     </div>
                     <div class="col-4 mt-4">
@@ -160,7 +161,7 @@
                         if (response.years) {
                             var html = '<option value="">Select DOE</option>';
                             $.each(response.years, function(k, v) {
-                                html += '<option value="' + v.id + '">' + v.year + '</option>';
+                                html += '<option value="' + v.year + '">' + v.year + '</option>';
                             });
                             $('#years').html(html);
                         }
