@@ -102,7 +102,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " AND et.period = " . $filter['period'];
     }
     // $sql .=  " GROUP BY unit.units";
-    //echo $sql;exit;
+    // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
  

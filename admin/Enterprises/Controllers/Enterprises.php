@@ -39,8 +39,8 @@ class Enterprises extends AdminController
 		$data['blocks'][0] = 'Select Block';
 		$data['district_id'] = 0;
 		$data['block_id'] = 0;
-		$data['year'] = 0;
-		$data['years'][0] = 'Select DOE';
+		
+		$data['years'][0]= 'Select DOE';
 
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
@@ -53,32 +53,28 @@ class Enterprises extends AdminController
 		}
 		if ($this->request->getGet('district_id')) {
 			$district_id = $this->request->getGet('district_id');
-			$years = $enterprisesmodel->yearWise($district_id);
+			$yeardata = $enterprisesmodel->yearWise($district_id);
 
 			$data['years'][0] = 'Select DOE';
-			foreach ($years as $year) {
-				$data['years'][$year->id] = $year->year;
+			foreach ($yeardata as $year) {
+				$data['doeyear'] = $year->year;
 			}
 		}
-		// dd($data);
+		// dd($data['doeyear']);
 
 		if ($this->request->getGet('block_id')) {
 
 			$data['block_id'] = $this->request->getGet('block_id');
 		}
-		// dd($data['block_id']);
-		$data['management_unit_type'] = 0;
+		$data['management_unit_type'] = 'all';
 		if ($this->request->getGet('management_unit_type')) {
 			$data['management_unit_type'] = $this->request->getGet('management_unit_type');
 		}
-		// dd($data['management_unit_type']);
-	
-		// dd($this->request->getGet('doeyear'));
-		if ($this->request->getGet('year')) {
-			$data['year'] = $this->request->getGet('year');
-		}
-		
 
+		$data['doeyear'] = 0;
+		if ($this->request->getGet('doeyear')) {
+			$data['doeyear'] = $this->request->getGet('doeyear');
+		}
 
 		$filter = [];
 		if ($data['district_id'] > 0) {
@@ -88,11 +84,12 @@ class Enterprises extends AdminController
 		if ($data['block_id'] > 0) {
 			$filter['block_id'] = $data['block_id'];
 		}
-		if ($data['management_unit_type'] > 0) {
+		if ($data['management_unit_type'] != 'all') {
 			$filter['management_unit_type'] = $data['management_unit_type'];
 		}
-		if ($data['year'] > 0) {
-			$filter['YEAR(e.date_estd)'] = $data['year'];
+	
+		if ($data['doeyear'] > 0) {
+			$filter['YEAR(e.date_estd)'] = $data['doeyear'];
 		}
 
 // dd($filter);
@@ -112,7 +109,6 @@ class Enterprises extends AdminController
 				'managing_unit_name' => $row->managing_unit_name,
 				'date_estd' => $row->date_estd,
 				'mou_date' => $row->mou_date,
-				'year' => $row->year,
 				'edit_url' => admin_url('enterprises/edit?id=' . $row->id),
 
 			];

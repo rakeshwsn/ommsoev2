@@ -177,7 +177,7 @@ class EnterprisesModel extends Model
 
   public function getAll($filter = [])
   {
-    $sql =  "SELECT
+    $sql = "SELECT
     e.id,
     e.unit_id,
     e.district_id,
@@ -205,13 +205,13 @@ class EnterprisesModel extends Model
     eu.name unit_name,
     eu.group_unit,
     YEAR(e.date_estd) year
-FROM enterprises e
+    FROM enterprises e
     LEFT JOIN soe_districts sd ON sd.id = e.district_id
     LEFT JOIN soe_blocks sb ON sb.id = e.block_id
     LEFT JOIN villages v ON v.id = e.village_id
     LEFT JOIN grampanchayat gp ON gp.id = e.gp_id
     LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-WHERE e.deleted_at IS NULL AND YEAR(e.date_estd) > 2000 AND e.management_unit_type='shg'";
+   WHERE e.deleted_at IS NULL AND YEAR(e.date_estd) > 2000 ";
 
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -222,8 +222,12 @@ WHERE e.deleted_at IS NULL AND YEAR(e.date_estd) > 2000 AND e.management_unit_ty
     if (isset($filter['unit_id'])) {
       $sql .= " AND e.unit_id = " . $filter['unit_id'];
     }
-    if (isset($filter['year'])) {
-      $sql .= " AND YEAR(e.date_estd) = " . $filter['year'];
+    if (isset($filter["management_unit_type"])) {
+      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+  }
+  
+    if (isset($filter["doeyear"])) {
+      $sql .= " AND YEAR(e.date_estd) = '" . $filter["doeyear"] . "'";
     }
 
     // Add ORDER BY clause if needed
