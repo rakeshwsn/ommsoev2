@@ -123,13 +123,11 @@ class EstablishmentTransaction extends AdminController
     }
     public function edit()
     {
-        $establishmentransaction = new EstablishmentTransactionModel();
-        $id=$this->request->getGet('id');
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
         if ($this->request->getMethod(1) == 'POST') {
-           
-            // $establishmentransaction->where('id', $this->request->getPost('id'))->delete();
-            $enterprisetransdata = [                        
+            $id = $this->request->getGet('id');
+
+            $enterprisetransdata = [
                 'no_of_days_functional' => $this->request->getPost('no_of_days_functional'),
                 'produced' => $this->request->getPost('produced'),
                 'charges_per_qtl' => $this->request->getPost('charges_per_qtl'),
@@ -137,12 +135,16 @@ class EstablishmentTransaction extends AdminController
                 'total_turnover' => $this->request->getPost('total_turnover'),
                 'created_at' => $this->request->getPost('created_at'),
 
-            ];
-            // dd('enterprisetransdata');
-            $establishmenttrasdtl->update($id,$enterprisetransdata);
 
+            ];
+            // dd($id);
+            // printr($enterprisetransdata);
+            // exit;
+
+            $establishmenttrasdtl->update($id, $enterprisetransdata);
             return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'successful');
         }
+
 
         return $this->getForm();
     }
@@ -150,17 +152,13 @@ class EstablishmentTransaction extends AdminController
     {
         helper('form');
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
-        $id=$this->request->getGet('id');
-// dd($id);
-        
-        // $data['enttranses'] = [];
-      
-            $entdata = $establishmenttrasdtl->where('id',$id)->getDataone();
-        // dd($datas);
+        $id = $this->request->getGet('id');
+        // dd($id);
+        if ($id) {
 
-            foreach ($entdata as $value)
-            // dd($datas);
-            {
+            $entdata = $establishmenttrasdtl->periodswisetrans(['id' => $id]);
+            //   dd($entdata);
+            foreach ($entdata as $value) {
                 $data['entranses'] = [
                     'year_id' => $value->year_name,
                     'unit_id' => $value->unit_name,
@@ -178,14 +176,11 @@ class EstablishmentTransaction extends AdminController
                     'total_turnover' => $value->total_turnover ?: 0,
 
                 ];
-                return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction',$data);
-
-                // dd($data['entranses']);
             }
-            // dd($data);
-        
-        // dd($data);
+        }
 
+
+        return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
     }
 
     public function download()
@@ -347,6 +342,10 @@ class EstablishmentTransaction extends AdminController
                 $worksheet->getColumnDimension('I')->setVisible(false);
                 $worksheet->getRowDimension('1')->setVisible(false);
                 $worksheet->getRowDimension('2')->setVisible(false);
+
+                if ($title == "Food Unit") {
+                    $worksheet->getColumnDimension('M')->setVisible(false);
+                }
             }
 
 

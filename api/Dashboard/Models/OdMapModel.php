@@ -43,11 +43,11 @@ class OdMapModel extends Model
 	{
 		$sql = "SELECT
 		ddm.district_id,
-		ddm.blocks blocks,
-		ddm.gps total_gps,
-		ddm.villages total_villages,
+		COALESCE(ddm.blocks,0) blocks,
+		COALESCE(ddm.gps,0 )total_gps,
+		COALESCE(ddm.villages,0) total_villages,
 		sd.name districts,
-		da.total_farmer
+		COALESCE(da.total_farmer,0) total_farmers
 	  FROM dashboard_district_map ddm
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
@@ -57,7 +57,7 @@ class OdMapModel extends Model
 		  FROM dashboard_areacoverage da
 		  WHERE da.deleted_at IS NULL
 		  GROUP BY da.district_id) da
-		  ON da.district_id = ddm.district_id ";
+		  ON da.district_id = ddm.district_id";
 
 		return $this->db->query($sql)->getResult();
 	}
