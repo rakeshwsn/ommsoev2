@@ -6,98 +6,97 @@ use CodeIgniter\Model;
 
 class EnterprisesUnitModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'enterprises_units';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
+    protected $DBGroup              = 'default';
+    protected $table                = 'enterprises_units';
+    protected $primaryKey           = 'id';
+    protected $useAutoIncrement     = true;
+    protected $insertID             = 0;
+    protected $returnType           = 'object';
     protected $useSoftDeletes        = true;
     protected $protectFields        = false;
-//	protected $allowedFields        = [];
+    //	protected $allowedFields        = [];
 
-	// Dates
-	protected $useTimestamps        = true;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+    // Dates
+    protected $useTimestamps        = true;
+    protected $dateFormat           = 'datetime';
+    protected $createdField         = 'created_at';
+    protected $updatedField         = 'updated_at';
+    protected $deletedField         = 'deleted_at';
 
-	// Validation
+    // Validation
     protected $validationRules      = [
         'name' => array(
             'label' => 'Name',
             'rules' => 'trim|required|max_length[100]'
         ),
     ];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
-	protected $cleanValidationRules = true;
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
 
-	// Callbacks
-	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = [];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = [];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+    // Callbacks
+    protected $allowCallbacks       = true;
+    protected $beforeInsert         = [];
+    protected $afterInsert          = [];
+    protected $beforeUpdate         = [];
+    protected $afterUpdate          = [];
+    protected $beforeFind           = [];
+    protected $afterFind            = [];
+    protected $beforeDelete         = [];
+    protected $afterDelete          = [];
 
-    public function getAll($data = array()){
-        //printr($data);
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getAll($data = array())
+    {
+        $builder = $this->db->table("{$this->table} eu");
+        $builder->join('enterprises e', 'eu.id=e.unit_id', 'left');
 
-        $builder->select("*");
+        $this->filter($builder, $data);
 
-        if (isset($data['sort']) && $data['sort']) {
-            $sort = $data['sort'];
-        } else {
-            $sort = "name";
-        }
+        $builder->select("eu.id,
+                        eu.name,
+                        eu.sort_order,
+                        eu.group_unit,
+                        eu.deleted_at,
+                        COUNT(e.unit_id) as total_ent");
 
-        if (isset($data['order']) && ($data['order'] == 'desc')) {
-            $order = "desc";
-        } else {
-            $order = "asc";
-        }
+        // Set the sorting order
+        $sort = isset($data['sort']) && $data['sort'] ? $data['sort'] : 'eu.name';
+        $order = isset($data['order']) && $data['order'] === 'desc' ? 'desc' : 'asc';
         $builder->orderBy($sort, $order);
 
+        // Set limit and offset if provided
         if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
-            }
-
-            if ($data['limit'] < 1) {
-                $data['limit'] = 10;
-            }
-            $builder->limit((int)$data['limit'],(int)$data['start']);
+            $start = isset($data['start']) && $data['start'] >= 0 ? (int)$data['start'] : 0;
+            $limit = isset($data['limit']) && $data['limit'] >= 1 ? (int)$data['limit'] : 15;
+            $builder->limit($limit, $start);
         }
-        $builder->where($this->deletedField, null);
 
+        $builder->where("eu.{$this->deletedField} IS NULL");
+
+        $builder->groupBy('e.unit_id');
+
+        // $query = $builder->getCompiledSelect();
+        // echo $query; exit;
         $res = $builder->get()->getResult();
-
         return $res;
     }
 
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getTotal($data = array())
+    {
+        $builder = $this->db->table("{$this->table} eu");
+        $this->filter($builder, $data);
         $count = $builder->countAllResults();
         return $count;
     }
 
-    private function filter($builder,$data){
+    private function filter($builder, $data)
+    {
 
         if (!empty($data['filter_search'])) {
-            $builder->where("
+            $builder->where(
+                "
 				name LIKE '%{$data['filter_search']}%'"
             );
         }
     }
-   
-   
-  
 }

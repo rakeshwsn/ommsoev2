@@ -43,7 +43,7 @@ class DistrictMap extends AdminController
 			];
 		}
 		$maplist = $DistrictMapModel->getAll($filter);
-		
+		// dd($maplist);
 		$data['maps'] = [];
 
 		foreach($maplist as $row){

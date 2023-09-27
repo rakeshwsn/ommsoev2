@@ -211,7 +211,7 @@ class EnterprisesModel extends Model
     LEFT JOIN villages v ON v.id = e.village_id
     LEFT JOIN grampanchayat gp ON gp.id = e.gp_id
     LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-   WHERE e.deleted_at IS NULL AND YEAR(e.date_estd) > 2000 ";
+   WHERE e.deleted_at IS NULL";
 
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -222,16 +222,12 @@ class EnterprisesModel extends Model
     if (isset($filter['unit_id'])) {
       $sql .= " AND e.unit_id = " . $filter['unit_id'];
     }
+    if (isset($filter['doeyear'])) {
+      $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
+    }
     if (isset($filter["management_unit_type"])) {
       $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
-  }
-  
-    if (isset($filter["doeyear"])) {
-      $sql .= " AND YEAR(e.date_estd) = '" . $filter["doeyear"] . "'";
     }
-
-    // Add ORDER BY clause if needed
-
 
     // printr($sql);
     // exit;

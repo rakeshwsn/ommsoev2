@@ -3,8 +3,8 @@
     <div class="col-4">
         <div class="block">
             <div class="block-header block-header-default"> Enterprises</div>
-            <div class="content">               
-                    <?= $form ?>
+            <div class="content">
+                <?= $form ?>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                            
+
                     </tbody>
                 </table>
             </div>
@@ -36,25 +36,25 @@
 
 <?php js_start(); ?>
 <script type="text/javascript">
-    $(function(){
+    $(function() {
+
         $('#datatable').DataTable({
             "processing": true,
             "serverSide": true,
-            "columnDefs": [
-                { targets: 'no-sort', orderable: false }
-            ],
-            "ajax":{
-                url :"<?=$datatable_url?>", // json datasource
-                type: "post",  // method  , by default get
-                error: function(){  // error handling
+
+            "paging": true,
+            "pageLength": 10,
+            "ajax": {
+                url: "<?= $datatable_url ?>", // json datasource
+                type: "post", // method  , by default get
+                error: function() { // error handling
                     $(".datatable_error").html("");
                     $("#datatable").append('<tbody class="datatable_error"><tr><th colspan="7">No data found.</th></tr></tbody>');
-                    $("#datatable_processing").css("display","none");
+                    $("#datatable_processing").css("display", "none");
                 },
-                dataType:'json'
+                dataType: 'json'
             },
         });
     });
-
-    </script>
+</script>
 <?php js_end(); ?>

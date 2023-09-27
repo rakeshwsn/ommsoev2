@@ -83,4 +83,5 @@ class AreaChartModel extends Model
 	  GROUP BY da.district_id";
 		return $this->db->query($sql)->getResult();
 	}
+	
 }

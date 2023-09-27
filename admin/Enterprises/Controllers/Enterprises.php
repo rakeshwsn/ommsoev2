@@ -23,7 +23,7 @@ class Enterprises extends AdminController
 	public function index()
 	{
 		$this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
-
+		$this->template->set('header',true);
 		helper('form');
 		$enterprisesmodel = new EnterprisesModel();
 		$distModel = new DistrictModel();
@@ -40,7 +40,7 @@ class Enterprises extends AdminController
 		$data['district_id'] = 0;
 		$data['block_id'] = 0;
 		
-		$data['years'][0]= 'Select DOE';
+		$data['years'][0] = 'Select DOE';
 
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
@@ -57,16 +57,17 @@ class Enterprises extends AdminController
 
 			$data['years'][0] = 'Select DOE';
 			foreach ($yeardata as $year) {
-				$data['doeyear'] = $year->year;
+				$data['years'][] = $year->year;
 			}
 		}
-		// dd($data['doeyear']);
+		
+		//  printr($data['years']); exit;
 
 		if ($this->request->getGet('block_id')) {
 
 			$data['block_id'] = $this->request->getGet('block_id');
 		}
-		$data['management_unit_type'] = 'all';
+		$data['management_unit_type'] = '';
 		if ($this->request->getGet('management_unit_type')) {
 			$data['management_unit_type'] = $this->request->getGet('management_unit_type');
 		}
@@ -84,15 +85,14 @@ class Enterprises extends AdminController
 		if ($data['block_id'] > 0) {
 			$filter['block_id'] = $data['block_id'];
 		}
-		if ($data['management_unit_type'] != 'all') {
+		if ($data['management_unit_type'] != '') {
 			$filter['management_unit_type'] = $data['management_unit_type'];
 		}
-	
 		if ($data['doeyear'] > 0) {
-			$filter['YEAR(e.date_estd)'] = $data['doeyear'];
+			$filter['doeyear'] = $data['doeyear'];
 		}
-
-// dd($filter);
+		// dd($filter);
+		// printr($data);exit;
 		$enterpriseslist = $enterprisesmodel->getAll($filter);
 		
 		// dd($enterpriseslist);
@@ -117,8 +117,9 @@ class Enterprises extends AdminController
 
 		$data['excel_link'] = admin_url('enterprises/exceldownld');
 
-		// printr($enterpriseslist);
+		// printr($data);
 		// exit;
+			// dd($data);
 		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
 	}
 
