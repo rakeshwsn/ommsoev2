@@ -24,7 +24,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                     <label for="district_id">District</label>
-                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' =>'districts']); ?>
+                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('managing_unit_name') ? 'is-invalid' : '' ?>">
@@ -36,7 +36,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                     <label for="block_id">Block</label>
-                    <?php echo form_dropdown('block_id', $blocks,set_value('block_id', $block_id), ['class' =>'form-control mb-3', 'id' =>'blocks']); ?>
+                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), ['class' => 'form-control mb-3', 'id' => 'blocks']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
 
                 </div>
@@ -50,13 +50,13 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
                     <label for="gp_id">GP</label>
-                    <?php echo form_dropdown('gp_id', $gps, set_value('gp_id', $gp_id), ['class' => 'form-control mb-3', 'id' =>'gps']); ?>
+                    <?php echo form_dropdown('gp_id', $gps, set_value('gp_id', $gp_id), ['class' => 'form-control mb-3', 'id' => 'gps']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('gp_id'); ?></div>
 
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('contact_mobile') ? 'is-invalid' : '' ?>">
                     <label for="Contact Mobile">Contact Mobile</label>
-                    <input type="text" name="contact_mobile" class="form-control" id="exampleInputPassword1" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>">
+                    <input type="text" name="contact_mobile" class="form-control" id="contact_mobile" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_mobile'); ?></div>
 
                 </div>
@@ -64,7 +64,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                     <label for="village">Village</label>
-                    <?php echo form_dropdown('village_id', $villages, set_value('village_id', $village_id), ['class' => 'form-control mb-3', 'id' =>'villages']); ?>
+                    <?php echo form_dropdown('village_id', $villages, set_value('village_id', $village_id), ['class' => 'form-control mb-3', 'id' => 'villages']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('village_id'); ?></div>
 
                 </div>
@@ -108,7 +108,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
                     <label for="management_unit">Is basic infrastructure support required?</label>
-                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' =>'is_support_basis_infr']); ?>
+                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' => 'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
                 </div>
             </div>
@@ -137,10 +137,11 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Submit</button>         
+                    <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                     <a href="admin/enterprises/cancel" class="btn btn-primary">Cancel</a>
                 </div>
             </div>
+
         </div>
 
     </form>
@@ -198,7 +199,7 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                      console.log(response);
+                    console.log(response);
                     if (response.gps) {
                         html = '<option value="">Select Gp</option>';
                         $.each(response.gps, function(k, v) {
@@ -256,15 +257,82 @@ $validation = \Config\Services::validation();
         });
 
         //hide show addl budget
-        $('#is_support_basis_infr').on('change',function(){
-            $is_support_basis_infr=$(this).val();
-            if($is_support_basis_infr == 'no'){
+        $('#is_support_basis_infr').on('change', function() {
+            $is_support_basis_infr = $(this).val();
+            if ($is_support_basis_infr == 'no') {
                 $('#budget_utilize').hide();
-            }
-            else{
+            } else {
                 $('#budget_utilize').show();
             }
         })
         $('#is_support_basis_infr').trigger('change');
+
+
+    });
+
+
+    $(document).ready(function() {
+        $('#submit').on('click', function() {
+            var managing_unit_name = document.getElementById("managing_unit_name");
+            var alpha = /^[a-zA-Z,\s]+$/;
+
+            if (managing_unit_name.value.length > 20 || !alpha.test(managing_unit_name.value)) {
+                alert('Managing unit name: Only letters allowed, maximum length is 20 characters');
+                return false; // Prevent form submission
+            }
+
+            var contact_person = document.getElementById("contact_person");
+
+            if (contact_person.value.length > 20 || !alpha.test(contact_person.value)) {
+                alert('Contact name: Only letters allowed, maximum length is 20 characters');
+                return false; // Prevent form submission
+            }
+            var purpose_infr_support = document.getElementById("purpose_infr_support");
+
+            if (purpose_infr_support.value.length > 20 || !alpha.test(purpose_infr_support.value)) {
+                alert('Purpose_infr_support: Only letters allowed, maximum length is 20 characters');
+                return false; // Prevent form submission
+            }
+
+            // Allow form submission
+            var unit_budget = document.getElementById("unit_budget");
+            var decimalPattern = /^\d{1,5}(\.\d{1,2})?$/;
+
+            if (!decimalPattern.test(unit_budget.value)) {
+                alert('Please enter a decimal number with up to 5 digits before the decimal point and up to 2 digits after the decimal point');
+                return false; // Prevent form submission
+            }
+            var addl_budget = document.getElementById("addl_budget");
+
+
+            if (!decimalPattern.test(addl_budget.value)) {
+                alert('Please enter a decimal number with up to 5 digits before the decimal point and up to 2 digits after the decimal point');
+                return false; // Prevent form submission
+            }
+            var contact_mobile = document.getElementById("contact_mobile");
+            var contact = /^[789]\d{9}$/;
+
+            if (!contact.test(contact_mobile.value)) {
+                alert('Please enter a valid  mobile number');
+                return false; // Prevent form submission
+            }
+            var unit_budget_amount = document.getElementById("unit_budget_amount");
+            var rupeesPattern = /^(?:\d{1,7}|\d{0,7}\.\d{1,2})$/;
+
+            if (!rupeesPattern.test(unit_budget_amount.value)) {
+                alert('Please enter a valid budget amount in  Rupees');
+                return false; // Prevent form submission
+            }
+            var support_infr_amount = document.getElementById("support_infr_amount");
+            var amount = /^(?:\d{1,7}|\d{0,7}\.\d{1,2})$/;
+
+            if (!amount.test(support_infr_amount.value)) {
+                alert('Please enter a valid budget amount in  Rupees');
+                return false; // Prevent form submission
+            }
+
+
+            return true;
+        });
     });
 </script>

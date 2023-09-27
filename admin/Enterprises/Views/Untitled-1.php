@@ -37,18 +37,20 @@
                         </select>
                     </div>
 
-
-
+                 
+                    
+                    <div class="col-2">
+                        <label class="form-label">DOE</label>
+                        <?php echo form_dropdown('doeyear', $years, set_value('doeyear', ''), ['class' => 'form-control mb-3', 'id' => 'years']); ?>
+                    </div>
 
                     <div class="col-2">
                         <label class="form-label">DOE</label>
-                        <select name="doeyear" class="form-control mb-3" id="years">
-                            <?php foreach ($years as $yearvalue) : ?>
-                                <?php $selected = ($doeyear == $yearvalue) ? 'selected' : ''; ?>
-                                <option value="<?= $yearvalue ?>" <?= $selected ?>><?= $yearvalue ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <select class="form-control" name="years" id="years">
+                            <option value="all">select doe</option>
+                           
 
+                        </select>
                     </div>
                     <div class="col-4 mt-4">
                         <button class="btn btn-primary">Submit</button>
@@ -186,7 +188,7 @@
             });
         });
 
-
+       
 
     })
 </script>
