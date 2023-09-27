@@ -3,6 +3,7 @@
 namespace Api\Dashboard\Controllers;
 
 use Api\Dashboard\Models\AreaChartModel;
+use Api\Dashboard\Models\DashboardChartModel;
 use Api\Dashboard\Models\DistrictMapModel;
 use Api\Dashboard\Models\EstablishmentChartModel;
 use Api\Dashboard\Models\PdsChartModel;
@@ -33,7 +34,7 @@ class Dashboard extends ResourceController
 	{
 
 		$districtmodel = new DistrictModel();
-		$areamodel = new AreaChartModel();
+		$areamodel = new DashboardChartModel();
 		$filter = [];
 		$district_id = 0;
 		if ($this->request->getGet('district_id')) {
@@ -94,8 +95,9 @@ class Dashboard extends ResourceController
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
 		}
-
-		return $this->respond(json_encode($data, JSON_NUMERIC_CHECK));
+		//return $this->respond($data);
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+		exit;
 	}
 
 	public function pds()
@@ -109,7 +111,7 @@ class Dashboard extends ResourceController
 		$data['card_holders_benefited'] = [];
 
 		foreach ($pdses as $pds) {
-			$data['pdsyear'][] = (int)$pds->year;
+			$data['pdsyear'][] = $pds->year;
 			$data['pdsquantity'][] = (int)$pds->total_quantity;
 			$data['card_holders_benefited'][] = (int)$pds->total_chb;
 		}
@@ -192,7 +194,8 @@ class Dashboard extends ResourceController
 		//generate table
 		$data['table'] = view('Api\Dashboard\Views\dashboardTable', $data);
 
-		return $this->respond(json_encode($data, JSON_NUMERIC_CHECK));
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+		exit;
 	}
 
 	public function districtarea()

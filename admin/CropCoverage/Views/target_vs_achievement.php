@@ -136,11 +136,11 @@
         },
         series: [
             {
-                name: 'Millet Target',
+                name: 'Area Target(In Hect)',
                 data: []
             },
             {
-                name: 'Millet Achievement',
+                name: 'Area Achievement(In Hect)',
                 data: []
             }
         ]
@@ -194,7 +194,7 @@
         },
         series: [
             {
-                name: 'Block Target(In Hect)',
+                name: 'Area Target(In Hect)',
                 data: [], // Replace this value with the millet target for the one district
                 color: 'rgba(165,170,217,1)',
                 borderRadius: 3,
@@ -202,7 +202,7 @@
                 borderWidth: 0
             },
             {
-                name: 'Block Achievement(In Hect)',
+                name: 'Area Achievement(In Hect)',
                 data: [], // Replace this value with the millet achievement for the one district
                 color: 'rgba(126,86,134,.9)',
                 borderRadius: 3,

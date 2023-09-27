@@ -60,7 +60,7 @@ class PdsChartModel extends Model
 	 
 	  $sql .= " GROUP BY p.distributed_year_id
 	  ORDER BY y.start_date";
-		
+		// printr($sql);exit;
 		return $this->db->query($sql)->getResult();
 	}
 }
