@@ -304,7 +304,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'Districtwise current year farmers vs acheivements',
+            text: ' Crop Demonstration for Kharif 2023-24 under Odisha Millets Mission',
             align: 'center'
         },
 
