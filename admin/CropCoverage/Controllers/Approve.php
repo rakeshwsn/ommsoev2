@@ -17,6 +17,9 @@ class Approve extends AdminController
     private $districtModel;
     private $cropsModel;
     private $practicesModel;
+    private $acModel;
+
+
 
     function __construct()
     {
@@ -25,7 +28,7 @@ class Approve extends AdminController
         $this->districtModel = new DistrictModel();
         $this->cropsModel = new CropsModel;
         $this->practicesModel = new PracticesModel;
-        $this->areacoveragemodel = new AreaCoverageModel();
+        $this->acModel = new AreaCoverageModel();
     }
 
     public function index()
@@ -72,9 +75,9 @@ class Approve extends AdminController
             $data['district_id'] = $district_id = $this->user->district_id;
         }
         $data['currentDay'] = date('l');
-        // $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday',));
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday', ));
 
-        $week_dates = $this->areacoveragemodel->getWeekDate();
+        $week_dates = $this->acModel->getWeekDate();
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
@@ -82,14 +85,14 @@ class Approve extends AdminController
             $data['start_date'] = $start_date = $week_dates['start_date'];
         }
 
-        $acModel = new AreaCoverageModel();
+
         //update status
         if ($this->request->getMethod(1) == 'POST') {
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
-            $acModel->where('district_id', $district_id)
+            $this->acModel->where('district_id', $district_id)
                 ->where('start_date', $start_date)->set($status)->update();
             return redirect()->to(admin_url('areacoverage/approve/district?district_id=' . $district_id . '&start_date=' . $start_date))
                 ->with('message', 'Status has been updated.');
@@ -102,7 +105,7 @@ class Approve extends AdminController
             'start_date' => $data['start_date']
         ];
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        $blocks = $this->acModel->getAreaCoverage($filter);
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
@@ -201,7 +204,7 @@ class Approve extends AdminController
             'action' => ''
         ];
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
@@ -209,7 +212,7 @@ class Approve extends AdminController
             $data['crops'][$crop->id] = $crop->crops;
         }
 
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = '';
@@ -237,7 +240,7 @@ class Approve extends AdminController
             }
         }
 
-        $district_status = $acModel->where('district_id', $district_id)
+        $district_status = $this->acModel->where('district_id', $district_id)
             ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
@@ -268,7 +271,7 @@ class Approve extends AdminController
 
         $start_date = $this->request->getGet('start_date');
 
-        $dates = $this->areacoveragemodel->getWeekDate($start_date);
+        $dates = $this->acModel->getWeekDate($start_date);
         $data['currentDay'] = date('l');
         $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
 
@@ -279,20 +282,20 @@ class Approve extends AdminController
             ];
             $status = (int) $this->request->getPost('status');
             $remarks = $this->request->getPost('remarks');
-            $this->areacoveragemodel->setStatus($filter, $status, $remarks);
+            $this->acModel->setStatus($filter, $status, $remarks);
 
             $this->session->setFlashdata('message', 'The area coverage data has been approved');
             return redirect()->to(admin_url('areacoverage/approve'));
         }
 
-        $acModel = new AreaCoverageModel();
+
         //update status
         if ($this->request->getMethod(1) == 'POST') {
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
-            $acModel->where('block_id', $block_id)
+            $this->acModel->where('block_id', $block_id)
                 ->where('start_date', $start_date)->set($status)->update();
             return redirect()->to(admin_url('areacoverage/approve/block?block_id=' . $block_id . '&start_date=' . $start_date))
                 ->with('message', 'Status has been updated.');
@@ -303,7 +306,7 @@ class Approve extends AdminController
             'start_date' => $dates['start_date']
         ];
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        $blocks = $this->acModel->getAreaCoverage($filter);
 
         $data['from_date'] = $dates['start_date'];
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
@@ -406,7 +409,7 @@ class Approve extends AdminController
             'action' => ''
         ];
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
@@ -432,7 +435,7 @@ class Approve extends AdminController
         }
         $data['block_id'] = $block_id;
 
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = $start_date;
@@ -445,7 +448,7 @@ class Approve extends AdminController
 
         $data['week_start_date'] = $week_start_date;
 
-        $district_status = $acModel->where('block_id', $block_id)
+        $district_status = $this->acModel->where('block_id', $block_id)
             ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
@@ -486,6 +489,7 @@ class Approve extends AdminController
 
     public function state()
     {
+
         $this->template->set_meta_title(lang('Approve.heading_title'));
 
         $data['breadcrumbs'] = array();
@@ -498,13 +502,13 @@ class Approve extends AdminController
 
         $data['heading_title'] = lang('Area Coverage Approval');
 
-        $data['text_list'] = lang('Approve.text_list');
-        $data['text_no_results'] = lang('Approve.text_no_results');
-        $data['text_confirm'] = lang('Approve.text_confirm');
+        // $data['text_list'] = lang('Approve.text_list');
+        // $data['text_no_results'] = lang('Approve.text_no_results');
+        // $data['text_confirm'] = lang('Approve.text_confirm');
 
-        $data['button_add'] = lang('Add Target');
-        $data['button_edit'] = lang('Edit Target');
-        $data['button_delete'] = lang('Approve.button_delete');
+        // $data['button_add'] = lang('Add Target');
+        // $data['button_edit'] = lang('Edit Target');
+        // $data['button_delete'] = lang('Approve.button_delete');
 
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
@@ -519,10 +523,10 @@ class Approve extends AdminController
         $weekDate = $this->areacoveragemodel->getWeekDate();
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $this->request->getGet('start_date');
-        } else if($weekDate) {
+        } else if ($weekDate) {
             $data['start_date'] = $weekDate['start_date'];
         } else {
-            $data['start_date'] = '';
+            $data['start_date'] = $this->acModel->getWeekDate()['start_date'];
         }
 
         $filter = [
@@ -531,7 +535,9 @@ class Approve extends AdminController
             'start_date' => $data['start_date']
         ];
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        $blocks = $this->acModel->getAreaCoverage($filter);
+        // printr($blocks);
+        // exit;
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
@@ -637,14 +643,14 @@ class Approve extends AdminController
             'action' => ''
         ];
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
         foreach ($crops as $crop) {
             $data['crops'][$crop->id] = $crop->crops;
         }
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = '';
@@ -671,7 +677,7 @@ class Approve extends AdminController
         $district_id = $this->request->getPost('district_id');
         $start_date = $this->request->getPost('start_date');
 
-        $updated = (new AreaCoverageModel())->where('district_id', $district_id)
+        $updated = $this->acModel->where('district_id', $district_id)
             ->where('start_date', $start_date)->set(['status' => 2])->update();
         $redirect = '';
         $status = false;
