@@ -320,6 +320,7 @@ FROM soe_districts sd
     public function getByDistrictNew($filter = [])
     {
         $sql = "SELECT
+  m.district,
   m.block_id,
   m.block,
   total_gps,
@@ -339,6 +340,7 @@ FROM soe_districts sd
   m.barnyard_ls,
   m.pearl_ls
 FROM (SELECT
+    d.name district,
     vbg.block_id,
     vbg.block,
     vbg.gps total_gps,
@@ -373,7 +375,7 @@ FROM (SELECT
             $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
         }
         $sql .= " ) vbw 
-      ON vbw.block_id = vbg.block_id";
+      ON vbw.block_id = vbg.block_id LEFT JOIN soe_districts d ON d.id=vbw.district_id";
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE vbg.district_id = " . $filter['district_id'];
         }
@@ -423,7 +425,7 @@ FROM (SELECT
       FROM nur n2
       WHERE n2.block_id = n1.block_id)) nur
     ON nur.block_id = m.block_id
-ORDER BY m.block";
+ORDER BY district,m.block";
 
         return $this->db->query($sql)->getResult();
     }
