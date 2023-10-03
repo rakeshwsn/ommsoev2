@@ -835,7 +835,7 @@ class AreaCoverage extends AdminController
         // exit;
 
 
-        $blockstatuses = $this->areaCoverageModel->getBlockWiseStatus($filter);
+        $blockstatuses = $this->acModel->getBlockWiseStatus($filter);
 
 
         $data['blockstatuses'] = [];
