@@ -9,6 +9,7 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->get('pds_c', 'Dashboard\Controllers\Dashboard::pds');
     $routes->get('establishment', 'Dashboard\Controllers\Dashboard::establishment');
     $routes->get('enterprises2', 'Dashboard\Controllers\Dashboard::enterprise');
+    $routes->get('currentyear', 'Dashboard\Controllers\Dashboard::currentyearchart');
 
     //api
     $routes->get('areacoverage', 'Dashboard\Controllers\Dashboard::areacoverage');

@@ -3,6 +3,7 @@
 namespace Api\Dashboard\Controllers;
 
 use Api\Dashboard\Models\AreaChartModel;
+use Api\Dashboard\Models\CurrentYearChartModel;
 use Api\Dashboard\Models\DashboardChartModel;
 use Api\Dashboard\Models\DistrictMapModel;
 use Api\Dashboard\Models\EstablishmentChartModel;
@@ -414,6 +415,26 @@ class Dashboard extends ResourceController
 		$data['heading'] = 'Summary Data';
 
 
+		return $this->respond($data);
+	}
+	public function currentyearchart()
+	{
+
+		$districtmodel = new DistrictModel();
+		$currentyeardata = new CurrentYearChartModel();
+
+		$crntyrdatas = $currentyeardata->getcurrentyeardata();
+		
+		$data['currentdistrict'] = [];
+		$data['currentfarmers'] = [];
+		$data['currentachievements'] = [];
+
+		foreach ($crntyrdatas as $crntyrdata) {
+			$data['currentdistrict'][] = $crntyrdata->districts;
+			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
+			$data['currentachievements'][] = (float)$crntyrdata->achievement;
+		}
+		
 		return $this->respond($data);
 	}
 }

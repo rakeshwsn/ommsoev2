@@ -56,7 +56,7 @@ class DistrictMapModel extends Model
         ddm.tentative_farmers,
         sd.name district,
         ddm.created_at,
-        sy.name year
+        sy.name year,ddm.acheivement
       FROM dashboard_district_map ddm
         LEFT JOIN dashboard_years sy
           ON ddm.year_id = sy.id
@@ -68,6 +68,7 @@ class DistrictMapModel extends Model
 			$sql .= " AND ddm.year_id = " . $filter['year_id'];
 		}
 		$sql .=  " GROUP BY ddm.year_id ORDER BY sd.name";
+		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
 
@@ -86,7 +87,7 @@ class DistrictMapModel extends Model
         ddm.villages,
         ddm.tentative_farmers,
         ddm.created_at,
-        sy.name year
+        sy.name year,ddm.acheivement
       FROM dashboard_district_map ddm
         LEFT JOIN dashboard_years sy
           ON ddm.year_id = sy.id
