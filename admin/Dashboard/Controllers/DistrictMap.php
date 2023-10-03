@@ -74,6 +74,7 @@ class DistrictMap extends AdminController
 					'tentative_farmers' => $values['tentative_farmers'],
 					'chcs' => $values['chcs'],
 					'cmscs' => $values['cmscs'],
+					'acheivement' => $values['acheivement'],
 				];
 			}
 			$DistrictMapModel->insertBatch($mapdata);
@@ -103,7 +104,8 @@ class DistrictMap extends AdminController
                     'villages' => $values['villages'],
                     'tentative_farmers' => $values['tentative_farmers'],
 					'chcs' => $values['chcs'],
-					'cmscs' => $values['cmscs']
+					'cmscs' => $values['cmscs'],
+					'acheivement' => $values['acheivement'],
 
 				];
 			}
@@ -160,7 +162,8 @@ class DistrictMap extends AdminController
 					'villages' => $district->villages ?: 0,
                     'tentative_farmers' => $district->tentative_farmers ?:0,
 					'chcs' => $district->chcs ?:0,
-					'cmscs' => $district->cmscs ?:0
+					'cmscs' => $district->cmscs ?:0,
+					'acheivement' => $district->acheivement ?:0
 
 				]; 	
 			}
@@ -178,7 +181,8 @@ class DistrictMap extends AdminController
                     'villages' => '',
                     'tentative_farmers' => '',
 					'chcs' => '',
-					'cmscs' => ''
+					'cmscs' => '',
+					'acheivement' => ''
 
 				];
 			}

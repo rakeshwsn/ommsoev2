@@ -42,7 +42,8 @@ class Dashboard extends BaseController
 		$data['establish_url'] = site_url('api/establishment');
 		$data['enterprise_url'] = site_url('api/enterprises2');
 		$data['odishamap_url'] = site_url('api/odmapdata');
-		
+		$data['currentyr_url'] = site_url('api/currentyear');
+
 		$this->template->set_layout('default');
 		$this->template->set('header',false);
 		$this->template->set('home',false);

@@ -45,7 +45,7 @@ class Dashboard extends AdminController
 		$data['establish_url'] = site_url('api/establishment');
 		$data['enterprise_url'] = site_url('api/enterprises');
 		$data['odishamap_url'] = site_url('api/odishamap');
-
+		$data['currentyr_url'] = site_url('api/currentyear');
 		return $this->template->view('Admin\Dashboard\Views\dashboardChart', $data);
 	}
 }

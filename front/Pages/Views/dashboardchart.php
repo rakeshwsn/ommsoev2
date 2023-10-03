@@ -148,7 +148,15 @@
     }
 </style>
 
+<div class="row">
+    <div class="col-12">
 
+        <div id="currentchart">
+            <figure class="highcharts-figure">
+            </figure>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-6">
         <div class="row">
@@ -264,7 +272,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                     </table>
                     <!-- </div> -->
@@ -291,6 +299,73 @@
 
 <script>
     //AREACOVERAGE START
+    var crntchart = {
+        districtwiseChart: {
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Districtwise current year farmers vs acheivements',
+            align: 'center'
+        },
+
+        xAxis: [{
+            categories: [],
+            crosshair: true
+        }],
+        yAxis: [{ // Primary yAxis
+            labels: {
+                format: '',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            title: {
+                text: 'Values',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            }
+        }, { // Secondary yAxis
+            title: {
+                text: 'Values ',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+
+            opposite: true
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            align: 'left',
+            x: 80,
+            verticalAlign: 'top',
+            y: 60,
+            floating: true,
+            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || // theme
+                'rgba(255,255,255,0.25)'
+        },
+        series: [{
+            name: 'No. of Farmer',
+            type: 'column',
+            yAxis: 1,
+            data: [],
+            tooltip: {
+                valueSuffix: ' '
+            }
+
+        }, {
+            name: 'Area Achievement (in hectare)',
+            type: 'spline',
+            data: [],
+            tooltip: {
+                valueSuffix: ''
+            }
+        }]
+    }
+    var districtwiseChart = Highcharts.chart('currentchart', crntchart);
 
     var areachartOptions = {
         areachart: {
@@ -601,58 +676,7 @@
     var chart = Highcharts.chart('container', chartOptions);
 
     //ENTERPRISE START
-    // var chartOptions = {
 
-    //     chart: {
-    //         type: 'column'
-    //     },
-
-    //     title: {
-    //         text: 'Progress on Millet based Enterprise Establishment ',
-
-    //         align: 'center'
-    //     },
-
-    //     xAxis: {
-    //         categories: []
-    //     },
-    //     tooltip: {
-    //         crosshairs: true,
-    //         shared: true
-    //     },
-
-    //     yAxis: {
-    //         allowDecimals: false,
-    //         min: 0,
-    //         title: {
-    //             text: 'Total Units '
-    //         }
-    //     },
-
-    //     tooltip: {
-    //         format: '<b>{key}</b><br/>{series.name}: {y}<br/>' +
-    //             'Total: {point.stackTotal}'
-    //     },
-
-    //     plotOptions: {
-    //         column: {
-    //             stacking: 'normal'
-    //         }
-    //     },
-
-    //     series: [{
-    //         name: ' SHG',
-    //         data: [],
-    //         color: '#085c19',
-    //         stack: 'North America'
-    //     }, {
-    //         name: 'FPO',
-    //         data: [],
-    //         color: '#26d128',
-    //         stack: 'North America'
-    //     }]
-    // };
-    // var chart = Highcharts.chart('container', chartOptions);
     // ENTERPRISE END
 
     $(function() {
@@ -772,6 +796,22 @@
 
 
     });
+    $.ajax({
+        url: '<?= $currentyr_url ?>',
+        data: {
+
+        },
+        type: 'GET',
+        dataType: 'JSON',
+        success: function(response) {
+            districtwiseChart.xAxis[0].setCategories(response.currentdistrict);
+            districtwiseChart.series[0].setData(response.currentfarmers);
+            districtwiseChart.series[1].setData(response.currentachievements);
+
+        }
+
+
+    });
 
 
     window.onload = function() {
@@ -796,7 +836,7 @@
 
                     // Now you can manipulate the SVG elements as needed
                     // For example, let's change the color of a path element to red
-                   
+
                     console.log(mapinfo);
                     const district = map.selectAll(".dist");
 
@@ -858,16 +898,16 @@
 
     };
 
-    function loadMapTable(data){
-        html='';
+    function loadMapTable(data) {
+        html = '';
         data.forEach(function(obj) {
-            html +='<tr data-dist="'+obj.district_id+'">';
-            html +='<td>'+obj.districts+'</td>';
-            html +='<td>'+obj.total_blocks+'</td>';
-            html +='<td>'+obj.total_gps+'</td>';
-            html +='<td>'+obj.total_villages+'</td>';
-            html +='<td>'+obj.total_farmers+'</td>';
-            html +='</tr>';
+            html += '<tr data-dist="' + obj.district_id + '">';
+            html += '<td>' + obj.districts + '</td>';
+            html += '<td>' + obj.total_blocks + '</td>';
+            html += '<td>' + obj.total_gps + '</td>';
+            html += '<td>' + obj.total_villages + '</td>';
+            html += '<td>' + obj.total_farmers + '</td>';
+            html += '</tr>';
         });
         $(".maptable tbody").html(html);
     }
