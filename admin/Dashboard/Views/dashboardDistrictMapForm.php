@@ -36,6 +36,7 @@
                                     <th>Framers</th>
                                     <th>CHC</th>
                                     <th>CMSC</th>
+                                    <th>Acheivement</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -50,6 +51,7 @@
                                     <td><input type="text" name="district[<?=$district['id']?>][tentative_farmers]" class="form-control" value="<?=$district['tentative_farmers']?>" ></td>
                                     <td><input type="text" name="district[<?=$district['id']?>][chcs]" class="form-control" value="<?=$district['chcs']?>" ></td>
                                     <td><input type="text" name="district[<?=$district['id']?>][cmscs]" class="form-control" value="<?=$district['cmscs']?>" ></td>
+                                    <td><input type="text" name="district[<?=$district['id']?>][acheivement]" class="form-control" value="<?=$district['acheivement']?>" ></td>
 
                                 </tr>
                                 <?php } ?>
