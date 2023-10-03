@@ -639,9 +639,13 @@ class AreaCoverage extends AdminController
             'season' => $data['current_season']
         ];
 
+<<<<<<< HEAD
         $blocks = $this->acModel->getByDistrictNew($filter);
         // dd($data);
         // exit;
+=======
+        $blocks = $acModel->getByDistrictNew($filter);
+>>>>>>> 0b12f97714aea4d68f1717e565ee0eb6f26bbd8b
 
         $this->_allblocks($blocks, $data);
 
@@ -743,8 +747,10 @@ class AreaCoverage extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else {
+        } else if($week_dates) {
             $data['start_date'] = $week_dates['start_date'];
+        } else {
+            $data['start_date'] = '';
         }
 
         if ($this->request->getGet('season')) {
@@ -805,8 +811,6 @@ class AreaCoverage extends AdminController
         $data['years'] = (new YearModel())->where('id', $data['year_id'])->asArray()->find();
         $week_dates = $this->acModel->getWeekDate();
         $filter = array();
-        // print_r($filter);
-        // exit;
 
         if ($this->request->getGet('district_id')) {
             $filter['district_id'] = $this->request->getGet('district_id');
@@ -819,17 +823,25 @@ class AreaCoverage extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $filter['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else {
+        } else if($week_dates) {
             $filter['start_date'] = $week_dates['start_date'];
+        } else {
+            $filter['start_date'] = '';
         }
+
         if ($this->request->getGet('season')) {
             $filter['current_season'] = $this->request->getGet('season');
         }
+<<<<<<< HEAD
         // print_r($filter);
         // exit;
         $blockstatuses = $this->acModel->getBlockWiseStatus($filter);
         // dd($blockstatuses);
         // exit;
+=======
+
+        $blockstatuses = $this->areaCoverageModel->getBlockWiseStatus($filter);
+>>>>>>> 0b12f97714aea4d68f1717e565ee0eb6f26bbd8b
 
         $data['blockstatuses'] = [];
         foreach ($blockstatuses as $blockstatus) {

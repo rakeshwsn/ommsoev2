@@ -40,6 +40,9 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('dashboard/map/add', 'Dashboard\Controllers\DistrictMap::add');
     $routes->add('dashboard/map/edit', 'Dashboard\Controllers\DistrictMap::edit');
 
+
+    $routes->get('dashboard/currentyear', 'Dashboard\Controllers\Currentyear::index');
+
 });
 
 
