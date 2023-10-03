@@ -217,6 +217,7 @@ FROM ac_crop_practices acp
     public function getWeekDate($date = 'today')
     {
         $output = $this->getWeeks();
+
         $date = strtotime($date);
         foreach ($output as $dates) {
             if ($date >= strtotime($dates['start_date']) && $date <= strtotime($dates['end_date'])) {
