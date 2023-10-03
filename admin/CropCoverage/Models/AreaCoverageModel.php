@@ -173,6 +173,11 @@ FROM ac_crop_practices acp
                 $season_start_date->modify('-1 year');
                 $season_end_date->modify('-1 year');
             }
+        } else {
+            //default return values. added by rakesh - 03/10/23
+            $current_season = '';
+            $season_start_date = '';
+            $season_end_date = '';
         }
 
         return [
@@ -195,7 +200,7 @@ FROM ac_crop_practices acp
 
         $output = [];
 
-        while ($start <= $end) {
+        while ($start && $start <= $end) {
             $day_of_week = (int) $start->format('w');
             if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
                 $output[] = [
@@ -212,6 +217,7 @@ FROM ac_crop_practices acp
     public function getWeekDate($date = 'today')
     {
         $output = $this->getWeeks();
+
         $date = strtotime($date);
         foreach ($output as $dates) {
             if ($date >= strtotime($dates['start_date']) && $date <= strtotime($dates['end_date'])) {
@@ -314,6 +320,7 @@ FROM soe_districts sd
     public function getByDistrictNew($filter = [])
     {
         $sql = "SELECT
+  m.district,
   m.block_id,
   m.block,
   total_gps,
@@ -333,6 +340,7 @@ FROM soe_districts sd
   m.barnyard_ls,
   m.pearl_ls
 FROM (SELECT
+    d.name district,
     vbg.block_id,
     vbg.block,
     vbg.gps total_gps,
@@ -367,7 +375,7 @@ FROM (SELECT
             $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
         }
         $sql .= " ) vbw 
-      ON vbw.block_id = vbg.block_id";
+      ON vbw.block_id = vbg.block_id LEFT JOIN soe_districts d ON d.id=vbw.district_id";
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE vbg.district_id = " . $filter['district_id'];
         }
@@ -417,7 +425,8 @@ FROM (SELECT
       FROM nur n2
       WHERE n2.block_id = n1.block_id)) nur
     ON nur.block_id = m.block_id
-ORDER BY m.block";
+ORDER BY district,m.block";
+
 
         return $this->db->query($sql)->getResult();
     }

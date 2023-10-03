@@ -29,7 +29,8 @@
                 <div class="form-group mg-b-10-force">
                     <select name="season" id="season" class="form-control" disabled>
                         <?php foreach ($seasons as $season) { ?>
-                            <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
+
+                            <option value="<?= $season['name'] ?>" <?php if ($season['id'] == 1) {
                                   echo 'selected';
                               } ?>><?= $season['name']; ?>
                             </option>
@@ -55,13 +56,17 @@
                         if ($crop === 'RAGI') {
                             $totalRagi = count($practices);
                             ?>
-                            <th colspan="<?= $totalRagi; ?>" class="cl-head"><?= $crop; ?></th>
+                            <th colspan="<?= $totalRagi; ?>" class="cl-head">
+                                <?= $crop; ?>
+                            </th>
                         <?php } ?>
                     <?php } ?>
 
                     <?php foreach ($heading as $crop => $practices): ?>
                         <?php if ($crop !== 'RAGI'): ?>
-                            <th colspan="<?= count($practices); ?>" class="cl-head"><?= $crop; ?></th>
+                            <th colspan="<?= count($practices); ?>" class="cl-head">
+                                <?= $crop; ?>
+                            </th>
                         <?php endif; ?>
                     <?php endforeach; ?>
                     <th colspan="7" class="cl-head">Follow Up Crops (with out incentive)(in Ha)</th>
@@ -347,13 +352,17 @@
                     if ($crop === 'RAGI') {
                         $totalRagi = count($practices);
                         ?>
-                        <th colspan="<?= $totalRagi ?>"><?= $crop; ?></th>
+                        <th colspan="<?= $totalRagi ?>">
+                            <?= $crop; ?>
+                        </th>
                     <?php } ?>
                 <?php } ?>
 
                 <?php foreach ($heading as $crop => $practices): ?>
                     <?php if ($crop !== 'RAGI'): ?>
-                        <th colspan="<?= count($practices) ?>"><?= $crop; ?></th>
+                        <th colspan="<?= count($practices) ?>">
+                            <?= $crop; ?>
+                        </th>
                     <?php endif; ?>
                 <?php endforeach; ?>
                 <th colspan="7">Follow Up Crops (with out incentive)(in Ha)</th>
@@ -381,7 +390,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($practicedata as $data) { ?>
+            <?php foreach ($blockstarget as $data) { ?>
                 <tr>
                     <td>
                         <?= $data["block"]; ?>

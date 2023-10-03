@@ -10,15 +10,24 @@
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id" required>
                             <?php foreach ($years as $year) { ?>
-                                <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
+                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
+                                    echo 'selected';
+                                } ?>>
+                                    <?= $year['name'] ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
                     <div class="col-md-2">
                         <label>Season</label>
                         <select class="form-control" id="season" name="season">
+                            <option value="">Select Season</option>
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?=$value?>" <?php if($value==$current_season){echo 'selected';} ?>><?=$season?></option>
+                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                    echo 'selected';
+                                } ?>>
+                                    <?= $season ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
@@ -44,25 +53,33 @@
     <div class="block-content block-content-full">
         <div class="tableFixHead">
             <table class="table custom-table " id="txn-table">
-    <thead>
-    <tr class="highlight-heading1">
-        <th>District</th>
-        <th>Total Blocks</th>
-        <th>Total Blocks Approved</th>
-        <th>Remaining</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($statuses as $status): ?>
-        <tr>
-            <td><?=$status['district']?></td>
-            <td><?=$status['total_blocks']?></td>
-            <td><?=$status['total_ac_blocks']?></td>
-            <td><?=$status['remaining']?></td>
-        </tr>
-    <?php endforeach; ?>
-    </tbody>
-</table>
+                <thead>
+                    <tr class="highlight-heading1">
+                        <th>District</th>
+                        <th>Total Blocks</th>
+                        <th>Total Blocks Approved</th>
+                        <th>Remaining</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($statuses as $status): ?>
+                        <tr>
+                            <td>
+                                <?= $status['district'] ?>
+                            </td>
+                            <td>
+                                <?= $status['total_blocks'] ?>
+                            </td>
+                            <td>
+                                <?= $status['total_ac_blocks'] ?>
+                            </td>
+                            <td>
+                                <?= $status['remaining'] ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

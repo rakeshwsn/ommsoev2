@@ -59,13 +59,17 @@ class AreaCoverage extends AdminController
         $districtModel = new DistrictModel();
         $data['districts'] = $districtModel->getAll();
 
-        $dates = $this->areacoveragemodel->getWeekDate();
         $data['currentDay'] = date('l');
         $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
 
-        $data['from_date'] = $dates['start_date'];
+        $dates = $this->areacoveragemodel->getWeekDate();
+        $data['from_date'] = '';
+        $data['to_date'] = '';
+        if($dates){
+            $data['from_date'] = $dates['start_date'];
+            $data['to_date'] = $dates['end_date'];
+        }
 
-        $data['to_date'] = $dates['end_date'];
         $data['upload_url'] = Url::areaCoverageUpload;
 
         $view = 'areacoverage_block';
@@ -222,9 +226,6 @@ class AreaCoverage extends AdminController
             $view = 'areacoverage_district';
         }
 
-        //printr($data);
-        //exit;
-
         return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
     }
 
@@ -232,6 +233,11 @@ class AreaCoverage extends AdminController
     {
 
         $dates = $this->areacoveragemodel->getWeekDate();
+
+        if(!$dates){
+            return redirect()->to(admin_url('areacoverage'))
+                ->with('message','Dates are not selected');
+        }
 
         $data['from_date'] = $dates['start_date'];
         $data['to_date'] = $dates['end_date'];
@@ -674,8 +680,10 @@ class AreaCoverage extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else {
+        } else if($week_dates) {
             $data['start_date'] = $start_date = $week_dates['start_date'];
+        } else {
+            $data['start_date'] = $start_date = '';
         }
 
         $acModel = new AreaCoverageModel();

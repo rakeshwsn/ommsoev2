@@ -92,7 +92,7 @@ class TargetModel extends Model
         }
     }
 
-    public function getAll($filter = array())
+    public function getBlockTarget($filter = array())
     {
 
         $district_id = 0;
@@ -273,6 +273,7 @@ FROM (SELECT
         ON fc.target_id = atm.id
     GROUP BY atm.district_id) followup
     ON followup.district_id=sd.id";
+
         return $this->db->query($sql)->getResultArray();
     }
 
