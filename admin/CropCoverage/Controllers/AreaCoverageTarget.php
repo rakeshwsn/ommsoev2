@@ -34,12 +34,12 @@ class AreaCoverageTarget extends AdminController
 	public function Index()
 	{
 		$this->template->set_meta_title(lang('Crop Coverage|Target'));
+
 		return $this->getList();
+
 	}
 	protected function getList()
 	{
-
-
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			//'text' => lang('Grampanchayat.heading_title'),
@@ -55,20 +55,11 @@ class AreaCoverageTarget extends AdminController
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
 
-		$seasons = array(
-			array(
-				'id' => '1',
-				'name' => 'Rabi'
-			),
-			array(
-				'id' => '2',
-				'name' => 'Kharif'
-			)
-		);
-		$data['seasons'] = $seasons;
-		// printr($seasons);
-		// exit;
-		// $data['seasons'] = $this->acModel->getSeasons();
+		$data['seasons'] = $this->acModel->getSeasons();
+
+		$data['current_season'] = strtolower(getCurrentSeason());
+
+
 
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
