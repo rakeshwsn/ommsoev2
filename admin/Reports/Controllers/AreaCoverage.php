@@ -639,14 +639,9 @@ class AreaCoverage extends AdminController
             'season' => $data['current_season']
         ];
 
-<<<<<<< HEAD
-        $blocks = $this->acModel->getByDistrictNew($filter);
-        // dd($data);
-        // exit;
-=======
-        $blocks = $acModel->getByDistrictNew($filter);
->>>>>>> 0b12f97714aea4d68f1717e565ee0eb6f26bbd8b
 
+        $blocks = $this->acModel->getByDistrictNew($filter);
+     
         $this->_allblocks($blocks, $data);
 
         //
