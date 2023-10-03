@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class AreaCoverage extends AdminController
 {
     private $districtModel;
-    private $areaCoverageModel;
+    private $acModel;
     public $statuses = ['Uploaded', 'Approved', 'Rejected', 'Not Uploaded', 'Not Required'];
     public $colors_ac = [
         'warning',
@@ -26,7 +26,7 @@ class AreaCoverage extends AdminController
     public function __construct()
     {
         $this->districtModel = new DistrictModel();
-        $this->areaCoverageModel = new AreaCoverageModel();
+        $this->acModel = new AreaCoverageModel();
     }
 
     public function index($action = '')
@@ -35,10 +35,10 @@ class AreaCoverage extends AdminController
         $data = [];
         $data['title'] = 'Area Coverage Report';
 
-        $acModel = new AreaCoverageModel();
+
         $cropsModel = new CropsModel();
         $data['years'] = getAllYears();
-        $data['seasons'] = $acModel->getSeasons();
+        $data['seasons'] = $this->acModel->getSeasons();
 
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['year_id'] = getCurrentYearId();
@@ -61,7 +61,7 @@ class AreaCoverage extends AdminController
             $data['block_id'] = $this->request->getGet('block_id');
         }
 
-        $dates = $acModel->getWeekDate();
+        $dates = $this->acModel->getWeekDate();
 
         $data['start_date'] = '';
         if ($this->request->getGet('start_date')) {
@@ -94,7 +94,8 @@ class AreaCoverage extends AdminController
             $data['districts'] = (new DistrictModel())->orderBy('name')->asArray()->find();
         }
 
-        $blocks = $acModel->getAreaCoverageReport($filter);
+        $blocks = $this->acModel->getAreaCoverageReport($filter);
+
 
         if ($data['block_id']) {
             $this->gps($blocks, $data);
@@ -104,7 +105,7 @@ class AreaCoverage extends AdminController
             $this->districts($blocks, $data);
         }
 
-        $data['crop_practices'] = $acModel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $cropsModel->findAll();
 
         $data['crops'] = [];
@@ -158,7 +159,7 @@ class AreaCoverage extends AdminController
             exit;
         }
 
-        $weeks = $acModel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'][0] = 'All weeks';
         $week_text = '';
@@ -391,6 +392,7 @@ class AreaCoverage extends AdminController
     private function _allblocks($blocks, &$data)
     {
 
+
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
@@ -399,6 +401,8 @@ class AreaCoverage extends AdminController
 
         $data['rows'] = [];
         $gps = 0;
+        // dd($blocks);
+        // exit;
 
         foreach ($blocks as $block) {
             $total_area = $block->fc_area +
@@ -604,10 +608,10 @@ class AreaCoverage extends AdminController
 
         $data['title'] = 'Area Coverage Blockwise Report';
 
-        $acModel = new AreaCoverageModel();
+
         $cropsModel = new CropsModel();
         $data['years'] = getAllYears();
-        $data['seasons'] = $acModel->getSeasons();
+        $data['seasons'] = $this->acModel->getSeasons();
 
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['year_id'] = getCurrentYearId();
@@ -635,14 +639,15 @@ class AreaCoverage extends AdminController
             'season' => $data['current_season']
         ];
 
-        $blocks = $acModel->getByDistrictNew($filter);
+
+        $blocks = $this->acModel->getByDistrictNew($filter);
 
         $this->_allblocks($blocks, $data);
 
         //
         $data['allblocks'] = true;
 
-        $data['crop_practices'] = $acModel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $cropsModel->findAll();
 
         $data['crops'] = [];
@@ -720,9 +725,9 @@ class AreaCoverage extends AdminController
     {
         $data = [];
 
-        $acModel = new AreaCoverageModel();
 
-        $data['seasons'] = $acModel->getSeasons();
+
+        $data['seasons'] = $this->acModel->getSeasons();
 
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['year_id'] = getCurrentYearId();
@@ -733,11 +738,11 @@ class AreaCoverage extends AdminController
             $data['year_id'] = $this->request->getGet('year_id');
         }
 
-        $week_dates = $acModel->getWeekDate();
+        $week_dates = $this->acModel->getWeekDate();
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else if($week_dates) {
+        } else if ($week_dates) {
             $data['start_date'] = $week_dates['start_date'];
         } else {
             $data['start_date'] = '';
@@ -747,7 +752,7 @@ class AreaCoverage extends AdminController
             $data['current_season'] = $this->request->getGet('season');
         }
 
-        $statuses = $acModel->getUploadStatus($data['start_date']);
+        $statuses = $this->acModel->getUploadStatus($data['start_date']);
         // printr($statuses);
         // exit;
 
@@ -770,7 +775,7 @@ class AreaCoverage extends AdminController
             'remaining' => ($total_blocks - $total_ac_blocks),
         ];
 
-        $weeks = $acModel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
         $data['weeks'] = [];
         $week_start_date = '';
         foreach ($weeks as $week) {
@@ -792,14 +797,14 @@ class AreaCoverage extends AdminController
         $data['districts'] = $this->districtModel->getAll();
 
         $this->template->add_package(array('datatable', 'select2'), true);
-        $acModel = new AreaCoverageModel();
 
-        $data['seasons'] = $acModel->getSeasons();
+
+        $data['seasons'] = $this->acModel->getSeasons();
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['year_id'] = getCurrentYearId();
 
         $data['years'] = (new YearModel())->where('id', $data['year_id'])->asArray()->find();
-        $week_dates = $acModel->getWeekDate();
+        $week_dates = $this->acModel->getWeekDate();
         $filter = array();
 
         if ($this->request->getGet('district_id')) {
@@ -813,7 +818,7 @@ class AreaCoverage extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $filter['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else if($week_dates) {
+        } else if ($week_dates) {
             $filter['start_date'] = $week_dates['start_date'];
         } else {
             $filter['start_date'] = '';
@@ -823,7 +828,15 @@ class AreaCoverage extends AdminController
             $filter['current_season'] = $this->request->getGet('season');
         }
 
-        $blockstatuses = $this->areaCoverageModel->getBlockWiseStatus($filter);
+        // print_r($filter);
+        // exit;
+        $blockstatuses = $this->acModel->getBlockWiseStatus($filter);
+        // dd($blockstatuses);
+        // exit;
+
+
+        $blockstatuses = $this->acModel->getBlockWiseStatus($filter);
+
 
         $data['blockstatuses'] = [];
         foreach ($blockstatuses as $blockstatus) {
@@ -852,7 +865,7 @@ class AreaCoverage extends AdminController
             ];
 
         }
-        $weeks = $acModel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
         $data['weeks'] = [];
         $week_start_date = '';
         foreach ($weeks as $week) {

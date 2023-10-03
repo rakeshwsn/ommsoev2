@@ -19,7 +19,6 @@ class AreaCoverageTarget extends AdminController
 	private $districtModel;
 	private $cropsModel;
 	private $practicesModel;
-
 	private $acModel;
 
 
@@ -39,6 +38,7 @@ class AreaCoverageTarget extends AdminController
 	}
 	protected function getList()
 	{
+
 
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
@@ -66,6 +66,8 @@ class AreaCoverageTarget extends AdminController
 			)
 		);
 		$data['seasons'] = $seasons;
+		// printr($seasons);
+		// exit;
 		// $data['seasons'] = $this->acModel->getSeasons();
 
 		if (isset($this->error['warning'])) {
@@ -90,14 +92,14 @@ class AreaCoverageTarget extends AdminController
 			// dd($distwisetarget);
 			// exit;
 		} else {
-			$practicedata = $this->targetModel->getAll([
+			$blockstarget = $this->targetModel->getBlockTarget([
 				'district_id' => $data['district_id']
 			]);
 		}
 		if ($data['district_id'] === 0) {
 			$data['distwisetarget'] = $distwisetarget;
 		} else {
-			$data['practicedata'] = $practicedata;
+			$data['blockstarget'] = $blockstarget;
 		}
 
 		$crops = [];
@@ -219,9 +221,11 @@ class AreaCoverageTarget extends AdminController
 
 	public function edit()
 	{
+
 		if ($this->request->getMethod(1) === 'POST') {
 
-
+			// printr($_POST);
+			// exit;
 			$block_id = $this->request->getGet('block_id');
 			$data['block_id'] = $block_id;
 
@@ -231,6 +235,9 @@ class AreaCoverageTarget extends AdminController
 				"year_id" => getCurrentYearId(),
 				"season" => getCurrentSeason(),
 			);
+			// printr($masterdata);
+			// exit;
+
 			$master = $this->targetModel->where($masterdata)->first();
 			if ($master) {
 				$target_id = $master->id;

@@ -427,6 +427,7 @@ FROM (SELECT
     ON nur.block_id = m.block_id
 ORDER BY district,m.block";
 
+
         return $this->db->query($sql)->getResult();
     }
 

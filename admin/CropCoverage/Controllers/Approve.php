@@ -519,7 +519,7 @@ class Approve extends AdminController
         $weekDate = $this->areacoveragemodel->getWeekDate();
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $this->request->getGet('start_date');
-        } else if($weekDate) {
+        } else if ($weekDate) {
             $data['start_date'] = $weekDate['start_date'];
         } else {
             $data['start_date'] = '';

@@ -3,31 +3,25 @@ namespace Admin\CropCoverage\Controllers;
 
 use App\Controllers\AdminController;
 use Admin\CropCoverage\Models\TargetModel;
+use Admin\CropCoverage\Models\AreaCoverageModel;
 
 class TargetVsAchievement extends AdminController
 {
     private $targetModel;
+    private $acModel;
     function __construct()
     {
         $this->targetModel = new TargetModel();
-
+        $this->acModel = new AreacoverageModel();
     }
     public function index()
     {
         $this->template->set_meta_title(lang('TargetVsAchievement'));
         $data['years'] = getAllYears();
 
-        $seasons = array(
-            array(
-                'id' => '1',
-                'name' => 'Rabi'
-            ),
-            array(
-                'id' => '2',
-                'name' => 'Kharif'
-            )
-        );
-        $data['seasons'] = $seasons;
+        $data['seasons'] = $this->acModel->getSeasons();
+
+        $data['current_season'] = strtolower(getCurrentSeason());
 
         $data['milletchart_url'] = admin_url('areacoverage/targetVsAchievement/milletchart');
         $data['distchart_url'] = admin_url('areacoverage/targetVsAchievement/distChart');
