@@ -174,7 +174,6 @@
             "pageLength": 10
         });
         $("#btn-excel").click(function() {
-
             if ($("#year").val() === "0") {
                 $("#em1").html("This field could not be empty!");
                 $("#year").css("border-color", "red");

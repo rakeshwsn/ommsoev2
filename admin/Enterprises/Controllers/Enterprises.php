@@ -1,6 +1,7 @@
 <?php
 
 namespace Admin\Enterprises\Controllers;
+
 use Admin\Enterprises\Models\BlockModel;
 use Admin\Enterprises\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesBudgetModel;
@@ -10,27 +11,36 @@ use Admin\Enterprises\Models\GpModel;
 use Admin\Enterprises\Models\VillagesModel;
 use Admin\Enterprises\Models\YearModel;
 use App\Controllers\AdminController;
+use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+
 
 class Enterprises extends AdminController
 {
 	public function index()
 	{
+		$this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
+		$this->template->set('header',true);
 		helper('form');
 		$enterprisesmodel = new EnterprisesModel();
 		$distModel = new DistrictModel();
 		$data['districts'][0] = 'Select District';
 
 		$districts = $distModel->findAll();
-
 		foreach ($districts as $district) {
 			$data['districts'][$district->id] = $district->name;
 		}
 
+
 		$blockmodel = new BlockModel();
 		$data['blocks'][0] = 'Select Block';
-
 		$data['district_id'] = 0;
 		$data['block_id'] = 0;
+		
+		$data['years'][0] = 'Select DOE';
 
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
@@ -41,8 +51,30 @@ class Enterprises extends AdminController
 				$data['blocks'][$block->id] = $block->name;
 			}
 		}
+		if ($this->request->getGet('district_id')) {
+			$district_id = $this->request->getGet('district_id');
+			$yeardata = $enterprisesmodel->yearWise($district_id);
+
+			$data['years'][0] = 'Select DOE';
+			foreach ($yeardata as $year) {
+				$data['years'][] = $year->year;
+			}
+		}
+		
+		//  printr($data['years']); exit;
+
 		if ($this->request->getGet('block_id')) {
+
 			$data['block_id'] = $this->request->getGet('block_id');
+		}
+		$data['management_unit_type'] = '';
+		if ($this->request->getGet('management_unit_type')) {
+			$data['management_unit_type'] = $this->request->getGet('management_unit_type');
+		}
+
+		$data['doeyear'] = 0;
+		if ($this->request->getGet('doeyear')) {
+			$data['doeyear'] = $this->request->getGet('doeyear');
 		}
 
 		$filter = [];
@@ -53,8 +85,18 @@ class Enterprises extends AdminController
 		if ($data['block_id'] > 0) {
 			$filter['block_id'] = $data['block_id'];
 		}
+		if ($data['management_unit_type'] != '') {
+			$filter['management_unit_type'] = $data['management_unit_type'];
+		}
+		if ($data['doeyear'] > 0) {
+			$filter['doeyear'] = $data['doeyear'];
+		}
+		// dd($filter);
+		// printr($data);exit;
 		$enterpriseslist = $enterprisesmodel->getAll($filter);
+		
 		// dd($enterpriseslist);
+		// exit;
 		$data['enterprises'] = [];
 
 		foreach ($enterpriseslist as $row) {
@@ -68,13 +110,107 @@ class Enterprises extends AdminController
 				'date_estd' => $row->date_estd,
 				'mou_date' => $row->mou_date,
 				'edit_url' => admin_url('enterprises/edit?id=' . $row->id),
-				
+
+			];
+		}
+		// dd($data);
+
+		$data['excel_link'] = admin_url('enterprises/exceldownld');
+
+		// printr($data);
+		// exit;
+			// dd($data);
+		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
+	}
+
+
+	public function download()
+	{
+		$enterprisesmodel = new EnterprisesModel();
+		$totalEntData = $enterprisesmodel->getAll();
+		$worksheet_unit = [];
+		$data['entdatas'] = [];
+
+		foreach ($totalEntData as $row) {
+			$data['entdatas'][] = [
+				'unit_name' => $row->unit_name,
+				'districts' => $row->districts,
+				'blocks' => $row->blocks,
+				'gp' => $row->gp,
+				'villages' => $row->villages,
+				'management_unit_type' => $row->management_unit_type,
+				'managing_unit_name' => $row->managing_unit_name,
+				'date_estd' => $row->date_estd,
+				'mou_date' => $row->mou_date,
+				'contact_person' => $row->contact_person,
+				'unit_budget' => $row->unit_budget,
+				'addl_budget' => $row->addl_budget,
+				'purpose_infr_support' => $row->is_support_basis_infr,
+				'support_infr_amount' => $row->is_support_basis_infr,
+				'contact_mobile' => $row->contact_mobile,
 			];
 		}
 
+		$filename = 'Enterprise-Establishment' . '.xlsx';
 
 
-		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
+		$sheetindex = 0;
+		$reader = new Html();
+		$doc = new \DOMDocument();
+		$spreadsheet = new Spreadsheet();
+
+		$htmltable = view('Admin\Enterprises\Views\excelFormEnt', $data);
+
+		$htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
+
+		$worksheet = $spreadsheet->createSheet($sheetindex);
+
+		$reader->setSheetIndex($sheetindex);
+		$worksheet->setTitle("Enterprises");
+
+		$spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
+
+		$worksheet = $spreadsheet->getActiveSheet();
+
+		// Load HTML content into a DOM object for formatting from class
+		$doc->loadHTML($htmltable);
+
+		$rows = $doc->getElementsByTagName('tr');
+
+		//formatting and designing
+		foreach ($worksheet->getRowIterator() as $row) {
+			// Find the corresponding row element in the HTML table
+			$rowIndex = $row->getRowIndex();
+
+			$rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
+
+			// Get the class name of the row element
+			$className = $rowElement->getAttribute('class');
+		}
+		// Assuming $worksheet is your PhpSpreadsheet worksheet object
+
+		// Get the highest column index
+		$highestColumn = $worksheet->getHighestColumn();
+
+		// Iterate through each column and set auto-size
+		for ($col = 'A'; $col <= $highestColumn; $col++) {
+			$worksheet->getColumnDimension($col)->setAutoSize(true);
+		}
+
+		//remove the default worksheet
+		$spreadsheet->removeSheetByIndex(
+			$spreadsheet->getIndex(
+				$spreadsheet->getSheetByName('Worksheet')
+			)
+		);
+
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+		header('Cache-Control: max-age=1');
+		$writer = new Xlsx($spreadsheet);
+		$writer->save('php://output');
+		exit();
 	}
 	public function add()
 	{
@@ -160,9 +296,18 @@ class Enterprises extends AdminController
 		$BlocksModel = new BlockModel();
 
 		$district_id = $this->request->getGet('district_id');
-
 		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->findAll();
+		// printr($data);
+		return $this->response->setJSON($data);
+	}
+	public function ajaxDoe()
+	{
 
+		$data['years'] = [];
+		$enterprisesmodel = new EnterprisesModel();
+		$district_id = $this->request->getGet('district_id');
+		$data['years'] = $enterprisesmodel->yearWise($district_id);
+		// printr($data);
 		return $this->response->setJSON($data);
 	}
 	public function ajaxgps()

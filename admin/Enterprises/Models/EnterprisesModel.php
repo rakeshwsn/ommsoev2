@@ -202,20 +202,16 @@ class EnterprisesModel extends Model
     sb.name blocks,
     v.name villages,
     gp.name gp,
-    eu.name,
-    eu.group_unit
-  FROM enterprises e
-    LEFT JOIN soe_districts sd
-      ON sd.id = e.district_id
-    LEFT JOIN soe_blocks sb
-      ON sb.id = e.block_id
-    LEFT JOIN villages v
-      ON v.id = e.village_id
-    LEFT JOIN grampanchayat gp
-      ON gp.id = e.gp_id
-    LEFT JOIN enterprises_units eu
-      ON eu.id = e.unit_id
-  WHERE e.deleted_at IS NULL";
+    eu.name unit_name,
+    eu.group_unit,
+    YEAR(e.date_estd) year
+    FROM enterprises e
+    LEFT JOIN soe_districts sd ON sd.id = e.district_id
+    LEFT JOIN soe_blocks sb ON sb.id = e.block_id
+    LEFT JOIN villages v ON v.id = e.village_id
+    LEFT JOIN grampanchayat gp ON gp.id = e.gp_id
+    LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
+   WHERE e.deleted_at IS NULL";
 
     if (isset($filter['district_id'])) {
       $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -226,7 +222,31 @@ class EnterprisesModel extends Model
     if (isset($filter['unit_id'])) {
       $sql .= " AND e.unit_id = " . $filter['unit_id'];
     }
+    if (isset($filter['doeyear'])) {
+      $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
+    }
+    if (isset($filter["management_unit_type"])) {
+      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+    }
+
+    // printr($sql);
+    // exit;
     return $this->db->query($sql)->getResult();
   }
-
+  public function yearWise($district_id)
+  {
+    $sql = "SELECT
+    e.id,
+    e.district_id,
+    YEAR(e.date_estd) year
+FROM enterprises e
+WHERE e.district_id = $district_id  AND YEAR(e.date_estd) > 2000
+GROUP BY year
+ORDER BY year 
+ 
+ ";
+    //  printr($sql);
+    //     exit;
+    return $this->db->query($sql)->getResult();
+  }
 }
