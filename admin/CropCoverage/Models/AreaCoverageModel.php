@@ -173,6 +173,11 @@ FROM ac_crop_practices acp
                 $season_start_date->modify('-1 year');
                 $season_end_date->modify('-1 year');
             }
+        } else {
+            //default return values. added by rakesh - 03/10/23
+            $current_season = '';
+            $season_start_date = '';
+            $season_end_date = '';
         }
 
         return [
@@ -195,7 +200,7 @@ FROM ac_crop_practices acp
 
         $output = [];
 
-        while ($start <= $end) {
+        while ($start && $start <= $end) {
             $day_of_week = (int) $start->format('w');
             if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
                 $output[] = [
@@ -212,6 +217,7 @@ FROM ac_crop_practices acp
     public function getWeekDate($date = 'today')
     {
         $output = $this->getWeeks();
+
         $date = strtotime($date);
         foreach ($output as $dates) {
             if ($date >= strtotime($dates['start_date']) && $date <= strtotime($dates['end_date'])) {
