@@ -27,12 +27,13 @@
             </div>
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
-                    <select name="season" id="season" class="form-control" disabled>
-                        <?php foreach ($seasons as $season) { ?>
-
-                            <option value="<?= $season['name'] ?>" <?php if ($season['id'] == 1) {
+                    <select name="season" id="season" class="form-control">
+                        <option value="">Select Season</option>
+                        <?php foreach ($seasons as $value => $season) { ?>
+                            <option value="<?= $value ?>" <?php if ($value == $current_season) {
                                   echo 'selected';
-                              } ?>><?= $season['name']; ?>
+                              } ?>>
+                                <?= $season ?>
                             </option>
                         <?php } ?>
                     </select>
