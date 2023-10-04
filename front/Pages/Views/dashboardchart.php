@@ -348,7 +348,7 @@
                 'rgba(255,255,255,0.25)'
         },
         series: [{
-            name: 'No. of Farmer',
+            name: 'Area Achievement (in hectare)',
             type: 'column',
             yAxis: 1,
             data: [],
@@ -357,7 +357,7 @@
             }
 
         }, {
-            name: 'Area Achievement (in hectare)',
+            name: 'No. of Farmer',
             type: 'spline',
             data: [],
             tooltip: {
@@ -805,8 +805,8 @@
         dataType: 'JSON',
         success: function(response) {
             districtwiseChart.xAxis[0].setCategories(response.currentdistrict);
-            districtwiseChart.series[0].setData(response.currentfarmers);
-            districtwiseChart.series[1].setData(response.currentachievements);
+            districtwiseChart.series[0].setData(response.currentachievements);
+            districtwiseChart.series[1].setData(response.currentfarmers);
 
         }
 
