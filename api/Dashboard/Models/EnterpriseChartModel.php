@@ -51,7 +51,6 @@ class EnterpriseChartModel extends Model
         d.name district,
 		SUM(e.wshg) total_wshg,
 		SUM(e.fpos) total_fpos,
-		e.unit_id,
 		e.unit_name,
 		e.district_id
 	  FROM dashboard_enterprises e
@@ -66,9 +65,7 @@ class EnterpriseChartModel extends Model
 		if (!empty($filter['year_id'])) {
 			$sql .= " AND year_id=" . $filter['year_id'];
 		}
-		$sql .= " GROUP BY e.unit_name
-		HAVING total_wshg>0 OR total_fpos>0
-	   ORDER BY e.year_id";
+		$sql .= " GROUP BY e.unit_name ";
 		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}

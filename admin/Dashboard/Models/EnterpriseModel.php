@@ -127,9 +127,7 @@ class EnterpriseModel extends Model
 		if (!empty($filter['year_id'])) {
 			$sql .= " AND year_id=" . $filter['year_id'];
 		}
-		$sql .= " GROUP BY e.unit_name
-		HAVING total_wshg>0 OR total_fpos>0
-	   ORDER BY e.unit_name";
+		$sql .= " GROUP BY e.unit_name ";
 		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}

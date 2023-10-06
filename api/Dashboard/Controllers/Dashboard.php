@@ -123,10 +123,8 @@ class Dashboard extends ResourceController
 	public function establishment()
 	{
 		$establishmentchartmodel = new EstablishmentChartModel();
-		$filter = [];
-
-
-		$establishes = $establishmentchartmodel->getestablishment($filter);
+	
+		$establishes = $establishmentchartmodel->getestablishment();
 
 		$data['estdistrict'] = [];
 		$data['chc'] = [];
