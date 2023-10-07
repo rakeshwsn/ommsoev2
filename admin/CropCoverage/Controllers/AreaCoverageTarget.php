@@ -54,17 +54,12 @@ class AreaCoverageTarget extends AdminController
 		$data['button_add'] = lang('Add Target');
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
-
 		$data['seasons'] = $this->acModel->getSeasons();
-
 		$data['current_season'] = strtolower(getCurrentSeason());
-
-
-
+		$data['target_url'] = admin_url('areacoverage/target/filter');
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
 		}
-
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = (array) $this->request->getGet('district_id');
 		} elseif ($this->user->district_id) {
@@ -72,12 +67,7 @@ class AreaCoverageTarget extends AdminController
 		} else {
 			$data['district_id'] = 0;
 		}
-
-
-
 		$croppractices = $this->targetModel->getPractices();
-
-
 		if ($data['district_id'] === 0) {
 			$distwisetarget = $this->targetModel->getDistrictWiseData([]);
 			// dd($distwisetarget);
@@ -103,14 +93,12 @@ class AreaCoverageTarget extends AdminController
 
 			$crops[$_crops][] = $cp['practice'];
 		}
-
 		$data['heading'] = $crops;
 		return $this->template->view('Admin\CropCoverage\Views\areacoverage_target', $data);
 	}
 
 	private function _allblocks($blocks, &$data)
 	{
-
 		$total_farmers_covered = $total_nursery_raised = $total_balance_smi =
 			$total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
 			$total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
@@ -181,9 +169,7 @@ class AreaCoverageTarget extends AdminController
 			$total_total_area += $total_area;
 
 			$gps += $block->total_gps;
-
 		}
-
 		$data['rows'][] = [
 			'district' => '<strong>Total</strong>',
 			'block' => '',
@@ -208,8 +194,6 @@ class AreaCoverageTarget extends AdminController
 			'total_area' => $total_total_area
 		];
 	}
-
-
 	public function edit()
 	{
 
@@ -364,6 +348,9 @@ class AreaCoverageTarget extends AdminController
 			// Invalid request
 			return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
 		}
+	}
+	public function getTargetFiltered()
+	{
 	}
 
 
