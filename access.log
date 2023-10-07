@@ -24623,3 +24623,5 @@
 127.0.0.1 - - [27/Sep/2023:11:03:16 +0530] "GET /index.php/admin?debugbar HTTP/1.1" 200 3735
 127.0.0.1 - - [27/Sep/2023:11:03:17 +0530] "GET /?debugbar_time=1695792796.896521 HTTP/1.1" 301 277
 127.0.0.1 - - [27/Sep/2023:11:03:17 +0530] "GET /index.php/admin?debugbar_time=1695792796.896521 HTTP/1.1" 500 88002
+127.0.0.1 - - [07/Oct/2023:10:34:09 +0530] "GET /dashboard HTTP/1.1" 200 54511
+127.0.0.1 - - [07/Oct/2023:10:34:14 +0530] "GET /index.php/admin?debugbar HTTP/1.1" 200 3735

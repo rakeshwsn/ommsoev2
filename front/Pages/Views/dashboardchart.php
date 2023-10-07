@@ -523,7 +523,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'CHC and CMS Establishment Progress',
+            text: 'CHC and CMSC Establishment Progress',
             align: 'center'
         },
 
