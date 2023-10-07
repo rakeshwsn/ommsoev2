@@ -312,59 +312,46 @@
             categories: [],
             crosshair: true
         }],
-        yAxis: [{ // Primary yAxis
-            labels: {
-                format: '',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
-            },
+        //
+        yAxis: { // Single y-axis for both Farmers and Achievements
             title: {
-                text: 'Values',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
-            }
-        }, { // Secondary yAxis
-            title: {
-                text: 'Values ',
+                text: 'Value',
                 style: {
                     color: Highcharts.getOptions().colors[0]
                 }
             },
-
-            opposite: true
-        }],
+            labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            tickInterval: 5000,
+        },
         tooltip: {
             shared: true
         },
         legend: {
             align: 'left',
-            x: 80,
-            verticalAlign: 'top',
-            y: 60,
+            verticalAlign: 'center',
+            y: 5,
             floating: true,
-            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || // theme
-                'rgba(255,255,255,0.25)'
+            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'rgba(255,255,255,0.25)'
         },
         series: [{
-            name: 'No. of Farmer',
-            type: 'column',
-            yAxis: 1,
-            data: [],
-            tooltip: {
-                valueSuffix: ' '
-            }
+            name: 'Area Achievement (in hectare)', 
+            type: 'column', 
+            data: [
 
+            ]
         }, {
-            name: 'Area Achievement (in hectare)',
-            type: 'spline',
-            data: [],
-            tooltip: {
-                valueSuffix: ''
-            }
+            name: 'No. of Farmer ', 
+            type: 'spline', 
+            data: [
+
+            ]
         }]
-    }
+    };
     var districtwiseChart = Highcharts.chart('currentchart', crntchart);
 
     var areachartOptions = {
@@ -536,7 +523,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'CHC and CMS Establishment Progress',
+            text: 'CHC and CMSC Establishment Progress',
             align: 'center'
         },
 
@@ -592,6 +579,8 @@
                 name: 'CHC (in Number)',
                 type: 'spline',
                 data: [],
+                color:'rgb(246, 143, 70)',
+               
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -600,6 +589,7 @@
                 name: 'CMSC (in number)',
                 type: 'spline',
                 data: [],
+                color:'rgb(229, 12, 225)',
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -619,7 +609,7 @@
                 enabled: true,
                 alpha: 0,
                 beta: 0,
-                viewDistance: 10,
+                viewDistance: 25,
                 depth: 40
             }
         },
@@ -633,7 +623,7 @@
             labels: {
                 skew3d: true,
                 style: {
-                    fontSize: '11x'
+                    fontSize: '10px'
                 }
             },
             categories: []
@@ -789,9 +779,9 @@
         dataType: 'JSON',
         success: function(response) {
             echart.xAxis[0].setCategories(response.estdistrict);
-            echart.series[0].setData(response.chc);
-            echart.series[1].setData(response.cmsc);
-            echart.series[2].setData(response.blocks);
+            echart.series[0].setData(response.blocks);
+            echart.series[1].setData(response.chc);
+            echart.series[2].setData(response.cmsc);
         }
 
 
@@ -805,8 +795,8 @@
         dataType: 'JSON',
         success: function(response) {
             districtwiseChart.xAxis[0].setCategories(response.currentdistrict);
-            districtwiseChart.series[0].setData(response.currentfarmers);
-            districtwiseChart.series[1].setData(response.currentachievements);
+            districtwiseChart.series[0].setData(response.currentachievements);
+            districtwiseChart.series[1].setData(response.currentfarmers);
 
         }
 

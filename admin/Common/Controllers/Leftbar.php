@@ -292,6 +292,14 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if ($this->user->hasPermission("dashboard/establishment")) {
+            $dashboards[] = [
+                "name" => 'Establishment',
+                "href" => admin_url("dashboard/establishment"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("dashboard/pds")) {
             $dashboards[] = [

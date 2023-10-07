@@ -42,7 +42,7 @@ class EstablishmentChartModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 
-	public function getestablishment($filter = [])
+	public function getestablishment()
 	{
 		$sql = "SELECT
 		dist.district_id,
