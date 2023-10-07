@@ -59,7 +59,7 @@
 <div class="content1">
     <div class="row mb-3">
         <div class="col-md-2">
-            <select name="year" id="year" class="form-control"disabled>
+            <select name="year" id="year" class="form-control" disabled>
                 <?php foreach ($years as $year) { ?>
                     <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
                           echo 'selected';
@@ -70,10 +70,12 @@
         </div>
         <div class="col-md-2">
             <select name="season" id="season" class="form-control">
-                <?php foreach ($seasons as $season) { ?>
-                    <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
+                <option value="">Select Season</option>
+                <?php foreach ($seasons as $value => $season) { ?>
+                    <option value="<?= $value ?>" <?php if ($value == $current_season) {
                           echo 'selected';
-                      } ?>><?= $season['name'] ?>
+                      } ?>>
+                        <?= $season ?>
                     </option>
                 <?php } ?>
             </select>
@@ -161,7 +163,7 @@
     });
 </script>
 <script>
-        var milletChartOptions = {
+    var milletChartOptions = {
         chart: {
             type: 'column'
         },
@@ -206,7 +208,7 @@
             }
         ]
     };
-        var bchart = Highcharts.chart('milletContainer',  milletChartOptions);
+    var bchart = Highcharts.chart('milletContainer', milletChartOptions);
     $(document).ready(function () {
         $('[name="year"],[name="season"]').on('change', function () {
             year_id = $('#year').val();
