@@ -630,7 +630,7 @@ FROM (SELECT
       WHERE n2.district_id = n1.district_id)) nur
     ON nur.district_id = m.district_id
 ORDER BY district";
-
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
