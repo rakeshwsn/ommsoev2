@@ -637,13 +637,7 @@ FROM (SELECT
       WHERE n2.district_id = n1.district_id)) nur
     ON nur.district_id = m.district_id
 ORDER BY district";
-<<<<<<< HEAD
-//echo $sql;exit;
-=======
-        // echo $sql;
-        // exit;
-
->>>>>>> 1ab430938bac879696b807a04e6a307697d28164
+        //echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
