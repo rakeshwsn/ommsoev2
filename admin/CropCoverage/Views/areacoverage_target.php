@@ -27,23 +27,29 @@
             </div>
             <div class="col-lg-3">
                 <div class="form-group mg-b-10-force">
-                    <select name="season" id="season" class="form-control" disabled>
-                        <?php foreach ($seasons as $season) { ?>
-
-                            <option value="<?= $season['name'] ?>" <?php if ($season['id'] == 1) {
+                    <select name="season" id="season" class="form-control">
+                        <option value="">Select Season</option>
+                        <?php foreach ($seasons as $value => $season) { ?>
+                            <option value="<?= $value ?>" <?php if ($value == $current_season) {
                                   echo 'selected';
-                              } ?>><?= $season['name']; ?>
+                              } ?>>
+                                <?= $season ?>
                             </option>
                         <?php } ?>
                     </select>
                 </div>
             </div>
+            <div class="col-lg-3">
+                <button type="button" id="btn-filter" class="btn btn-outline btn-primary">
+                    <i class="fa fa-filter"></i> Filter</button>
+                <button type="button" id="btn-reset" class="btn btn-secondary">Reset</button>
+            </div>
+
         </div>
     </div>
 </div>
 <div class="tableFixHead">
-    <?php
-    if (empty($district_id)) { ?>
+    <?php if (empty($district_id)) { ?>
         <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
             <thead>
                 <tr>
@@ -477,6 +483,7 @@
 <?php } ?>
 
 <script>
+    //Script for calculation of ragi,non-ragi,follow-up for block
     $(document).ready(function () {
         $('tr').not(':last-child').each(function () {
             var row = $(this);
@@ -496,8 +503,8 @@
 
         $('.all-total-block').text(totalSum);
     });
-</script>
-<script>
+    //Script for calculation of ragi,non-ragi,follow-up for district
+
     $(document).ready(function () {
         $('tr').not(':last-child').each(function () {
             var row = $(this);
@@ -517,4 +524,78 @@
 
         $('.all-total').text(totalSum);
     });
+
+    //Script for filter and reset 
+
+    $(document).ready(function () {
+        $('#btn-filter').click(function () {
+            filterTable();
+        });
+
+        $('#btn-reset').click(function () {
+            resetFilters();
+        });
+
+        Codebase.helpers(['select2']);
+    });
+
+    function filterTable() {
+        var year_id = $('#filter_year_id').val();
+        var season = $('#filter_season').val();
+
+
+
+        // Perform your filtering logic here
+
+        // Example: Fetch filtered data using AJAX and update the table
+        $(document).ready(function () {
+            $('[name="year"],[name="season"]').on('change', function () {
+                year_id = $('#year').val();
+                season = $('#season').val();
+                $.ajax({
+                    url: '<?= $target_url ?>',
+                    type: "post",
+                    data: { year_id: year_id, season: season },
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $('.alert-dismissible, .text-danger').remove();
+                        // Show loading overlay or spinner if needed
+                    },
+                    success: function (data) {
+                        // Update your table with the filtered data
+                        updateTable(data);
+                    },
+                    complete: function () {
+                        // Hide loading overlay or spinner if needed
+                    },
+                    error: function () {
+                        // Handle error if the AJAX request fails
+                    }
+                });
+            });
+            $('[name="year"]').trigger('change');
+        });
+
+        function resetFilters() {
+            $('#form-filter')[0].reset();
+            // Perform resetting of the table here if needed
+        }
+
+        function updateTable(data) {
+            // Assuming your table body has an ID of 'table-body'
+            var tableBody = $('#table-body');
+            tableBody.empty(); // Clear the existing table rows
+
+            // Loop through the data and create rows for the table
+            for (var i = 0; i < data.length; i++) {
+                var row = '<tr>';
+                row += '<td>' + data[i].column1 + '</td>'; // Adjust column names
+                row += '<td>' + data[i].column2 + '</td>';
+                // Add more columns as needed
+                row += '</tr>';
+
+                tableBody.append(row);
+            }
+        }
+    }    
 </script>
