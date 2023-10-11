@@ -97,6 +97,7 @@ class AreaCoverage extends AdminController
         $blocks = $this->acModel->getAreaCoverageReport($filter);
 
 
+
         if ($data['block_id']) {
             $this->gps($blocks, $data);
         } else if ($data['district_id']) {
