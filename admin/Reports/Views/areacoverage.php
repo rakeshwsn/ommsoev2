@@ -1,5 +1,4 @@
 <?= $filter_panel ?>
-
 <div class="block block-themed">
     <div class="block-header bg-muted">
         <h3 class="block-title">

@@ -327,7 +327,7 @@ FROM soe_districts sd
   nur.nursery_raised,
   nur.balance_smi,
   nur.balance_lt,
-  m.farmers_covered,
+  nur.farmers_covered,
   m.fc_area,
   m.ragi_smi,
   m.ragi_lt,
@@ -391,6 +391,7 @@ FROM (SELECT
             SUM(an.nursery_raised) nursery_raised,
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
+            SUM(acc.farmers_covered) farmers_covered,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -418,7 +419,8 @@ FROM (SELECT
       nursery_raised,
       balance_smi,
       balance_lt,
-      start_date
+      start_date,
+       n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -426,18 +428,20 @@ FROM (SELECT
       WHERE n2.block_id = n1.block_id)) nur
     ON nur.block_id = m.block_id
 ORDER BY district,m.block";
-
+        // echo $sql;
+        // exit;
 
         return $this->db->query($sql)->getResult();
     }
 
     public function getByBlockNew($filter = [])
     {
+
         $sql = "SELECT
   gp,
   m.gp_id,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
-  m.farmers_covered,
+  nur.farmers_covered,
   m.fc_area,
   m.ragi_smi,
   m.ragi_lt,
@@ -493,6 +497,7 @@ FROM (SELECT
             SUM(an.nursery_raised) nursery_raised,
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
+            SUM(acc.farmers_covered) farmers_covered,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -519,7 +524,8 @@ FROM (SELECT
       nursery_raised,
       balance_smi,
       balance_lt,
-      start_date
+      start_date,
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -527,6 +533,8 @@ FROM (SELECT
       WHERE n2.gp_id = n1.gp_id)) nur
     ON nur.gp_id = m.gp_id
 ORDER BY m.gp";
+        // echo $sql;
+        // exit;
 
         return $this->db->query($sql)->getResult();
     }
@@ -595,7 +603,7 @@ FROM (SELECT
             SUM(an.nursery_raised) nursery_raised,
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
-              SUM(acc.farmers_covered) farmers_covered,
+            SUM(acc.farmers_covered) farmers_covered,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -632,13 +640,8 @@ FROM (SELECT
       WHERE n2.district_id = n1.district_id)) nur
     ON nur.district_id = m.district_id
 ORDER BY district";
-<<<<<<< HEAD
-//echo $sql;exit;
-=======
         // echo $sql;
         // exit;
-
->>>>>>> 1ab430938bac879696b807a04e6a307697d28164
         return $this->db->query($sql)->getResult();
     }
 

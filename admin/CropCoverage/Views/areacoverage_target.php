@@ -22,7 +22,6 @@
                             </option>
                         <?php } ?>
                     </select>
-
                 </div>
             </div>
             <div class="col-lg-3">
@@ -44,7 +43,6 @@
                     <i class="fa fa-filter"></i> Filter</button>
                 <button type="button" id="btn-reset" class="btn btn-secondary">Reset</button>
             </div>
-
         </div>
     </div>
 </div>
