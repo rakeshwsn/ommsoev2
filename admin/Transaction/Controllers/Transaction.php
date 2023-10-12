@@ -394,6 +394,12 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             $data['show_form'] = false;
         }
 
+        //special permission to edit for spmu user
+        if($this->user->agency_type_id==11){
+            $action = 'edit';
+            $data['show_form'] = true;
+        }
+
         //editing override for atma
         /*if($this->user->agency_type_id != $this->settings->block_user){
             $action = 'edit';
@@ -453,6 +459,10 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         }
         if($txn->agency_type_id == $this->settings->rs_user){
             $filter['component_agency_type_id'] = 9; //rs --to be added to settings
+        }
+        //added by rakesh
+        if($txn->agency_type_id > 9){
+            $filter['component_agency_type_id'] = $txn->agency_type_id;
         }
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
