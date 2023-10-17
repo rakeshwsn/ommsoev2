@@ -132,10 +132,10 @@ class Dashboard extends ResourceController
 		$data['blocks'] = [];
 
 		foreach ($establishes as $establish) {
-			$data['estdistrict'][] = $establish->district;
+			$data['estdistrict'][] = $establish->district;	
+			$data['blocks'][] = (int)$establish->blocks;
 			$data['chc'][] = (int)$establish->chc;
 			$data['cmsc'][] = (int)$establish->cmsc;
-			$data['blocks'][] = (int)$establish->blocks;
 		}
 		// dd($data);
 		return $this->respond($data);
