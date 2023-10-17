@@ -78,8 +78,10 @@ class Approve extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else {
+        } else if($week_dates) {
             $data['start_date'] = $start_date = $week_dates['start_date'];
+        } else {
+            $data['start_date'] = $start_date = '';
         }
 
         $acModel = new AreaCoverageModel();
