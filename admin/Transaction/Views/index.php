@@ -296,23 +296,25 @@
     }
 
     //check mis
-    $(function () {
-        $('#month').on('change',function () {
-            year = $('#year').val();
-            month = $(this).val();
-            $.ajax({
-                url:'<?=$check_mis_url?>',
-                data:{year:year,month:month},
-                success:function (json) {
-                    $('#btn-row').html(json.html);
-                },
-                error:function () {
-                    alert('Unable to check MIS upload');
-                }
+    <?php if($check_mis){ ?>
+        $(function () {
+            $('#month').on('change',function () {
+                year = $('#year').val();
+                month = $(this).val();
+                $.ajax({
+                    url:'<?=$check_mis_url?>',
+                    data:{year:year,month:month},
+                    success:function (json) {
+                        $('#btn-row').html(json.html);
+                    },
+                    error:function () {
+                        alert('Unable to check MIS upload');
+                    }
+                });
             });
+            $('#month').trigger('change');
         });
-        $('#month').trigger('change');
-    });
+    <?php } ?>
 
 </script>
 <?php js_end(); ?>

@@ -164,7 +164,7 @@ class Dashboard extends ResourceController
 			$year_id = $this->request->getGet('year_id');
 		}
 
-		$enterprises = $enterprisemodel->getYearwisedata($filter);
+		$enterprises = $enterprisemodel->getYearwisedataAll($filter);
 
 		$data['enterprises'] = $enterprises;
 		$data['year'] = [];
