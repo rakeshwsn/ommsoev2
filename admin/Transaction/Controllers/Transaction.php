@@ -46,6 +46,9 @@ class Transaction extends AdminController {
 
         //control validation from env file
         $data['upload_enabled'] = false;
+        $data['check_mis'] = true;
+        $data['mis_uploaded'] = false;
+
         if(env('soe.uploadDateValidation')){
 
             $upload_model = new AllowuploadModel();
@@ -62,6 +65,13 @@ class Transaction extends AdminController {
             }
 
             $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
+
+            //exception --rakesh 12-10
+            if((int)in_array($this->user->id,[193])==true){
+                $data['upload_enabled'] = true;
+                $data['check_mis'] = false;
+                $data['mis_uploaded'] = true;
+            }
         }
         
         $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
@@ -70,7 +80,6 @@ class Transaction extends AdminController {
         
         $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies():[];
 
-        $data['mis_uploaded'] = false;
         $misModel = new MISModel();
         $mis_exist = $misModel->where([
             'block_id' => $this->user->block_id,
@@ -385,6 +394,12 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             $data['show_form'] = false;
         }
 
+        //special permission to edit for spmu user
+        if($this->user->agency_type_id==11){
+            $action = 'edit';
+            $data['show_form'] = true;
+        }
+
         //editing override for atma
         /*if($this->user->agency_type_id != $this->settings->block_user){
             $action = 'edit';
@@ -444,6 +459,10 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         }
         if($txn->agency_type_id == $this->settings->rs_user){
             $filter['component_agency_type_id'] = 9; //rs --to be added to settings
+        }
+        //added by rakesh
+        if($txn->agency_type_id > 9){
+            $filter['component_agency_type_id'] = $txn->agency_type_id;
         }
 
         $block_components = $txnModel->getBlockDistrictReport($filter);
@@ -738,12 +757,8 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $agency_type_id = $this->user->agency_type_id;
 
-        //block and district can enter for cbo
-        if ($this->user->agency_type_id == $this->settings->block_user
-            || $this->user->agency_type_id == $this->settings->district_user) {
-            if($this->request->getGet('agency_type_id')) {
-                $agency_type_id = $this->request->getGet('agency_type_id');
-            }
+        if($this->request->getGet('agency_type_id')) {
+            $agency_type_id = $this->request->getGet('agency_type_id');
         }
 
         $txn_type = $this->request->getGet('txn_type');
@@ -897,9 +912,10 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         if($district_id){
             $filter['district_id'] = $district_id;
         }
-        if(in_array($agency_type_id,[$this->settings->ps_user,$this->settings->rs_user,11])) {
-            $filter['component_agency_type_id'] = $agency_type_id;
-        }
+//        if(in_array($agency_type_id,[$this->settings->ps_user,$this->settings->rs_user,11])) {
+//            $filter['component_agency_type_id'] = $agency_type_id;
+//        }
+        $filter['component_agency_type_id'] = $agency_type_id;
         if($agency_type_id==$this->settings->district_user){
             $filter['component_agency_type_id'] = 7;
             $filter['category'] = ['program', 'pmu'];
