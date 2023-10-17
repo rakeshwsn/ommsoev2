@@ -83,8 +83,12 @@ class AreaCoverage extends AdminController
             ];
 
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
-            //dd($blocks);
-            $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+
+            $data['start_date'] = '';
+            $weekDate = $this->areacoveragemodel->getWeekDate();
+            if($weekDate){
+                $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+            }
             $data['filtered_data_url'] = admin_url('areacoverage/filtered');
             $weeks = $this->areacoveragemodel->getWeeks();
             $data['weeks'] = [];
