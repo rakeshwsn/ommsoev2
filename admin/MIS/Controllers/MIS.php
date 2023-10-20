@@ -428,11 +428,16 @@ class MIS extends AdminController
         } else {
             $file = $this->request->getFile('file');
             $file->move(DIR_UPLOAD . 'mis');
+            $message = '<span class="badge badge-warning badge-file-name p-2">
+  <a target="_blank" class="text-muted" href="'.base_url('uploads/mis/'.$file->getName()).'">'.$file->getName().'</a>
+  <a class="remove ml-2" role="button"><i class="fa fa-close"></i></a> 
+</span>';
             $data = [
                 'status'=>true,
-                'message'=> '<a target="_blank" href="'.base_url('uploads/mis/'.$file->getName()).'">'.$file->getName().'</a>',
+//                'message'=> '<a target="_blank" href="'.base_url('uploads/mis/'.$file->getName()).'">'.$file->getName().'</a>',
                 'filename' => $file->getName(),
-                'filepath' => $file->getName()
+                'filepath' => $file->getName(),
+                'message' => $message
             ];
         }
         return $this->response->setJSON($data);

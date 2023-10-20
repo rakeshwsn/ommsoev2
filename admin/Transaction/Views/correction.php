@@ -1,5 +1,8 @@
 <!-- Main content -->
 <div class="block" id="upload-controls">
+    <div class="block-header block-header-default">
+        <h3 class="block-title">Filter Submissions</h3>
+    </div>
     <div class="block-content block-content-full">
         <form>
             <div class="row">
