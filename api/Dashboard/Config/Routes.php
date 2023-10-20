@@ -21,4 +21,6 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->get('enterprises', 'Dashboard\Controllers\Dashboard::enterprises');
     $routes->get('summary', 'Dashboard\Controllers\Dashboard::summary');
     $routes->get('odmapdata', 'Dashboard\Controllers\Dashboard::odmapdata');
+    $routes->get('sumdata', 'Dashboard\Controllers\Dashboard::sumdata');
+
 });
