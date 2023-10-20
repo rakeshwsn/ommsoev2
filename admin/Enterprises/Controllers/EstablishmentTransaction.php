@@ -117,7 +117,7 @@ class EstablishmentTransaction extends AdminController
         $data['excel_link'] = admin_url('enterprises/download');
         $data['upload_url'] = admin_url('enterprises/upload');
 
-
+// dd($data['excel_link']);
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
@@ -206,7 +206,7 @@ class EstablishmentTransaction extends AdminController
                 'district_id' => $district_id
             ];
             $details = $enterpriseunitsmodel->getAll($filter);
-            // printr($details);
+            // dd($details);
             $worksheet_unit[$key]['id'] = $unit->id;
             $worksheet_unit[$key]['name'] = $unit->name;
             $worksheet_unit[$key]['group_unit'] = $unit->group_unit;

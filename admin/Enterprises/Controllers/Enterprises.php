@@ -23,50 +23,49 @@ class Enterprises extends AdminController
 	public function index()
 	{
 		$this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
-		$this->template->set('header',true);
+		$this->template->set('header', true);
 		helper('form');
 		$enterprisesmodel = new EnterprisesModel();
 		$distModel = new DistrictModel();
-		$data['districts'][0] = 'Select District';
+		$blockmodel = new BlockModel();
 
+		//populate districts
+		$data['districts'][0] = 'Select District';
 		$districts = $distModel->findAll();
 		foreach ($districts as $district) {
 			$data['districts'][$district->id] = $district->name;
 		}
 
-
-		$blockmodel = new BlockModel();
-		$data['blocks'][0] = 'Select Block';
 		$data['district_id'] = 0;
-		$data['block_id'] = 0;
-		
-		$data['years'][0] = 'Select DOE';
 
+
+		//populate blocks of district selected
+		$data['blocks'][0] = 'Select Block';
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
-			$blocks = $blockmodel->where('district_id', $data['district_id'])->findAll();
 
-			$data['blocks'][0] = 'Select Block';
+			$blocks = $blockmodel->where('district_id', $data['district_id'])->findAll();
 			foreach ($blocks as $block) {
 				$data['blocks'][$block->id] = $block->name;
 			}
 		}
+
+		//get years from district selected
+		$data['years'][0] = 'Select DOE';
 		if ($this->request->getGet('district_id')) {
 			$district_id = $this->request->getGet('district_id');
 			$yeardata = $enterprisesmodel->yearWise($district_id);
 
-			$data['years'][0] = 'Select DOE';
 			foreach ($yeardata as $year) {
 				$data['years'][] = $year->year;
 			}
 		}
-		
-		//  printr($data['years']); exit;
 
+		$data['block_id'] = 0;
 		if ($this->request->getGet('block_id')) {
-
 			$data['block_id'] = $this->request->getGet('block_id');
 		}
+
 		$data['management_unit_type'] = '';
 		if ($this->request->getGet('management_unit_type')) {
 			$data['management_unit_type'] = $this->request->getGet('management_unit_type');
@@ -77,29 +76,11 @@ class Enterprises extends AdminController
 			$data['doeyear'] = $this->request->getGet('doeyear');
 		}
 
-		$filter = [];
-		if ($data['district_id'] > 0) {
-			$filter['district_id'] = $data['district_id'];
-		}
-
-		if ($data['block_id'] > 0) {
-			$filter['block_id'] = $data['block_id'];
-		}
-		if ($data['management_unit_type'] != '') {
-			$filter['management_unit_type'] = $data['management_unit_type'];
-		}
-		if ($data['doeyear'] > 0) {
-			$filter['doeyear'] = $data['doeyear'];
-		}
-		// dd($filter);
-		// printr($data);exit;
-		$enterpriseslist = $enterprisesmodel->getAll($filter);
 		
-		// dd($enterpriseslist);
-		// exit;
+		$filteredData = $this->filter($data);
 		$data['enterprises'] = [];
 
-		foreach ($enterpriseslist as $row) {
+		foreach ($filteredData as $row) {
 			$data['enterprises'][] = [
 				'districts' => $row->districts,
 				'blocks' => $row->blocks,
@@ -114,24 +95,48 @@ class Enterprises extends AdminController
 			];
 		}
 		// dd($data);
-
+		// 
 		$data['excel_link'] = admin_url('enterprises/exceldownld');
 
-		// printr($data);
-		// exit;
-			// dd($data);
+		// dd($data);
 		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
 	}
 
+	private function filter($data)
+	{
+		$enterprisesmodel = new EnterprisesModel();
+		$filter = [];
+		if ($this->request->getGet('district_id') > 0) {
+			$filter['district_id'] = $this->request->getGet('district_id');
+		}
+
+		if ($this->request->getGet('block_id') > 0) {
+			$filter['block_id'] = $this->request->getGet('block_id');
+		}
+		if ($this->request->getGet('management_unit_type') != '') {
+			$filter['management_unit_type'] = $this->request->getGet('management_unit_type');
+		}
+		if ($this->request->getGet('doeyear') > 0) {
+			$filter['doeyear'] = $this->request->getGet('doeyear');
+		}
+		
+		
+		$filteredData = $enterprisesmodel->getAll($filter);
+		// dd($filteredData);
+		return $filteredData;
+
+	}
 
 	public function download()
 	{
 		$enterprisesmodel = new EnterprisesModel();
-		$totalEntData = $enterprisesmodel->getAll();
+
+		$filteredData = $this->filter($data=[]);
+
 		$worksheet_unit = [];
 		$data['entdatas'] = [];
 
-		foreach ($totalEntData as $row) {
+		foreach ($filteredData as $row) {
 			$data['entdatas'][] = [
 				'unit_name' => $row->unit_name,
 				'districts' => $row->districts,
@@ -212,6 +217,8 @@ class Enterprises extends AdminController
 		$writer->save('php://output');
 		exit();
 	}
+
+
 	public function add()
 	{
 

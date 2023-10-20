@@ -1,5 +1,7 @@
 <?php
+
 namespace Api\Dashboard\Models;
+
 use CodeIgniter\Model;
 
 class OdMapModel extends Model
@@ -38,7 +40,7 @@ class OdMapModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 	protected $bulider;
-	
+
 	public function getestablishmentmap()
 	{
 		$sql = "SELECT
@@ -53,11 +55,23 @@ class OdMapModel extends Model
 		sd.name districts
 	  FROM dashboard_district_map ddm
 		LEFT JOIN soe_districts sd
-		  ON ddm.district_id = sd.id";
+		  ON ddm.district_id = sd.id
+	  WHERE ddm.deleted_at IS NULL";
 
 		return $this->db->query($sql)->getResult();
 	}
-	
 
-	
+	public function getEstablishSumData()
+	{
+		$sql = "SELECT
+		SUM(gps) sum_of_gps,
+		SUM(villages) sum_of_villages,
+		SUM(tentative_farmers) sum_of_farmers,
+		SUM(blocks) sum_of_blocks,
+		COUNT(district_id) sum_districts
+		FROM dashboard_district_map
+		WHERE deleted_at IS NULL";
+
+		return $this->db->query($sql)->getResult();
+	}
 }

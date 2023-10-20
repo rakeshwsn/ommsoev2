@@ -123,7 +123,7 @@ class Dashboard extends ResourceController
 	public function establishment()
 	{
 		$establishmentchartmodel = new EstablishmentChartModel();
-	
+
 		$establishes = $establishmentchartmodel->getestablishment();
 
 		$data['estdistrict'] = [];
@@ -132,7 +132,7 @@ class Dashboard extends ResourceController
 		$data['blocks'] = [];
 
 		foreach ($establishes as $establish) {
-			$data['estdistrict'][] = $establish->district;	
+			$data['estdistrict'][] = $establish->district;
 			$data['blocks'][] = (int)$establish->blocks;
 			$data['chc'][] = (int)$establish->chc;
 			$data['cmsc'][] = (int)$establish->cmsc;
@@ -236,8 +236,7 @@ class Dashboard extends ResourceController
 		$odmapdatas = $odmapmodel->getestablishmentmap();
 
 		$data['heading'] = 'Scale of Odisha Millets Mission';
-
-		$data['data'] = [];
+	
 		foreach ($odmapdatas as $mapdata) {
 			$data['data'][] = [
 				'district_id' => $mapdata->district_id,
@@ -246,10 +245,24 @@ class Dashboard extends ResourceController
 				'total_gps' => $mapdata->total_gps,
 				'total_villages' => $mapdata->total_villages,
 				'total_farmers' => $mapdata->total_farmers,
-
 			];
 		}
-		// dd($data);
+
+		return $this->respond($data);
+	}
+	public function sumdata()
+	{
+		$odmapmodel = new OdMapModel();
+		$sumdatas = $odmapmodel->getEstablishSumData();
+		foreach ($sumdatas as $sumdata) {
+			$data['sumdata'] = [
+				'sum_of_gps' => $sumdata->sum_of_gps,
+				'sum_of_villages' => $sumdata->sum_of_villages,
+				'sum_of_farmers' =>  $sumdata->sum_of_farmers,
+				'sum_of_blocks' =>  $sumdata->sum_of_blocks,
+				'sum_districts' => $sumdata->sum_districts
+			];
+		}
 		return $this->respond($data);
 	}
 	public function enterprises()
@@ -422,7 +435,7 @@ class Dashboard extends ResourceController
 		$currentyeardata = new CurrentYearChartModel();
 
 		$crntyrdatas = $currentyeardata->getcurrentyeardata();
-		
+
 		$data['currentdistrict'] = [];
 		$data['currentfarmers'] = [];
 		$data['currentachievements'] = [];
@@ -432,7 +445,7 @@ class Dashboard extends ResourceController
 			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
 			$data['currentachievements'][] = (float)$crntyrdata->achievement;
 		}
-		
+
 		return $this->respond($data);
 	}
 }
