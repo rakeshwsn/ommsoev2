@@ -154,6 +154,15 @@
     $(function () {
         numOnly();
         decimalOnly();
+
+        //change request -- 20/10/2023
+        //remove uploaded file when close button is clicked
+        $(document).on('click','.dm-uploader .remove',function(){
+            upldr = $(this).closest('.dm-uploader');
+            $(upldr).find('.badge-file-name').remove();
+            $(upldr).find('.filepath').val('');
+            $(upldr).find('.status').text('Upload file');
+        });
     });
 
     //rakesh
@@ -201,6 +210,7 @@
             }
         });
     }
+
 </script>
 <?php js_end(); ?>
 
