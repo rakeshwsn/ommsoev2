@@ -531,6 +531,7 @@
             categories: [],
             crosshair: true
         }],
+        
         yAxis: [{ // Primary yAxis
             labels: {
                 format: '',
