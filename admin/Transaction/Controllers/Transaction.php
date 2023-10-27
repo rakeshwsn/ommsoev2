@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace Admin\Transaction\Controllers;
+
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Common\Models\CommonModel;
 use Admin\Common\Models\YearModel;
@@ -17,9 +19,11 @@ use Config\Url;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
-class Transaction extends AdminController {
+class Transaction extends AdminController
+{
 
     use TreeTrait;
+
     private $cells = [
         'month' => 'A1',
         'year' => 'B1',
@@ -36,12 +40,13 @@ class Transaction extends AdminController {
         'cum_cell' => 'K4',
     ];
 
-    public function index() {
+    public function index()
+    {
 
-        $this->template->add_package(['datatable','uploader','jquery_loading'],true);
+        $this->template->add_package(['datatable', 'uploader', 'jquery_loading'], true);
         $data = [];
         $data['months'] = getMonths();
-        $data['years'] = (new YearModel())->where('id',getCurrentYearId())->asArray()->findAll();
+        $data['years'] = (new YearModel())->where('id', getCurrentYearId())->asArray()->findAll();
         $data['download_url'] = Url::transactionDownloadTemplate;
 
         //control validation from env file
@@ -49,7 +54,7 @@ class Transaction extends AdminController {
         $data['check_mis'] = true;
         $data['mis_uploaded'] = false;
 
-        if(env('soe.uploadDateValidation')){
+        if (env('soe.uploadDateValidation')) {
 
             $upload_model = new AllowuploadModel();
 
@@ -64,21 +69,21 @@ class Transaction extends AdminController {
                 $months[] = $item['month'];
             }
 
-            $data['upload_enabled'] = in_array(getCurrentMonthId(),$months);
+            $data['upload_enabled'] = in_array(getCurrentMonthId(), $months);
 
             //exception --rakesh 12-10
-            if((int)in_array($this->user->id,[193])==true){
+            if ((int)in_array($this->user->id, [193]) == true) {
                 $data['upload_enabled'] = true;
                 $data['check_mis'] = false;
                 $data['mis_uploaded'] = true;
             }
         }
-        
-        $data['download_button'] = ($this->user->agency_type_id==$this->settings->block_user) && $data['upload_enabled'];
+
+        $data['download_button'] = ($this->user->agency_type_id == $this->settings->block_user) && $data['upload_enabled'];
         $data['month_id'] = getCurrentMonthId();
         $data['year_id'] = getCurrentYearId();
-        
-        $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies():[];
+
+        $data['fund_agencies'] = !$this->user->fund_agency_id ? (new BlockModel())->getFundAgencies() : [];
 
         $misModel = new MISModel();
         $mis_exist = $misModel->where([
@@ -90,10 +95,10 @@ class Transaction extends AdminController {
             'user_id' => $this->user->user_id,
         ])->first();
 
-        if($mis_exist){
+        if ($mis_exist) {
             $data['mis_uploaded'] = true;
         }
-       
+
         $data['datatable_url'] = Url::transactionDatatable;
         $data['check_mis_url'] = Url::misIsUploaded;
         $data['upload_url'] = Url::transactionUpload;
@@ -104,7 +109,8 @@ class Transaction extends AdminController {
         return $this->template->view('Admin\Transaction\Views\index', $data);
     }
 
-    private function filterOptions(&$data) {
+    private function filterOptions(&$data)
+    {
 
         $data['blocks'] = [];
         /*if ($this->user->agency_type_id != $this->settings->block_user) {
@@ -131,61 +137,66 @@ class Transaction extends AdminController {
 
     }
 
-    public function search() {
-        if(!$this->request->isAJAX()){
+    public function search()
+    {
+        if (!$this->request->isAJAX()) {
             return $this->response->setStatusCode(404);
         }
 
         $txnModel = new TransactionModel();
         $requestData = $_REQUEST;
-        $totalData = $txnModel->getTotal(['user_id'=>$this->user->user_id]);
+        $totalData = $txnModel->getTotal(['user_id' => $this->user->user_id]);
         $totalFiltered = $totalData;
 
         $filter_search = $requestData['search']['value'];
 
         $order_columns = [
-            't.id','t.date_added','t.year','t.month','t.txn_type','t.agency_type_id'
+            't.id', 't.date_added', 't.year', 't.month', 't.txn_type', 't.agency_type_id'
         ];
+        $order = '';
+        $sort = '';
+        if (!empty($requestData['order'])) {
+            $order = $requestData['order'][0]['dir'];
+            $sort = $order_columns[$requestData['order'][0]['column']];
+        }
         $filter_data = [
             'user_id' => $this->user->user_id,
             'filter_search' => $filter_search,
-            'order' => $requestData['order'][0]['dir'],
-            'sort' => $order_columns[$requestData['order'][0]['column']],
+            'order' => $order,
+            'sort' => $sort,
             'start' => $requestData['start'],
             'limit' => $requestData['length']
         ];
-//        $totalFiltered = 0;
 
-
-$totalFiltered = $txnModel->getTotal($filter_data);
+        $totalFiltered = $txnModel->getTotal($filter_data);
 
         $filteredData = $txnModel->getAll($filter_data);
 
         $datatable = [];
 
-        foreach($filteredData as $result) {
+        foreach ($filteredData as $result) {
 
-            $action  = '<div class="btn-group">';
-            $action .= '<a class="btn btn-sm btn-primary" href="' . Url::transactionEdit.'/'.$result->id . '"><i class="fa fa-pencil"></i></a>';
+            $action = '<div class="btn-group">';
+            $action .= '<a class="btn btn-sm btn-primary" href="' . Url::transactionEdit . '/' . $result->id . '"><i class="fa fa-pencil"></i></a>';
             $action .= '</div>';
 
-            if($result->status==0){
-                $status = '<label class="badge badge-warning">'.$this->statuses[$result->status].'</label>';
+            if ($result->status == 0) {
+                $status = '<label class="badge badge-warning">' . $this->statuses[$result->status] . '</label>';
             }
-            if($result->status==1){
-                $status = '<label class="badge badge-success">'.$this->statuses[$result->status].'</label>';
+            if ($result->status == 1) {
+                $status = '<label class="badge badge-success">' . $this->statuses[$result->status] . '</label>';
             }
-            if($result->status==2){
-                $status = '<label class="badge badge-danger">'.$this->statuses[$result->status].'</label>';
+            if ($result->status == 2) {
+                $status = '<label class="badge badge-danger">' . $this->statuses[$result->status] . '</label>';
             }
 
-            if($result->transaction_type=='expense'){
+            if ($result->transaction_type == 'expense') {
                 $txn_type = '<label class="badge badge-danger">Expense</label>';
             } else {
                 $txn_type = '<label class="badge badge-success">Fund Receipt</label>';
             }
 
-            $datatable[]=array(
+            $datatable[] = array(
                 $result->id,
                 ymdToDmy($result->date_added),
                 $result->year,
@@ -202,17 +213,18 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         }
         //printr($datatable);
         $json_data = array(
-            "draw"            => isset($requestData['draw']) ? intval( $requestData['draw'] ):1,
-            "recordsTotal"    => intval( $totalData ),
-            "recordsFiltered" => intval( $totalFiltered ),
-            "data"            => $datatable
+            "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $datatable
         );
         ob_end_clean();
         return $this->response->setJSON($json_data);
 
     }
 
-    public function upload() {
+    public function upload()
+    {
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
@@ -224,9 +236,9 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         if (!$input) {
             return $this->response->setJSON([
-                'status'=>false,
-                'message'=>'Invalid file',
-                'errors'=>$this->validator->getErrors()
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
             ]);
         } else {
             $file = $this->request->getFile('file');
@@ -235,17 +247,17 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
             //validate file name
 
-            if(strpos($filename,'soe')===false && strpos($filename,'fund')===false){
+            if (strpos($filename, 'soe') === false && strpos($filename, 'fund') === false) {
                 $invalid_filename = [
-                    'status'=>false,
-                    'message'=>'This is not a valid file',
-                    'errors'=> []
+                    'status' => false,
+                    'message' => 'This is not a valid file',
+                    'errors' => []
                 ];
                 return $this->response->setJSON($invalid_filename);
             }
 
-            $file->move(DIR_UPLOAD.'/transactions');
-            $_file = DIR_UPLOAD.'/transactions/'.$file->getName();
+            $file->move(DIR_UPLOAD . '/transactions');
+            $_file = DIR_UPLOAD . '/transactions/' . $file->getName();
 
             $reader = IOFactory::createReader('Xls');
 
@@ -260,13 +272,13 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             $txn_type = $row_data[0][2];
             $fund_agency_id = $row_data[0][3];
             $agency_type_id = $row_data[0][4];
-            $txn_type_text = $txn_type=='expense' ? 'Expenditure':'Fund Receipt';
+            $txn_type_text = $txn_type == 'expense' ? 'Expenditure' : 'Fund Receipt';
 
             $txnModel = new TransactionModel();
             $txn = $txnModel
                 ->where([
-                    'block_id'=>$this->user->block_id,
-                    'agency_type_id'=>$agency_type_id,
+                    'block_id' => $this->user->block_id,
+                    'agency_type_id' => $agency_type_id,
                     'month' => $month,
                     'year' => $year,
                     'transaction_type' => $txn_type,
@@ -274,28 +286,28 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 ])->first();
 
             $error = false;
-            if($txn){
+            if ($txn) {
                 $data = [
                     'status' => false,
-                    'message' => $txn_type_text.' for the month already exists'
+                    'message' => $txn_type_text . ' for the month already exists'
                 ];
                 $error = true;
                 unlink($_file);
             }
             //check if date is open
             $upload_model = new AllowuploadModel();
-            if($upload_model){
+            if ($upload_model) {
 
             }
-            if(!$error){
+            if (!$error) {
                 $txn_data = [
-                    'block_id'=>$this->user->block_id,
-                    'district_id'=>$this->user->district_id,
-                    'agency_type_id'=>$agency_type_id,
+                    'block_id' => $this->user->block_id,
+                    'district_id' => $this->user->district_id,
+                    'agency_type_id' => $agency_type_id,
                     'month' => $month,
                     'year' => $year,
                     'filename' => $file->getName(),
-                    'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
+                    'status' => (int)in_array($this->user->agency_type_id, $this->settings->auto_approve_users),
                     'date_added' => date('Y-m-d'),
                     'user_id' => $this->user->user_id,
                     'transaction_type' => $txn_type,
@@ -307,7 +319,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 $row_data = array_slice($row_data, 6);
                 $components = [];
                 foreach ($row_data as $row) {
-                    if($row[0]){
+                    if ($row[0]) {
                         $components[] = [
                             'transaction_id' => $txn_id,
                             'component_id' => (int)$row[0],
@@ -319,32 +331,33 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 $tcModel = new TransactionComponentModel();
                 $tcModel->insertBatch($components);
 
-                $data = ['status'=>true];
+                $data = ['status' => true];
             }
             ob_end_clean();
             return $this->response->setJSON($data);
         }
     }
 
-    public function edit() {
+    public function edit()
+    {
         $txnModel = new TransactionModel();
         $txnCompModel = new TransactionComponentModel();
         $data = [];
 
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
             $id = $this->uri->getSegment(4);
 
             $txn = $txnModel->find($this->uri->getSegment(4));
             $txnModel->delete($id);
 
             $txn_data = [
-                'block_id'=>$txn->block_id,
-                'district_id'=>$txn->district_id,
-                'agency_type_id'=>$txn->agency_type_id,
+                'block_id' => $txn->block_id,
+                'district_id' => $txn->district_id,
+                'agency_type_id' => $txn->agency_type_id,
                 'month' => $txn->month,
                 'year' => $txn->year,
                 'filename' => $txn->filename,
-                'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
+                'status' => (int)in_array($this->user->agency_type_id, $this->settings->auto_approve_users),
                 'date_added' => date('Y-m-d'),
                 'user_id' => $txn->user_id,
                 'transaction_type' => $txn->transaction_type,
@@ -353,7 +366,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             $txn_id = $txnModel->insert($txn_data);
 
             //delete the existing transaction components
-            $txnCompModel->where(['transaction_id'=>$id])->delete();
+            $txnCompModel->where(['transaction_id' => $id])->delete();
             $components = [];
 
             foreach ($this->request->getPost() as $component_id => $value) {
@@ -366,7 +379,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             }
             $txnCompModel->insertBatch($components);
 
-            $this->session->setFlashdata('message','Your changes have been saved');
+            $this->session->setFlashdata('message', 'Your changes have been saved');
             return redirect()->to(Url::transaction);
         }
 
@@ -374,19 +387,19 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $txn = $txnModel->find($this->uri->getSegment(4));
 
-            if(!$txn){
-                $this->session->setFlashdata('message','Transaction not found!');
+            if (!$txn) {
+                $this->session->setFlashdata('message', 'Transaction not found!');
                 return redirect()->to(Url::transaction);
             }
 
             //validate user transaction
-            if(!$txnModel->canEdit($txn)){
-                $this->session->setFlashdata('message','You cannot edit this transaction');
+            if (!$txnModel->canEdit($txn)) {
+                $this->session->setFlashdata('message', 'You cannot edit this transaction');
                 return redirect()->to(Url::transaction);
             }
         }
 
-        if($txn->status==0 || $txn->status==2){
+        if ($txn->status == 0 || $txn->status == 2) {
             $action = 'edit';
             $data['show_form'] = true;
         } else {
@@ -395,7 +408,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         }
 
         //special permission to edit for spmu user
-        if($this->user->agency_type_id==11){
+        if ($this->user->agency_type_id == 11) {
             $action = 'edit';
             $data['show_form'] = true;
         }
@@ -409,19 +422,19 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $data['block'] = $txn->block;
         $data['district'] = $txn->district;
         $data['agency_type'] = (new UserGroupModel())->find($txn->agency_type_id)->name;
-        $data['fund_agency'] = $txn->fund_agency_id ? (new CommonModel())->getFundAgency($txn->fund_agency_id)['name']:'-';
+        $data['fund_agency'] = $txn->fund_agency_id ? (new CommonModel())->getFundAgency($txn->fund_agency_id)['name'] : '-';
         $data['month'] = getMonthById($txn->month)['name'];
         $data['year'] = getYear($txn->year);
         $data['date_added'] = ymdToDmy($txn->date_added);
         $data['phy'] = $txn->physical;
         $data['fin'] = $txn->financial;
-        $data['allow_negative_amount'] = $txn->transaction_type=='fund_receipt';
+        $data['allow_negative_amount'] = $txn->transaction_type == 'fund_receipt';
 
         $data['status'] = $this->statuses[$txn->status];
 
         $data['remarks'] = $txn->remarks;
 
-        $data['txn_type_text'] = $txn->transaction_type=='expense'?'Expense':'Fund Receipt';
+        $data['txn_type_text'] = $txn->transaction_type == 'expense' ? 'Expense' : 'Fund Receipt';
 
         $filter = [
             'user_id' => $txn->user_id,
@@ -437,31 +450,31 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $filter['fund_agency_id'] = $user->fund_agency_id;
 
         //for wassan --rakesh
-        if($txn->agency_type_id == $this->settings->ps_user){
+        if ($txn->agency_type_id == $this->settings->ps_user) {
             $filter['fund_agency_id'] = $txn->fund_agency_id;
         }
 
-        if($txn->agency_type_id == $this->settings->block_user
-            || $txn->agency_type_id == $this->settings->cbo_user){
+        if ($txn->agency_type_id == $this->settings->block_user
+            || $txn->agency_type_id == $this->settings->cbo_user) {
             $filter['component_agency_type_id'] = 5; //fa/cbo --to be added to settings
             $filter['category'] = 'program';
         }
-        if($txn->agency_type_id == $this->settings->district_user){
+        if ($txn->agency_type_id == $this->settings->district_user) {
             $filter['component_agency_type_id'] = 7; //fa/cbo --to be added to settings
             //for dmf angul/keunjhar
-            if(in_array($this->user->district_id,[7,15])){
+            if (in_array($this->user->district_id, [7, 15])) {
                 $filter['component_agency_type_id'] = 7;
-                $filter['category'] = ['program', 'pmu','addl'];
+                $filter['category'] = ['program', 'pmu', 'addl'];
             }
         }
-        if($txn->agency_type_id == $this->settings->ps_user){
+        if ($txn->agency_type_id == $this->settings->ps_user) {
             $filter['component_agency_type_id'] = 8; //ps --to be added to settings
         }
-        if($txn->agency_type_id == $this->settings->rs_user){
+        if ($txn->agency_type_id == $this->settings->rs_user) {
             $filter['component_agency_type_id'] = 9; //rs --to be added to settings
         }
         //added by rakesh
-        if($txn->agency_type_id > 9){
+        if ($txn->agency_type_id > 9) {
             $filter['component_agency_type_id'] = $txn->agency_type_id;
         }
 
@@ -469,12 +482,13 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $components = $this->buildTree($block_components, 'parent', 'scomponent_id');
 
-        $data['components'] = $this->getTable($components,$txn->transaction_type,$action);
+        $data['components'] = $this->getTable($components, $txn->transaction_type, $action);
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
 
-    public function downloadTemplate() {
+    public function downloadTemplate()
+    {
 
         $month_id = $this->request->getGet('month');
 
@@ -483,27 +497,27 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $txn_type = $this->request->getGet('txn_type');
 
         $block_id = $this->user->block_id;
-        if($this->request->getGet('block_id')) {
+        if ($this->request->getGet('block_id')) {
             $block_id = $this->request->getGet('block_id');
         }
 
         $district_id = $this->user->district_id;
-        if($this->request->getGet('district_id')) {
+        if ($this->request->getGet('district_id')) {
             $district_id = $this->request->getGet('district_id');
         }
 
         $agency_type_id = $this->user->agency_type_id;
-        if($this->request->getGet('agency_type_id')) {
+        if ($this->request->getGet('agency_type_id')) {
             $agency_type_id = $this->request->getGet('agency_type_id');
         }
 
-        if(!$txn_type){
-            $this->session->setFlashdata('message','Invalid request!!');
+        if (!$txn_type) {
+            $this->session->setFlashdata('message', 'Invalid request!!');
             return redirect()->to(Url::transaction);
         }
 
         $reader = IOFactory::createReader('Xls');
-        $template_file = DIR_TEMPLATE.'soe_fund_receipt.xls';
+        $template_file = DIR_TEMPLATE . 'soe_fund_receipt.xls';
 
         $spreadsheet = $reader->load($template_file);
 
@@ -516,7 +530,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $data = [
             'month' => $month_id,
             'year' => $year,
-            'month_year' => $month.' '.$fin_year,
+            'month_year' => $month . ' ' . $fin_year,
             'agency_type_id' => $agency_type_id,
             'txn_type' => $txn_type,
             'district_id' => $district_id,
@@ -525,12 +539,12 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         ];
         $activesheet->setTitle('Sheet1');
 
-        $this->fillExcel($activesheet,$data);
+        $this->fillExcel($activesheet, $data);
 
         $writer = new Xls($spreadsheet);
-        $txn_type_filename = $txn_type=='expense' ? 'SOE':'Fund_receipt';
+        $txn_type_filename = $txn_type == 'expense' ? 'SOE' : 'Fund_receipt';
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'.$txn_type_filename . '_' . $this->user->username . '_' . $month . '-' . $year . '-' . date('Y-m-d His') . '.xls');
+        header('Content-Disposition: attachment; filename="' . $txn_type_filename . '_' . $this->user->username . '_' . $month . '-' . $year . '-' . date('Y-m-d His') . '.xls');
         ob_end_clean();
         $writer->save("php://output");
 
@@ -732,32 +746,33 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         }
     }
 
-    public function add() {
+    public function add()
+    {
 
         $txnModel = new TransactionModel();
         $txnCompModel = new TransactionComponentModel();
 
         $block_id = $this->user->block_id;
-        if($this->request->getGet('block_id')) {
+        if ($this->request->getGet('block_id')) {
             $block_id = $this->request->getGet('block_id');
         }
         $district_id = $this->user->district_id;
-        if($this->request->getGet('district_id')) {
+        if ($this->request->getGet('district_id')) {
             $district_id = $this->request->getGet('district_id');
         }
 
-        if($this->user->agency_type_id == $this->settings->district_user){
+        if ($this->user->agency_type_id == $this->settings->district_user) {
             $district_id = $this->user->district_id;
         }
 
-        $fund_agency_id=$this->user->fund_agency_id;
-        if($this->request->getGet('fund_agency_id')) {
+        $fund_agency_id = $this->user->fund_agency_id;
+        if ($this->request->getGet('fund_agency_id')) {
             $fund_agency_id = $this->request->getGet('fund_agency_id');
         }
 
         $agency_type_id = $this->user->agency_type_id;
 
-        if($this->request->getGet('agency_type_id')) {
+        if ($this->request->getGet('agency_type_id')) {
             $agency_type_id = $this->request->getGet('agency_type_id');
         }
 
@@ -765,8 +780,8 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         $month = $this->request->getGet('month');
         $year = $this->request->getGet('year');
 
-        if(!$txn_type){
-            $this->session->setFlashdata('message','Invalid request!!');
+        if (!$txn_type) {
+            $this->session->setFlashdata('message', 'Invalid request!!');
             return redirect()->to(Url::transaction);
         }
 
@@ -774,9 +789,9 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         //validate if transaction exists
         $txn = $txnModel->where([
-            'block_id'=>$block_id,
-            'district_id'=>$district_id,
-            'agency_type_id'=>$agency_type_id,
+            'block_id' => $block_id,
+            'district_id' => $district_id,
+            'agency_type_id' => $agency_type_id,
             'month' => $month,
             'year' => $year,
             'user_id' => $this->user->user_id,
@@ -784,8 +799,8 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             'fund_agency_id' => $fund_agency_id
         ])->first();
 
-        if($txn){
-            $this->session->setFlashdata('message','Cannot add transaction. Transaction already exists!!');
+        if ($txn) {
+            $this->session->setFlashdata('message', 'Cannot add transaction. Transaction already exists!!');
             return redirect()->to(Url::transaction);
         }
 
@@ -803,7 +818,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
         //skip validation for ps
         if (in_array($this->user->agency_type_id,
             [$this->settings->ps_user,
-                $this->settings->rs_user,11])) {
+                $this->settings->rs_user, 11])) {
             //pass
 
         } else {
@@ -834,11 +849,11 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                 //check if total cbs for each block is equal to month
                 if (isset($pending_transactions['pending_cbs'])) {
                     foreach ($pending_transactions['pending_cbs'] as $pending_cb) {
-                        if($pending_cb->total_cbs < $month){
+                        if ($pending_cb->total_cbs < $month) {
                             $this->session->setFlashdata('message', 'Cannot add transaction. 
                             Blocks closing balance not submitted');
                             return redirect()->to(Url::transaction);
-                        } else if($pending_cb->pending>0){
+                        } else if ($pending_cb->pending > 0) {
                             $this->session->setFlashdata('message', 'Cannot add transaction. 
                             Blocks closing balance is not approved');
                             return redirect()->to(Url::transaction);
@@ -848,16 +863,16 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             }
         }
 
-        if($this->request->getMethod(1)=='POST'){
+        if ($this->request->getMethod(1) == 'POST') {
 
             $txn_data = [
-                'block_id'=>$block_id,
-                'district_id'=>$district_id,
-                'agency_type_id'=>$agency_type_id,
+                'block_id' => $block_id,
+                'district_id' => $district_id,
+                'agency_type_id' => $agency_type_id,
                 'month' => $month,
                 'year' => $year,
                 'filename' => '',
-                'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
+                'status' => (int)in_array($this->user->agency_type_id, $this->settings->auto_approve_users),
                 'date_added' => date('Y-m-d'),
                 'user_id' => $this->user->user_id,
                 'transaction_type' => $txn_type,
@@ -877,16 +892,16 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             }
             $txnCompModel->insertBatch($components);
 
-            $this->session->setFlashdata('message','New transaction added');
+            $this->session->setFlashdata('message', 'New transaction added');
             return redirect()->to(Url::transaction);
         }
 
         $data['show_form'] = true;
 
-        $data['block'] = $block_id ? (new BlockModel)->find($block_id)->name:'-';
-        $data['district'] = $district_id ? (new DistrictModel)->find($district_id)->name:'-';
-        $data['agency_type'] = $agency_type_id ? (new UserGroupModel)->find($agency_type_id)->name:'-';
-        $data['fund_agency'] = $fund_agency_id ? (new CommonModel())->getFundAgency($fund_agency_id)['name']:'-';
+        $data['block'] = $block_id ? (new BlockModel)->find($block_id)->name : '-';
+        $data['district'] = $district_id ? (new DistrictModel)->find($district_id)->name : '-';
+        $data['agency_type'] = $agency_type_id ? (new UserGroupModel)->find($agency_type_id)->name : '-';
+        $data['fund_agency'] = $fund_agency_id ? (new CommonModel())->getFundAgency($fund_agency_id)['name'] : '-';
         $data['month'] = getMonthById($month)['name'];
         $data['year'] = getYear($year);
         $data['date_added'] = date('Y/m/d');
@@ -897,9 +912,9 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $data['remarks'] = '-';
 
-        $data['allow_negative_amount'] = $txn_type=='fund_receipt';
+        $data['allow_negative_amount'] = $txn_type == 'fund_receipt';
 
-        $data['txn_type_text'] = $txn_type=='expense'?'Expense':'Fund Receipt';
+        $data['txn_type_text'] = $txn_type == 'expense' ? 'Expense' : 'Fund Receipt';
 
         $filter = [
             'user_id' => $this->user->user_id,
@@ -909,23 +924,23 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             'year' => $year,
         ];
 
-        if($district_id){
+        if ($district_id) {
             $filter['district_id'] = $district_id;
         }
 //        if(in_array($agency_type_id,[$this->settings->ps_user,$this->settings->rs_user,11])) {
 //            $filter['component_agency_type_id'] = $agency_type_id;
 //        }
         $filter['component_agency_type_id'] = $agency_type_id;
-        if($agency_type_id==$this->settings->district_user){
+        if ($agency_type_id == $this->settings->district_user) {
             $filter['component_agency_type_id'] = 7;
             $filter['category'] = ['program', 'pmu'];
             //for dmf angul/keunjhar
-            if(in_array($this->user->district_id,[7,15])){
+            if (in_array($this->user->district_id, [7, 15])) {
                 $filter['component_agency_type_id'] = 7;
-                $filter['category'] = ['program', 'pmu','addl'];
+                $filter['category'] = ['program', 'pmu', 'addl'];
             }
         }
-        if($agency_type_id == $this->settings->block_user || $agency_type_id == $this->settings->cbo_user){
+        if ($agency_type_id == $this->settings->block_user || $agency_type_id == $this->settings->cbo_user) {
             $filter['component_agency_type_id'] = 5; //fa/cbo --to be added to settings
             $filter['category'] = 'program';
         }
@@ -947,35 +962,38 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $components = $this->buildTree($block_components, 'parent', 'scomponent_id');
 
-        $data['components'] = $this->getTable($components,$txn_type,'edit');
+        $data['components'] = $this->getTable($components, $txn_type, 'edit');
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
 
     //yet to be implemented
-    public function getForm() {
+    public function getForm()
+    {
         $data = [];
 
         return $this->template->view('Admin\Transaction\Views\edit', $data);
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $txnModel = new TransactionModel();
         $txnCompModel = new TransactionComponentModel();
 
         $txnModel->delete($id);
-        $txnCompModel->where(['transaction_id'=>$id])->delete();
+        $txnCompModel->where(['transaction_id' => $id])->delete();
 
-        $this->session->setFlashdata('message','The record has been deleted.');
+        $this->session->setFlashdata('message', 'The record has been deleted.');
         return redirect()->to(Url::transaction);
 
     }
 
-    public function misIsUploaded() {
+    public function misIsUploaded()
+    {
 
         //allow for ps user
         $upload_allowed = true;
-        if(env('soe.uploadDateValidation') && $this->user->agency_type_id != $this->settings->ps_user) {
+        if (env('soe.uploadDateValidation') && $this->user->agency_type_id != $this->settings->ps_user) {
             $upload_model = new AllowuploadModel();
 
             $upload_allowed = $upload_model->uploadAllowed([
@@ -988,7 +1006,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
 
         $misExists = true;
         //skip for ps user and if soe.misValidation is false
-        if(env('soe.misValidation') && $this->user->agency_type_id != $this->settings->ps_user){
+        if (env('soe.misValidation') && $this->user->agency_type_id != $this->settings->ps_user) {
             $misModel = new MISModel();
             $misExists = $misModel->where([
                 'block_id' => $this->user->block_id,
@@ -1000,14 +1018,14 @@ $totalFiltered = $txnModel->getTotal($filter_data);
             ])->first();
         }
 
-        if(!$upload_allowed) {
+        if (!$upload_allowed) {
             $data['html'] = '<div class="col-12" id="alert-msg">
                         <div class="alert alert-danger" role="alert">
                             <p class="mb-0">The SoE/Fund Receipt upload is closed for the month.</p>
                         </div>
                         </div>';
         }
-        if(!$misExists){
+        if (!$misExists) {
             $data['html'] = '<div class="col-12" id="alert-msg">
                         <div class="alert alert-danger" role="alert">
                             <p class="mb-0">Please upload MIS first to enable SoE/Fund Receipt upload. </p>
@@ -1015,7 +1033,7 @@ $totalFiltered = $txnModel->getTotal($filter_data);
                         </div>';
         }
 
-        if(($upload_allowed && $misExists) || (env('soe.uploadDateValidation')==false && env('soe.misValidation')==false)) {
+        if (($upload_allowed && $misExists) || (env('soe.uploadDateValidation') == false && env('soe.misValidation') == false)) {
             $data['html'] = view('Admin\Transaction\Views\upload_function');
         }
 
