@@ -77,7 +77,7 @@ class Enterprises extends AdminController
 		}
 
 		
-		$filteredData = $this->filter($data);
+		$filteredData = $this->filter();
 		$data['enterprises'] = [];
 
 		foreach ($filteredData as $row) {
@@ -102,7 +102,7 @@ class Enterprises extends AdminController
 		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
 	}
 
-	private function filter($data)
+	private function filter()
 	{
 		$enterprisesmodel = new EnterprisesModel();
 		$filter = [];
@@ -113,7 +113,7 @@ class Enterprises extends AdminController
 		if ($this->request->getGet('block_id') > 0) {
 			$filter['block_id'] = $this->request->getGet('block_id');
 		}
-		if ($this->request->getGet('management_unit_type') != '') {
+		if ($this->request->getGet('management_unit_type') != 'all') {
 			$filter['management_unit_type'] = $this->request->getGet('management_unit_type');
 		}
 		if ($this->request->getGet('doeyear') > 0) {
@@ -131,7 +131,7 @@ class Enterprises extends AdminController
 	{
 		$enterprisesmodel = new EnterprisesModel();
 
-		$filteredData = $this->filter($data=[]);
+		$filteredData = $this->filter();
 
 		$worksheet_unit = [];
 		$data['entdatas'] = [];

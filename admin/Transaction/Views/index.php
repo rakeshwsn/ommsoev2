@@ -166,7 +166,7 @@
                 { targets: [5,6,7,8], orderable: false },
                 { targets: [0], visible: false },
             ],
-            order: [[1, 'desc']],
+            "order": [],
             "ajax":{
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
                 url :"<?=$datatable_url?>", // json datasource
