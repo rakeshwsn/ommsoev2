@@ -20,6 +20,7 @@ class Village extends AdminController
 	public function index()
 	{
 		$this->template->set_meta_title(lang('Village.heading_title'));
+		// echo"dadad"
 		return $this->getList();
 	}
 
