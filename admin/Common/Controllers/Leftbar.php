@@ -604,6 +604,14 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if ($this->user->hasPermission("areacoverage/finaldata")) {
+            $areacoverage[] = [
+                "name" => 'Final Data',
+                "href" => admin_url("areacoverage/finaldata"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($areacoverage) {
             $data["menus"][] = [

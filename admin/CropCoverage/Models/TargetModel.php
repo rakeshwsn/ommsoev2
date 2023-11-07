@@ -2,7 +2,6 @@
 namespace Admin\CropCoverage\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class TargetModel extends Model
 {
@@ -343,7 +342,8 @@ FROM ac_crops ac
         $sql .= " AND atm.deleted_at IS NULL) fl
 		 ON ac.id = fl.crop_id
     WHERE ac.crops IS NOT NULL";
-
+        // echo $sql;
+        // exit;
 
 
         return $this->db->query($sql)->getResultArray();

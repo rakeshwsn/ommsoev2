@@ -85,7 +85,7 @@
                                     <tr class="odd">
                                         <td><?= $enterprise['districts'] ?></td>
                                         <td><?= $enterprise['blocks'] ?></td>
-                                        <td><?= $enterprise['gp'] ?></td>
+                                        <td><?= $enterprise['gps'] ?></td>
                                         <td><?= $enterprise['villages'] ?></td>
                                         <td><?= $enterprise['management_unit_type'] ?></td>
                                         <td><?= $enterprise['managing_unit_name'] ?></td>
