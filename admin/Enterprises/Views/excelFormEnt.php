@@ -33,7 +33,7 @@
                 <td><?= $entdata['unit_name']?></td>
                 <td><?= $entdata['districts'] ?></td>
                 <td><?= $entdata['blocks'] ?></td>
-                <td><?= $entdata['gp'] ?></td>
+                <td><?= $entdata['gps'] ?></td>
                 <td><?= $entdata['villages'] ?></td>
                 <td><?= $entdata['unit_budget'] ?></td>
                 <td><?= $entdata['purpose_infr_support'] ?></td>

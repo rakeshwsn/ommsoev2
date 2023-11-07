@@ -15,7 +15,6 @@
             <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
 
                 <?php echo form_open('', ['method' => 'get']); ?>
-
                 <div class="row">
                     <div class="col-2">
                         <label class="form-label">District</label>
@@ -36,10 +35,6 @@
 
                         </select>
                     </div>
-
-
-
-
                     <div class="col-2">
                         <label class="form-label">DOE</label>
                         <select name="doeyear" class="form-control mb-3" id="years">
@@ -58,14 +53,13 @@
             </div>
         </div>
     </div>
-
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Enterprises List</h3>
             <div class="block-options">
-                <a href="<?= $excel_link ?>" target="_blank" id="btn-excel" class="btn btn-outline-danger mg-r-5"><i class="fa fa-file-excel-o"></i> Download Excel</a>
-
+            <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
             </div>
+
         </div>
         <div class="block-content block-content-full">
             <div class="row">
@@ -91,7 +85,7 @@
                                     <tr class="odd">
                                         <td><?= $enterprise['districts'] ?></td>
                                         <td><?= $enterprise['blocks'] ?></td>
-                                        <td><?= $enterprise['gp'] ?></td>
+                                        <td><?= $enterprise['gps'] ?></td>
                                         <td><?= $enterprise['villages'] ?></td>
                                         <td><?= $enterprise['management_unit_type'] ?></td>
                                         <td><?= $enterprise['managing_unit_name'] ?></td>
@@ -118,13 +112,26 @@
         </div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
+    var download_url = "http://ommsoev2.local/admin/enterprises/exceldownld";
+
+    $(function() {
+        function main() {
+            var href = download_url + '?district_id=' + $('#districts').val() + '&block_id=' + $('#blocks').val() + '&management_unit_type=' + $('#management_unit_type').val() + '&doeyear=' + $('#years').val();
+            $('#btn-excel').attr('href', href);
+        }
+        $('#districts, #blocks, #management_unit_type, #years').on('change', main);
+        main();
+    });
+    
+    var download_url = "<?= $excel_link ?>";
+    
     $(document).ready(function() {
-        var download_url = "http://ommsoev2.local/admin/enterprises/exceldownld";
         var table = $('#page_list').DataTable({
             "paging": true,
             "pageLength": 10
         });
+
         $(function() {
             $('#districts').on('change', function() {
 

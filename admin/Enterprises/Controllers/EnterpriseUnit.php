@@ -2,7 +2,7 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Enterprises\Models\EnterprisesUnitmodel;
+use Admin\Enterprises\Models\EnterprisesUnitModel;
 use App\Controllers\AdminController;
 
 
@@ -11,7 +11,7 @@ class EnterpriseUnit extends AdminController
     private $enterprisesunitmodel;
     public function __construct()
     {
-        $this->enterprisesunitmodel = new EnterprisesUnitmodel();
+        $this->enterprisesunitmodel = new EnterprisesUnitModel();
     }
     public function index()
     {
