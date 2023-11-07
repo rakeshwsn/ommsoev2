@@ -141,7 +141,7 @@ class Enterprises extends AdminController
 				'unit_name' => $row->unit_name,
 				'districts' => $row->districts,
 				'blocks' => $row->blocks,
-				'gp' => $row->gp,
+				'gps' => $row->gps,
 				'villages' => $row->villages,
 				'management_unit_type' => $row->management_unit_type,
 				'managing_unit_name' => $row->managing_unit_name,
