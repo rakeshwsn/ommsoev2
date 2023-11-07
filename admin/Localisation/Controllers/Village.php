@@ -1,6 +1,7 @@
 <?php
 
 namespace Admin\Localisation\Controllers;
+
 use Admin\Localisation\Models\BlockModel;
 use App\Controllers\AdminController;
 use Admin\Localisation\Models\VillageModel;
@@ -32,8 +33,8 @@ class Village extends AdminController
 				'gp_id' => $this->request->getPost('gp_id'),
 				'name' => $this->request->getPost('name'),
 			];
-		
-				$id=$this->villageModel->insert($data);
+
+			$id = $this->villageModel->insert($data);
 			$this->session->setFlashdata('message', 'village Saved Successfully.');
 
 			return redirect()->to(base_url('admin/village'));
@@ -50,8 +51,8 @@ class Village extends AdminController
 				'gp_id' => $this->request->getPost('gp_id'),
 				'name' => $this->request->getPost('name'),
 			];
-		
-				$edit_data=$this->villageModel->update($id,$data);
+
+			$edit_data = $this->villageModel->update($id, $data);
 
 			$this->session->setFlashdata('message', 'Village Updated Successfully.');
 
@@ -178,7 +179,7 @@ class Village extends AdminController
 			'href' => admin_url('village')
 		);
 
-	
+
 		$_SESSION['isLoggedIn'] = true;
 
 		$data['heading_title'] 	= lang('Village.heading_title');
@@ -193,7 +194,7 @@ class Village extends AdminController
 			$village_info = $this->villageModel->getDataById($this->uri->getSegment(4));
 		}
 
-// dd($village_info);
+		// dd($village_info);
 		$columns = ['district_id', 'gp_id', 'block_id', 'village_name', 'village_id'];
 		foreach ($columns as $field) {
 			if ($this->request->getPost($field)) {
@@ -225,7 +226,7 @@ class Village extends AdminController
 		foreach ($gpmodel->orderBy('name', 'asc')->getAll() as $gp) {
 			$data['gps'][$gp->id] = $gp->name;
 		}
-	
+
 		if ($this->request->isAJAX()) {
 
 			return $this->template->view('Admin\Localisation\Views\villageForm', $data, true);
