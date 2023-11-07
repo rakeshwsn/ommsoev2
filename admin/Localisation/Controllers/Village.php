@@ -212,18 +212,21 @@ class Village extends AdminController
 		foreach ($districtmodel->orderBy('name', 'asc')->getAll() as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
+		// dd($data['district_id']);
 		//distrcit end
 		//Blocks start
 		$data['blocks'][0] = 'Select block';
-		$blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
-		foreach ($blockmodel->orderBy('name', 'asc')->getAll() as $block) {
+		$blocks=$blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+		// dd($blocks);
+		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
+		// dd($data);
 		//blocks end
 		//gp start
 		$data['gps'][0] = 'Select GP';
-		$gpmodel->where('block_id', $data['block_id'])->orderBy('name', 'asc')->findAll();
-		foreach ($gpmodel->orderBy('name', 'asc')->getAll() as $gp) {
+		$gps = $gpmodel->where('block_id', $data['block_id'])->orderBy('name', 'asc')->findAll();
+		foreach ($gps as $gp) {
 			$data['gps'][$gp->id] = $gp->name;
 		}
 
@@ -246,6 +249,7 @@ class Village extends AdminController
 		$data['gps'] = $gpmodel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
 		// printr($data['gps']);
 		return $this->response->setJSON($data);
+	
 	}
 	public function block()
 	{
