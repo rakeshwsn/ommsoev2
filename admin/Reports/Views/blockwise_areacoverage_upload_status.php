@@ -13,7 +13,18 @@
                     </div>
                     <div class="col-md-2">
                         <label>Season</label>
-                        <?= form_dropdown('season', $seasons, $current_season, "class='form-control' id='filter_season'") ?>
+
+                        <select class="form-control" id="season" name="season" class='form-control' id='filter_season'>
+                            <option value="">Select Season</option>
+                            <?php foreach ($seasons as $value => $season) { ?>
+                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $season ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+
 
                     </div>
                     <div class="col-lg-3">

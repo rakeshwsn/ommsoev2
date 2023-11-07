@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class GpModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'grampanchayat';
+	protected $table                = 'soe_grampanchayats';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;

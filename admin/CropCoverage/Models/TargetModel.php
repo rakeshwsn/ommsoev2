@@ -2,7 +2,6 @@
 namespace Admin\CropCoverage\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class TargetModel extends Model
 {
@@ -92,13 +91,11 @@ class TargetModel extends Model
         }
     }
 
-    public function getAll($filter = array())
+    public function viewBlockTarget($filter = array())
     {
 
         $district_id = 0;
-        if (!empty($filter['district_id'])) {
-            $district_id = $filter['district_id'];
-        }
+
 
         $sql = "SELECT
         block_target.target_id,
@@ -176,7 +173,19 @@ class TargetModel extends Model
         GROUP BY target_id
     ) followup ON block_target.target_id = followup.target_id
     LEFT JOIN ac_target_master atm ON block_target.target_id = atm.id
-    WHERE sb.district_id = $district_id AND atm.deleted_at IS NULL";
+    WHERE";
+        if (!empty($filter['district_id'])) {
+            $sql .= " sb.district_id =" . $filter['district_id'];
+
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND atm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND atm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= " AND atm.deleted_at IS NULL";
         // echo $sql;
         // exit;
         return $result = $this->db->query($sql)->getResultArray();
@@ -273,6 +282,7 @@ FROM (SELECT
         ON fc.target_id = atm.id
     GROUP BY atm.district_id) followup
     ON followup.district_id=sd.id";
+
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -332,7 +342,8 @@ FROM ac_crops ac
         $sql .= " AND atm.deleted_at IS NULL) fl
 		 ON ac.id = fl.crop_id
     WHERE ac.crops IS NOT NULL";
-
+        // echo $sql;
+        // exit;
 
 
         return $this->db->query($sql)->getResultArray();

@@ -102,59 +102,8 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " AND et.period = " . $filter['period'];
     }
     // $sql .=  " GROUP BY unit.units";
-    //echo $sql;exit;
+    // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
-  public function getDataone()
-  {
-    $sql = "SELECT
-    et1.id,
-    et.unit_id,
-    et.period,
-    et.district_id,
-    et.year_id,
-    et.month_id,
-    et1.transaction_id,
-    et1.block_id,
-    et1.gp_id,
-    et.created_at,
-    et1.village_id,
-    et1.no_of_days_functional,
-    et1.produced,
-    et1.charges_per_qtl,
-    et1.total_expend,
-    et1.total_turnover,
-    sm.name month_name,
-    dy.name year_name,
-    sd.name district_name,
-    sb.name block_name,
-    g.name gp_name,
-    v.name village_name,
-    eu.name unit_name,
-    CASE WHEN et.period = 1 THEN '1st fortnight' ELSE '2nd fortnight' END  period_type
-    FROM enterprises_transaction et
-    LEFT JOIN enterprises_transactiondetails et1
-      ON et.id = et1.transaction_id
-    LEFT JOIN soe_months sm
-      ON sm.id = et.month_id
-    LEFT JOIN dashboard_years dy
-      ON dy.id = et.year_id
-    LEFT JOIN soe_districts sd
-      ON sd.id = et.district_id
-    LEFT JOIN soe_blocks sb
-      ON sb.id = et1.block_id
-    LEFT JOIN grampanchayat g
-      ON g.id = et1.gp_id
-    LEFT JOIN villages v
-      ON v.id = et1.village_id
-    LEFT JOIN enterprises_units eu
-      ON eu.id = et.unit_id
-  WHERE et1.deleted_at IS NULL ";
-   
-  
-  //  echo $sql;
-  //  exit;
-
-    return $this->db->query($sql)->getResult();
-  }
+ 
 }

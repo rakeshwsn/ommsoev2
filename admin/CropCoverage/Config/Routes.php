@@ -31,6 +31,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->match(['get', 'post'], 'areacoverage/targetVsAchievement', 'CropCoverage\Controllers\TargetVsAchievement::index');
     $routes->match(['get', 'post'], 'areacoverage/targetVsAchievement/milletchart', 'CropCoverage\Controllers\TargetVsAchievement::milletChart');
     $routes->match(['get', 'post'], 'areacoverage/targetVsAchievement/distChart', 'CropCoverage\Controllers\TargetVsAchievement::distTarVsAchChart');
+    $routes->get('areacoverage/target/filter', 'CropCoverage\Controllers\AreaCoverageTarget::getTargetFiltered');
+    $routes->get('areacoverage/finaldata', 'CropCoverage\Controllers\AreaCoverageFinalData::index');
+    $routes->match(['get', 'post'], 'areacoverage/finaldata/add', 'CropCoverage\Controllers\AreaCoverageFinalData::getForm');
+    $routes->get('areacoverage/finaldata/download', 'CropCoverage\Controllers\AreaCoverageFinalData::getList/download');
 
 
 

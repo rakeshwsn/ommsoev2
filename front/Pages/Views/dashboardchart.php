@@ -148,7 +148,15 @@
     }
 </style>
 
+<div class="row">
+    <div class="col-12">
 
+        <div id="currentchart">
+            <figure class="highcharts-figure">
+            </figure>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-6">
         <div class="row">
@@ -264,15 +272,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($maps as $map) { ?>
-                                <tr data-dist="<?= $map->district_id ?>">
-                                    <td><?= $map->districts ?></td>
-                                    <td><?= $map->blocks ?></td>
-                                    <td><?= $map->total_gps ?></td>
-                                    <td><?= $map->total_villages ?></td>
-                                    <td><?= $map->total_farmer ?></td>
-                                </tr>
-                            <?php  } ?>
+
                         </tbody>
                     </table>
                     <!-- </div> -->
@@ -299,6 +299,60 @@
 
 <script>
     //AREACOVERAGE START
+    var crntchart = {
+        districtwiseChart: {
+            zoomType: 'xy'
+        },
+        title: {
+            text: ' Crop Demonstration for Kharif 2023-24 under Odisha Millets Mission',
+            align: 'center'
+        },
+
+        xAxis: [{
+            categories: [],
+            crosshair: true
+        }],
+        //
+        yAxis: { // Single y-axis for both Farmers and Achievements
+            title: {
+                text: 'Value',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[0]
+                }
+            },
+            tickInterval: 5000,
+        },
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            align: 'left',
+            verticalAlign: 'center',
+            y: 5,
+            floating: true,
+            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'rgba(255,255,255,0.25)'
+        },
+        series: [{
+            name: 'Area Achievement (in hectare)', 
+            type: 'column', 
+            data: [
+
+            ]
+        }, {
+            name: 'No. of Farmer ', 
+            type: 'spline', 
+            data: [
+
+            ]
+        }]
+    };
+    var districtwiseChart = Highcharts.chart('currentchart', crntchart);
 
     var areachartOptions = {
         areachart: {
@@ -469,7 +523,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: 'CHC and CMS Establishment Progress',
+            text: 'CHC and CMSC Establishment Progress',
             align: 'center'
         },
 
@@ -477,6 +531,7 @@
             categories: [],
             crosshair: true
         }],
+        
         yAxis: [{ // Primary yAxis
             labels: {
                 format: '',
@@ -525,6 +580,8 @@
                 name: 'CHC (in Number)',
                 type: 'spline',
                 data: [],
+                color:'rgb(246, 143, 70)',
+               
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -533,6 +590,7 @@
                 name: 'CMSC (in number)',
                 type: 'spline',
                 data: [],
+                color:'rgb(229, 12, 225)',
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -552,7 +610,7 @@
                 enabled: true,
                 alpha: 0,
                 beta: 0,
-                viewDistance: 10,
+                viewDistance: 25,
                 depth: 40
             }
         },
@@ -566,7 +624,7 @@
             labels: {
                 skew3d: true,
                 style: {
-                    fontSize: '11x'
+                    fontSize: '10px'
                 }
             },
             categories: []
@@ -609,58 +667,7 @@
     var chart = Highcharts.chart('container', chartOptions);
 
     //ENTERPRISE START
-    // var chartOptions = {
 
-    //     chart: {
-    //         type: 'column'
-    //     },
-
-    //     title: {
-    //         text: 'Progress on Millet based Enterprise Establishment ',
-
-    //         align: 'center'
-    //     },
-
-    //     xAxis: {
-    //         categories: []
-    //     },
-    //     tooltip: {
-    //         crosshairs: true,
-    //         shared: true
-    //     },
-
-    //     yAxis: {
-    //         allowDecimals: false,
-    //         min: 0,
-    //         title: {
-    //             text: 'Total Units '
-    //         }
-    //     },
-
-    //     tooltip: {
-    //         format: '<b>{key}</b><br/>{series.name}: {y}<br/>' +
-    //             'Total: {point.stackTotal}'
-    //     },
-
-    //     plotOptions: {
-    //         column: {
-    //             stacking: 'normal'
-    //         }
-    //     },
-
-    //     series: [{
-    //         name: ' SHG',
-    //         data: [],
-    //         color: '#085c19',
-    //         stack: 'North America'
-    //     }, {
-    //         name: 'FPO',
-    //         data: [],
-    //         color: '#26d128',
-    //         stack: 'North America'
-    //     }]
-    // };
-    // var chart = Highcharts.chart('container', chartOptions);
     // ENTERPRISE END
 
     $(function() {
@@ -773,9 +780,25 @@
         dataType: 'JSON',
         success: function(response) {
             echart.xAxis[0].setCategories(response.estdistrict);
-            echart.series[0].setData(response.chc);
-            echart.series[1].setData(response.cmsc);
-            echart.series[2].setData(response.blocks);
+            echart.series[0].setData(response.blocks);
+            echart.series[1].setData(response.chc);
+            echart.series[2].setData(response.cmsc);
+        }
+
+
+    });
+    $.ajax({
+        url: '<?= $currentyr_url ?>',
+        data: {
+
+        },
+        type: 'GET',
+        dataType: 'JSON',
+        success: function(response) {
+            districtwiseChart.xAxis[0].setCategories(response.currentdistrict);
+            districtwiseChart.series[0].setData(response.currentachievements);
+            districtwiseChart.series[1].setData(response.currentfarmers);
+
         }
 
 
@@ -783,51 +806,67 @@
 
 
     window.onload = function() {
-        Snap.load("uploads/files/ommodishamap.svg", function(loadedFragment) {
-            // 'loadedFragment' contains the loaded SVG elements
-            var map = loadedFragment.select("svg");
+        $.ajax({
+            url: '<?= $odishamap_url ?>',
+            data: {
 
-            // Get the jQuery element where you want to append the SVG
-            var $element = $("#map-container");
+            },
+            type: 'GET',
+            dataType: 'JSON',
+            success: function(response) {
+                mapinfo = response.data
+                Snap.load("uploads/files/ommodishamap.svg", function(loadedFragment) {
+                    // 'loadedFragment' contains the loaded SVG elements
+                    var map = loadedFragment.select("svg");
 
-            // Append the SVG to the element
-            $element.append(map.node);
+                    // Get the jQuery element where you want to append the SVG
+                    var $element = $("#map-container");
 
-            // Now you can manipulate the SVG elements as needed
-            // For example, let's change the color of a path element to red
-            mapinfo = <?php echo json_encode($maps); ?>;
-             console.log(mapinfo);
-            const district = map.selectAll(".dist");
+                    // Append the SVG to the element
+                    $element.append(map.node);
 
-            district.forEach(function(obj) {
-                var mapid = obj.attr('id');
-                if (mapid) {
+                    // Now you can manipulate the SVG elements as needed
+                    // For example, let's change the color of a path element to red
 
-                    const dist = mapinfo.filter(item => item.district_id === mapid);
+                    console.log(mapinfo);
+                    const district = map.selectAll(".dist");
 
+                    district.forEach(function(obj) {
+                        var mapid = obj.attr('id');
+                        if (mapid) {
 
-                    if (dist[0].blocks >= 1 && dist[0].blocks <= 3) {
-                        obj.addClass('bg-scale1')
-                    }
-                    if (dist[0].blocks >= 4 && dist[0].blocks <= 5) {
-                        obj.addClass('bg-scale2')
-                    }
-                    if (dist[0].blocks >= 6 && dist[0].blocks <= 8) {
-                        obj.addClass('bg-scale3')
-                    }
-                    if (dist[0].blocks >= 9) {
-                        obj.addClass('bg-scale4')
-                    } else if (dist[0].blocks == 0) {
-                        obj.addClass('bg-scale2')
-                    }
+                            const dist = mapinfo.filter(item => item.district_id === mapid);
 
 
-                }
-                obj.click(clickCallback);
+                            if (dist[0].total_blocks >= 1 && dist[0].total_blocks <= 3) {
+                                obj.addClass('bg-scale1')
+                            }
+                            if (dist[0].total_blocks >= 4 && dist[0].total_blocks <= 5) {
+                                obj.addClass('bg-scale2')
+                            }
+                            if (dist[0].total_blocks >= 6 && dist[0].total_blocks <= 8) {
+                                obj.addClass('bg-scale3')
+                            }
+                            if (dist[0].total_blocks >= 9) {
+                                obj.addClass('bg-scale4')
+                            } else if (dist[0].total_blocks == 0) {
+                                obj.addClass('bg-scale2')
+                            }
 
-            }, "text");
+
+                        }
+                        obj.click(clickCallback);
+
+                    }, "text");
+
+                });
+
+                loadMapTable(mapinfo);
+            }
+
 
         });
+
 
         var clickCallback = function(event) {
             console.log(event);
@@ -849,5 +888,19 @@
         };
 
     };
+
+    function loadMapTable(data) {
+        html = '';
+        data.forEach(function(obj) {
+            html += '<tr data-dist="' + obj.district_id + '">';
+            html += '<td>' + obj.districts + '</td>';
+            html += '<td>' + obj.total_blocks + '</td>';
+            html += '<td>' + obj.total_gps + '</td>';
+            html += '<td>' + obj.total_villages + '</td>';
+            html += '<td>' + obj.total_farmers + '</td>';
+            html += '</tr>';
+        });
+        $(".maptable tbody").html(html);
+    }
 </script>
 <?php js_end(); ?>

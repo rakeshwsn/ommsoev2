@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 class DashboardChartModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'areacoverage';
+	protected $table                = 'dashboard_areacoverage';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
@@ -52,14 +52,14 @@ class DashboardChartModel extends Model
 		y.name `year`,
 		SUM(a.farmers) total_farmers,
 		SUM(a.achievement) total_ach
-	  FROM areacoverage a LEFT JOIN dashboard_years y ON y.id=a.year_id
+	  FROM dashboard_areacoverage a LEFT JOIN dashboard_years y ON y.id=a.year_id
 	  WHERE a.deleted_at IS NULL";
 	  if(!empty($filter['district_id'])){
 		$sql .= " AND district_id=".$filter['district_id'];
 	  }
 	  $sql .= " GROUP BY a.year_id
 		ORDER BY y.start_date";
-
+		// printr($sql);exit;
 		return $this->db->query($sql)->getResult();
 	}
 }

@@ -69,11 +69,13 @@
             </select>
         </div>
         <div class="col-md-2">
-            <select name="season" id="season" class="form-control" disabled>
-                <?php foreach ($seasons as $season) { ?>
-                    <option value="<?= $season['name'] ?>" <?php if ($season['id'] == $season['id']) {
+            <select name="season" id="season" class="form-control">
+                <option value="">Select Season</option>
+                <?php foreach ($seasons as $value => $season) { ?>
+                    <option value="<?= $value ?>" <?php if ($value == $current_season) {
                           echo 'selected';
-                      } ?>><?= $season['name']; ?>
+                      } ?>>
+                        <?= $season ?>
                     </option>
                 <?php } ?>
             </select>
@@ -136,11 +138,11 @@
         },
         series: [
             {
-                name: 'Millet Target',
+                name: 'Area Target(In Hect)',
                 data: []
             },
             {
-                name: 'Millet Achievement',
+                name: 'Area Achievement(In Hect)',
                 data: []
             }
         ]
@@ -194,7 +196,7 @@
         },
         series: [
             {
-                name: 'Block Target(In Hect)',
+                name: 'Area Target(In Hect)',
                 data: [], // Replace this value with the millet target for the one district
                 color: 'rgba(165,170,217,1)',
                 borderRadius: 3,
@@ -202,7 +204,7 @@
                 borderWidth: 0
             },
             {
-                name: 'Block Achievement(In Hect)',
+                name: 'Area Achievement(In Hect)',
                 data: [], // Replace this value with the millet achievement for the one district
                 color: 'rgba(126,86,134,.9)',
                 borderRadius: 3,

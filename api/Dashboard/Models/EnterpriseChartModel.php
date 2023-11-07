@@ -69,7 +69,37 @@ class EnterpriseChartModel extends Model
 		$sql .= " GROUP BY e.unit_name
 		HAVING total_wshg>0 OR total_fpos>0
 	   ORDER BY e.year_id";
-		// echo $sql;exit;
+
+		return $this->db->query($sql)->getResult();
+	}
+
+	public function getYearwisedataAll($filter = [])
+	{
+		$sql = "SELECT
+		e.year_id,
+		y.name year,
+		y.id ,
+        d.name district,
+		SUM(e.wshg) total_wshg,
+		SUM(e.fpos) total_fpos,
+		e.unit_id,
+		e.unit_name,
+		e.district_id
+	  FROM dashboard_enterprises e
+		LEFT JOIN dashboard_years y
+		  ON y.id = e.year_id
+		LEFT JOIN soe_districts d
+		  ON d.id = e.district_id
+		  WHERE e.deleted_at IS NULL";
+		if (!empty($filter['district_id'])) {
+			$sql .= " AND district_id=" . $filter['district_id'];
+		}
+		if (!empty($filter['year_id'])) {
+			$sql .= " AND year_id=" . $filter['year_id'];
+		}
+		$sql .= " GROUP BY e.unit_name
+	   ORDER BY e.year_id";
+
 		return $this->db->query($sql)->getResult();
 	}
 }

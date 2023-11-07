@@ -85,22 +85,33 @@ class EstablishmentModel extends Model
     public function getestablishmentmap()
 	{
 		$sql = "SELECT
+		ddm.id,
 		ddm.district_id,
-		ddm.blocks total_blocks,
+		ddm.blocks,
 		ddm.gps total_gps,
 		ddm.villages total_villages,
+		ddm.created_at,
+		ddm.year_id,
+		ddm.tentative_farmers total_farmers,
 		sd.name districts,
-		da.total_farmer
+		sum_dddm.sum_of_gps,
+		sum_dddm.sum_of_villages,
+		sum_dddm.sum_of_farmers,
+		sum_dddm.sum_of_blocks,
+		sum_dddm.sum_districts
 	  FROM dashboard_district_map ddm
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
 		LEFT JOIN (SELECT
-			da.district_id,
-			SUM(da.farmers) total_farmer
-		  FROM dashboard_areacoverage da
-		  WHERE da.deleted_at IS NULL
-		  GROUP BY da.district_id) da
-		  ON da.district_id = ddm.district_id ";
+			SUM(gps) sum_of_gps,
+			SUM(villages) sum_of_villages,
+			SUM(tentative_farmers) sum_of_farmers,
+			SUM(blocks) sum_of_blocks,
+			COUNT(district_id) sum_districts
+		  FROM dashboard_district_map
+		  WHERE deleted_at IS NULL) sum_dddm
+		  ON 1 = 1
+	  WHERE ddm.deleted_at IS NULL";
 
 		return $this->db->query($sql)->getResult();
 	}

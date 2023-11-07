@@ -16,8 +16,13 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/add', 'Enterprises\Controllers\Enterprises::add');
     $routes->add('enterprises', 'Enterprises\Controllers\Enterprises::index');
     $routes->add('enterprises/blocks', 'Enterprises\Controllers\Enterprises::ajaxBlocks');
+    $routes->add('enterprises/doe', 'Enterprises\Controllers\Enterprises::ajaxDoe');
+    $routes->add('enterprises/exceldownld', 'Enterprises\Controllers\Enterprises::download');
+    $routes->add('enterprises/excel', 'Enterprises\Controllers\Enterprises::excel');
+
+
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
-    $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::add');
+    $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::index');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
     $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');

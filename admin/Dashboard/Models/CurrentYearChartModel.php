@@ -1,10 +1,11 @@
 <?php
 
-namespace Api\Dashboard\Models;
+namespace Admin\Dashboard\Models;
 
 use CodeIgniter\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
-class OdMapModel extends Model
+class CurrentYearChartModel extends Model
 {
 	protected $DBGroup              = 'default';
 	protected $table                = 'dashboard_district_map';
@@ -12,12 +13,12 @@ class OdMapModel extends Model
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
 	protected $returnType           = 'object';
-	protected $useSoftDeletes       = false;
+	protected $useSoftDeletes       = true;
 	protected $protectFields        = false;
 	protected $allowedFields        = [];
 
 	// Dates
-	protected $useTimestamps        = false;
+	protected $useTimestamps        = true;
 	protected $dateFormat           = 'datetime';
 	protected $createdField         = 'created_at';
 	protected $updatedField         = 'updated_at';
@@ -41,37 +42,25 @@ class OdMapModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 
-	public function getestablishmentmap()
+
+	public function getcurrentyeardata()
 	{
 		$sql = "SELECT
 		ddm.id,
 		ddm.district_id,
-		ddm.blocks,
-		ddm.gps total_gps,
-		ddm.villages total_villages,
-		ddm.created_at,
 		ddm.year_id,
 		ddm.tentative_farmers total_farmers,
+		ddm.acheivement achievement,
 		sd.name districts
 	  FROM dashboard_district_map ddm
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
 	  WHERE ddm.deleted_at IS NULL";
-
+			//   echo $sql;
 		return $this->db->query($sql)->getResult();
 	}
 
-	public function getEstablishSumData()
-	{
-		$sql = "SELECT
-		SUM(gps) sum_of_gps,
-		SUM(villages) sum_of_villages,
-		SUM(tentative_farmers) sum_of_farmers,
-		SUM(blocks) sum_of_blocks,
-		COUNT(district_id) sum_districts
-		FROM dashboard_district_map
-		WHERE deleted_at IS NULL";
 
-		return $this->db->query($sql)->getResult();
-	}
+
+
 }

@@ -2,7 +2,7 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Enterprises\Models\EnterprisesUnitmodel;
+use Admin\Enterprises\Models\EnterprisesUnitModel;
 use App\Controllers\AdminController;
 
 
@@ -11,7 +11,7 @@ class EnterpriseUnit extends AdminController
     private $enterprisesunitmodel;
     public function __construct()
     {
-        $this->enterprisesunitmodel = new EnterprisesUnitmodel();
+        $this->enterprisesunitmodel = new EnterprisesUnitModel();
     }
     public function index()
     {
@@ -65,8 +65,9 @@ class EnterpriseUnit extends AdminController
         $totalFiltered = $this->enterprisesunitmodel->getTotal($filter_data);
 
         $filteredData = $this->enterprisesunitmodel->getAll($filter_data);
-
+    //    printr($filteredData); exit;
         $datatable = array();
+        $startIndex = isset($requestData['start']) ? intval($requestData['start']) : 0; // Start index of the current page
         foreach ($filteredData as $key => $result) {
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
@@ -74,12 +75,12 @@ class EnterpriseUnit extends AdminController
             
             $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterpriseunit/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
-
+            $sequentialNumber = $startIndex + $key + 1;
             $datatable[] = array(
-                $key + 1,
+                $sequentialNumber,
                 $result->name,
                 $result->group_unit,
-                10,
+                $result->total_ent,
                 $action
             );
         }

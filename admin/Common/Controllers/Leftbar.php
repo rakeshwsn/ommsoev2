@@ -292,6 +292,14 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        if ($this->user->hasPermission("dashboard/establishment")) {
+            $dashboards[] = [
+                "name" => 'Establishment',
+                "href" => admin_url("dashboard/establishment"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("dashboard/pds")) {
             $dashboards[] = [
@@ -592,6 +600,14 @@ class Leftbar extends AdminController
             $areacoverage[] = [
                 "name" => 'Delete Area Coverage',
                 "href" => admin_url("areacoverage/delete"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("areacoverage/finaldata")) {
+            $areacoverage[] = [
+                "name" => 'Final Data',
+                "href" => admin_url("areacoverage/finaldata"),
                 "heading" => 0,
                 "children" => [],
             ];

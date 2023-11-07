@@ -59,13 +59,17 @@ class AreaCoverage extends AdminController
         $districtModel = new DistrictModel();
         $data['districts'] = $districtModel->getAll();
 
-        $dates = $this->areacoveragemodel->getWeekDate();
         $data['currentDay'] = date('l');
         $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
 
-        $data['from_date'] = $dates['start_date'];
+        $dates = $this->areacoveragemodel->getWeekDate();
+        $data['from_date'] = '';
+        $data['to_date'] = '';
+        if ($dates) {
+            $data['from_date'] = $dates['start_date'];
+            $data['to_date'] = $dates['end_date'];
+        }
 
-        $data['to_date'] = $dates['end_date'];
         $data['upload_url'] = Url::areaCoverageUpload;
 
         $view = 'areacoverage_block';
@@ -79,8 +83,12 @@ class AreaCoverage extends AdminController
             ];
 
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
-            //dd($blocks);
-            $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+
+            $data['start_date'] = '';
+            $weekDate = $this->areacoveragemodel->getWeekDate();
+            if ($weekDate) {
+                $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+            }
             $data['filtered_data_url'] = admin_url('areacoverage/filtered');
             $weeks = $this->areacoveragemodel->getWeeks();
             $data['weeks'] = [];
@@ -103,7 +111,7 @@ class AreaCoverage extends AdminController
                 $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
 
             $data['blocks'] = [];
-//            dd($blocks);
+            //            dd($blocks);
             foreach ($blocks as $block) {
                 $status = $block->status;
                 if (!isset($status)) {
@@ -132,9 +140,9 @@ class AreaCoverage extends AdminController
                 $total_ragi = $block->ragi_smi +
                     $block->ragi_lt +
                     $block->ragi_ls;
-//echo 'total_area:'.$total_area.' total_ragi:'.$total_ragi.' fc_area:'.$block->fc_area.'<br>';
+                //echo 'total_area:'.$total_area.' total_ragi:'.$total_ragi.' fc_area:'.$block->fc_area.'<br>';
 
-//                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
+                //                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
                 //subtraction issue for float values
                 $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
@@ -212,18 +220,15 @@ class AreaCoverage extends AdminController
 
             $view = 'areacoverage_block';
         } else if ($this->user->district_id) {
-//            $filter = [
+            //            $filter = [
 //                'district_id' => $this->user->district_id,
 //                'year_id' => getCurrentYearId(),
 //                'season' => getCurrentSeason()
 //            ];
 
-//            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
+            //            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
             $view = 'areacoverage_district';
         }
-
-        //printr($data);
-        //exit;
 
         return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
     }
@@ -232,6 +237,11 @@ class AreaCoverage extends AdminController
     {
 
         $dates = $this->areacoveragemodel->getWeekDate();
+
+        if (!$dates) {
+            return redirect()->to(admin_url('areacoverage'))
+                ->with('message', 'Dates are not selected');
+        }
 
         $data['from_date'] = $dates['start_date'];
         $data['to_date'] = $dates['end_date'];
@@ -674,8 +684,10 @@ class AreaCoverage extends AdminController
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
-        } else {
+        } else if ($week_dates) {
             $data['start_date'] = $start_date = $week_dates['start_date'];
+        } else {
+            $data['start_date'] = $start_date = '';
         }
 
         $acModel = new AreaCoverageModel();
