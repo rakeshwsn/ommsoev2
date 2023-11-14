@@ -63,7 +63,7 @@ class EstablishmentTransactionDetailsModel extends Model
     dy.name year_name,
     sm.name month_name,
     eu.name unit_name,
-    txn_dtl.period period_type,txn_dtl.created_at
+    txn_dtl.period,txn_dtl.created_at
   FROM (SELECT
       etd.id id,
       etd.no_of_days_functional,
@@ -115,8 +115,8 @@ class EstablishmentTransactionDetailsModel extends Model
     if (isset($filter['month_id'])) {
       $sql .= " AND txn_dtl.month_id = " . $filter['month_id'];
     }
-    if (isset($filter['period_type'])) {
-      $sql .= " AND txn_dtl.period_type = " . $filter['period_type'];
+    if (isset($filter['period'])) {
+      $sql .= " AND txn_dtl.period = " . $filter['period'];
     }
     // $sql .=  " GROUP BY unit.units";
     //  echo $sql;exit;

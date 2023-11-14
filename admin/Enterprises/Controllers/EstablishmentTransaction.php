@@ -101,7 +101,7 @@ class EstablishmentTransaction extends AdminController
             $data['trans'][] = [
                 // 'created_at' => $row->created_at,
                 'units' => $row->unit_name,
-                'period' => $row->period_type,
+                'period' => $row->period,
                 'month' => $row->month_name,
                 'districts' => $row->district_name,
                 'blocks' => $row->block_name,
@@ -168,7 +168,7 @@ class EstablishmentTransaction extends AdminController
                     'month_id' => $value->month_name,
                     'gp_id' => $value->gp_name,
                     'village_id' => $value->village_name,
-                    'period' => $value->period_type,
+                    'period' => $value->period,
                     'created_at' => ymdToDmy($value->created_at) ?: 0,
                     'no_of_days_functional' => $value->no_of_days_functional ?: 0,
                     'produced' => $value->produced ?: 0,
