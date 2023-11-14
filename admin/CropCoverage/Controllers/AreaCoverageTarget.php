@@ -55,7 +55,9 @@ class AreaCoverageTarget extends AdminController
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
 		$data['seasons'] = $this->acModel->getSeasons();
-		$data['current_season'] = "rabi";
+		$data['current_season'] = "kharif";
+		$croppractices = $this->targetModel->getPractices();
+
 		$data['target_url'] = admin_url('areacoverage/target/filter');
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
@@ -67,7 +69,6 @@ class AreaCoverageTarget extends AdminController
 		} else {
 			$data['district_id'] = 0;
 		}
-		$croppractices = $this->targetModel->getPractices();
 		if ($data['district_id'] === 0) {
 			$distwisetarget = $this->targetModel->getDistrictWiseData([]);
 			// dd($distwisetarget);
@@ -130,7 +131,8 @@ class AreaCoverageTarget extends AdminController
 
 
 			$data['crop_data'] = $this->request->getPost('crop');
-
+			// printr($data['crop_data']);
+			// exit;
 
 			$this->targetModel->addTargets($data, $target_id);
 
@@ -167,14 +169,15 @@ class AreaCoverageTarget extends AdminController
 
 
 		$data['croppractices'] = $this->acModel->getCropPractices();
-
+		// print_r($data['croppractices']);
+		// exit;
 		// Pass the practice data to the view
 		// echo getCurrentSeason();
 		// exit;
 		$data['practicedata'] = $this->targetModel->getBlockTargets([
 
 			'block_id' => $data['block_id'],
-			'season' => "rabi",
+			'season' => "kharif",
 			'year_id' => getCurrentYearId()
 		]);
 		// printr($data['practicedata']);

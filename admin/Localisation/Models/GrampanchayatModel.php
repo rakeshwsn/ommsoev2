@@ -89,7 +89,7 @@ class GrampanchayatModel extends Model
 		//$builder->where($this->deletedField, null);
 		//$builder->where('g.tcode', null);
 		$res = $builder->get()->getResult();
-//		echo $this->db->getLastQuery();
+		//		echo $this->db->getLastQuery();
 		return $res;
 	}
 
@@ -103,10 +103,10 @@ class GrampanchayatModel extends Model
 
 	private function filter($builder, $data)
 	{
-        $builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
-        $builder->join('soe_districts sd', 'sb.district_id = sd.id', 'left');
+		$builder->join('soe_blocks sb', 'sg.block_id = sb.id', 'left');
+		$builder->join('soe_districts sd', 'sb.district_id = sd.id', 'left');
 
-        if (!empty($data['filter_district'])) {
+		if (!empty($data['filter_district'])) {
 			$builder->where("sg.district_id  = '" . $data['filter_district'] . "'");
 		}
 
@@ -130,16 +130,27 @@ class GrampanchayatModel extends Model
 
 	public function getGPsByBlock($block_id)
 	{
-		$sql = "SELECT
-  sb.id block_id,
-  sb.name block,
-  sg.id gp_id,
-  sg.name gp
+		// echo $block_id;
+		// exit;
+		$sql = "
+SELECT
+  sb.id AS block_id,
+  sb.name AS block,
+  sg.id AS gp_id,
+  sg.name AS gp
 FROM soe_grampanchayats sg
-  LEFT JOIN soe_blocks sb
-    ON sg.block_id = sb.id
-WHERE sg.deleted_at IS NULL
-AND sg.block_id = $block_id";
+LEFT JOIN soe_blocks sb
+  ON sg.block_id = sb.id
+WHERE sg.deleted_at IS NULL";
+
+		if ($block_id) {
+			$sql .= " AND sg.block_id = " . $block_id;
+		} else {
+			$sql .= " AND sg.block_id = " . 0;
+		}
+
+		// echo $sql;
+		// exit;
 		$res = $this->db->query($sql)->getResult();
 		return $res;
 	}

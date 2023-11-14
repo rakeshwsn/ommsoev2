@@ -4,7 +4,8 @@
 			<?= $heading_title; ?>
 		</h3>
 		<div class="block-options">
-			<a href="<?= $add; ?>" data-toggle="tooltip" title="<?= $button_add; ?>" class="btn btn-primary ajaxaction"><i class="fa fa-plus"></i></a>
+			<a href="<?= $add; ?>" data-toggle="tooltip" title="<?= $button_add; ?>"
+				class="btn btn-primary ajaxaction"><i class="fa fa-plus"></i></a>
 			<!-- <button type="button" data-toggle="tooltip" title="<?= $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?= $text_confirm; ?>') ? $('#form-grampanchayat').submit() : false;"><i class="fa fa-trash-o"></i></button> -->
 		</div>
 	</div>
@@ -28,7 +29,8 @@
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Grampanchayat: <span class="tx-danger">*</span></label>
-							<input type="text" name="name" class="form-control" placeholder="Grampanchayat" id="filter_gp" />
+							<input type="text" name="name" class="form-control" placeholder="Grampanchayat"
+								id="filter_gp" />
 						</div>
 					</div>
 
@@ -48,7 +50,8 @@
 			<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 				<thead>
 					<tr>
-						<th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
+						<th style="width: 1px;" class="text-center no-sort"><input type="checkbox"
+								onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
 						<th>GP Name</th>
 						<th>District</th>
 						<th>Block</th>
@@ -61,19 +64,19 @@
 </div>
 <?php js_start(); ?>
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(document).ready(function () {
 		var blockId = "<?= $block_id; ?>"
-		$('select[name=\'district_id\']').bind('change', function() {
+		$('select[name=\'district_id\']').bind('change', function () {
 			$.ajax({
 				url: '<?= admin_url("district/block"); ?>/' + this.value,
 				dataType: 'json',
-				beforeSend: function() {
+				beforeSend: function () {
 					//$('select[name=\'country_id\']').after('<span class="wait">&nbsp;<img src="view/image/loading.gif" alt="" /></span>');
 				},
-				complete: function() {
+				complete: function () {
 					//$('.wait').remove();
 				},
-				success: function(json) {
+				success: function (json) {
 					//console.log(blockId);
 
 					html = '<option value="">Select Block</option>';
@@ -97,14 +100,14 @@
 					$('select[name=\'block_id\']').html(html);
 					$('select[name=\'block_id\']').select2();
 				},
-				error: function(xhr, ajaxOptions, thrownError) {
+				error: function (xhr, ajaxOptions, thrownError) {
 					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
 				}
 			});
 		});
 		$('select[name=\'district_id\']').trigger('change');
 	});
-	$(function() {
+	$(function () {
 		table = $('#datatable').DataTable({
 			"processing": true,
 			"serverSide": true,
@@ -115,19 +118,19 @@
 			"ajax": {
 				url: "<?= $datatable_url; ?>", // json datasource
 				type: "post", // method  , by default get
-				data: function(data) {
+				data: function (data) {
 					data.district = $('#filter_district').val();
 					data.block = $('#filter_block').val();
 					data.grampanchayat = $('#filter_gp').val();
 				},
-				beforeSend: function() {
+				beforeSend: function () {
 					$('.alert-dismissible, .text-danger').remove();
 					$("#datatable_wrapper").LoadingOverlay("show");
 				},
-				complete: function() {
+				complete: function () {
 					$("#datatable_wrapper").LoadingOverlay("hide");
 				},
-				error: function() { // error handling
+				error: function () { // error handling
 					$(".datatable_error").html("");
 					$("#datatable").append('<tbody class="datatable_error"><tr><th colspan="5">No data found.</th></tr></tbody>');
 					$("#datatable_processing").css("display", "none");
@@ -136,10 +139,10 @@
 				dataType: 'json'
 			}
 		});
-		$('#btn-filter').click(function() { //button filter event click
+		$('#btn-filter').click(function () { //button filter event click
 			table.ajax.reload(); //just reload table
 		});
-		$('#btn-reset').click(function() { //button reset event click
+		$('#btn-reset').click(function () { //button reset event click
 			$('#form-filter')[0].reset();
 			table.ajax.reload(); //just reload table
 		});
@@ -152,10 +155,10 @@
 		gbox.show({
 			content: '<h2>Delete Manager</h2>Are you sure you want to delete this Manager?<br><b>' + title,
 			buttons: {
-				'Yes': function() {
+				'Yes': function () {
 					$.post('<?= admin_url('members.delete'); ?>', {
 						user_id: id
-					}, function(data) {
+					}, function (data) {
 						if (data.success) {
 							gbox.hide();
 							$('#member_list').DataTable().ajax.reload();
