@@ -22,7 +22,7 @@
     .myform-area .form-area {
         position: relative;
         background: rgba(152, 166, 72);
-        width: 100%;
+        /* width: 100%; */
         /* height: 550px; */
         overflow: hidden;
         box-shadow: -1px 0px 7px 2px #e1e1e1;
@@ -38,7 +38,7 @@
     }
 
     .myform-area .form-area .form-content {
-        width: 50%;
+        width: 100%;
         padding: 40px 30px;
     }
 
@@ -69,7 +69,7 @@
         background: #3B579D;
         color: #fff;
         font-size: 15px;
-        
+
         border-radius: 4px;
         border: 1px solid #3B579D;
         -webkit-transition: all .5s;
@@ -88,7 +88,7 @@
         background: #00ACED;
         color: #fff;
         font-size: 15px;
-        
+
         border-radius: 4px;
         border: 1px solid #00ACED;
         -webkit-transition: all .5s;
@@ -109,7 +109,7 @@
     }
 
     .myform-area .form-area .form-inputt {
-        width: 50%;
+        width: 100%;
         background: #fff;
         padding: 5px 30px;
     }
@@ -126,7 +126,7 @@
 
     .myform-area .form-area .form-inputt input,
     .myform-area .form-area .form-inputt textarea {
-        
+
         width: 100%;
         box-sizing: border-box;
         outline: none;
@@ -159,21 +159,22 @@
 <section class="myform-area">
     <div class="container">
         <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
-            <div class="col-lg-8">
-                <div class="form-area login-form">
-                    <div class="form-content">
-                        <div class="col-sm-12">
-                            <!-- <a class="link-effect font-w700" href="index.php">
-                        <i class="si si-fire"></i>
-                        <span class="font-size-xl text-primary-dark">code</span><span class="font-size-xl">base</span>
-                    </a> -->
+        <div class="col-lg-8">
+        <div class="form-area login-form">
+           <div class="row">
+            <div class="col-sm-12 col-md-6 d-none d-md-block">
+            <div class="form-content">
+
                             <h5 class="h5 font-w700 mt-0 mb-10 text-center">Goverment of Odisha</h5>
                             <h5 class="h5 font-w700 mt-10 mb-10 text-center">Department of Agriculture & Farmers' Empowerment</h5>
                             <h5 class="h5 font-w700 mt-25 mb-10 text-center" style="padding-top: 30px;font-size: 24px;">Odisha Millets Mission</h5>
                             <p class="text-center" style="color: white !important;*! font-family: font-family: &quot;Times New Roman&quot;, Times, serif; */font-family: &quot;algerian&quot;,;font-family: &quot;Algerian&quot;, Times, serif;font-size: 30px;padding-top: 40px;">SOE &amp; MIS PORTAL</p>
-                        </div>
+
                     </div>
-                    <div class="d-flex justify-content-center" style="background: #fff;">
+            </div>
+            <div class="col-sm-12 col-md-6">
+
+            <div class="d-flex justify-content-center" style="background: #fff;">
                         <img src="<?php echo base_url() ?>/themes/default/assets/images/Gov. Logo(1).png" alt="" style="height: 100px; width: auto; padding-top: 5px;padding-bottom: 5px;">
                         <img src="<?php echo base_url() ?>/themes/default/assets/images/OMM New Logo(2).png" alt="" style="height: 100px; width: auto; padding-top: 5px;padding-bottom: 5px;">
                     </div>
@@ -223,8 +224,11 @@
                         </div>
                         <?php echo form_close(); ?>
                     </div>
-                </div>
             </div>
+           </div>
+            </div>
+
+                            </div>
         </div>
     </div>
 </section>
