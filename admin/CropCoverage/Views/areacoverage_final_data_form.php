@@ -108,18 +108,21 @@
                             <!-- Other fields related to GP data -->
                             <td>
                                 <input type="number" name="no_of_village[<?= $gpdata['gp_id'] ?>]"
-                                    id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>">
+                                    id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>"
+                                    oninput="validatePositiveInteger(this, 5)">
                             </td>
 
                             <td>
-                                <input type="number" name="farmers_covered_under_demonstration[<?= $gpdata['gp_id'] ?>]"
+                                <input type=" number" name="farmers_covered_under_demonstration[<?= $gpdata['gp_id'] ?>]"
                                     id="farmers_demonstration_<?= $gpdata['gp_id'] ?>"
-                                    value="<?= $gpdata['farmers_covered_under_demonstration']; ?>">
+                                    value="<?= $gpdata['farmers_covered_under_demonstration']; ?>"
+                                    oninput="validatePositiveInteger(this, 5)">
                             </td>
                             <td>
                                 <input type="number" name="farmers_covered_under_followup[<?= $gpdata['gp_id'] ?>]"
                                     id="farmers_followup_<?= $gpdata['gp_id'] ?>"
-                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>">
+                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>"
+                                    oninput="validatePositiveInteger(this,5)">
                             </td>
                             <!-- Other GP-specific fields -->
                             <?php
@@ -131,10 +134,10 @@
 
                                         <td>
                                             <input type="hidden" name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][crops]"
-                                                value="<?= $gpcrops['crops'] ?>">
+                                                value="<?= $gpcrops['crops'] ?>" oninput="validateField(this,7)">
                                             <input type="number"
                                                 name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][<?= $key ?>]"
-                                                value="<?= $gpcrops[$key] ?>">
+                                                value="<?= $gpcrops[$key] ?>" oninput="validateField(this,7)">
                                         </td>
                                         <?php
 
@@ -144,47 +147,54 @@
 
                             <td>
                                 <p id="total_ragi">
-                                    <?= $totalRagi ?>
+                                    10
                                 </p>
                             </td>
                             <td>
                                 <p id="total_non_ragi">
-                                    <?= $totalNonRagi; ?>
+                                    15
                                 </p>
                             </td>
                             <td>
                                 <input type="number" name="fup_ragi[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>">
+                                    id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_lm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>">
+                                    id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_fm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_fm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_fm']; ?>">
+                                    id="fup_fm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_fm']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_sorghum[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_sorghum_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_sorghum']; ?>">
+                                    id="fup_sorghum_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_sorghum']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_km[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>">
+                                    id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_bm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_bm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_bm']; ?>">
+                                    id="fup_bm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_bm']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
                                 <input type="number" name="fup_pm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_pm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_pm']; ?>">
+                                    id="fup_pm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_pm']; ?>"
+                                    oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="text" value="r" name="total_ach_demon" id="total_ach_demon" disabled>
+                                <input type="text" value="12" name="total_ach_demon" id="total_ach_demon" disabled>
                             </td>
                             <td>
-                                <input type="" value="" name="total_fup" id="total_fup" disabled>
+                                <input type="" value="15" name="total_fup" id="total_fup" disabled>
                             </td>
 
                         </tr>
@@ -197,44 +207,32 @@
         </div>
     </div>
 </div>
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Function to calculate totals
-        function calculateTotals() {
-            var totalRagi = 0;
-            var totalNonRagi = 0;
+    function validateField(field, maxDigits) {
+        var inputValue = field.value.trim();
+        var decimalRegex = /^\d+(\.\d{1,5})?$/; // Regular expression for valid decimal numbers
 
-            var inputFields = document.querySelectorAll("input[name^='crop_data']");
-            inputFields.forEach(function (inputField) {
-                var value = parseFloat(inputField.value) || 0;
+        if (!decimalRegex.test(inputValue) || inputValue.length > maxDigits) {
+            field.setCustomValidity('Please enter a valid positive decimal number with up to 5 decimal places and a maximum of 7 digits.');
+        } else {
+            field.setCustomValidity('');
+        }
+    }
+</script>
+<script>
+    function validatePositiveInteger(input, maxLength) {
+        // Remove non-numeric characters (except ".") from the input
+        input.value = input.value.replace(/[^0-9]/g, '');
 
-                if (!isNaN(value)) {
-                    var inputName = inputField.name;
-                    var key = inputName.match(/\[([^\]]+)\]$/)[1];
-
-                    if (key) {
-                        if (['smi', 'lt', 'ls'].includes(key)) {
-                            totalRagi += value;
-                        } else {
-                            totalNonRagi += value;
-                        }
-                    }
-                }
-            });
-
-            // Update the total values in the HTML
-            document.getElementById("total_ragi").textContent = totalRagi.toFixed(2);
-            document.getElementById("total_non_ragi").textContent = totalNonRagi.toFixed(2);
+        // Ensure the input is not negative
+        if (parseInt(input.value) < 0) {
+            input.value = '';
         }
 
-        // Use event delegation to handle input changes
-        document.addEventListener("input", function (event) {
-            if (event.target && event.target.matches("input[name^='crop_data']")) {
-                calculateTotals();
-            }
-        });
-
-        // Initial calculation
-        calculateTotals();
-    });
+        // Ensure the input has a maximum length of maxLength
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+        }
+    }
 </script>
