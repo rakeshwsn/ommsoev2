@@ -56,7 +56,7 @@ class AreaCoverageFinalData extends AdminController
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
         $data['seasons'] = $this->acModel->getSeasons();
-        $data['current_season'] = "kharif";
+        $data['current_season'] = strtolower(getCurrentSeason());
         $data['get_blocks'] = Url::getBlocks;
 
         $data['district_id'] = '';
@@ -94,7 +94,8 @@ class AreaCoverageFinalData extends AdminController
             $data['crops'][$crop->id] = $crop->crops;
         }
         $data['districts'] = ($this->districtModel)->orderBy('name')->asArray()->find();
-
+        // printr($data['districts']);
+        // exit;
         $data['add'] = admin_url('areacoverage/finaldata/add');
 
         //for area coverage report
@@ -178,7 +179,6 @@ class AreaCoverageFinalData extends AdminController
     {
         $data = [];
         $data['seasons'] = $this->acModel->getSeasons();
-        $data['current_season'] = "kharif";
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
         $crops = $this->cropsModel->findAll();
@@ -187,46 +187,40 @@ class AreaCoverageFinalData extends AdminController
             $data['crops'][$crop->id] = $crop->crops;
         }
         $data['crop_practices'] = $this->acModel->getCropPractices();
-
         $data['district_id'] = $this->user->district_id;
-
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = (array) $this->request->getGet('district_id');
         }
-
         $data['blocks'] = [];
-
         if ($data['district_id']) {
             $data['blocks'] = ($this->blockModel)->where('district_id', $data['district_id'])
                 ->orderBy('name')->asArray()->findAll();
         }
-
         $data['block_id'] = $this->request->getGet('block_id', null);
-        $data['year_id'] = $this->request->getGet('year_id', getCurrentYearId());
+        $data['year_id'] = getCurrentYearId();
         $data['current_season'] = getCurrentSeason();
-
         $filter = [
             'year_id' => $data['year_id'],
             'season' => $data['current_season'],
             'block_id' => $data['block_id']
         ];
-
+        // print_r($filter);
+        // exit;
         $data['gpsfinaldata'] = $this->fdModel->getGpsFinalData($filter);
-
         // printr($data['gpsfinaldata']);
         // exit;
         foreach ($data['gpsfinaldata'] as &$gpsfinal) {
             $final_data_id = $gpsfinal['id'];
 
-            // Fetch GPS Demonstration Data
+
             $gps_demon_data = $this->fdModel->getGpsDemonData($final_data_id);
 
-            // Loop through the GPS Demonstration Data
+
             foreach ($gps_demon_data as &$crop) {
-                // Check if the crop ID exists in the crop practices array
+
                 $practice = $data['crop_practices'][$crop['id']];
 
-                // Remove fields not in the practice array
+
                 if (!in_array('smi', $practice)) {
                     unset($crop['smi']);
                 }
@@ -237,27 +231,41 @@ class AreaCoverageFinalData extends AdminController
                     unset($crop['ls']);
                 }
             }
-
-
             $gpsfinal['crops_data'] = $gps_demon_data;
         }
         // printr($gpsfinal['crops_data']);
         // exit;
-
         if ($this->request->getMethod(1) === 'POST') {
             $block_id = $this->request->getGet('block_id');
             $data['block_id'] = $block_id;
-
             $gpMasterData = [];
+            // printr($data['gpsfinaldata']);
+            // exit;
 
             foreach ($data['gpsfinaldata'] as $gpdata) {
 
+                $record = $this->fdModel
+                    ->where('id', $gpdata['id'])
+                    ->where('season', $gpdata['season'])
+                    ->where('year_id', $gpdata['year_id'])
+                    ->first();
+
+                if ($record) {
+                    $this->fdModel
+                        ->where('id', $record->id)
+                        ->delete();
+                }
+
+                //delete
+                //$this->fdModel->delete(2);
+
+                // printr($record);
+                // exit;
                 $gpMasterData[] = [
                     "year_id" => getCurrentYearId(),
                     "season" => getCurrentSeason(),
                     "district_id" => $this->user->district_id,
                     "block_id" => $block_id,
-
 
                     "gp_id" => $gpdata['gp_id'],
                     "no_of_village" => $this->request->getPost('no_of_village[' . $gpdata['gp_id'] . ']'),
@@ -272,7 +280,12 @@ class AreaCoverageFinalData extends AdminController
                     "fup_pm" => $this->request->getPost('fup_pm[' . $gpdata['gp_id'] . ']'),
                 ];
 
+                $this->fdModel->insertBatch($gpMasterData);
+
+
             }
+            printr($gpdata);
+            exit;
 
             $final_data_ids = [];
             foreach ($gpMasterData as $data) {
@@ -283,37 +296,23 @@ class AreaCoverageFinalData extends AdminController
                     ->where('block_id', $data['block_id'])
                     ->where('gp_id', $data['gp_id'])
                     ->first();
-
-
                 if ($master) {
                     $final_data_id = $master->id;
 
-                    // Store both final_data_id and gp_id in the final_data_ids array
                     $final_data_ids[] = ['final_data_id' => $final_data_id, 'gp_id' => $data['gp_id']];
                 } else {
                     $final_data_id = $this->fdModel->insert($data);
 
-                    // Store both final_data_id and gp_id in the final_data_ids array
                     $final_data_ids[] = ['final_data_id' => $final_data_id, 'gp_id' => $data['gp_id']];
                 }
-
-
-
-
             }
-
-
             // printr($final_data_ids);
             // exit;
-
             $crop_data = $this->request->getPost('crop_data'); // Assuming crop data is an associative array.
-
             $mergedData = [];
-
             foreach ($final_data_ids as $finalData) {
                 $final_data_id = $finalData['final_data_id'];
                 $gp_id = $finalData['gp_id'];
-
                 if (isset($crop_data[$gp_id])) {
                     foreach ($crop_data[$gp_id] as $crop_id => $data) {
                         $smi = isset($data['smi']) ? $data['smi'] : 0;
@@ -332,23 +331,12 @@ class AreaCoverageFinalData extends AdminController
             }
             // printr($mergedData);
             // exit;
-
             $this->fdModel->addGpCropsData($mergedData);
-            // Your existing code continues here
-
-
 
 
             $this->session->setFlashdata('message', 'Target Updated Successfully.');
-
             return redirect()->to(base_url('admin/areacoverage/finaldata/add'));
-
-            // echo $final_data_id;
-            // exit;
-            // printr($gpMasterData);
-            // exit;
         }
-
         echo $this->template->view('Admin\CropCoverage\Views\areacoverage_final_data_form', $data);
     }
 

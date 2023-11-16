@@ -67,7 +67,10 @@ class FinalDataModel extends Model
     public function getGpsFinalData($filter = [])
     {
         $sql = "SELECT
+        
       fd.id,
+COALESCE(fd.year_id, " . getCurrentYearId() . ") AS year_id,
+      COALESCE(fd.season, '" . getCurrentSeason() . "') AS season,
   gp.id AS gp_id,
   gp.name,
   COALESCE(no_of_village, 0) AS no_of_village,
@@ -96,6 +99,8 @@ FROM (
 LEFT JOIN (
   SELECT
   afdm.id,
+   COALESCE(afdm.year_id, " . getCurrentYearId() . ") AS year_id,
+        COALESCE(afdm.season, '" . getCurrentSeason() . "') AS season,
     afdm.gp_id,
     afdm.no_of_village,
     afdm.farmers_covered_under_demonstration,
@@ -111,11 +116,26 @@ LEFT JOIN (
   FROM ac_final_data_master afdm
     LEFT JOIN ac_final_area_data afad ON afdm.id = afad.final_data_id
     LEFT JOIN (SELECT *, id AS crop_id FROM ac_crops) c ON afad.crop_id = c.crop_id
-  WHERE afdm.deleted_at IS NULL
+  WHERE afdm.deleted_at IS NULL"; // Add your specific conditions here
+
+        if (empty($filter['year_id'])) {
+            $filter['year_id'] = getCurrentYearId();
+        }
+
+        if (empty($filter['season'])) {
+            $filter['season'] = getCurrentSeason();
+        }
+
+        $sql .= " AND COALESCE(afdm.year_id, " . getCurrentYearId() . ") = " . $filter['year_id'];
+        $sql .= " AND COALESCE(afdm.season, '" . getCurrentSeason() . "') = '" . $filter['season'] . "'";
+
+
+
+        $sql .= "
   GROUP BY afdm.gp_id
 ) AS fd
 ON gp.id = fd.gp_id
-";
+order by gp.name";
 
         // echo $sql;
         // exit;
@@ -167,20 +187,107 @@ FROM ac_crops ac
 
         if (!empty($filter['block_id'])) {
 
-            return $this->getByBlockNew($filter);
+            return $this->getGpwiseFinalReport($filter);
 
         } else if (!empty($filter['district_id'])) {
 
-            return $this->getByDistrictNew($filter);
+            return $this->getBlockWiseFinalReport($filter);
 
         } else {
 
-            return $this->getAllDistrictsNew($filter);
+            return $this->getAllDistrictsFinalReport($filter);
 
         }
     }
+    public function getGpwiseFinalReport($filter = [])
+    {
+        $sql = "SELECT
+  sg.id AS gp_id,
+  sg.name AS gp_name,
+  COALESCE(afdm.no_of_village, 0) AS total_village,
+  COALESCE(afdm.farmers_covered_under_demonstration, 0) AS total_demon_farmer,
+  COALESCE(afdm.farmers_covered_under_followup, 0) AS total_follow_farmer,
+  COALESCE(
+  afdm.fup_ragi+
+  afdm.fup_lm +
+  afdm.fup_fm +
+  afdm.fup_sorghum +
+  afdm.fup_km +
+  afdm.fup_bm +
+  afdm.fup_pm,
+  0
+) AS total_fup,
 
-    public function getByDistrictNew($filter = [])
+  COALESCE(SUM(CASE WHEN t3.crops = 'Ragi' THEN COALESCE(t3.smi, 0) ELSE 0 END), 0) AS ragi_total_smi,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Ragi' THEN COALESCE(t3.lt, 0) ELSE 0 END), 0) AS ragi_total_lt,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Ragi' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS ragi_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Little Millet' THEN COALESCE(t3.lt, 0) ELSE 0 END), 0) AS little_millet_lt,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Little Millet' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS little_millet_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Foxtail Millet' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS foxtail_millet_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Sorghum' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS sorghum_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Kodo Millet' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS kodo_millet_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Barnyard Millet' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS barnyard_millet_ls,
+  COALESCE(SUM(CASE WHEN t3.crops = 'Pearl Millet' THEN COALESCE(t3.ls, 0) ELSE 0 END), 0) AS pearl_millet_ls
+FROM
+  soe_grampanchayats sg
+LEFT JOIN
+  ac_final_data_master afdm ON sg.id = afdm.gp_id
+LEFT JOIN
+  (
+    SELECT
+      afdm.gp_id,
+      t3.crops,
+      t3.smi,
+      t3.lt,
+      t3.ls
+    FROM
+      ac_final_data_master afdm
+    LEFT JOIN
+      (
+        SELECT
+          afad.final_data_id,
+          afad.crop_id,
+          ac.crops AS crops,
+          afad.smi,
+          afad.lt,
+          afad.ls
+        FROM
+          ac_final_area_data afad
+        LEFT JOIN
+          ac_crops ac ON afad.crop_id = ac.id
+      ) AS t3 ON afdm.id = t3.final_data_id
+    WHERE
+      ";
+        if (!empty($filter['block_id'])) {
+            $sql .= " afdm.district_id =" . $filter['district_id'];
+
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND afdm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= "AND afdm.deleted_at IS NULL
+  ) AS t3 ON sg.id = t3.gp_id
+WHERE
+   ";
+        if (!empty($filter['block_id'])) {
+            $sql .= " afdm.district_id =" . $filter['district_id'];
+
+        }
+
+        $sql .= "
+GROUP BY
+  sg.id, sg.name
+order by sg.name";
+        // echo $sql;
+        // exit;
+
+        return $this->db->query($sql)->getResult();
+    }
+    public function getBlockWiseFinalReport($filter = [])
     {
         $sql = "SELECT
   t1.block_id,
@@ -208,7 +315,12 @@ FROM (
     COUNT(sg.block_id) AS total_gp
   FROM soe_blocks sb
   LEFT JOIN soe_grampanchayats sg ON sb.id = sg.block_id
-  WHERE sb.district_id = 15 AND sg.deleted_at IS NULL
+  WHERE ";
+        if (!empty($filter['district_id'])) {
+            $sql .= " sb.district_id =" . $filter['district_id'];
+
+        }
+        $sql .= " AND sg.deleted_at IS NULL
   GROUP BY sb.id, sb.name
 ) AS t1
 LEFT JOIN (
@@ -228,8 +340,19 @@ LEFT JOIN (
       SUM(afdm.fup_pm)
     ) AS total_fup
   FROM ac_final_data_master afdm
-  WHERE afdm.year_id = 2 AND afdm.district_id = 15 AND afdm.season = 'rabi'
-  GROUP BY afdm.block_id
+  WHERE ";
+        if (!empty($filter['district_id'])) {
+            $sql .= " afdm.district_id =" . $filter['district_id'];
+
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND afdm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id
 ) AS t2 ON t1.block_id = t2.block_id
 LEFT JOIN (
   SELECT
@@ -250,8 +373,19 @@ LEFT JOIN (
     FROM ac_final_area_data afad
     LEFT JOIN ac_crops ac ON ac.id = afad.crop_id
   ) AS t3 ON afdm.id = t3.final_data_id
-  WHERE afdm.year_id = 2 AND afdm.district_id = 15 AND afdm.season = 'rabi'
-  GROUP BY afdm.block_id, t3.crops
+  WHERE";
+        if (!empty($filter['district_id'])) {
+            $sql .= " afdm.district_id =" . $filter['district_id'];
+
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND afdm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id, t3.crops
 ) AS t3 ON t2.block_id = t3.block_id
 GROUP BY t1.block_id
 ";
@@ -261,112 +395,9 @@ GROUP BY t1.block_id
         return $this->db->query($sql)->getResult();
     }
 
-    public function getByBlockNew($filter = [])
-    {
 
-        $sql = "SELECT
-  gp,
-  m.gp_id,
-  nur.nursery_raised,nur.balance_smi,nur.balance_lt,
-  nur.farmers_covered,
-  m.fc_area,
-  m.ragi_smi,
-  m.ragi_lt,
-  m.ragi_ls,
-  m.little_millet_lt,
-  m.little_millet_ls,
-  m.foxtail_ls,
-  m.sorghum_ls,
-  m.kodo_ls,
-  m.barnyard_ls,
-  m.pearl_ls
-FROM (SELECT
-    gp_id,
-    gp,
-    year_id,
-    season,
-    start_date,
-    SUM(farmers_covered) farmers_covered,
-    SUM(fc_area) fc_area,
-    SUM(ragi_smi) ragi_smi,
-    SUM(ragi_lt) ragi_lt,
-    SUM(ragi_ls) ragi_ls,
-    SUM(little_millet_lt) little_millet_lt,
-    SUM(little_millet_ls) little_millet_ls,
-    SUM(foxtail_ls) foxtail_ls,
-    SUM(sorghum_ls) sorghum_ls,
-    SUM(kodo_ls) kodo_ls,
-    SUM(barnyard_ls) barnyard_ls,
-    SUM(pearl_ls) pearl_ls
-  FROM vw_area_coverage_report_gpwise
-  WHERE 1 = 1";
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
-        }
-        if (!empty($filter['block_id'])) {
-            $sql .= " AND block_id=" . $filter['block_id'];
-        }
-        if (!empty($filter['start_date'])) {
-            $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
-        }
-        $sql .= " GROUP BY gp_id) m
-  LEFT JOIN (WITH nur
-      AS
-      (SELECT
-            acc.district_id,
-            acc.block_id,
-            acc.gp_id,
-            acc.year_id,
-            acc.season,
-            SUM(an.nursery_raised) nursery_raised,
-            SUM(an.balance_smi) balance_smi,
-            SUM(an.balance_lt) balance_lt,
-            SUM(acc.farmers_covered) farmers_covered,
-            acc.start_date
-          FROM ac_nursery an
-            LEFT JOIN ac_crop_coverage acc
-              ON an.crop_coverage_id = acc.id
-          WHERE acc.deleted_at IS NULL
-          AND acc.status = 1";
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
-        }
-        if (!empty($filter['block_id'])) {
-            $sql .= " AND block_id=" . $filter['block_id'];
-        }
-        if (!empty($filter['start_date'])) {
-            $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
-        }
-        $sql .= " GROUP BY DATE(acc.start_date),acc.gp_id)
-    SELECT
-      n1.gp_id,
-      n1.year_id,
-      n1.season,
-      nursery_raised,
-      balance_smi,
-      balance_lt,
-      start_date,
-      n1.farmers_covered
-    FROM nur n1
-    WHERE DATE(start_date) = (SELECT
-        MAX(DATE(n2.start_date))
-      FROM nur n2
-      WHERE n2.gp_id = n1.gp_id)) nur
-    ON nur.gp_id = m.gp_id
-ORDER BY m.gp";
-        // echo $sql;
-        // exit;
 
-        return $this->db->query($sql)->getResult();
-    }
-
-    public function getAllDistrictsNew($filter = [])
+    public function getAllDistrictsFinalReport($filter = [])
     {
         $sql = "SELECT
   sd.id,
@@ -407,9 +438,16 @@ FROM soe_districts sd
       SUM(afdm.farmers_covered_under_followup) AS total_follow_farmer,
       SUM(afdm.fup_ragi + afdm.fup_lm + afdm.fup_fm + afdm.fup_sorghum + afdm.fup_km + afdm.fup_bm + afdm.fup_pm) AS total_fup
     FROM ac_final_data_master afdm
-    WHERE afdm.year_id = 2
-    AND afdm.season = 'rabi'
-    GROUP BY afdm.district_id) AS demonstration_data
+    WHERE";
+
+        if (!empty($filter['year_id'])) {
+            $sql .= " afdm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= " AND afdm.deleted_at IS NULL GROUP BY afdm.district_id) AS demonstration_data
     ON sd.id = demonstration_data.district_id
   LEFT JOIN (SELECT
       afdm.district_id,
@@ -429,8 +467,16 @@ FROM soe_districts sd
           LEFT JOIN ac_crops ac
             ON afad.crop_id = ac.id) AS t3
         ON afdm.id = t3.final_data_id
-    WHERE afdm.year_id = 2
-    AND afdm.season = 'rabi'
+    WHERE";
+
+        if (!empty($filter['year_id'])) {
+            $sql .= " afdm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= " AND afdm.deleted_at IS NULL
     GROUP BY afdm.district_id,
              t3.crops) AS t3
     ON sd.id = t3.district_id
