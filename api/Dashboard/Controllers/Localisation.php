@@ -32,14 +32,21 @@ class Localisation extends ResourceController
 		Header('Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE');
 	}
 
+	/**
+	 * This function is responsible for retrieving all districts and blocks for the API.
+	 * Implemented by Rakesh Nayak.
+	 */
 	public function localisation()
 	{
+		// Create new instances of DistrictModel and BlockModel
 		$districtmodel = new DistrictModel();
 		$blockmodel = new BlockModel();
+
+		// Get all districts and blocks
 		$data['allDistricts'] =  $districtmodel->getAllDistrict();
 		$data['allBlocks'] =  $blockmodel->getAllBlock();
-       // printr($allblocks); exit;
+
+		// Return the data
 		return $this->respond($data);
 	}
-
 }
