@@ -33,6 +33,8 @@ $user = service('user');
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 
     <!-- Controller Defined Stylesheets -->
     <?= $template->stylesheets() ?>

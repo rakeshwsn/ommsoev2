@@ -13,7 +13,6 @@ use Admin\Localisation\Models\GrampanchayatModel;
 use Admin\CropCoverage\Models\FinalDataModel;
 use Admin\CropCoverage\Models\PracticesModel;
 use Admin\CropCoverage\Models\TargetModel;
-
 use Config\Url;
 
 class AreaCoverageFinalData extends AdminController
@@ -58,7 +57,7 @@ class AreaCoverageFinalData extends AdminController
         $data['seasons'] = $this->acModel->getSeasons();
         $data['current_season'] = strtolower(getCurrentSeason());
         $data['get_blocks'] = Url::getBlocks;
-
+        $data['get_blocks'] = Url::getBlocks;
         $data['district_id'] = '';
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
@@ -212,10 +211,12 @@ class AreaCoverageFinalData extends AdminController
         foreach ($data['gpsfinaldata'] as &$gpsfinal) {
             $final_data_id = $gpsfinal['id'];
 
-
+            // printr($final_data_id);
+            // exit;
             $gps_demon_data = $this->fdModel->getGpsDemonData($final_data_id);
 
-
+            // printr($gps_demon_data);
+            // exit;
             foreach ($gps_demon_data as &$crop) {
 
                 $practice = $data['crop_practices'][$crop['id']];
@@ -233,15 +234,15 @@ class AreaCoverageFinalData extends AdminController
             }
             $gpsfinal['crops_data'] = $gps_demon_data;
         }
-        // printr($gpsfinal['crops_data']);
+        // printr($data['gpsfinaldata']);
         // exit;
         if ($this->request->getMethod(1) === 'POST') {
             $block_id = $this->request->getGet('block_id');
             $data['block_id'] = $block_id;
             $gpMasterData = [];
-            // printr($data['gpsfinaldata']);
-            // exit;
-
+            printr($data['gpsfinaldata']);
+            exit;
+            $ids = [];
             foreach ($data['gpsfinaldata'] as $gpdata) {
 
                 $record = $this->fdModel
@@ -249,12 +250,19 @@ class AreaCoverageFinalData extends AdminController
                     ->where('season', $gpdata['season'])
                     ->where('year_id', $gpdata['year_id'])
                     ->first();
+                // printr($record);
+                // exit;
+
 
                 if ($record) {
-                    $this->fdModel
-                        ->where('id', $record->id)
-                        ->delete();
+                    $id = $record->id;
+                    $ids[] = ['id' => $id, 'gp_id' => $gpdata['gp_id']];
+                    // printr($ids);
+                    // exit;
                 }
+
+
+
 
                 //delete
                 //$this->fdModel->delete(2);
@@ -280,12 +288,18 @@ class AreaCoverageFinalData extends AdminController
                     "fup_pm" => $this->request->getPost('fup_pm[' . $gpdata['gp_id'] . ']'),
                 ];
 
-                $this->fdModel->insertBatch($gpMasterData);
+
 
 
             }
-            printr($gpdata);
-            exit;
+            if (!empty($ids)) {
+                // Delete records based on the IDs in $ids
+                $this->fdModel->whereIn('id', array_column($ids, 'id'))->delete();
+            } else {
+                // Insert new records based on $data['gpsfinaldata']
+                $this->fdModel->insertBatch($gpMasterData);
+            }
+
 
             $final_data_ids = [];
             foreach ($gpMasterData as $data) {
