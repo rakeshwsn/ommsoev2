@@ -61,32 +61,23 @@
                     </div>
                     <div class="col-md-2">
                         <label>Block</label>
-                        <select class="form-control" id="block" name="block_id" <?php if ($district_id and $block_id) {
-                            echo 'disabled';
-                        } ?>>
+                        <select class="form-control" id="block" name="block_id">
                             <option value="">All Blocks</option>
                             <?php foreach ($blocks as $block) { ?>
                                 <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
 
-                                      echo 'selected disabled';
+                                      echo 'selected';
                                   } ?>>
                                     <?= $block['name'] ?>
                                 </option>
                             <?php } ?>
                         </select>
                     </div>
+                    <div class="col-md-2" style="margin-top:25px;">
+                        <button id="btn-filter" class="btn btn-outline btn-primary">
+                            <i class="fa fa-filter"></i> Filter</button>
 
-                    <?php if ($block_id) { ?>
-                        <div class="col-md-2" style="margin-top:25px;" hidden>
-                            <a href="" class="btn btn-square btn-info min-width-125 mb-10">filter</a>
-
-                        </div>
-                    <?php } else { ?>
-                        <div class="col-md-2" style="margin-top:25px;">
-                            <a href="" class="btn btn-square btn-info min-width-125 mb-10">filter</a>
-
-                        </div>
-                    <?php } ?>
+                    </div>
                 </div>
             </div>
         </div>
