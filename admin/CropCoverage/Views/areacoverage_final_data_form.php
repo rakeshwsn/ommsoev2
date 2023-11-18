@@ -12,7 +12,7 @@
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id" disabled>
                             <?php foreach ($years as $year) { ?>
-                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
+                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
                                       echo 'selected';
                                   } ?>><?= $year['name'] ?>
                                 </option>
@@ -23,7 +23,7 @@
                         <label>Season</label>
                         <select class="form-control" id="season" name="season" disabled>
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                <option value="<?= $value ?>" <?php if ($value == strtolower($current_season)) {
                                       echo 'selected';
                                   } ?>>
                                     <?= $season ?>
@@ -106,23 +106,27 @@
                         <tr>
                             <td>
                                 <?= $gpdata['name']; ?>
-                                <input type="hidden" name="gp_id[]" value="<?= $gpdata['gp_id']; ?>">
+                                <input type="hidden" name="area[<?= $gpdata['gp_id'] ?>][master_id]"
+                                    value="<?= $gpdata['id']; ?>">
+                                <input type="hidden" name="area[<?= $gpdata['gp_id'] ?>][gp_id]"
+                                    value="<?= $gpdata['gp_id']; ?>">
                             </td>
                             <!-- Other fields related to GP data -->
                             <td>
-                                <input type="number" name="no_of_village[<?= $gpdata['gp_id'] ?>]"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][no_of_village]"
                                     id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>"
                                     oninput="validatePositiveInteger(this, 5)">
                             </td>
 
                             <td>
-                                <input type=" number" name="farmers_covered_under_demonstration[<?= $gpdata['gp_id'] ?>]"
+                                <input type=" number"
+                                    name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_demonstration]"
                                     id="farmers_demonstration_<?= $gpdata['gp_id'] ?>"
                                     value="<?= $gpdata['farmers_covered_under_demonstration']; ?>"
                                     oninput="validatePositiveInteger(this, 5)">
                             </td>
                             <td>
-                                <input type="number" name="farmers_covered_under_followup[<?= $gpdata['gp_id'] ?>]"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_followup]"
                                     id="farmers_followup_<?= $gpdata['gp_id'] ?>"
                                     value="<?= $gpdata['farmers_covered_under_followup']; ?>"
                                     oninput="validatePositiveInteger(this,5)">
@@ -134,21 +138,19 @@
                                 foreach ($keys as $key):
                                     if (isset($gpcrops[$key])):
                                         ?>
-
                                         <td>
                                             <input type="hidden"
-                                                name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][<?= $key ?>]"
+                                                name="area[<?= $gpdata['gp_id'] ?>][crop_data][<?= $gpcrops['id'] ?>][<?= $key ?>]"
                                                 value="<?= $gpcrops[$key] ?>" oninput="validateField(this, 7)"
                                                 data-crop-id="<?= $gpcrops['id'] ?>">
 
                                             <input type="number"
-                                                name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][<?= $key ?>]"
+                                                name="area[<?= $gpdata['gp_id'] ?>][crop_data][<?= $gpcrops['id'] ?>][<?= $key ?>]"
                                                 value="<?= $gpcrops[$key] ?>" oninput="validateField(this, 7)"
                                                 data-crop-id="<?= $gpcrops['id'] ?>">
 
                                         </td>
                                         <?php
-
                                     endif;
                                 endforeach;
                             endforeach; ?>
@@ -160,37 +162,37 @@
                                 <input type="" value="" name="total_non_ragi" id="total_non_ragi" disabled>
                             </td>
                             <td>
-                                <input type="number" name="fup_ragi[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_ragi]" class="fup-input"
                                     id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_lm[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_lm]" class="fup-input"
                                     id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_fm[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_fm]" class="fup-input"
                                     id="fup_fm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_fm']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_sorghum[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_sorghum]" class="fup-input"
                                     id="fup_sorghum_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_sorghum']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_km[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_km]" class="fup-input"
                                     id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_bm[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_bm]" class="fup-input"
                                     id="fup_bm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_bm']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
                             <td>
-                                <input type="number" name="fup_pm[<?= $gpdata['gp_id'] ?>]" class="fup-input"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_pm]" class="fup-input"
                                     id="fup_pm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_pm']; ?>"
                                     oninput="validateField(this,7)">
                             </td>
@@ -268,8 +270,8 @@
         var totalRagi = 0;
         var totalNonRagi = 0;
 
-        // Iterate through inputs with names starting with "crop_data"
-        $('[name^="crop_data"]').each(function () {
+        // Iterate through inputs with class "crop-data-input"
+        $('.crop-data-input').each(function () {
             var inputValue = parseFloat($(this).val()) || 0;
             var cropId = parseInt($(this).data('crop-id'));
 
@@ -290,7 +292,7 @@
 
     $(document).ready(function () {
         // Attach the updateTotals function to the input events
-        $('[name^="crop_data"]').on('input', function () {
+        $('.crop-data-input').on('input', function () {
             validateField(this, 7); // Call your existing validation function
             updateTotals();
         });
