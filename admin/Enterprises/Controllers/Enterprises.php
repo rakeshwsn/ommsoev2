@@ -56,8 +56,8 @@ class Enterprises extends AdminController
 				$data['blocks'][$block->id] = $block->name;
 			}
 		}
-		
-		
+
+
 		//get years from district selected
 		$data['years'][0] = 'Select DOE';
 		if ($this->request->getGet('district_id')) {
@@ -240,11 +240,11 @@ class Enterprises extends AdminController
 
 
 		if ($this->request->getMethod(1) == 'POST') {
-			// dd($this->request->getPost());
+
 			$enterprisesmodel = new EnterprisesModel();
 			$enterprisesmodel->where('id', $this->request->getGet('id'))->delete();
 
-			$enterprisesdata[] = [
+			$enterprisesdata = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $this->request->getPost('district_id'),
 				'block_id' => $this->request->getPost('block_id'),
@@ -260,13 +260,13 @@ class Enterprises extends AdminController
 				'unit_budget' => $this->request->getPost('unit_budget'),
 				'addl_budget' => $this->request->getPost('addl_budget'),
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
-				'is_support_basis_infr' => $this->request->getPost('is_support_basis_infr'),
+				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
 				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
 				'support_infr_amount' => $this->request->getPost('support_infr_amount')
 			];
 			// dd($enterprisesdata);
 
-			$enterprisesmodel->insertBatch($enterprisesdata);
+			$enterprisesmodel->insert($enterprisesdata);
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
 		}
@@ -278,11 +278,29 @@ class Enterprises extends AdminController
 
 		$enterprisesmodel = new EnterprisesModel();
 		if ($this->request->getMethod(1) == 'POST') {
+
 			$id = $this->request->getGet('id');
 			$district_id = $this->request->getPost('district_id');
 			$block_id = $this->request->getPost('block_id');
 			$enterprisesmodel->where('id', $id)->delete();
-			$enterprisesdata[] = [
+			//if is_support_basis_infr is no set values
+			if ($this->request->getPost('is_support_basis_infr') == 0) {
+				$data = [
+					'purpose_infr_support' => '',
+					'support_infr_amount' => '',
+					'addl_budget'=>'',
+				];
+			} else {
+
+				$data = [
+					'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
+					'support_infr_amount' => $this->request->getPost('support_infr_amount'),
+					'addl_budget' => $this->request->getPost('addl_budget'),
+				];
+			}
+
+
+			$enterprisesdata = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $district_id,
 				'block_id' => $block_id,
@@ -296,14 +314,14 @@ class Enterprises extends AdminController
 				'date_estd' => $this->request->getPost('date_estd'),
 				'mou_date' => $this->request->getPost('mou_date'),
 				'unit_budget' => $this->request->getPost('unit_budget'),
-				'addl_budget' => $this->request->getPost('addl_budget'),
+				'addl_budget' => $data['addl_budget'],
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
-				'is_support_basis_infr' => $this->request->getPost('is_support_basis_infr'),
-				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
-				'support_infr_amount' => $this->request->getPost('support_infr_amount')
+				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
+				'purpose_infr_support' =>$data['purpose_infr_support'],
+				'support_infr_amount' => $data['support_infr_amount']
 			];
 
-			$data['enterprises'] = $enterprisesmodel->insertBatch($enterprisesdata);
+			$data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
 		}
@@ -412,8 +430,8 @@ class Enterprises extends AdminController
 			'FPO' => 'FPO',
 		];
 		$data['is_support'] = [
-			'no' => 'No',
-			'yes' => 'Yes',
+			'0' => 'No',
+			'1' => 'Yes',
 		];
 		//district
 		$data['districts'][] = 'Select districts';
@@ -489,6 +507,8 @@ class Enterprises extends AdminController
 		*/
 		//Add village Url
 		$data['add_village_url'] = admin_url('village/add');
+
+		// dd($data);
 
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}

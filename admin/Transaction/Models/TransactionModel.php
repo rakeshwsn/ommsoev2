@@ -133,11 +133,6 @@ AND tc.deleted_at IS NULL";
         return $this->db->query($sql)->getResult();
     }
 
-    //test push
-    public function test() {
-        //tthis this test function
-    }
-
     public function getTotal($filter=[]) {
 
         $sql = "SELECT
