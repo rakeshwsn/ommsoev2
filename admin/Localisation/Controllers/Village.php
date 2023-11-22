@@ -208,6 +208,9 @@ class Village extends AdminController
 		// dd($village_info);
 		//district start
 		$data['districts'][0] = 'Select district';
+		if($this->request->getGet('district_id')){
+			$data['district_id'] = $this->request->getGet('district_id');
+		}
 
 		foreach ($districtmodel->orderBy('name', 'asc')->getAll() as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
@@ -221,6 +224,9 @@ class Village extends AdminController
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
+		if($this->request->getGet('block_id')){
+			$data['block_id'] = $this->request->getGet('block_id');
+		}
 		// dd($data);
 		//blocks end
 		//gp start
@@ -229,7 +235,9 @@ class Village extends AdminController
 		foreach ($gps as $gp) {
 			$data['gps'][$gp->id] = $gp->name;
 		}
-
+		if($this->request->getGet('gp_id')){
+			$data['gp_id'] = $this->request->getGet('gp_id');
+		}
 		if ($this->request->isAJAX()) {
 
 			return $this->template->view('Admin\Localisation\Views\villageForm', $data, true);

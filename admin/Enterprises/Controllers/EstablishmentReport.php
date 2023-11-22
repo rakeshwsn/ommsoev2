@@ -159,7 +159,6 @@ class EstablishmentReport extends AdminController
 					'units' => $_units
 				];
 			}
-			$data['district_text']=$units['district'];
 			
 
 			// dd($data['district_text']);

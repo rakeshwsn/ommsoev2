@@ -186,7 +186,7 @@ class Grampanchayat extends AdminController
 			'text' => lang('Grampanchayat.heading_title'),
 			'href' => admin_url('grampanchayat')
 		);
-		//printr($_SESSION);
+		
 		$_SESSION['isLoggedIn'] = true;
 		$data['heading_title'] = lang('Grampanchayat.heading_title');
 		$data['text_form'] = $this->uri->getSegment(4) ? "Grampanchayat Edit" : "Grampanchayat Add";
@@ -195,12 +195,11 @@ class Grampanchayat extends AdminController
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
 		}
-		// dd($data);
+		
 		//Saraswatee code
 		if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
 			$grampanchayat_info = $this->grampanchayatModel->find($this->uri->getSegment(4));
 		}
-		// dd($grampanchayat_info);
 
 		foreach ($this->grampanchayatModel->getFieldNames('soe_grampanchayats') as $field) {
 			if ($this->request->getPost($field)) {
@@ -213,20 +212,26 @@ class Grampanchayat extends AdminController
 		}
 
 		$data['districts'][0] = 'Select district';
+		if($this->request->getGet('district_id')){
+			$data['district_id'] = $this->request->getGet('district_id');
+		}
 
 		foreach ($districtmodel->orderBy('name', 'asc')->getAll() as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
-		// dd($data['district_id']);
 		//distrcit end
 		//Blocks start
 		$data['blocks'][0] = 'Select block';
 		$blocks = $blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
-		// dd($blocks);
+		
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
-		// printr($data);exit;
+		
+		if($this->request->getGet('block_id')){
+			$data['block_id'] = $this->request->getGet('block_id');
+		}
+		
 		if ($this->request->isAJAX()) {
 
 			echo $this->template->view('Admin\Localisation\Views\grampanchayatForm', $data, true);

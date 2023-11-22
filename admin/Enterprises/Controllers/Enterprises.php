@@ -398,7 +398,7 @@ class Enterprises extends AdminController
 
 		//units
 		$data['units'] = [];
-		$data['units'][0] = 'Select Units';
+		$data['units'][] = 'Select Units';
 
 		$units = $enterprisesunitmodel->findAll();
 
@@ -416,7 +416,7 @@ class Enterprises extends AdminController
 			'yes' => 'Yes',
 		];
 		//district
-		$data['districts'][0] = 'Select districts';
+		$data['districts'][] = 'Select districts';
 
 		$districts = $districtmodel->orderBy('name', 'asc')->findAll();
 
@@ -425,7 +425,7 @@ class Enterprises extends AdminController
 		}
 
 		//blocks
-		$data['blocks'][0] = 'Select blocks';
+		$data['blocks'][] = 'Select blocks';
 
 		if ($data['district_id']) {
 			$blocks = $blockModel->where('district_id', $data['district_id'])->findAll();
@@ -434,7 +434,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//GPS
-		$data['gps'][0] = 'Select Gp';
+		$data['gps'][] = 'Select Gp';
 		if ($data['block_id']) {
 			$gps = $gpmodel->where('block_id', $data['block_id'])->findAll();
 			foreach ($gps as $gp) {
@@ -442,7 +442,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//Villages
-		$data['villages'][0] = 'Select Village';
+		$data['villages'][] = 'Select Village';
 		if ($data['gp_id']) {
 			$villages = $villagemodel->where('gp_id', $data['gp_id'])->findAll();
 
@@ -452,7 +452,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//Budget fin yrs
-		$data['unit_budgets'][0] = 'Select budgets';
+		$data['unit_budgets'][] = 'Select budgets';
 		// $budget_id = [];
 		$unit_budgets = $enterprisesbudgetmodel->findAll();
 
@@ -460,7 +460,7 @@ class Enterprises extends AdminController
 			$data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
 		}
 		//Addl budget
-		$data['addl_budgets'][0] = 'Select budgets';
+		$data['addl_budgets'][] = 'Select budgets';
 
 		$addl_budgets = $enterprisesbudgetmodel->findAll();
 
@@ -469,13 +469,27 @@ class Enterprises extends AdminController
 		}
 		////Budget final year
 		$yearmodel = new YearModel();
-		$data['budget_fin_yrs'][0] = 'Select Budget Year';
+		$data['budget_fin_yrs'][] = 'Select Budget Year';
 
 		$budget_fin_yrs = $yearmodel->findAll();
 
 		foreach ($budget_fin_yrs as $budget_fin_yr) {
 			$data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
 		}
+
+		//Add GP url
+		$data['add_gp_url'] = admin_url('grampanchayat/add');
+		/*
+		if($data['district_id']){
+			$data['add_gp_url'] .= "district_id=".$data['district_id'];
+		}
+		if($data['block_id']){
+			$data['add_gp_url'] .= "block_id=".$data['block_id'];
+		}
+		*/
+		//Add village Url
+		$data['add_village_url'] = admin_url('village/add');
+
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}
 }

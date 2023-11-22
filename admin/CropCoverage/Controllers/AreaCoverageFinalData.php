@@ -51,7 +51,11 @@ class AreaCoverageFinalData extends AdminController
     }
     protected function getList($action = '')
     {
+<<<<<<< HEAD
 
+=======
+        $data['permission_add'] = $this->user->agency_type_id;
+>>>>>>> test
         $data['heading_title'] = lang('Area Coverage Final Data');
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
