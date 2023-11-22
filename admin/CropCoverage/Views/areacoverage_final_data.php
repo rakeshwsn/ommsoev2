@@ -6,8 +6,14 @@
                     <?= $heading_title; ?>
                 </h3>
                 <div class="block-options">
-                    <a href="<?= $add; ?>" data-toggle="tooltip" title="add" class="btn btn-primary ajaxaction">Add<i
-                            class="fa fa-plus"></i></a>
+                    <?php if ($district_id && $block_id) { ?>
+                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add" class="btn btn-primary ajaxaction"
+                            hidden>Add/Edit<i class="fa fa-plus"></i></a>
+                    <?php } else { ?>
+                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add" class="btn btn-primary ajaxaction">Add<i
+                                class="fa fa-plus"></i></a>
+
+                    <?php } ?>
                 </div>
             </div>
             <div class="block-content block-content-full">
@@ -38,11 +44,13 @@
                     </div>
                     <div class="col-md-2">
                         <label>Districts</label>
-                        <select class="form-control" id="district" name="district_id">
-                            <option>Select District</option>
+                        <select class="form-control" id="district" name="district_id" <?php if ($district_id) {
+                            echo 'disabled';
+                        } ?>><option>Select District</option>
 
                             <?php foreach ($districts as $district) { ?>
                                 <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
+
                                       echo 'selected';
                                   } ?>>
                                     <?= $district['name'] ?>
@@ -57,6 +65,7 @@
                             <option value="">All Blocks</option>
                             <?php foreach ($blocks as $block) { ?>
                                 <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
+
                                       echo 'selected';
                                   } ?>>
                                     <?= $block['name'] ?>
@@ -64,10 +73,9 @@
                             <?php } ?>
                         </select>
                     </div>
-
-
                     <div class="col-md-2" style="margin-top:25px;">
-                        <a href="" class="btn btn-square btn-info min-width-125 mb-10">filter</a>
+                        <button id="btn-filter" class="btn btn-outline btn-primary">
+                            <i class="fa fa-filter"></i> Filter</button>
 
                     </div>
                 </div>
@@ -136,7 +144,7 @@
                         <tr>
                             <?php if ($block_id) { ?>
                                 <td>
-                                    <?= $blockfd->gp ?>
+                                    <?= $blockfd->gp_name ?>
                                 </td>
                             <?php } else if ($district_id) { ?>
                                     <td>

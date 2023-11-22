@@ -1,5 +1,7 @@
 <?php
+
 namespace Api\Dashboard\Config;
+
 if (!isset($routes)) {
     $routes = \Config\Services::routes(true);
 }
@@ -23,4 +25,8 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->get('odmapdata', 'Dashboard\Controllers\Dashboard::odmapdata');
     $routes->get('sumdata', 'Dashboard\Controllers\Dashboard::sumdata');
 
+
+    //added by rakesh nayak
+    $routes->get('localisation', 'Dashboard\Controllers\Localisation::localisation');
+    $routes->get('partnerdashboard', 'Dashboard\Controllers\Partnerdashboard::partnerdashboard');
 });

@@ -12,7 +12,7 @@
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id" disabled>
                             <?php foreach ($years as $year) { ?>
-                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
+                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
                                       echo 'selected';
                                   } ?>><?= $year['name'] ?>
                                 </option>
@@ -23,7 +23,7 @@
                         <label>Season</label>
                         <select class="form-control" id="season" name="season" disabled>
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                <option value="<?= $value ?>" <?php if ($value == strtolower($current_season)) {
                                       echo 'selected';
                                   } ?>>
                                     <?= $season ?>
@@ -36,15 +36,18 @@
                         <select class="form-control" id="block" name="block_id">
                             <option value="">All Blocks</option>
                             <?php foreach ($blocks as $block) { ?>
-                                <option value="<?= $block['id'] ?>">
+                                <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
+
+                                      echo 'selected';
+                                  } ?>>
                                     <?= $block['name'] ?>
                                 </option>
                             <?php } ?>
                         </select>
                     </div>
                     <div class="col-md-2" style="margin-top:25px;">
-                        <button id="btn-submit" class="btn btn-outline btn-primary">
-                            Submit</button>
+                        <button id="btn-filter" class="btn btn-outline btn-primary">
+                            <i class="fa fa-filter"></i> Filter</button>
                     </div>
                 </div>
             </div>
@@ -103,23 +106,30 @@
                         <tr>
                             <td>
                                 <?= $gpdata['name']; ?>
-                                <input type="hidden" name="gp_id[]" value="<?= $gpdata['gp_id']; ?>">
+                                <input type="hidden" name="area[<?= $gpdata['gp_id'] ?>][master_id]"
+                                    value="<?= $gpdata['id']; ?>">
+                                <input type="hidden" name="area[<?= $gpdata['gp_id'] ?>][gp_id]"
+                                    value="<?= $gpdata['gp_id']; ?>">
                             </td>
                             <!-- Other fields related to GP data -->
                             <td>
-                                <input type="number" name="no_of_village[<?= $gpdata['gp_id'] ?>]"
-                                    id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][no_of_village]"
+                                    id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>"
+                                    oninput="validatePositiveInteger(this, 5)">
                             </td>
 
                             <td>
-                                <input type="number" name="farmers_covered_under_demonstration[<?= $gpdata['gp_id'] ?>]"
+                                <input type=" number"
+                                    name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_demonstration]"
                                     id="farmers_demonstration_<?= $gpdata['gp_id'] ?>"
-                                    value="<?= $gpdata['farmers_covered_under_demonstration']; ?>">
+                                    value="<?= $gpdata['farmers_covered_under_demonstration']; ?>"
+                                    oninput="validatePositiveInteger(this, 5)">
                             </td>
                             <td>
-                                <input type="number" name="farmers_covered_under_followup[<?= $gpdata['gp_id'] ?>]"
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_followup]"
                                     id="farmers_followup_<?= $gpdata['gp_id'] ?>"
-                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>">
+                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>"
+                                    oninput="validatePositiveInteger(this,5)">
                             </td>
                             <!-- Other GP-specific fields -->
                             <?php
@@ -128,64 +138,79 @@
                                 foreach ($keys as $key):
                                     if (isset($gpcrops[$key])):
                                         ?>
-
                                         <td>
-                                            <input type="hidden" name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][crops]"
-                                                value="<?= $gpcrops['crops'] ?>">
+                                            <input type="hidden"
+                                                name="area[<?= $gpdata['gp_id'] ?>][crop_data][<?= $gpcrops['id'] ?>][<?= $key ?>]"
+                                                value="<?= $gpcrops[$key] ?>" oninput="validateField(this, 7)"
+                                                data-crop-id="<?= $gpcrops['id'] ?>" data-gp-id="<?= $gpdata['gp_id'] ?>">
+
                                             <input type="number"
-                                                name="crop_data[<?= $gpdata['gp_id'] ?>][<?= $gpcrops['id'] ?>][<?= $key ?>]"
-                                                value="<?= $gpcrops[$key] ?>">
+                                                name="area[<?= $gpdata['gp_id'] ?>][crop_data][<?= $gpcrops['id'] ?>][<?= $key ?>]"
+                                                value="<?= $gpcrops[$key] ?>" oninput="validateField(this, 7)"
+                                                data-crop-id="<?= $gpcrops['id'] ?>" data-gp-id="<?= $gpdata['gp_id'] ?>">
+
                                         </td>
                                         <?php
-
                                     endif;
                                 endforeach;
                             endforeach; ?>
 
                             <td>
-                                <p id="total_ragi">
-                                    <?= $totalRagi ?>
-                                </p>
+                                <input type="text" value="" name="total_ragi_<?= $gpdata['gp_id'] ?>"
+                                    id="total_ragi_<?= $gpdata['gp_id'] ?>" readonly>
                             </td>
                             <td>
-                                <p id="total_non_ragi">
-                                    <?= $totalNonRagi; ?>
-                                </p>
+                                <input type="text" value="" name="total_non_ragi_<?= $gpdata['gp_id'] ?>"
+                                    id="total_non_ragi_<?= $gpdata['gp_id'] ?>" readonly>
+                            </td>
+
+
+
+                            <td>
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_ragi]" class="fup-input"
+                                    id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_ragi[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_lm]" class="fup-input"
+                                    id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_lm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_fm]" class="fup-input"
+                                    id="fup_fm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_fm']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_fm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_fm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_fm']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_sorghum]" class="fup-input"
+                                    id="fup_sorghum_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_sorghum']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_sorghum[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_sorghum_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_sorghum']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_km]" class="fup-input"
+                                    id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_km[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_bm]" class="fup-input"
+                                    id="fup_bm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_bm']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_bm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_bm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_bm']; ?>">
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_pm]" class="fup-input"
+                                    id="fup_pm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_pm']; ?>"
+                                    oninput="validateField(this,7)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="fup_pm[<?= $gpdata['gp_id'] ?>]"
-                                    id="fup_pm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_pm']; ?>">
+                                <input type="text" value="" name="total_ach_demon_<?= $gpdata['gp_id'] ?>"
+                                    id="total_ach_demon_<?= $gpdata['gp_id'] ?>" readonly>
                             </td>
                             <td>
-                                <input type="text" value="r" name="total_ach_demon" id="total_ach_demon" disabled>
+
+                                <input type="text" value="" name="total_fup_<?= $gpdata['gp_id'] ?>"
+                                    id="total_fup_<?= $gpdata['gp_id'] ?>" readonly>
                             </td>
-                            <td>
-                                <input type="" value="" name="total_fup" id="total_fup" disabled>
-                            </td>
+
 
                         </tr>
                     <?php endforeach; ?>
@@ -197,44 +222,162 @@
         </div>
     </div>
 </div>
+
+
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Function to calculate totals
-        function calculateTotals() {
-            var totalRagi = 0;
-            var totalNonRagi = 0;
+    function validatePositiveInteger(input, maxLength) {
+        // Remove non-numeric characters (except ".") from the input
+        input.value = input.value.replace(/[^0-9]/g, '');
 
-            var inputFields = document.querySelectorAll("input[name^='crop_data']");
-            inputFields.forEach(function (inputField) {
-                var value = parseFloat(inputField.value) || 0;
-
-                if (!isNaN(value)) {
-                    var inputName = inputField.name;
-                    var key = inputName.match(/\[([^\]]+)\]$/)[1];
-
-                    if (key) {
-                        if (['smi', 'lt', 'ls'].includes(key)) {
-                            totalRagi += value;
-                        } else {
-                            totalNonRagi += value;
-                        }
-                    }
-                }
-            });
-
-            // Update the total values in the HTML
-            document.getElementById("total_ragi").textContent = totalRagi.toFixed(2);
-            document.getElementById("total_non_ragi").textContent = totalNonRagi.toFixed(2);
+        // Ensure the input is not negative
+        if (parseInt(input.value) < 0) {
+            input.value = '';
         }
 
-        // Use event delegation to handle input changes
-        document.addEventListener("input", function (event) {
-            if (event.target && event.target.matches("input[name^='crop_data']")) {
-                calculateTotals();
+        // Ensure the input has a maximum length of maxLength
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+        }
+    }
+</script>
+<?php
+// Assuming $gpsfinaldata is the array containing GP data
+$gpIds = array_map(function ($gpdata) {
+    return $gpdata['gp_id'];
+}, $gpsfinaldata);
+?>
+
+<script>
+    var gpIds = <?= json_encode($gpIds) ?>;
+
+    function updateTotalFup(gpId) {
+        var fupInputs = document.querySelectorAll('.fup-input[data-gp-id="' + gpId + '"]');
+        var sum = 0;
+
+        fupInputs.forEach(function (input) {
+            sum += parseFloat(input.value) || 0;
+        });
+
+        document.getElementById('total_fup_' + gpId).value = sum;
+
+        // Update the total Achievement under Demonstration for the specific GP
+        updateTotals(gpId);
+    }
+
+    document.addEventListener('input', function (event) {
+        var target = event.target;
+
+        if (target.classList.contains('fup-input')) {
+            var gpId = target.dataset.gpId;
+            updateTotalFup(gpId);
+        }
+    });
+
+    // Initialize the event listeners for each GP
+    gpIds.forEach(function (gpId) {
+        var fupInputs = document.querySelectorAll('.fup-input[data-gp-id="' + gpId + '"]');
+
+        fupInputs.forEach(function (input) {
+            input.addEventListener('input', function () {
+                updateTotalFup(gpId);
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+<script>
+    function validateField(field, maxDigits) {
+        var inputValue = field.value.trim();
+        var decimalRegex = /^\d+(\.\d{1,5})?/; // Regular expression for valid decimal numbers
+
+        if (!decimalRegex.test(inputValue) || inputValue.length > maxDigits) {
+            field.setCustomValidity('Please enter a valid positive decimal number with up to 5 decimal places and a maximum of 7 digits.');
+        } else {
+            field.setCustomValidity('');
+        }
+
+        // Call the updateTotals function with the appropriate parameters
+        var gpId = field.dataset.gpId;
+        updateTotals(gpId);
+    }
+
+    function updateTotals(gpId) {
+        console.log('Update totals for GP ID: ' + gpId);
+        var totalRagiSMI = 0;
+        var totalRagiLT = 0;
+        var totalRagiLS = 0;
+        var totalNonRagiLT = 0;
+        var totalNonRagiLS = 0;
+
+        // Keep track of processed crop IDs to avoid duplication
+        var processedCropIds = [];
+
+        // Iterate through inputs with names containing "crop_data" for the specific GP
+        $('[name^="area[' + gpId + '][crop_data]"]').each(function () {
+            var cropId = $(this).data('crop-id');
+
+            // Skip if this crop ID has already been processed
+            if (processedCropIds.includes(cropId)) {
+                return;
+            }
+
+            var inputValue = 0;
+
+            // Accumulate values for the specific crop and practices
+            $('[name^="area[' + gpId + '][crop_data][' + cropId + ']"]').each(function () {
+                inputValue += parseFloat($(this).val()) || 0;
+            });
+
+            // Mark the crop ID as processed
+            processedCropIds.push(cropId);
+
+            // Check the crop and practice
+            if (cropId === 1) { // Ragi
+                if ($(this).attr('name').indexOf('[smi]') !== -1) {
+                    totalRagiSMI += inputValue;
+                } else if ($(this).attr('name').indexOf('[lt]') !== -1) {
+                    totalRagiLT += inputValue;
+                } else if ($(this).attr('name').indexOf('[ls]') !== -1) {
+                    totalRagiLS += inputValue;
+                }
+            } else { // Non-Ragi
+                if ($(this).attr('name').indexOf('[lt]') !== -1) {
+                    totalNonRagiLT += inputValue;
+                } else if ($(this).attr('name').indexOf('[ls]') !== -1) {
+                    totalNonRagiLS += inputValue;
+                }
             }
         });
 
-        // Initial calculation
-        calculateTotals();
+        // Sum up the values for Ragi and non-Ragi crops
+        var totalRagi = totalRagiSMI + totalRagiLT + totalRagiLS;
+        var totalNonRagi = totalNonRagiLT + totalNonRagiLS;
+
+        // Update the total fields for the specific GP
+        $('#total_ragi_' + gpId).val(totalRagi.toFixed(2));
+        $('#total_non_ragi_' + gpId).val(totalNonRagi.toFixed(2));
+
+        // Calculate and update the total Achievement under Demonstration for the specific GP
+        var totalAchDemon = totalRagi + totalNonRagi;
+        $('#total_ach_demon_' + gpId).val(totalAchDemon.toFixed(2));
+
+        // Update the total Follow Up Crops field
+
+    }
+
+
+
+    $(document).ready(function () {
+        // Trigger the initial update when the page loads for each GP
+        $('[name^="area["][name$="[crop_data]"][data-crop-id]').each(function () {
+            var gpId = $(this).data('gp-id');
+            updateTotals(gpId);
+        });
     });
 </script>
