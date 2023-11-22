@@ -6,8 +6,11 @@
                     <?= $heading_title; ?>
                 </h3>
                 <div class="block-options">
-                    <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
-                        class="btn btn-primary ajaxaction">Add/Edit</a>
+
+                    <?php if ($permission_add == 7): ?>
+                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
+                            class="btn btn-primary ajaxaction">Add/Edit</a>
+                    <?php endif; ?>
 
 
                 </div>
@@ -419,8 +422,8 @@
         }
 
         // Call the function for the specific class and assign to 'allTotalRagi'
-        calculateAndAssignSum('non-ragi-all-total', 'allTotalRagi');
-        calculateAndAssignSum('ragi-all-total', 'allTotalNonRagi');
+        calculateAndAssignSum('ragi-all-total', 'allTotalRagi');
+        calculateAndAssignSum('non-ragi-all-total', 'allTotalNonRagi');
         calculateAndAssignSum('all-total-fup', 'allTotalFup');
         calculateAndAssignSum('all-total-area', 'allTotalArea');
 
