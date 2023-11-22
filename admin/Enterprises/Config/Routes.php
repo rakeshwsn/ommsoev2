@@ -43,4 +43,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     // $routes->post('incentive/delete', 'Incentive\Controllers\Incentive::delete');
     // $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
     // $routes->post('incentive/searchall', 'Incentive\Controllers\Incentive::searchall');
+    $routes->get('report', 'Enterprises\Controllers\EstablishmentReport::index');
+    $routes->add('enterprisesreport/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
+    $routes->get('esttransreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');
+
+
 });
