@@ -112,12 +112,12 @@ class EstablishmentTransaction extends AdminController
                 'edit_url' => admin_url('enterprisestrans/edit?id=' . $row->id),
 
             ];
-            // printr($row);exit;
+            // printr($data);exit;
         }
         $data['excel_link'] = admin_url('enterprises/download');
         $data['upload_url'] = admin_url('enterprises/upload');
 
-// dd($data['excel_link']);
+       // dd($data['excel_link']);
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
@@ -157,8 +157,9 @@ class EstablishmentTransaction extends AdminController
         if ($id) {
 
             $entdata = $establishmenttrasdtl->periodswisetrans(['id' => $id]);
-            //   dd($entdata);
+            // printr($entdata);exit;
             foreach ($entdata as $value) {
+              
                 $data['entranses'] = [
                     'year_id' => $value->year_name,
                     'unit_id' => $value->unit_name,
@@ -167,7 +168,7 @@ class EstablishmentTransaction extends AdminController
                     'month_id' => $value->month_name,
                     'gp_id' => $value->gp_name,
                     'village_id' => $value->village_name,
-                    'period' => $value->period_type,
+                    'period' => $value->period,
                     'created_at' => ymdToDmy($value->created_at) ?: 0,
                     'no_of_days_functional' => $value->no_of_days_functional ?: 0,
                     'produced' => $value->produced ?: 0,
@@ -179,7 +180,7 @@ class EstablishmentTransaction extends AdminController
             }
         }
 
-
+// dd($data['entranses']);
         return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
     }
 
@@ -332,8 +333,8 @@ class EstablishmentTransaction extends AdminController
                 $style->getAlignment()->setWrapText(true);
             }
 
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save('output_file.xlsx');
+            //$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            //$writer->save('output_file.xlsx');
             if ($worksheet) {
                 $worksheet->getColumnDimension('A')->setVisible(false);
                 $worksheet->getColumnDimension('B')->setVisible(false);

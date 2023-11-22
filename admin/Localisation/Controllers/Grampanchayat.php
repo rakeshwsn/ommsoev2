@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\Localisation\Controllers;
 
 use App\Controllers\AdminController;
@@ -130,7 +131,7 @@ class Grampanchayat extends AdminController
 
 		$filter_data = array(
 			'filter_search' => $requestData['search']['value'],
-			//			'filter_district' => $requestData['district'],
+						'filter_district' => $requestData['district'],
 			'filter_block' => $requestData['block'],
 			'filter_grampanchayat' => $requestData['grampanchayat'],
 			'order' => $requestData['order'][0]['dir'],
@@ -161,7 +162,6 @@ class Grampanchayat extends AdminController
 				$result->block,
 				$action
 			);
-
 		}
 		//printr($datatable);
 		$json_data = array(
@@ -179,22 +179,24 @@ class Grampanchayat extends AdminController
 	{
 
 		$this->template->add_package(array('select2'), true);
-
+		$districtmodel = new DistrictModel();
+		$blockmodel = new BlockModel();
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			'text' => lang('Grampanchayat.heading_title'),
 			'href' => admin_url('grampanchayat')
 		);
-		//printr($_SESSION);
+		
 		$_SESSION['isLoggedIn'] = true;
 		$data['heading_title'] = lang('Grampanchayat.heading_title');
 		$data['text_form'] = $this->uri->getSegment(4) ? "Grampanchayat Edit" : "Grampanchayat Add";
 		$data['cancel'] = admin_url('areacoverage/grampanchayat');
-
+		
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
 		}
-
+		
+		//Saraswatee code
 		if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
 			$grampanchayat_info = $this->grampanchayatModel->find($this->uri->getSegment(4));
 		}
@@ -209,15 +211,30 @@ class Grampanchayat extends AdminController
 			}
 		}
 
-		$data['districts'] = $this->districtModel->getAll();
-		$data['blocks'] = $this->districtModel->getAll();
-		$data['district_id'] = $this->user->district_id;
-		$data['block_id'] = $this->user->block_id;
+		$data['districts'][0] = 'Select district';
+		if($this->request->getGet('district_id')){
+			$data['district_id'] = $this->request->getGet('district_id');
+		}
 
+		foreach ($districtmodel->orderBy('name', 'asc')->getAll() as $dist) {
+			$data['districts'][$dist->id] = $dist->name;
+		}
+		//distrcit end
+		//Blocks start
+		$data['blocks'][0] = 'Select block';
+		$blocks = $blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+		
+		foreach ($blocks as $block) {
+			$data['blocks'][$block->id] = $block->name;
+		}
+		
+		if($this->request->getGet('block_id')){
+			$data['block_id'] = $this->request->getGet('block_id');
+		}
+		
 		if ($this->request->isAJAX()) {
 
 			echo $this->template->view('Admin\Localisation\Views\grampanchayatForm', $data, true);
-
 		} else {
 			echo $this->template->view('Admin\Localisation\Views\grampanchayatForm', $data);
 		}

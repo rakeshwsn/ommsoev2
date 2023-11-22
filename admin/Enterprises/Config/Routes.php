@@ -22,7 +22,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
 
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
-    $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::add');
+    $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::index');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
     $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
@@ -43,4 +43,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     // $routes->post('incentive/delete', 'Incentive\Controllers\Incentive::delete');
     // $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
     // $routes->post('incentive/searchall', 'Incentive\Controllers\Incentive::searchall');
+    $routes->get('report', 'Enterprises\Controllers\EstablishmentReport::index');
+    $routes->add('enterprisesreport/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
+    $routes->get('esttransreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');
+
+
 });

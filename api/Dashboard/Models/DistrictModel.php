@@ -1,5 +1,7 @@
 <?php
+
 namespace Api\Dashboard\Models;
+
 use CodeIgniter\Model;
 
 class DistrictModel extends Model
@@ -38,9 +40,14 @@ class DistrictModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 	protected $bulider;
-	
 
-	
 
-	
+	public function getAllDistrict()
+	{
+		$builder = $this->db->table($this->table);
+		$builder->select("*");
+		$builder->orderBy('name', 'ASC');
+		$query = $builder->get();
+		return $query->getResult();
+	}
 }

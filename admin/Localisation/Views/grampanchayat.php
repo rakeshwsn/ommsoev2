@@ -93,8 +93,7 @@
 							html += '>' + json[i]['name'] + '</option>';
 
 						}
-					}
-					else {
+					} else {
 						html += '<option value="0" selected="selected">Select Block</option>';
 					}
 
@@ -112,12 +111,13 @@
 		table = $('#datatable').DataTable({
 			"processing": true,
 			"serverSide": true,
-			"columnDefs": [
-				{ targets: 'no-sort', orderable: false }
-			],
+			"columnDefs": [{
+				targets: 'no-sort',
+				orderable: false
+			}],
 			"ajax": {
 				url: "<?= $datatable_url; ?>", // json datasource
-				type: "post",  // method  , by default get
+				type: "post", // method  , by default get
 				data: function (data) {
 					data.district = $('#filter_district').val();
 					data.block = $('#filter_block').val();
@@ -130,7 +130,7 @@
 				complete: function () {
 					$("#datatable_wrapper").LoadingOverlay("hide");
 				},
-				error: function () {  // error handling
+				error: function () { // error handling
 					$(".datatable_error").html("");
 					$("#datatable").append('<tbody class="datatable_error"><tr><th colspan="5">No data found.</th></tr></tbody>');
 					$("#datatable_processing").css("display", "none");
@@ -140,22 +140,25 @@
 			}
 		});
 		$('#btn-filter').click(function () { //button filter event click
-			table.ajax.reload();  //just reload table
+			table.ajax.reload(); //just reload table
 		});
 		$('#btn-reset').click(function () { //button reset event click
 			$('#form-filter')[0].reset();
-			table.ajax.reload();  //just reload table
+			table.ajax.reload(); //just reload table
 		});
 
 		Codebase.helpers(['select2']);
 	});
+
 	function delete_district(title, id) {
 
 		gbox.show({
 			content: '<h2>Delete Manager</h2>Are you sure you want to delete this Manager?<br><b>' + title,
 			buttons: {
 				'Yes': function () {
-					$.post('<?= admin_url('members.delete'); ?>', { user_id: id }, function (data) {
+					$.post('<?= admin_url('members.delete'); ?>', {
+						user_id: id
+					}, function (data) {
 						if (data.success) {
 							gbox.hide();
 							$('#member_list').DataTable().ajax.reload();
@@ -171,5 +174,6 @@
 		});
 		return false;
 	}
-//--></script>
+	//-->
+</script>
 <?php js_end(); ?>

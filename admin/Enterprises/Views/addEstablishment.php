@@ -1,75 +1,92 @@
 <?php
 $validation = \Config\Services::validation();
 ?>
+<style>
+    .error {
+        color: red;
+    }
+</style>
 <div class="block">
-    <form method="post">
-        <div class="block-header">
-
+    <form method="post" id="establishmentform">
+        <div class="block-header block-header-default">
             <h4><?php echo $enterprise_text ?></h4>
-
         </div>
+
         <div class="container ">
+
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('unit_id') ? 'is-invalid' : '' ?> ">
-                    <label for="unit_id">Name/Type of Unit</label>
-                    <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'units']); ?>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_id'); ?></div>
+                    <label for="units">Name/Type of Unit <span class="text-danger">*</span></label>
+                    <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control', 'id' => 'units', 'required' => 'required']); ?>
                 </div>
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('management_unit_type') ? 'is-invalid' : '' ?>">
-                    <label for="management_unit">Type of management unit</label>
-                    <?php echo form_dropdown('management_unit_type', $management_unit_types, set_value('management_unit_type', $management_unit_type), ['class' => 'form-control mb-3', 'id' => 'management_unit_type']); ?>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('management_unit_type'); ?></div>
+                    <label for="management_unit">Type of management unit<span class="text-danger">*</span></label>
+                    <?php echo form_dropdown('management_unit_type', $management_unit_types, set_value('management_unit_type', $management_unit_type), ['class' => 'form-control', 'id' => 'management_unit_type']); ?>
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
-                    <label for="district_id">District</label>
-                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+                    <label for="district_id">District<span class="text-danger">*</span></label>
+                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), ['class' => 'form-control', 'id' => 'districts']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('district_id'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('managing_unit_name') ? 'is-invalid' : '' ?>">
-                    <label for="managing unit name">Name Of Managing Unit</label>
-                    <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>">
+                    <label for="managing unit name">Name Of Managing Unit<span class="text-danger">*</span></label>
+                    <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>" required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('managing_unit_name'); ?></div>
+
+
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
-                    <label for="block_id">Block</label>
-                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), ['class' => 'form-control mb-3', 'id' => 'blocks']); ?>
+                    <label for="block_id">Block<span class="text-danger">*</span></label>
+                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), ['class' => 'form-control required', 'id' => 'blocks']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('block_id'); ?></div>
 
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('contact_person') ? 'is-invalid' : '' ?>">
-                    <label for="Contact Person">Contact Person</label>
-                    <input type="text" name="contact_person" class="form-control" id="contact_person" placeholder="Name" value="<?= set_value('contact_person', $contact_person) ?>">
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_person'); ?></div>
-
+                    <label for="Contact Person">Contact Person<span class="text-danger">*</span></label>
+                    <input type="text" name="contact_person" class="form-control" id="contact_person" placeholder="contact name" value="<?= set_value('contact_person', $contact_person) ?>" required>
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
-                    <label for="gp_id">GP</label>
-                    <?php echo form_dropdown('gp_id', $gps, set_value('gp_id', $gp_id), ['class' => 'form-control mb-3', 'id' => 'gps']); ?>
+                    <label for="gp_id">GP<span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <?php echo form_dropdown('gp_id', 
+                        $gps, set_value('gp_id', $gp_id), 
+                        ['class' => 'form-control', 'id' => 'gps']); ?>
+                        <div class="input-group-append">
+                            <a href="<?=$add_gp_url?>" class="btn btn-secondary" id="btn-add-gp">Add GP</a>
+                        </div>
+                    </div>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('gp_id'); ?></div>
 
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('contact_mobile') ? 'is-invalid' : '' ?>">
-                    <label for="Contact Mobile">Contact Mobile</label>
-                    <input type="text" name="contact_mobile" class="form-control" id="contact_mobile" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>">
+                    <label for="Contact Mobile">Contact Mobile<span class="text-danger">*</span></label>
+                    <input type="text" name="contact_mobile" class="form-control" id="contact_mobile" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>" required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_mobile'); ?></div>
 
                 </div>
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
-                    <label for="village">Village</label>
-                    <?php echo form_dropdown('village_id', $villages, set_value('village_id', $village_id), ['class' => 'form-control mb-3', 'id' => 'villages']); ?>
+                    <label for="village_id">Village<span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <?php echo form_dropdown('village_id', 
+                        $villages, set_value('village_id', $village_id), 
+                        ['class' => 'form-control', 'id' => 'villages']); ?>
+                        <div class="input-group-append">
+                            <a href="<?=$add_village_url?>" class="btn btn-secondary" id="btn-add-village">Add Village</a>
+                        </div>
+                    </div>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('village_id'); ?></div>
 
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('date_estd') ? 'is-invalid' : '' ?>">
-                    <label for="Enterprise Establishment">Date of Enterprise Establishment</label>
+                    <label for="Enterprise Establishment">Date of Enterprise Establishment<span class="text-danger">*</span></label>
                     <input type="date" name="date_estd" class="form-control" id="date_estd" placeholder="Date " value="<?= set_value('date_estd', $date_estd) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('date_estd'); ?></div>
 
@@ -78,12 +95,12 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('budget_fin_yr_id') ? 'is-invalid' : '' ?>">
-                    <label for="budget finnacial year">Budget Utilized of Financial year</label>
-                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control mb-3', 'id' => '']); ?>
+                    <label for="budget finnacial year">Budget Utilized of Financial year<span class="text-danger">*</span></label>
+                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control', 'id' => 'budget_fin_yr_id']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('budget_fin_yr_id'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('mou_date') ? 'is-invalid' : '' ?>">
-                    <label for="Date of OMU Under OMM">Date of OMU Under OMM</label>
+                    <label for="Date of OMU Under OMM">Date of OMU Under OMM<span class="text-danger">*</span></label>
                     <input type="date" name="mou_date" class="form-control" id="mou_unit" placeholder="Date " value="<?= set_value('mou_date', $mou_date) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('mou_date'); ?></div>
 
@@ -91,7 +108,7 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget') ? 'is-invalid' : '' ?>">
-                    <label for="Established Unit Budget Head">Established Unit Budget Head</label>
+                    <label for="Established Unit Budget Head">Established Unit Budget Head<span class="text-danger">*</span></label>
                     <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder=" " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
@@ -99,7 +116,7 @@ $validation = \Config\Services::validation();
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
-                    <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes</label>
+                    <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
                     <input type="text" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
@@ -108,28 +125,28 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
                     <label for="management_unit">Is basic infrastructure support required?</label>
-                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' => 'is_support_basis_infr']); ?>
+                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control', 'id' => 'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
                 </div>
             </div>
             <div class="block" id="budget_utilize">
                 <div class="row">
                     <div class=" col-6 form-group <?= $validation->hasError('purpose_infr_support') ? 'is-invalid' : '' ?>">
-                        <label for="Purposeof Addl. infa structure">Type/ Purposeof Addl. infa structure</label>
-                        <input type="text" name="purpose_infr_support" class="form-control" id="purpose_infr_support" placeholder="Type/ Purposeof Addl. infa structure " value="<?= set_value('purpose_infr_support', $purpose_infr_support) ?>">
+                        <label for="Purposeof Addl. infa structure">Type/ Purposeof Addl. infa structure<span class="text-danger">*</span></label>
+                        <input type="text" name="purpose_infr_support" class="form-control" id="purpose_infr_support" placeholder="Type/ Purposeof Addl. infa structure " value="<?= set_value('purpose_infr_support', $purpose_infr_support) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('purpose_infr_support'); ?></div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="  col-6 form-group <?= $validation->hasError('addl_budget') ? 'is-invalid' : '' ?>">
-                        <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support</label>
+                        <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support<span class="text-danger">*</span></label>
                         <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Enter Budget " value="<?= set_value('addl_budget', $addl_budget) ?>">
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('addl_budget'); ?></div>
                     </div>
                 </div>
                 <div class="row">
                     <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
-                        <label for="Budget Ruppes">Budget Utilized in Ruppes</label>
+                        <label for="Budget Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
                         <input type="text" name="support_infr_amount" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
                     </div>
@@ -146,6 +163,8 @@ $validation = \Config\Services::validation();
 
     </form>
 </div>
+<?php js_start(); ?>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
 <script>
     $(function() {
@@ -163,9 +182,9 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     if (response.blocks) {
-                        html = '<option value="">Select Block</option>';
+                        html = '<option value="">Select Block</potion>';
                         $.each(response.blocks, function(k, v) {
 
                             html += '<option value="' + v.id + '"' + (blockid == v.id ? ' selected' : '') + '>' + v.name + '</option>';
@@ -183,7 +202,7 @@ $validation = \Config\Services::validation();
                 }
             });
         });
-        $('#districts').trigger('change');
+        //$('#districts').trigger('change');
         $('#blocks').on('change', function() {
 
             b_id = $(this).val();
@@ -199,7 +218,7 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     if (response.gps) {
                         html = '<option value="">Select Gp</option>';
                         $.each(response.gps, function(k, v) {
@@ -209,7 +228,7 @@ $validation = \Config\Services::validation();
                         });
                         $('#gps').html(html);
 
-                        $('#gps').trigger('change');
+
                     }
                 },
                 error: function() {
@@ -220,7 +239,7 @@ $validation = \Config\Services::validation();
                 }
             });
         });
-
+        //$('#gps').trigger('change');
         $('#gps').on('change', function() {
 
             g_id = $(this).val();
@@ -235,7 +254,7 @@ $validation = \Config\Services::validation();
                 dataType: 'JSON',
                 beforeSend: function() {},
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     if (response.villages) {
                         html = '<option value="">Select Village</option>';
                         $.each(response.villages, function(k, v) {
@@ -244,6 +263,7 @@ $validation = \Config\Services::validation();
 
                         });
                         $('#villages').html(html)
+
                     }
                 },
                 error: function() {
@@ -259,80 +279,196 @@ $validation = \Config\Services::validation();
         //hide show addl budget
         $('#is_support_basis_infr').on('change', function() {
             $is_support_basis_infr = $(this).val();
-            if ($is_support_basis_infr == 'no') {
+            if ($is_support_basis_infr == '0') {
                 $('#budget_utilize').hide();
             } else {
                 $('#budget_utilize').show();
             }
-        })
+        });
         $('#is_support_basis_infr').trigger('change');
 
+        //add gp btn click
+        $('#btn-add-gp').click(function(e){
+            e.preventDefault();
 
-    });
+            url = $(this).attr('href');
+            dist = $('#districts').val();
+            block = $('#blocks').val();
 
+            url += "?district_id="+dist+"&block_id="+block;
 
-    $(document).ready(function() {
-        $('#submit').on('click', function() {
-            var managing_unit_name = document.getElementById("managing_unit_name");
-            var alpha = /^[a-zA-Z,\s]+$/;
-
-            if (managing_unit_name.value.length > 20 || !alpha.test(managing_unit_name.value)) {
-                alert('Managing unit name: Only letters allowed, maximum length is 20 characters');
-                return false; // Prevent form submission
+            var popupWindow = window.open(url,"Add GP","width=500,height=500");
+            if (popupWindow) {
+                //Browser has allowed it to be opened
+                popupWindow.focus();
+            } else {
+                //Browser has blocked it
+                alert('Please allow popups for this website');
             }
+            var popupTimer = setInterval(function() {
+            if (popupWindow.closed) {
+                    clearInterval(popupTimer);
+                    // console.log('Popup window closed.');
+                    // Add your event handling logic here
+                    $('#blocks').trigger('change');
+                }
+            }, 500);
+        });
+        //add village btn click
+        $('#btn-add-village').click(function(e){
+            e.preventDefault();
 
-            var contact_person = document.getElementById("contact_person");
+            url = $(this).attr('href');
+            dist = $('#districts').val();
+            block = $('#blocks').val();
+            gp = $('#gps').val();
 
-            if (contact_person.value.length > 20 || !alpha.test(contact_person.value)) {
-                alert('Contact name: Only letters allowed, maximum length is 20 characters');
-                return false; // Prevent form submission
+            url += "?district_id="+dist+"&block_id="+block+"&gp_id="+gp;
+
+            var popupWindow = window.open(url,"Add Village","width=500,height=500");
+            if (popupWindow) {
+                //Browser has allowed it to be opened
+                popupWindow.focus();
+            } else {
+                //Browser has blocked it
+                alert('Please allow popups for this website');
             }
-            var purpose_infr_support = document.getElementById("purpose_infr_support");
-
-            if (purpose_infr_support.value.length > 20 || !alpha.test(purpose_infr_support.value)) {
-                alert('Purpose_infr_support: Only letters allowed, maximum length is 20 characters');
-                return false; // Prevent form submission
-            }
-
-            // Allow form submission
-            var unit_budget = document.getElementById("unit_budget");
-            var decimalPattern = /^\d{1,5}(\.\d{1,2})?$/;
-
-            if (!decimalPattern.test(unit_budget.value)) {
-                alert('Please enter a decimal number with up to 5 digits before the decimal point and up to 2 digits after the decimal point');
-                return false; // Prevent form submission
-            }
-            var addl_budget = document.getElementById("addl_budget");
-
-
-            if (!decimalPattern.test(addl_budget.value)) {
-                alert('Please enter a decimal number with up to 5 digits before the decimal point and up to 2 digits after the decimal point');
-                return false; // Prevent form submission
-            }
-            var contact_mobile = document.getElementById("contact_mobile");
-            var contact = /^[789]\d{9}$/;
-
-            if (!contact.test(contact_mobile.value)) {
-                alert('Please enter a valid  mobile number');
-                return false; // Prevent form submission
-            }
-            var unit_budget_amount = document.getElementById("unit_budget_amount");
-            var rupeesPattern = /^(?:\d{1,7}|\d{0,7}\.\d{1,2})$/;
-
-            if (!rupeesPattern.test(unit_budget_amount.value)) {
-                alert('Please enter a valid budget amount in  Rupees');
-                return false; // Prevent form submission
-            }
-            var support_infr_amount = document.getElementById("support_infr_amount");
-            var amount = /^(?:\d{1,7}|\d{0,7}\.\d{1,2})$/;
-
-            if (!amount.test(support_infr_amount.value)) {
-                alert('Please enter a valid budget amount in  Rupees');
-                return false; // Prevent form submission
-            }
-
-
-            return true;
+            var popupTimer = setInterval(function() {
+            if (popupWindow.closed) {
+                    clearInterval(popupTimer);
+                    // console.log('Popup window closed.');
+                    // Add your event handling logic here
+                    $('#gps').trigger('change');
+                }
+            }, 500);
         });
     });
+    $(document).ready(function() {
+        $("#establishmentform").validate({
+            rules: {
+                managing_unit_name: {
+                    required: true,
+                    lettersonly: true
+                },
+                unit_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                gp_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                district_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                block_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                village_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                contact_person: {
+                    required: true,
+                    lettersonly: true
+                },
+                contact_mobile: {
+                    required: true,
+                    digitsOnly: true
+
+                },
+                unit_budget_amount: {
+                    required: true,
+                    ruppes: true
+                },
+                unit_budget: {
+                    required: true,
+                    decimal: true
+                },
+                purpose_infr_support: {
+                    required: true,
+                    lettersonly: true
+                },
+                addl_budget: {
+                    required: true,
+                    decimal: true
+                },
+                support_infr_amount: {
+                    required: true,
+                    ruppes: true
+                },
+                budget_fin_yr_id: {
+                    required: true,
+                    ddrequired: true
+                }
+            },
+            messages: {
+                managing_unit_name: {
+                    required: "This field is required.",
+                    lettersonly: "Please enter only letters and spaces."
+                },
+                contact_mobile: {
+                    required: "This field is required.",
+                    digitsOnly: "Please enter only numbers "
+                },
+                unit_budget_amount: {
+                    required: "This field is required.",
+                    ruppes: "Please enter  ruppes (ex-00.00) "
+                },
+                unit_budget: {
+                    required: "This field is required.",
+                    decimal: "Please enter only decimal numbers."
+                },
+                unit_id: {
+                    required: "This field is required.",
+
+                },
+                district_id: {
+                    required: "This field is required.",
+
+                },
+                block_id: {
+                    required: "This field is required.",
+
+                },
+                gp_id: {
+                    required: "This field is required.",
+
+                },
+                village_id: {
+                    required: "This field is required.",
+
+                },
+            },
+            errorPlacement: function(error, element) {
+                //error.insertAfter(element); // Places the error message after the element
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent('.input-group'));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+        });
+
+    })
+    $(document).ready(function() {
+        jQuery.validator.addMethod("lettersonly", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z\s]+$/.test(value);
+        }, "Please enter only letters and spaces.");
+        jQuery.validator.addMethod("digitsOnly", function(value, element) {
+            return this.optional(element) || /^\d{10}$/.test(value);
+        }, "Please enter exactly 10 digits.");
+        jQuery.validator.addMethod("decimal", function(value, element) {
+            return this.optional(element) || /^\d+\.\d$/.test(value);
+        }, "Please enter decimal number ");
+        jQuery.validator.addMethod("ruppes", function(value, element) {
+            return this.optional(element) || /^\d+\.\d+$/.test(value);
+        }, "Please enter  ruppes (ex-12.00) ");
+        jQuery.validator.addMethod("ddrequired", function(value, element) {
+            return this.optional(element) || (parseFloat(value) > 0);
+        }, "* This is a required field");
+    });
 </script>
+<?php js_end(); ?>

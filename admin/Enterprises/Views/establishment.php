@@ -45,7 +45,13 @@
                         </select>
 
                     </div>
-                    <div class="col-4 mt-4">
+                    <div class="col-2">
+                        <label class="form-label">Unit Type</label>
+                        <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+
+
+                    </div>
+                    <div class="col-2 mt-4">
                         <button class="btn btn-primary">Submit</button>
                     </div>
                 </div>
@@ -71,6 +77,7 @@
                                 <th>Block</th>
                                 <th>GP</th>
                                 <th>Village</th>
+                                <th>Unit Type</th>
                                 <th>Mang. Unit Type</th>
                                 <th>Mang. Unit Name</th>
                                 <th>DOE</th>
@@ -85,8 +92,9 @@
                                     <tr class="odd">
                                         <td><?= $enterprise['districts'] ?></td>
                                         <td><?= $enterprise['blocks'] ?></td>
-                                        <td><?= $enterprise['gp'] ?></td>
+                                        <td><?= $enterprise['gps'] ?></td>
                                         <td><?= $enterprise['villages'] ?></td>
+                                        <td><?= $enterprise['unit_name'] ?></td>
                                         <td><?= $enterprise['management_unit_type'] ?></td>
                                         <td><?= $enterprise['managing_unit_name'] ?></td>
                                         <td><?= $enterprise['date_estd'] ?></td>
