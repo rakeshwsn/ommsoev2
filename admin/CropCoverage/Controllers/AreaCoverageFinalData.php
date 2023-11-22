@@ -81,7 +81,7 @@ class AreaCoverageFinalData extends AdminController
             $data['block_id'] = 0;
         }
 
-        $params = 'year_id=' . $data['year_id'];
+        $params = 'year_id=' . $this->request->getGet('yaer_id') ?? $data['year_id'];
         $params .= '&season=' . $data['current_season'];
         $params .= '&district_id=' . $data['district_id'];
         $params .= '&block_id=' . $data['block_id'];
@@ -98,23 +98,24 @@ class AreaCoverageFinalData extends AdminController
         $data['add'] = admin_url('areacoverage/finaldata/add');
 
         //for area coverage report
-        if ($this->user->block_id) {
-            $data['block_id'] = $filter['block_id'] = $this->user->block_id;
-            $data['districts'] = ($this->districtModel)->where('id', $this->user->district_id)->asArray()->find();
-        } else if ($this->user->district_id) {
+        // if ($this->user->block_id) {
+        //     $data['block_id'] = $filter['block_id'] = $this->user->block_id;
+        //     $data['districts'] = ($this->districtModel)->where('id', $this->user->district_id)->asArray()->find();
+        if ($this->user->district_id) {
             $data['district_id'] = $filter['district_id'] = $this->user->district_id;
             $data['districts'] = ($this->districtModel)->where('id', $this->user->district_id)->asArray()->find();
         } else {
             $data['districts'] = ($this->districtModel)->orderBy('name')->asArray()->find();
         }
         $filter = [
-            'year_id' => $data['year_id'],
-            'season' => $data['current_season'],
+            'season' => $this->request->getGet('season') ?? $data['current_season'],
             'district_id' => $data['district_id'],
-
             'block_id' => $data['block_id'],
+            'year_id' => $this->request->getGet('year_id') ?? $data['year_id'],
 
         ];
+        // printr($filter);
+        // exit;
 
 
         $blocks = $this->fdModel->getAreaCoverageFinalReport($filter);
@@ -296,7 +297,7 @@ class AreaCoverageFinalData extends AdminController
             }
 
             $this->session->setFlashdata('message', 'Target Updated Successfully.');
-            return redirect()->to(base_url('admin/areacoverage/finaldata/add'));
+            return redirect()->to(base_url('admin/areacoverage/finaldata'));
         }
         echo $this->template->view('Admin\CropCoverage\Views\areacoverage_final_data_form', $data);
     }
