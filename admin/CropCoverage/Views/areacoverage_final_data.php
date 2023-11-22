@@ -305,7 +305,7 @@
             // Assign the sum to the specified total element
             var totalElement = document.getElementById(totalId);
             if (totalElement) {
-                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+                totalElement.textContent = sum.toFixed(); // Adjust the precision as needed
             }
         }
 
