@@ -96,7 +96,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('budget_fin_yr_id') ? 'is-invalid' : '' ?>">
                     <label for="budget finnacial year">Budget Utilized of Financial year<span class="text-danger">*</span></label>
-                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control mb-3', 'id' => 'budget_fin_yr_id']); ?>
+                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control', 'id' => 'budget_fin_yr_id']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('budget_fin_yr_id'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('mou_date') ? 'is-invalid' : '' ?>">
@@ -125,7 +125,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
                     <label for="management_unit">Is basic infrastructure support required?</label>
-                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' => 'is_support_basis_infr']); ?>
+                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control', 'id' => 'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
                 </div>
             </div>
@@ -279,12 +279,12 @@ $validation = \Config\Services::validation();
         //hide show addl budget
         $('#is_support_basis_infr').on('change', function() {
             $is_support_basis_infr = $(this).val();
-            if ($is_support_basis_infr == 'no') {
+            if ($is_support_basis_infr == '0') {
                 $('#budget_utilize').hide();
             } else {
                 $('#budget_utilize').show();
             }
-        })
+        });
         $('#is_support_basis_infr').trigger('change');
 
         //add gp btn click
