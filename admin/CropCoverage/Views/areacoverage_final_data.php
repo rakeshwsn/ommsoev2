@@ -302,7 +302,7 @@
             // Assign the sum to the specified total element
             var totalElement = document.getElementById(totalId);
             if (totalElement) {
-                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+                totalElement.textContent = sum.toFixed(); // Adjust the precision as needed
             }
         }
 
@@ -419,8 +419,8 @@
         }
 
         // Call the function for the specific class and assign to 'allTotalRagi'
-        calculateAndAssignSum('non-ragi-all-total', 'allTotalRagi');
-        calculateAndAssignSum('ragi-all-total', 'allTotalNonRagi');
+        calculateAndAssignSum('ragi-all-total', 'allTotalRagi');
+        calculateAndAssignSum('non-ragi-all-total', 'allTotalNonRagi');
         calculateAndAssignSum('all-total-fup', 'allTotalFup');
         calculateAndAssignSum('all-total-area', 'allTotalArea');
 
