@@ -333,8 +333,8 @@ class EstablishmentTransaction extends AdminController
                 $style->getAlignment()->setWrapText(true);
             }
 
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            $writer->save('output_file.xlsx');
+            //$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            //$writer->save('output_file.xlsx');
             if ($worksheet) {
                 $worksheet->getColumnDimension('A')->setVisible(false);
                 $worksheet->getColumnDimension('B')->setVisible(false);
