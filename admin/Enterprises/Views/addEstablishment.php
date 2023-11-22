@@ -87,7 +87,7 @@ $validation = \Config\Services::validation();
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('date_estd') ? 'is-invalid' : '' ?>">
                     <label for="Enterprise Establishment">Date of Enterprise Establishment<span class="text-danger">*</span></label>
-                    <input type="date" name="date_estd" class="form-control" id="date_estd" placeholder="Date " value="<?= set_value('date_estd', $date_estd) ?>">
+                    <input type="date" name="date_estd" class="form-control" id="date_estd" placeholder="Date " value="<?= set_value('date_estd', $date_estd) ?>" min="2015-01-01" max="2030-12-31">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('date_estd'); ?></div>
 
                 </div>
@@ -96,14 +96,13 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('budget_fin_yr_id') ? 'is-invalid' : '' ?>">
                     <label for="budget finnacial year">Budget Utilized of Financial year<span class="text-danger">*</span></label>
-                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control mb-3', 'id' => 'budget_fin_yr_id']); ?>
+                    <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control', 'id' => 'budget_fin_yr_id']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('budget_fin_yr_id'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('mou_date') ? 'is-invalid' : '' ?>">
                     <label for="Date of OMU Under OMM">Date of OMU Under OMM<span class="text-danger">*</span></label>
-                    <input type="date" name="mou_date" class="form-control" id="mou_unit" placeholder="Date " value="<?= set_value('mou_date', $mou_date) ?>">
+                    <input type="date" name="mou_date" class="form-control" id="mou_unit" placeholder="Date " value="<?= set_value('mou_date', $mou_date) ?>" min="2015-01-01" max="2030-12-31">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('mou_date'); ?></div>
-
                 </div>
             </div>
             <div class="row">
@@ -117,7 +116,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
                     <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                    <input type="text" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
+                    <input type="text" max="999999999999.99" maxlength="14" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
 
@@ -125,7 +124,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
                     <label for="management_unit">Is basic infrastructure support required?</label>
-                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control mb-3', 'id' => 'is_support_basis_infr']); ?>
+                    <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control', 'id' => 'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
                 </div>
             </div>
@@ -147,7 +146,7 @@ $validation = \Config\Services::validation();
                 <div class="row">
                     <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
                         <label for="Budget Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                        <input type="text" name="support_infr_amount" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
+                        <input type="text" name="support_infr_amount" max="999999999999.99" maxlength="14" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
                     </div>
                 </div>
@@ -279,12 +278,12 @@ $validation = \Config\Services::validation();
         //hide show addl budget
         $('#is_support_basis_infr').on('change', function() {
             $is_support_basis_infr = $(this).val();
-            if ($is_support_basis_infr == 'no') {
+            if ($is_support_basis_infr == '0') {
                 $('#budget_utilize').hide();
             } else {
                 $('#budget_utilize').show();
             }
-        })
+        });
         $('#is_support_basis_infr').trigger('change');
 
         //add gp btn click
@@ -376,8 +375,7 @@ $validation = \Config\Services::validation();
                 },
                 contact_mobile: {
                     required: true,
-                    digitsOnly: true
-
+                    mobile:true
                 },
                 unit_budget_amount: {
                     required: true,
@@ -402,44 +400,26 @@ $validation = \Config\Services::validation();
                 budget_fin_yr_id: {
                     required: true,
                     ddrequired: true
+                },
+                date_estd: {
+                    required: true,
+                },
+                mou_date: {
+                    required: true,
                 }
             },
             messages: {
                 managing_unit_name: {
-                    required: "This field is required.",
                     lettersonly: "Please enter only letters and spaces."
                 },
                 contact_mobile: {
-                    required: "This field is required.",
-                    digitsOnly: "Please enter only numbers "
+                    mobile: "This is not a valid mobile number "
                 },
                 unit_budget_amount: {
-                    required: "This field is required.",
                     ruppes: "Please enter  ruppes (ex-00.00) "
                 },
                 unit_budget: {
-                    required: "This field is required.",
                     decimal: "Please enter only decimal numbers."
-                },
-                unit_id: {
-                    required: "This field is required.",
-
-                },
-                district_id: {
-                    required: "This field is required.",
-
-                },
-                block_id: {
-                    required: "This field is required.",
-
-                },
-                gp_id: {
-                    required: "This field is required.",
-
-                },
-                village_id: {
-                    required: "This field is required.",
-
                 },
             },
             errorPlacement: function(error, element) {
@@ -469,6 +449,9 @@ $validation = \Config\Services::validation();
         jQuery.validator.addMethod("ddrequired", function(value, element) {
             return this.optional(element) || (parseFloat(value) > 0);
         }, "* This is a required field");
+        jQuery.validator.addMethod("mobile", function(value, element) {
+            return this.optional(element) || /([0-9]{11}$)|(^[5-9][0-9]{9}$)/.test(value);
+        }, "Please enter a valid mobile number");
     });
 </script>
 <?php js_end(); ?>
