@@ -420,7 +420,7 @@
 
         // Call the function for the specific class and assign to 'allTotalRagi'
         calculateAndAssignSum('ragi-all-total', 'allTotalRagi');
-        calculateAndAssignSum('non-ragi-all-total', 'allTotalNonRagi');
+
         calculateAndAssignSum('all-total-fup', 'allTotalFup');
         calculateAndAssignSum('all-total-area', 'allTotalArea');
 
