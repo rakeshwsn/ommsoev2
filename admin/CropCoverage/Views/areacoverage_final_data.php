@@ -6,21 +6,17 @@
                     <?= $heading_title; ?>
                 </h3>
                 <div class="block-options">
-                    <?php if ($district_id && $block_id) { ?>
-                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add" class="btn btn-primary ajaxaction"
-                            hidden>Add/Edit<i class="fa fa-plus"></i></a>
-                    <?php } else { ?>
-                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add" class="btn btn-primary ajaxaction">Add<i
-                                class="fa fa-plus"></i></a>
+                    <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
+                        class="btn btn-primary ajaxaction">Add/Edit</a>
 
-                    <?php } ?>
+
                 </div>
             </div>
             <div class="block-content block-content-full">
                 <div class="row">
                     <div class="col-md-2">
                         <label>Year</label>
-                        <select class="form-control" id="year_id" name="year_id" disabled>
+                        <select class="form-control" id="year_id" name="year_id">
                             <?php foreach ($years as $year) { ?>
                                 <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
                                       echo 'selected';
@@ -32,7 +28,7 @@
                     </div>
                     <div class="col-md-2">
                         <label>Season</label>
-                        <select class="form-control" id="season" name="season" disabled>
+                        <select class="form-control" id="season" name="season">
                             <?php foreach ($seasons as $value => $season) { ?>
                                 <option value="<?= $value ?>" <?php if ($value == $current_season) {
                                       echo 'selected';
@@ -44,9 +40,8 @@
                     </div>
                     <div class="col-md-2">
                         <label>Districts</label>
-                        <select class="form-control" id="district" name="district_id" <?php if ($district_id) {
-                            echo 'disabled';
-                        } ?>><option>Select District</option>
+                        <select class="form-control" id="district" name="district_id">
+                            <option>Select District</option>
 
                             <?php foreach ($districts as $district) { ?>
                                 <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
@@ -150,7 +145,7 @@
                                     <td>
                                     <?= $blockfd->block ?>
                                     </td>
-                                    <td>
+                                    <td class="total_gp">
                                     <?= $blockfd->total_gp ?>
                                     </td>
                             <?php } else if (isset($allblocks)) { ?>
@@ -160,7 +155,7 @@
                                         <td>
                                     <?= $block['block'] ?>
                                         </td>
-                                        <td>
+                                        <td class="total_gp">
                                     <?= $block['gps'] ?>
                                         </td>
                             <?php } else { ?>
@@ -170,63 +165,91 @@
                                         <td>
                                     <?= $blockfd->blocks ?>
                                         </td>
-                                        <td>
+                                        <td class="total_gp">
                                     <?= $blockfd->gps ?>
                                         </td>
                             <?php } ?>
-                            <td>
+                            <td class="total_village">
                                 <?= $blockfd->total_village ?>
                             </td>
-                            <td>
+                            <td class="total_demon_farmer">
                                 <?= $blockfd->total_demon_farmer ?>
                             </td>
-                            <td>
+                            <td class="total_follow_farmer">
                                 <?= $blockfd->total_follow_farmer ?>
                             </td>
-                            <td>
+                            <td class="ragi_total_smi">
                                 <?= $blockfd->ragi_total_smi ?>
                             </td>
-                            <td>
+                            <td class="ragi_total_lt">
                                 <?= $blockfd->ragi_total_lt ?>
                             </td>
-                            <td>
+                            <td class="ragi_total_ls">
                                 <?= $blockfd->ragi_ls ?>
                             </td>
-                            <td>
+                            <td class="little_millet_lt">
                                 <?= $blockfd->little_millet_lt ?>
                             </td>
-                            <td>
+                            <td class="little_millet_ls">
                                 <?= $blockfd->little_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="foxtail_millet_ls">
                                 <?= $blockfd->foxtail_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="sorghum_ls">
                                 <?= $blockfd->sorghum_ls ?>
                             </td>
-                            <td>
+                            <td class="kodo_millet_ls">
                                 <?= $blockfd->kodo_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="barnyard_millet_ls">
                                 <?= $blockfd->barnyard_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="pearl_millet_ls">
                                 <?= $blockfd->pearl_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="ragi-all-total">
                                 <?= $blockfd->ragi_total_smi + $blockfd->ragi_total_lt + $blockfd->ragi_ls ?>
                             </td>
-                            <td>
+                            <td class="non-ragi-all-total">
                                 <?= $blockfd->little_millet_lt + $blockfd->little_millet_ls + $blockfd->foxtail_millet_ls + $blockfd->sorghum_ls + $blockfd->kodo_millet_ls + $blockfd->barnyard_millet_ls + $blockfd->pearl_millet_ls ?>
                             </td>
-                            <td>
+                            <td class="all-total-fup">
                                 <?= $blockfd->total_fup ?>
                             </td>
-                            <td>
+                            <td class="all-total-area">
                                 <?= $blockfd->ragi_total_smi + $blockfd->ragi_total_lt + $blockfd->ragi_ls + $blockfd->little_millet_lt + $blockfd->little_millet_ls + $blockfd->foxtail_millet_ls + $blockfd->sorghum_ls + $blockfd->kodo_millet_ls + $blockfd->barnyard_millet_ls + $blockfd->pearl_millet_ls + $blockfd->total_fup ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
+                    <tr>
+                        <td>All Total</td>
+                        <?php if (!$district_id && !$block_id) { ?>
+                            <td id="allTotalBlock"></td>
+                        <?php }
+                        if (!$block_id) { ?>
+                            <td id="allTotalGp"></td>
+
+                        <?php } ?>
+                        <td id="allTotalVlg"></td>
+                        <td id="allTotalDemonFar"></td>
+                        <td id="allTotalFolFar"></td>
+                        <td id="allTotalRagiSMI"></td>
+                        <td id="allTotalRagiLT"></td>
+                        <td id="allTotalRagiLs"></td>
+                        <td id="allTotalLittleMilletLt"></td>
+                        <td id="allTotalLittleMilletLs"></td>
+                        <td id="allTotalFoxtailMilletLs"></td>
+                        <td id="allTotalSorghumLs"></td>
+                        <td id="allTotalKodoMilletLs"></td>
+                        <td id="allTotalBarnyardMilletLs"></td>
+                        <td id="allTotalPearlMilletLs"></td>
+                        <td id="allTotalRagi"></td>
+                        <td id="allTotalNonRagi"></td>
+                        <td id="allTotalFup"></td>
+                        <td id="allTotalArea"></td>
+
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -261,3 +284,145 @@
     });
 </script>
 <?php js_end(); ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to calculate the sum for a given class and assign it to the specified total element
+        function calculateAndAssignSum(className, totalId) {
+            // Get all elements with the specified class
+            var elements = document.querySelectorAll('.' + className);
+
+            // Initialize sum
+            var sum = 0;
+
+            // Loop through each element and add its value to the sum
+            elements.forEach(function (element) {
+                sum += parseFloat(element.textContent) || 0;
+            });
+
+            // Assign the sum to the specified total element
+            var totalElement = document.getElementById(totalId);
+            if (totalElement) {
+                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+            }
+        }
+
+        // Call the function for the 'total_gp' class
+        calculateAndAssignSum('total_gp', 'allTotalGp');
+        calculateAndAssignSum('blocks', 'allTotalBlock');
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get all elements with the specified classes
+        var totalVillageElements = document.querySelectorAll('.total_village');
+        var totalDemonFarmerElements = document.querySelectorAll('.total_demon_farmer');
+        var totalFollowFarmerElements = document.querySelectorAll('.total_follow_farmer');
+
+        // Initialize sums
+        var totalVillageSum = 0;
+        var totalDemonFarmerSum = 0;
+        var totalFollowFarmerSum = 0;
+
+        // Loop through each element and add its value to the sum
+        function calculateSum(elements, sum) {
+            elements.forEach(function (element) {
+                sum += parseFloat(element.textContent) || 0;
+            });
+            return sum;
+        }
+
+        // Calculate sums for each field
+        totalVillageSum = calculateSum(totalVillageElements, totalVillageSum);
+        totalDemonFarmerSum = calculateSum(totalDemonFarmerElements, totalDemonFarmerSum);
+        totalFollowFarmerSum = calculateSum(totalFollowFarmerElements, totalFollowFarmerSum);
+
+        // Assign the sums to the respective elements
+        var allTotalVlgElement = document.getElementById('allTotalVlg');
+        var allTotalDemonFarElement = document.getElementById('allTotalDemonFar');
+        var allTotalFolFarElement = document.getElementById('allTotalFolFar');
+
+        if (allTotalVlgElement) {
+            allTotalVlgElement.textContent = totalVillageSum.toFixed(2); // Adjust the precision as needed
+        }
+        if (allTotalDemonFarElement) {
+            allTotalDemonFarElement.textContent = totalDemonFarmerSum.toFixed(2);
+        }
+        if (allTotalFolFarElement) {
+            allTotalFolFarElement.textContent = totalFollowFarmerSum.toFixed(2);
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to calculate the sum for a given class and assign it to the specified total element
+        function calculateAndAssignSum(className, totalId) {
+            // Get all elements with the specified class
+            var elements = document.querySelectorAll('.' + className);
+
+            // Initialize sum
+            var sum = 0;
+
+            // Loop through each element and add its value to the sum
+            elements.forEach(function (element) {
+                sum += parseFloat(element.textContent) || 0;
+            });
+
+            // Assign the sum to the specified total element
+            var totalElement = document.getElementById(totalId);
+            if (totalElement) {
+                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+            }
+        }
+
+        // Call the function for each specific class
+        calculateAndAssignSum('ragi_total_smi', 'allTotalRagiSMI');
+        calculateAndAssignSum('ragi_total_lt', 'allTotalRagiLT');
+        calculateAndAssignSum('ragi_ls', 'allTotalRagiLs');
+        calculateAndAssignSum('little_millet_lt', 'allTotalLittleMilletLt');
+        calculateAndAssignSum('little_millet_ls', 'allTotalLittleMilletLs');
+        calculateAndAssignSum('foxtail_millet_ls', 'allTotalFoxtailMilletLs');
+        calculateAndAssignSum('sorghum_ls', 'allTotalSorghumLs');
+        calculateAndAssignSum('kodo_millet_ls', 'allTotalKodoMilletLs');
+        calculateAndAssignSum('barnyard_millet_ls', 'allTotalBarnyardMilletLs');
+        calculateAndAssignSum('pearl_millet_ls', 'allTotalPearlMilletLs');
+
+        // Calculate and assign the sum for the specified fields
+        var totalRagiSum = parseFloat(document.querySelector('.ragi_total_smi').textContent) || 0 +
+            parseFloat(document.querySelector('.ragi_total_lt').textContent) || 0 +
+            parseFloat(document.querySelector('.ragi_ls').textContent) || 0;
+
+        document.getElementById('allTotalRagi').textContent = totalRagiSum.toFixed(2); // Adjust the precision as needed
+    });
+</script>
+<!-- JavaScript code -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to calculate the sum for a given class and assign it to the specified total element
+        function calculateAndAssignSum(className, totalId) {
+            // Get all elements with the specified class
+            var elements = document.querySelectorAll('.' + className);
+
+            // Initialize sum
+            var sum = 0;
+
+            // Loop through each element and add its value to the sum
+            elements.forEach(function (element) {
+                sum += parseFloat(element.textContent) || 0;
+            });
+
+            // Assign the sum to the specified total element
+            var totalElement = document.getElementById(totalId);
+            if (totalElement) {
+                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+            }
+        }
+
+        // Call the function for the specific class and assign to 'allTotalRagi'
+        calculateAndAssignSum('non-ragi-all-total', 'allTotalRagi');
+        calculateAndAssignSum('ragi-all-total', 'allTotalNonRagi');
+        calculateAndAssignSum('all-total-fup', 'allTotalFup');
+        calculateAndAssignSum('all-total-area', 'allTotalArea');
+
+    });
+</script>

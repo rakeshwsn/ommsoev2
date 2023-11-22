@@ -5,68 +5,68 @@ use CodeIgniter\Model;
 
 class FinalDataModel extends Model
 {
-    protected $DBGroup = 'default';
-    protected $table = 'ac_final_data_master';
-    protected $primaryKey = 'id';
-    protected $useAutoIncrement = true;
-    protected $insertID = 0;
-    protected $returnType = 'object';
-    protected $useSoftDeletes = true;
-    protected $protectFields = false;
-    // protected $allowedFields = [
-    // 	'block_id',
-    // 	'year_id',
-    // 	'season',
-    // 	'ragi_smi',
-    // 	'ragi_lt',
-    // 	'ragi_ls',
-    // ];
+  protected $DBGroup = 'default';
+  protected $table = 'ac_final_data_master';
+  protected $primaryKey = 'id';
+  protected $useAutoIncrement = true;
+  protected $insertID = 0;
+  protected $returnType = 'object';
+  protected $useSoftDeletes = true;
+  protected $protectFields = false;
+  // protected $allowedFields = [
+  // 	'block_id',
+  // 	'year_id',
+  // 	'season',
+  // 	'ragi_smi',
+  // 	'ragi_lt',
+  // 	'ragi_ls',
+  // ];
 
-    // Dates
-    protected $useTimestamps = true;
-    protected $dateFormat = 'datetime';
-    protected $createdField = 'created_at';
-    protected $updatedField = 'updated_at';
-    protected $deletedField = 'deleted_at';
+  // Dates
+  protected $useTimestamps = true;
+  protected $dateFormat = 'datetime';
+  protected $createdField = 'created_at';
+  protected $updatedField = 'updated_at';
+  protected $deletedField = 'deleted_at';
 
-    // Validation
-    protected $validationRules = [
+  // Validation
+  protected $validationRules = [
 
-    ];
+  ];
 
 
-    protected $validationMessages = [];
-    protected $skipValidation = false;
-    protected $cleanValidationRules = true;
+  protected $validationMessages = [];
+  protected $skipValidation = false;
+  protected $cleanValidationRules = true;
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert = [];
-    protected $afterInsert = [];
-    protected $beforeUpdate = [];
-    protected $afterUpdate = [];
-    protected $beforeFind = [];
-    protected $afterFind = [];
-    protected $beforeDelete = [];
-    protected $afterDelete = [];
-    public function addGpCropsData($mergedData)
-    {
-        // Delete existing records for the given final_data_id
-        $finalDataIds = array_unique(array_column($mergedData, 'final_data_id'));
+  // Callbacks
+  protected $allowCallbacks = true;
+  protected $beforeInsert = [];
+  protected $afterInsert = [];
+  protected $beforeUpdate = [];
+  protected $afterUpdate = [];
+  protected $beforeFind = [];
+  protected $afterFind = [];
+  protected $beforeDelete = [];
+  protected $afterDelete = [];
+  public function addGpCropsData($mergedData)
+  {
+    // Delete existing records for the given final_data_id
+    $finalDataIds = array_unique(array_column($mergedData, 'final_data_id'));
 
-        // Delete existing records for the given final_data_ids
-        $this->db->table('ac_final_area_data')->whereIn('final_data_id', $finalDataIds)->delete();
-        // Insert the merged data into the database
-        foreach ($mergedData as $data) {
-            $this->db->table('ac_final_area_data')->insert($data);
-        }
+    // Delete existing records for the given final_data_ids
+    $this->db->table('ac_final_area_data')->whereIn('final_data_id', $finalDataIds)->delete();
+    // Insert the merged data into the database
+    foreach ($mergedData as $data) {
+      $this->db->table('ac_final_area_data')->insert($data);
     }
+  }
 
 
 
-    public function getGpsFinalData($filter = [])
-    {
-        $sql = "SELECT
+  public function getGpsFinalData($filter = [])
+  {
+    $sql = "SELECT
         
       fd.id,
 COALESCE(fd.year_id, " . getCurrentYearId() . ") AS year_id,
@@ -89,13 +89,13 @@ FROM (
   FROM soe_grampanchayats sg
   WHERE 1=1"; // Add your specific conditions here
 
-        if (!empty($filter['block_id'])) {
-            $sql .= " AND sg.block_id = " . $filter['block_id'];
-        } else {
-            $sql .= " AND sg.block_id = " . 0;
-        }
+    if (!empty($filter['block_id'])) {
+      $sql .= " AND sg.block_id = " . $filter['block_id'];
+    } else {
+      $sql .= " AND sg.block_id = " . 0;
+    }
 
-        $sql .= ") AS gp
+    $sql .= ") AS gp
 LEFT JOIN (
   SELECT
   afdm.id,
@@ -118,33 +118,33 @@ LEFT JOIN (
     LEFT JOIN (SELECT *, id AS crop_id FROM ac_crops) c ON afad.crop_id = c.crop_id
   WHERE afdm.deleted_at IS NULL"; // Add your specific conditions here
 
-        if (empty($filter['year_id'])) {
-            $filter['year_id'] = getCurrentYearId();
-        }
+    if (empty($filter['year_id'])) {
+      $filter['year_id'] = getCurrentYearId();
+    }
 
-        if (empty($filter['season'])) {
-            $filter['season'] = getCurrentSeason();
-        }
+    if (empty($filter['season'])) {
+      $filter['season'] = getCurrentSeason();
+    }
 
-        $sql .= " AND COALESCE(afdm.year_id, " . getCurrentYearId() . ") = " . $filter['year_id'];
-        $sql .= " AND COALESCE(afdm.season, '" . getCurrentSeason() . "') = '" . $filter['season'] . "'";
+    $sql .= " AND COALESCE(afdm.year_id, " . getCurrentYearId() . ") = " . $filter['year_id'];
+    $sql .= " AND COALESCE(afdm.season, '" . getCurrentSeason() . "') = '" . $filter['season'] . "'";
 
 
 
-        $sql .= "
+    $sql .= "
   GROUP BY afdm.gp_id
 ) AS fd
 ON gp.id = fd.gp_id
 order by gp.name";
 
-        // echo $sql;
-        // exit;
+    // echo $sql;
+    // exit;
 
-        return $this->db->query($sql)->getResultArray();
-    }
-    public function getGpsDemonData($final_data_id)
-    {
-        $sql = "SELECT
+    return $this->db->query($sql)->getResultArray();
+  }
+  public function getGpsDemonData($final_data_id)
+  {
+    $sql = "SELECT
             ac.id,
             ac.crops,
             cd.final_data_id,
@@ -165,43 +165,43 @@ FROM ac_crops ac
 		WHERE 1 = 1";
 
 
-        if (!empty($final_data_id)) {
-            $sql .= " AND afad.final_data_id = " . $final_data_id;
-        } else {
-            $sql .= " AND afad.final_data_id is null";
-        }
+    if (!empty($final_data_id)) {
+      $sql .= " AND afad.final_data_id = " . $final_data_id;
+    } else {
+      $sql .= " AND afad.final_data_id is null";
+    }
 
 
-        $sql .= " AND afdm.deleted_at IS NULL) cd
+    $sql .= " AND afdm.deleted_at IS NULL) cd
     ON ac.id = cd.crop_id
     WHERE ac.crops IS NOT NULL";
-        // echo $sql;
-        // exit;
+    // echo $sql;
+    // exit;
 
-        return $this->db->query($sql)->getResultArray();
+    return $this->db->query($sql)->getResultArray();
+  }
+
+
+  public function getAreaCoverageFinalReport($filter = [])
+  {
+
+    if (!empty($filter['block_id'])) {
+
+      return $this->getGpwiseFinalReport($filter);
+
+    } else if (!empty($filter['district_id'])) {
+
+      return $this->getBlockWiseFinalReport($filter);
+
+    } else {
+
+      return $this->getAllDistrictsFinalReport($filter);
+
     }
-
-
-    public function getAreaCoverageFinalReport($filter = [])
-    {
-
-        if (!empty($filter['block_id'])) {
-
-            return $this->getGpwiseFinalReport($filter);
-
-        } else if (!empty($filter['district_id'])) {
-
-            return $this->getBlockWiseFinalReport($filter);
-
-        } else {
-
-            return $this->getAllDistrictsFinalReport($filter);
-
-        }
-    }
-    public function getGpwiseFinalReport($filter = [])
-    {
-        $sql = "SELECT
+  }
+  public function getGpwiseFinalReport($filter = [])
+  {
+    $sql = "SELECT
   sg.id AS gp_id,
   sg.name AS gp_name,
   COALESCE(afdm.no_of_village, 0) AS total_village,
@@ -258,38 +258,42 @@ LEFT JOIN
       ) AS t3 ON afdm.id = t3.final_data_id
     WHERE
       ";
-        if (!empty($filter['block_id'])) {
-            $sql .= " afdm.district_id =" . $filter['district_id'];
+    if (!empty($filter['district_id'])) {
+      $sql .= " afdm.district_id =" . $filter['district_id'];
 
-        }
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND afdm.year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
-        }
+    }
+    if (!empty($filter['block_id'])) {
+      $sql .= " AND afdm.block_id =" . $filter['block_id'];
 
-        $sql .= "AND afdm.deleted_at IS NULL
+    }
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND afdm.year_id = " . $filter['year_id'];
+    }
+    if (!empty($filter['season'])) {
+      $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+    }
+
+    $sql .= "AND afdm.deleted_at IS NULL
   ) AS t3 ON sg.id = t3.gp_id
 WHERE
    ";
-        if (!empty($filter['block_id'])) {
-            $sql .= " afdm.district_id =" . $filter['district_id'];
+    if (!empty($filter['block_id'])) {
+      $sql .= " afdm.block_id =" . $filter['block_id'];
 
-        }
+    }
 
-        $sql .= "
+    $sql .= "
 GROUP BY
   sg.id, sg.name
 order by sg.name";
-        // echo $sql;
-        // exit;
+    // echo $sql;
+    // exit;
 
-        return $this->db->query($sql)->getResult();
-    }
-    public function getBlockWiseFinalReport($filter = [])
-    {
-        $sql = "SELECT
+    return $this->db->query($sql)->getResult();
+  }
+  public function getBlockWiseFinalReport($filter = [])
+  {
+    $sql = "SELECT
   t1.block_id,
   t1.block,
   t1.total_gp,
@@ -316,11 +320,11 @@ FROM (
   FROM soe_blocks sb
   LEFT JOIN soe_grampanchayats sg ON sb.id = sg.block_id
   WHERE ";
-        if (!empty($filter['district_id'])) {
-            $sql .= " sb.district_id =" . $filter['district_id'];
+    if (!empty($filter['district_id'])) {
+      $sql .= " sb.district_id =" . $filter['district_id'];
 
-        }
-        $sql .= " AND sg.deleted_at IS NULL
+    }
+    $sql .= " AND sg.deleted_at IS NULL
   GROUP BY sb.id, sb.name
 ) AS t1
 LEFT JOIN (
@@ -341,18 +345,18 @@ LEFT JOIN (
     ) AS total_fup
   FROM ac_final_data_master afdm
   WHERE ";
-        if (!empty($filter['district_id'])) {
-            $sql .= " afdm.district_id =" . $filter['district_id'];
+    if (!empty($filter['district_id'])) {
+      $sql .= " afdm.district_id =" . $filter['district_id'];
 
-        }
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND afdm.year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
-        }
+    }
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND afdm.year_id = " . $filter['year_id'];
+    }
+    if (!empty($filter['season'])) {
+      $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+    }
 
-        $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id
+    $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id
 ) AS t2 ON t1.block_id = t2.block_id
 LEFT JOIN (
   SELECT
@@ -374,32 +378,32 @@ LEFT JOIN (
     LEFT JOIN ac_crops ac ON ac.id = afad.crop_id
   ) AS t3 ON afdm.id = t3.final_data_id
   WHERE";
-        if (!empty($filter['district_id'])) {
-            $sql .= " afdm.district_id =" . $filter['district_id'];
+    if (!empty($filter['district_id'])) {
+      $sql .= " afdm.district_id =" . $filter['district_id'];
 
-        }
-        if (!empty($filter['year_id'])) {
-            $sql .= " AND afdm.year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
-        }
+    }
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND afdm.year_id = " . $filter['year_id'];
+    }
+    if (!empty($filter['season'])) {
+      $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+    }
 
-        $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id, t3.crops
+    $sql .= "AND afdm.deleted_at IS NULL GROUP BY afdm.block_id, t3.crops
 ) AS t3 ON t2.block_id = t3.block_id
 GROUP BY t1.block_id
 ";
-        // echo $sql;
-        // exit;
+    // echo $sql;
+    // exit;
 
-        return $this->db->query($sql)->getResult();
-    }
+    return $this->db->query($sql)->getResult();
+  }
 
 
 
-    public function getAllDistrictsFinalReport($filter = [])
-    {
-        $sql = "SELECT
+  public function getAllDistrictsFinalReport($filter = [])
+  {
+    $sql = "SELECT
   sd.id,
   sd.name AS district,
   COALESCE(block_data.block_count, 0) AS blocks,
@@ -440,14 +444,14 @@ FROM soe_districts sd
     FROM ac_final_data_master afdm
     WHERE";
 
-        if (!empty($filter['year_id'])) {
-            $sql .= " afdm.year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
-        }
+    if (!empty($filter['year_id'])) {
+      $sql .= " afdm.year_id = " . $filter['year_id'];
+    }
+    if (!empty($filter['season'])) {
+      $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+    }
 
-        $sql .= " AND afdm.deleted_at IS NULL GROUP BY afdm.district_id) AS demonstration_data
+    $sql .= " AND afdm.deleted_at IS NULL GROUP BY afdm.district_id) AS demonstration_data
     ON sd.id = demonstration_data.district_id
   LEFT JOIN (SELECT
       afdm.district_id,
@@ -469,14 +473,14 @@ FROM soe_districts sd
         ON afdm.id = t3.final_data_id
     WHERE";
 
-        if (!empty($filter['year_id'])) {
-            $sql .= " afdm.year_id = " . $filter['year_id'];
-        }
-        if (!empty($filter['season'])) {
-            $sql .= " AND afdm.season = '" . $filter['season'] . "'";
-        }
+    if (!empty($filter['year_id'])) {
+      $sql .= " afdm.year_id = " . $filter['year_id'];
+    }
+    if (!empty($filter['season'])) {
+      $sql .= " AND afdm.season = '" . $filter['season'] . "'";
+    }
 
-        $sql .= " AND afdm.deleted_at IS NULL
+    $sql .= " AND afdm.deleted_at IS NULL
     GROUP BY afdm.district_id,
              t3.crops) AS t3
     ON sd.id = t3.district_id
@@ -485,10 +489,10 @@ GROUP BY sd.id,
 ORDER BY sd.name
 
 ";
-        // echo $sql;
-        // exit;
-        return $this->db->query($sql)->getResult();
-    }
+    // echo $sql;
+    // exit;
+    return $this->db->query($sql)->getResult();
+  }
 
 }
 ?>
