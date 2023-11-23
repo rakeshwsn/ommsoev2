@@ -28,7 +28,7 @@ class Enterprises extends AdminController
 		$enterprisesmodel = new EnterprisesModel();
 		$distModel = new DistrictModel();
 		$blockmodel = new BlockModel();
-
+		$enterprisesunitmodel = new EnterprisesUnitModel();
 		//populate districts
 		$data['districts'][0] = 'Select District';
 		$districts = $distModel->orderBy('name', 'asc')->findAll();
@@ -37,7 +37,14 @@ class Enterprises extends AdminController
 		}
 
 		$data['district_id'] = 0;
+		$data['units'][0] = 'Select Unit Type';
+		$units = $enterprisesunitmodel->orderBy('name', 'asc')->findAll();
+		// dd($units);
+		foreach ($units as $unit) {
+			$data['units'][$unit->id] = $unit->name;
+		}
 
+		$data['unit_id'] = 0;
 
 		//populate blocks of district selected
 		$data['blocks'][0] = 'Select Block';
@@ -49,6 +56,7 @@ class Enterprises extends AdminController
 				$data['blocks'][$block->id] = $block->name;
 			}
 		}
+
 
 		//get years from district selected
 		$data['years'][0] = 'Select DOE';
@@ -75,10 +83,14 @@ class Enterprises extends AdminController
 		if ($this->request->getGet('doeyear')) {
 			$data['doeyear'] = $this->request->getGet('doeyear');
 		}
+		$data['unit_id'] = 0;
+		if ($this->request->getGet('unit_id')) {
+			$data['unit_id'] = $this->request->getGet('unit_id');
+		}
 
 
 		$filteredData = $this->filter();
-		// dd($filteredData);
+		// printr($filteredData);exit;
 		$data['enterprises'] = [];
 
 		foreach ($filteredData as $row) {
@@ -87,6 +99,7 @@ class Enterprises extends AdminController
 				'blocks' => $row->blocks,
 				'gps' => $row->gps,
 				'villages' => $row->villages,
+				'unit_name' => $row->unit_name,
 				'management_unit_type' => $row->management_unit_type,
 				'managing_unit_name' => $row->managing_unit_name,
 				'date_estd' => $row->date_estd,
@@ -109,6 +122,9 @@ class Enterprises extends AdminController
 		$filter = [];
 		if ($this->request->getGet('district_id') > 0) {
 			$filter['district_id'] = $this->request->getGet('district_id');
+		}
+		if ($this->request->getGet('unit_id') > 0) {
+			$filter['unit_id'] = $this->request->getGet('unit_id');
 		}
 
 		if ($this->request->getGet('block_id') > 0) {
@@ -224,11 +240,11 @@ class Enterprises extends AdminController
 
 
 		if ($this->request->getMethod(1) == 'POST') {
-			// dd($this->request->getPost());
+
 			$enterprisesmodel = new EnterprisesModel();
 			$enterprisesmodel->where('id', $this->request->getGet('id'))->delete();
 
-			$enterprisesdata[] = [
+			$enterprisesdata = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $this->request->getPost('district_id'),
 				'block_id' => $this->request->getPost('block_id'),
@@ -244,13 +260,13 @@ class Enterprises extends AdminController
 				'unit_budget' => $this->request->getPost('unit_budget'),
 				'addl_budget' => $this->request->getPost('addl_budget'),
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
-				'is_support_basis_infr' => $this->request->getPost('is_support_basis_infr'),
+				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
 				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
 				'support_infr_amount' => $this->request->getPost('support_infr_amount')
 			];
 			// dd($enterprisesdata);
 
-			$enterprisesmodel->insertBatch($enterprisesdata);
+			$enterprisesmodel->insert($enterprisesdata);
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
 		}
@@ -262,11 +278,29 @@ class Enterprises extends AdminController
 
 		$enterprisesmodel = new EnterprisesModel();
 		if ($this->request->getMethod(1) == 'POST') {
+
 			$id = $this->request->getGet('id');
 			$district_id = $this->request->getPost('district_id');
 			$block_id = $this->request->getPost('block_id');
 			$enterprisesmodel->where('id', $id)->delete();
-			$enterprisesdata[] = [
+			//if is_support_basis_infr is no set values
+			if ($this->request->getPost('is_support_basis_infr') == 0) {
+				$data = [
+					'purpose_infr_support' => '',
+					'support_infr_amount' => '',
+					'addl_budget'=>'',
+				];
+			} else {
+
+				$data = [
+					'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
+					'support_infr_amount' => $this->request->getPost('support_infr_amount'),
+					'addl_budget' => $this->request->getPost('addl_budget'),
+				];
+			}
+
+
+			$enterprisesdata = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $district_id,
 				'block_id' => $block_id,
@@ -280,14 +314,14 @@ class Enterprises extends AdminController
 				'date_estd' => $this->request->getPost('date_estd'),
 				'mou_date' => $this->request->getPost('mou_date'),
 				'unit_budget' => $this->request->getPost('unit_budget'),
-				'addl_budget' => $this->request->getPost('addl_budget'),
+				'addl_budget' => $data['addl_budget'],
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
-				'is_support_basis_infr' => $this->request->getPost('is_support_basis_infr'),
-				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
-				'support_infr_amount' => $this->request->getPost('support_infr_amount')
+				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
+				'purpose_infr_support' =>$data['purpose_infr_support'],
+				'support_infr_amount' => $data['support_infr_amount']
 			];
 
-			$data['enterprises'] = $enterprisesmodel->insertBatch($enterprisesdata);
+			$data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
 		}
@@ -343,7 +377,7 @@ class Enterprises extends AdminController
 		return $this->response->setJSON($data);
 	}
 
-	
+
 
 	public function getForm()
 	{
@@ -362,7 +396,7 @@ class Enterprises extends AdminController
 		}
 
 		$data['enterprise_text'] = "Add Enterprise Data";
-// dd($this->request->getGet('id'));
+		// dd($this->request->getGet('id'));
 		if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
 			$enterprise = $enterprisesmodel->find($this->request->getGet('id'));
 
@@ -371,7 +405,7 @@ class Enterprises extends AdminController
 
 		foreach ($enterprisesmodel->db->getFieldNames('enterprises') as $field) {
 			if ($this->request->getPost($field)) {
-			
+
 				$data[$field] = $this->request->getPost($field);
 			} else if (isset($enterprise->{$field}) && $enterprise->{$field}) {
 				$data[$field] = html_entity_decode($enterprise->{$field}, ENT_QUOTES, 'UTF-8');
@@ -382,7 +416,7 @@ class Enterprises extends AdminController
 
 		//units
 		$data['units'] = [];
-		$data['units'][0] = 'Select Units';
+		$data['units'][] = 'Select Units';
 
 		$units = $enterprisesunitmodel->findAll();
 
@@ -396,11 +430,11 @@ class Enterprises extends AdminController
 			'FPO' => 'FPO',
 		];
 		$data['is_support'] = [
-			'no' => 'No',
-			'yes' => 'Yes',
+			'0' => 'No',
+			'1' => 'Yes',
 		];
 		//district
-		$data['districts'][0] = 'Select districts';
+		$data['districts'][] = 'Select districts';
 
 		$districts = $districtmodel->orderBy('name', 'asc')->findAll();
 
@@ -409,7 +443,7 @@ class Enterprises extends AdminController
 		}
 
 		//blocks
-		$data['blocks'][0] = 'Select blocks';
+		$data['blocks'][] = 'Select blocks';
 
 		if ($data['district_id']) {
 			$blocks = $blockModel->where('district_id', $data['district_id'])->findAll();
@@ -418,7 +452,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//GPS
-		$data['gps'][0] = 'Select Gp';
+		$data['gps'][] = 'Select Gp';
 		if ($data['block_id']) {
 			$gps = $gpmodel->where('block_id', $data['block_id'])->findAll();
 			foreach ($gps as $gp) {
@@ -426,7 +460,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//Villages
-		$data['villages'][0] = 'Select Village';
+		$data['villages'][] = 'Select Village';
 		if ($data['gp_id']) {
 			$villages = $villagemodel->where('gp_id', $data['gp_id'])->findAll();
 
@@ -436,7 +470,7 @@ class Enterprises extends AdminController
 			}
 		}
 		//Budget fin yrs
-		$data['unit_budgets'][0] = 'Select budgets';
+		$data['unit_budgets'][] = 'Select budgets';
 		// $budget_id = [];
 		$unit_budgets = $enterprisesbudgetmodel->findAll();
 
@@ -444,7 +478,7 @@ class Enterprises extends AdminController
 			$data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
 		}
 		//Addl budget
-		$data['addl_budgets'][0] = 'Select budgets';
+		$data['addl_budgets'][] = 'Select budgets';
 
 		$addl_budgets = $enterprisesbudgetmodel->findAll();
 
@@ -453,16 +487,29 @@ class Enterprises extends AdminController
 		}
 		////Budget final year
 		$yearmodel = new YearModel();
-		$data['budget_fin_yrs'][0] = 'Select Budget Year';
+		$data['budget_fin_yrs'][] = 'Select Budget Year';
 
 		$budget_fin_yrs = $yearmodel->findAll();
 
 		foreach ($budget_fin_yrs as $budget_fin_yr) {
 			$data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
 		}
+
+		//Add GP url
+		$data['add_gp_url'] = admin_url('grampanchayat/add');
+		/*
+		if($data['district_id']){
+			$data['add_gp_url'] .= "district_id=".$data['district_id'];
+		}
+		if($data['block_id']){
+			$data['add_gp_url'] .= "block_id=".$data['block_id'];
+		}
+		*/
+		//Add village Url
+		$data['add_village_url'] = admin_url('village/add');
+
+		// dd($data);
+
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}
-
-
-
 }
