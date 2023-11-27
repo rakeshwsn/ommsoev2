@@ -28,5 +28,6 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
 
     //added by rakesh nayak
     $routes->get('localisation', 'Dashboard\Controllers\Localisation::localisation');
-    $routes->get('partnerdashboard', 'Dashboard\Controllers\Partnerdashboard::partnerdashboard');
+    $routes->post('partnerdashboard', 'Dashboard\Controllers\Partnerdashboard::partnerdashboard');
+    $routes->post('partnerdashboardAreacoverage', 'Dashboard\Controllers\Partnerdashboard::partnerdashboardAreacoverage');
 });
