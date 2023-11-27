@@ -46,7 +46,7 @@
             <tr>
                 <?php if ($block_id) { ?>
                     <td>
-                        <?= $blockfd->gp ?>
+                        <?= $blockfd->gp_name ?>
                     </td>
                 <?php } else if ($district_id) { ?>
                         <td>

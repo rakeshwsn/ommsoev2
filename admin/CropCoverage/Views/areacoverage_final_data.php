@@ -165,7 +165,7 @@
                                         <td>
                                     <?= $blockfd->district ?>
                                         </td>
-                                        <td>
+                                        <td class="blocks">
                                     <?= $blockfd->blocks ?>
                                         </td>
                                         <td class="total_gp">
