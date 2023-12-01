@@ -121,7 +121,6 @@ class AreaCoverageFinalData extends AdminController
         }
         $filter = [
             'season' => $this->request->getGet('season') ?? 'kharif',
-
             'district_id' => $data['district_id'],
             'block_id' => $data['block_id'],
             'year_id' => $data['year_id']
