@@ -160,6 +160,7 @@ FROM ac_crop_practices acp
             && $given_date->format('n') <= $kharif_end_month_number
         ) {
             $current_season = 'Kharif';
+
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_start_month_number . '-01');
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_end_month_number . '-30');
         } elseif (
