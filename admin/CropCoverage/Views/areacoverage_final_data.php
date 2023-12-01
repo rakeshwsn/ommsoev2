@@ -33,7 +33,7 @@
                         <label>Season</label>
                         <select class="form-control" id="season" name="season">
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                <option value="<?= $value ?>" <?php if ($value !== strtolower($current_season)) {
                                       echo 'selected';
                                   } ?>>
                                     <?= $season ?>
@@ -44,7 +44,7 @@
                     <div class="col-md-2">
                         <label>Districts</label>
                         <select class="form-control" id="district" name="district_id">
-                            <option>Select District</option>
+                            <option value="">Select District</option>
 
                             <?php foreach ($districts as $district) { ?>
                                 <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
@@ -251,7 +251,6 @@
                         <td id="allTotalNonRagi"></td>
                         <td id="allTotalFup"></td>
                         <td id="allTotalArea"></td>
-
                     </tr>
                 </tbody>
             </table>

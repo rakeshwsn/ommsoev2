@@ -308,7 +308,7 @@ $gpIds = array_map(function ($gpdata) {
 <script>
     function validateField(field, maxDigits) {
         var inputValue = field.value.trim();
-        var decimalRegex = /^\d{1,3}(?:\.\d{1,2})?$/; // Allowing up to 3 digits before the decimal and up to 2 after
+        var decimalRegex = /^\d{0,3}(?:\.\d{1,2})?$/; // Allowing up to 3 digits before the decimal and up to 2 after
 
         if (!decimalRegex.test(inputValue) || inputValue.length > maxDigits) {
             field.setCustomValidity('Please enter a valid positive decimal number with up to 2 decimal places and a maximum of 5 digits.');
