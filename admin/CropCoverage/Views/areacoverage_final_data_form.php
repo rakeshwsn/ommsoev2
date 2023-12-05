@@ -308,7 +308,7 @@ $gpIds = array_map(function ($gpdata) {
 <script>
     function validateField(field, maxDigits) {
         var inputValue = field.value.trim();
-        var decimalRegex = /^\d{0,3}(?:\.\d{1,2})?$/; // Allowing up to 3 digits before the decimal and up to 2 after
+        var decimalRegex = /^\d{0,3}(?:\.\d{1,2})?$/;
 
         if (!decimalRegex.test(inputValue) || inputValue.length > maxDigits) {
             field.setCustomValidity('Please enter a valid positive decimal number with up to 2 decimal places and a maximum of 5 digits.');
@@ -316,7 +316,7 @@ $gpIds = array_map(function ($gpdata) {
             field.setCustomValidity('');
         }
 
-        // Call the updateTotals function with the appropriate parameters
+        
         var gpId = field.dataset.gpId;
         updateTotals(gpId);
     }
@@ -329,7 +329,7 @@ $gpIds = array_map(function ($gpdata) {
         var totalNonRagiLT = 0;
         var totalNonRagiLS = 0;
 
-        // Iterate through visible number inputs with names containing "crop_data" for the specific GP
+    
         $('[name^="area[' + gpId + '][crop_data]"]:visible').each(function () {
             var cropId = $(this).data('crop-id');
             var inputValue = parseFloat($(this).val()) || 0;
@@ -351,39 +351,41 @@ $gpIds = array_map(function ($gpdata) {
             }
         });
 
-        // Sum up the values for Ragi and non-Ragi crops
+        
         var totalRagi = totalRagiSMI + totalRagiLT + totalRagiLS;
         var totalNonRagi = totalNonRagiLT + totalNonRagiLS;
 
-        // Update the total fields for the specific GP
+        
         $('#total_ragi_' + gpId).text(totalRagi.toFixed(2));
         $('#total_non_ragi_' + gpId).text(totalNonRagi.toFixed(2));
 
-        // Calculate and update the total Achievement under Demonstration for the specific GP
+        
         var totalAchDemon = totalRagi + totalNonRagi;
         $('#total_ach_demon_' + gpId).text(totalAchDemon.toFixed(2));
 
-        // Update the total Follow Up Crops field
+    
     }
 
     // Attach the focusin event handler to reset original values
-    $(document).on('focusin', '[name^="area[' + gpId + '][crop_data]"][data-crop-id]', function () {
-        $(this).data('original-value', $(this).val());
-    });
+    // Attach the focusin event handler to reset original values
+$(document).on('focusin', '[name^="area["][name$="[crop_data]"][data-crop-id]', function () {
+    $(this).data('original-value', $(this).val());
+});
 
-    // Attach the focusout and change event handlers to relevant visible input fields
-    $(document).on('focusout change', '[name^="area[' + gpId + '][crop_data]"]:visible[data-crop-id]', function () {
+// Attach the focusout and change event handlers to relevant visible input fields
+$(document).on('focusout change', '[name^="area["][name$="[crop_data]"]:visible[data-crop-id]', function () {
+    var gpId = $(this).data('gp-id');
+    updateTotals(gpId);
+});
+
+// Trigger the initial update when the page loads for each GP
+$(document).ready(function () {
+    $('[name^="area["][name$="[crop_data]"][data-crop-id]').each(function () {
         var gpId = $(this).data('gp-id');
         updateTotals(gpId);
     });
+});
 
-    // Trigger the initial update when the page loads for each GP
-    $(document).ready(function () {
-        $('[name^="area["][name$="[crop_data]"][data-crop-id]').each(function () {
-            var gpId = $(this).data('gp-id');
-            updateTotals(gpId);
-        });
-    });
 </script>
     <script>
         // Attach the oninput event handler to relevant input fields

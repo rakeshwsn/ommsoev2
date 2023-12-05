@@ -91,93 +91,64 @@ class TargetModel extends Model
         }
     }
 
-    public function viewBlockTarget($filter = array())
+    public function viewBlockTarget($filter = [])
     {
 
-        $district_id = 0;
-
-
         $sql = "SELECT
-        block_target.target_id,
-        sb.name AS block,
-        sb.id AS block_id,
-        sb.district_id,
-        block_target.year_id,
-        block_target.season,
-        block_target.RAGI AS RAGI_SMI,
-        block_target.RAGI_LT,
-        block_target.RAGI_LS,
-        block_target.LITTLE_MILLET_LT,
-        block_target.LITTLE_MILLET_LS,
-        block_target.FOXTAIL_MILLET_LT,
-        block_target.FOXTAIL_MILLET_LS,
-        block_target.SORGHUM_LT,
-        block_target.SORGHUM_LS,
-        block_target.PEARL_MILLET_LT,
-        block_target.PEARL_MILLET_LS,
-        block_target.BARNYARD_MILLET_LT,
-        block_target.BARNYARD_MILLET_LS,
-        block_target.KODO_MILLET_LT,
-        block_target.KODO_MILLET_LS,
-        followup.RAGI AS RAGI_FOLLOWUP,
-        followup.LITTLE_MILLET AS LITTLE_MILLET_FOLLOWUP,
-        followup.FOXTAIL_MILLET AS FOXTAIL_MILLET_FOLLOWUP,
-        followup.SORGHUM AS SORGHUM_FOLLOWUP,
-        followup.PEARL_MILLET AS PEARL_MILLET_FOLLOWUP,
-        followup.BARNYARD_MILLET AS BARNYARD_MILLET_FOLLOWUP,
-        followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP
-    FROM soe_blocks sb
-    LEFT JOIN (
-        SELECT
-            tm.id AS target_id,
-            tm.block_id,
-            tm.year_id,
-            tm.season,
-            MAX(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
-            MAX(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
-            MAX(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
-            MAX(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
-            MAX(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
-            MAX(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
-            MAX(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
-            MAX(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
-            MAX(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
-            MAX(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
-            MAX(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
-            MAX(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
-            MAX(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
-            MAX(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
-            MAX(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
-            MAX(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
-            MAX(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
-            MAX(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
-            MAX(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
-            MAX(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
-            MAX(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS
-        FROM ac_target_master tm
-        LEFT JOIN ac_target_area ta ON tm.id = ta.target_id
-        LEFT JOIN (SELECT *, id AS crop_id FROM ac_crops) c ON ta.crop_id = c.id
-        GROUP BY tm.block_id
-    ) block_target ON block_target.block_id = sb.id
-    LEFT JOIN (
-        SELECT
-            target_id,
-            MAX(CASE WHEN crop_id = 1 THEN followup END) AS RAGI,
-            MAX(CASE WHEN crop_id = 2 THEN followup END) AS LITTLE_MILLET,
-            MAX(CASE WHEN crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
-            MAX(CASE WHEN crop_id = 4 THEN followup END) AS SORGHUM,
-            MAX(CASE WHEN crop_id = 5 THEN followup END) AS PEARL_MILLET,
-            MAX(CASE WHEN crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
-            MAX(CASE WHEN crop_id = 7 THEN followup END) AS KODO_MILLET
-        FROM ac_target_followup_crop
-        GROUP BY target_id
-    ) followup ON block_target.target_id = followup.target_id
-    LEFT JOIN ac_target_master atm ON block_target.target_id = atm.id
-    WHERE";
-        if (!empty($filter['district_id'])) {
-            $sql .= " sb.district_id =" . $filter['district_id'];
+  block_target.target_id,
+  block.name AS block_name,
+  block.id AS block_id,
+  COALESCE(block_target.year_id , " . getCurrentYearId() . ") AS year_id,
+  COALESCE(block_target.season,'" . getCurrentSeason() . "') AS season,
+  COALESCE(block_target.RAGI_SMI, 0.00) AS RAGI_SMI,
+  COALESCE(block_target.RAGI_LT, 0.00) AS RAGI_LT,
+  COALESCE(block_target.RAGI_LS, 0.00) AS RAGI_LS,
+  COALESCE(block_target.LITTLE_MILLET_LT, 0.00) AS LITTLE_MILLET_LT,
+  COALESCE(block_target.LITTLE_MILLET_LS, 0.00) AS LITTLE_MILLET_LS,
+  COALESCE(block_target.FOXTAIL_MILLET_LS, 0.00) AS FOXTAIL_MILLET_LS,
+  COALESCE(block_target.SORGHUM_LS, 0.00) AS SORGHUM_LS,
+  COALESCE(block_target.PEARL_MILLET_LS, 0.00) AS PEARL_MILLET_LS,
+  COALESCE(block_target.BARNYARD_MILLET_LS, 0.00) AS BARNYARD_MILLET_LS,
+  COALESCE(block_target.KODO_MILLET_LS, 0.00) AS KODO_MILLET_LS,
+  COALESCE(followup.RAGI_FOLLOWUP, 0.00) AS RAGI_FOLLOWUP,
+  COALESCE(followup.LITTLE_MILLET_FOLLOWUP, 0.00) AS LITTLE_MILLET_FOLLOWUP,
+  COALESCE(followup.FOXTAIL_MILLET_FOLLOWUP, 0.00) AS FOXTAIL_MILLET_FOLLOWUP,
+  COALESCE(followup.SORGHUM_FOLLOWUP, 0.00) AS SORGHUM_FOLLOWUP,
+  COALESCE(followup.PEARL_MILLET_FOLLOWUP, 0.00) AS PEARL_MILLET_FOLLOWUP,
+  COALESCE(followup.BARNYARD_MILLET_FOLLOWUP, 0.00) AS BARNYARD_MILLET_FOLLOWUP,
+  COALESCE(followup.KODO_MILLET_FOLLOWUP, 0.00) AS KODO_MILLET_FOLLOWUP
+FROM (
+  SELECT *
+  FROM soe_blocks sb
+  WHERE"; // Add your specific conditions here
 
+        if (!empty($filter['district_id'])) {
+            $sql .= " sb.district_id = " . $filter['district_id'];
         }
+
+        $sql .= "
+) AS block
+LEFT JOIN (
+  SELECT
+    atm.id AS target_id,
+    atm.block_id,
+    COALESCE(atm.year_id, " . getCurrentYearId() . ") AS year_id,
+    COALESCE(atm.season, '" . getCurrentSeason() . "') AS season,
+    MAX(CASE WHEN ata.crop_id = 1 THEN ata.smi END) AS RAGI_SMI,
+    MAX(CASE WHEN ata.crop_id = 1 THEN ata.lt END) AS RAGI_LT,
+    MAX(CASE WHEN ata.crop_id = 1 THEN ata.ls END) AS RAGI_LS,
+    MAX(CASE WHEN ata.crop_id = 2 THEN ata.lt END) AS LITTLE_MILLET_LT,
+    MAX(CASE WHEN ata.crop_id = 2 THEN ata.ls END) AS LITTLE_MILLET_LS,
+    MAX(CASE WHEN ata.crop_id = 3 THEN ata.ls END) AS FOXTAIL_MILLET_LS,
+    MAX(CASE WHEN ata.crop_id = 4 THEN ata.ls END) AS SORGHUM_LS,
+    MAX(CASE WHEN ata.crop_id = 5 THEN ata.ls END) AS PEARL_MILLET_LS,
+    MAX(CASE WHEN ata.crop_id = 6 THEN ata.ls END) AS BARNYARD_MILLET_LS,
+    MAX(CASE WHEN ata.crop_id = 7 THEN ata.ls END) AS KODO_MILLET_LS
+  FROM ac_target_master atm
+  LEFT JOIN ac_target_area ata ON atm.id = ata.target_id
+  
+  WHERE atm.deleted_at IS NULL"; // Add your specific conditions here
+
         if (!empty($filter['year_id'])) {
             $sql .= " AND atm.year_id = " . $filter['year_id'];
         }
@@ -185,104 +156,138 @@ class TargetModel extends Model
             $sql .= " AND atm.season = '" . $filter['season'] . "'";
         }
 
-        $sql .= " AND atm.deleted_at IS NULL";
+        $sql .= "
+  GROUP BY atm.id
+) block_target ON block_target.block_id = block.id
+LEFT JOIN (
+  SELECT
+    target_id,
+    MAX(CASE WHEN crop_id = 1 THEN followup END) AS RAGI_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 2 THEN followup END) AS LITTLE_MILLET_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 3 THEN followup END) AS FOXTAIL_MILLET_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 4 THEN followup END) AS SORGHUM_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 5 THEN followup END) AS PEARL_MILLET_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 6 THEN followup END) AS BARNYARD_MILLET_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 7 THEN followup END) AS KODO_MILLET_FOLLOWUP
+  FROM ac_target_followup_crop
+  GROUP BY target_id
+) followup ON block_target.target_id = followup.target_id ORDER BY block_name
+";
         // echo $sql;
         // exit;
         return $result = $this->db->query($sql)->getResultArray();
-        // printr($result);
-        // exit;
+
     }
 
     public function getDistrictWiseData($filter = [])
     {
-        $sql = "SELECT
-  sd.name AS district,
-  sd.id AS district_id,
-  sd.no_of_block,
-  district_target.year_id,
-  district_target.season,
-  district_target.RAGI AS RAGI_SMI,
-  district_target.RAGI_LT,
-  district_target.RAGI_LS,
-  district_target.LITTLE_MILLET_LT,
-  district_target.LITTLE_MILLET_LS,
-  district_target.FOXTAIL_MILLET_LT,
-  district_target.FOXTAIL_MILLET_LS,
-  district_target.SORGHUM_LT,
-  district_target.SORGHUM_LS,
-  district_target.PEARL_MILLET_LT,
-  district_target.PEARL_MILLET_LS,
-  district_target.BARNYARD_MILLET_LT,
-  district_target.BARNYARD_MILLET_LS,
-  district_target.KODO_MILLET_LT,
-  district_target.KODO_MILLET_LS,
-  followup.RAGI AS RAGI_FOLLOWUP,
-  followup.LITTLE_MILLET AS LITTLE_MILLET_FOLLOWUP,
-  followup.FOXTAIL_MILLET AS FOXTAIL_MILLET_FOLLOWUP,
-  followup.SORGHUM AS SORGHUM_FOLLOWUP,
-  followup.PEARL_MILLET AS PEARL_MILLET_FOLLOWUP,
-  followup.BARNYARD_MILLET AS BARNYARD_MILLET_FOLLOWUP,
-  followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP
-FROM (SELECT
-    sd.id,
-    sd.name,
-    COUNT(sb.id) no_of_block
-  FROM soe_districts sd
-    LEFT JOIN soe_blocks sb
-      ON sd.id = sb.district_id
-  GROUP BY sb.district_id) sd
-  LEFT JOIN (SELECT
-      tm.id AS target_id,
-      tm.district_id,
-      tm.year_id,
-      tm.season,
-      sum(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
-      sum(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
-      sum(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
-      sum(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
-      sum(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
-      sum(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
-      sum(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
-      sum(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
-      sum(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
-      sum(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
-      sum(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
-      sum(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
-      sum(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
-      sum(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
-      sum(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
-      sum(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
-      sum(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
-      sum(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
-      sum(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
-      sum(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
-      sum(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS
-    FROM ac_target_master tm
-      LEFT JOIN ac_target_area ta
-        ON tm.id = ta.target_id
-      LEFT JOIN (SELECT
-          *,
-          id AS crop_id
-        FROM ac_crops) c
-        ON ta.crop_id = c.id
-    GROUP BY tm.district_id) district_target
-    ON district_target.district_id = sd.id
-  LEFT JOIN (SELECT
-      fc.target_id,
-      atm.district_id,
-      sum(CASE WHEN fc.crop_id = 1 THEN followup END) AS RAGI,
-      sum(CASE WHEN fc.crop_id = 2 THEN followup END) AS LITTLE_MILLET,
-      sum(CASE WHEN fc.crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
-      sum(CASE WHEN fc.crop_id = 4 THEN followup END) AS SORGHUM,
-      sum(CASE WHEN fc.crop_id = 5 THEN followup END) AS PEARL_MILLET,
-      sum(CASE WHEN fc.crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
-      sum(CASE WHEN fc.crop_id = 7 THEN followup END) AS KODO_MILLET
-    FROM ac_target_followup_crop fc
-      LEFT JOIN ac_target_master atm
-        ON fc.target_id = atm.id
-    GROUP BY atm.district_id) followup
-    ON followup.district_id=sd.id";
 
+        $sql = "SELECT
+    sd.name AS district,
+    sd.id AS district_id,
+    sd.no_of_block,
+    district_target.RAGI AS RAGI_SMI,
+    district_target.RAGI_LT,
+    district_target.RAGI_LS,
+    district_target.LITTLE_MILLET_LT,
+    district_target.LITTLE_MILLET_LS,
+    district_target.FOXTAIL_MILLET_LT,
+    district_target.FOXTAIL_MILLET_LS,
+    district_target.SORGHUM_LT,
+    district_target.SORGHUM_LS,
+    district_target.PEARL_MILLET_LT,
+    district_target.PEARL_MILLET_LS,
+    district_target.BARNYARD_MILLET_LT,
+    district_target.BARNYARD_MILLET_LS,
+    district_target.KODO_MILLET_LT,
+    district_target.KODO_MILLET_LS,
+    followup.RAGI AS RAGI_FOLLOWUP,
+    followup.LITTLE_MILLET AS LITTLE_MILLET_FOLLOWUP,
+    followup.FOXTAIL_MILLET AS FOXTAIL_MILLET_FOLLOWUP,
+    followup.SORGHUM AS SORGHUM_FOLLOWUP,
+    followup.PEARL_MILLET AS PEARL_MILLET_FOLLOWUP,
+    followup.BARNYARD_MILLET AS BARNYARD_MILLET_FOLLOWUP,
+    followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP
+FROM
+    (
+        SELECT
+            sd.id,
+            sd.name,
+            COUNT(sb.id) no_of_block
+        FROM soe_districts sd
+        LEFT JOIN soe_blocks sb ON sd.id = sb.district_id
+        GROUP BY sb.district_id
+    ) sd
+LEFT JOIN
+    (
+        SELECT
+            tm.id AS target_id,
+            tm.district_id,
+            SUM(CASE WHEN c.crop_id = 1 THEN ta.smi END) AS RAGI,
+            SUM(CASE WHEN c.crop_id = 1 THEN ta.lt END) AS RAGI_LT,
+            SUM(CASE WHEN c.crop_id = 1 THEN ta.ls END) AS RAGI_LS,
+            SUM(CASE WHEN c.crop_id = 2 THEN ta.smi END) AS LITTLE_MILLET,
+            SUM(CASE WHEN c.crop_id = 2 THEN ta.lt END) AS LITTLE_MILLET_LT,
+            SUM(CASE WHEN c.crop_id = 2 THEN ta.ls END) AS LITTLE_MILLET_LS,
+            SUM(CASE WHEN c.crop_id = 3 THEN ta.smi END) AS FOXTAIL_MILLET,
+            SUM(CASE WHEN c.crop_id = 3 THEN ta.lt END) AS FOXTAIL_MILLET_LT,
+            SUM(CASE WHEN c.crop_id = 3 THEN ta.ls END) AS FOXTAIL_MILLET_LS,
+            SUM(CASE WHEN c.crop_id = 4 THEN ta.smi END) AS SORGHUM,
+            SUM(CASE WHEN c.crop_id = 4 THEN ta.lt END) AS SORGHUM_LT,
+            SUM(CASE WHEN c.crop_id = 4 THEN ta.ls END) AS SORGHUM_LS,
+            SUM(CASE WHEN c.crop_id = 5 THEN ta.smi END) AS PEARL_MILLET,
+            SUM(CASE WHEN c.crop_id = 5 THEN ta.lt END) AS PEARL_MILLET_LT,
+            SUM(CASE WHEN c.crop_id = 5 THEN ta.ls END) AS PEARL_MILLET_LS,
+            SUM(CASE WHEN c.crop_id = 6 THEN ta.smi END) AS BARNYARD_MILLET,
+            SUM(CASE WHEN c.crop_id = 6 THEN ta.lt END) AS BARNYARD_MILLET_LT,
+            SUM(CASE WHEN c.crop_id = 6 THEN ta.ls END) AS BARNYARD_MILLET_LS,
+            SUM(CASE WHEN c.crop_id = 7 THEN ta.smi END) AS KODO_MILLET,
+            SUM(CASE WHEN c.crop_id = 7 THEN ta.lt END) AS KODO_MILLET_LT,
+            SUM(CASE WHEN c.crop_id = 7 THEN ta.ls END) AS KODO_MILLET_LS
+        FROM ac_target_master tm
+        LEFT JOIN ac_target_area ta ON tm.id = ta.target_id
+        LEFT JOIN (SELECT *, id AS crop_id FROM ac_crops) c ON ta.crop_id = c.id
+        WHERE";
+
+        if (!empty($filter['year_id'])) {
+            $sql .= " tm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND tm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= "AND tm.deleted_at IS NULL
+        GROUP BY tm.district_id
+    ) district_target ON district_target.district_id = sd.id
+LEFT JOIN
+    (
+        SELECT
+            fc.target_id,
+            atm.district_id,
+            SUM(CASE WHEN fc.crop_id = 1 THEN followup END) AS RAGI,
+            SUM(CASE WHEN fc.crop_id = 2 THEN followup END) AS LITTLE_MILLET,
+            SUM(CASE WHEN fc.crop_id = 3 THEN followup END) AS FOXTAIL_MILLET,
+            SUM(CASE WHEN fc.crop_id = 4 THEN followup END) AS SORGHUM,
+            SUM(CASE WHEN fc.crop_id = 5 THEN followup END) AS PEARL_MILLET,
+            SUM(CASE WHEN fc.crop_id = 6 THEN followup END) AS BARNYARD_MILLET,
+            SUM(CASE WHEN fc.crop_id = 7 THEN followup END) AS KODO_MILLET
+        FROM ac_target_followup_crop fc
+        LEFT JOIN ac_target_master atm ON fc.target_id = atm.id
+        WHERE";
+
+        if (!empty($filter['year_id'])) {
+            $sql .= " atm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND atm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= " AND atm.deleted_at IS NULL
+        GROUP BY atm.district_id
+    ) followup ON followup.district_id = sd.id";
+
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -444,7 +449,8 @@ LEFT JOIN (
     GROUP BY
         acc.district_id
 ) ach ON ach.district_id = sd.id ORDER BY district";
-
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResultArray();
 
     }

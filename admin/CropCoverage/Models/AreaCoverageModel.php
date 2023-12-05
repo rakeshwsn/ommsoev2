@@ -143,15 +143,18 @@ FROM ac_crop_practices acp
         $this->settings = new \Config\Settings();
 
         $kharif_start_month = getMonthById((int) $this->settings->kharif_start_month);
+
         $kharif_end_month = getMonthById((int) $this->settings->kharif_end_month);
 
         $rabi_start_month = getMonthById((int) $this->settings->rabi_start_month);
         $rabi_end_month = getMonthById((int) $this->settings->rabi_end_month);
 
         $date = $date ?: date('Y-m-d');
+
         $given_date = \DateTime::createFromFormat('Y-m-d', $date);
 
         $kharif_start_month_number = $kharif_start_month['number'];
+
         $kharif_end_month_number = $kharif_end_month['number'];
         $rabi_start_month_number = $rabi_start_month['number'];
         $rabi_end_month_number = $rabi_end_month['number'];
@@ -162,6 +165,7 @@ FROM ac_crop_practices acp
             $current_season = 'Kharif';
 
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_start_month_number . '-01');
+
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_end_month_number . '-30');
         } elseif (
             $given_date->format('n') >= $rabi_start_month_number
@@ -170,10 +174,15 @@ FROM ac_crop_practices acp
             $current_season = 'Rabi';
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_start_month_number . '-01');
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_end_month_number . '-30');
+
             if ($given_date->format('n') <= 3) {
-                $season_start_date->modify('-1 year');
-                $season_end_date->modify('-1 year');
+                $season_start_date->modify('+1 year');
+                $season_end_date->modify('+1 year');
+                //This code Added by Hemanta for rabi season
+            } elseif ($given_date->format('n') >= 11) {
+                $season_end_date->modify('+1 year');
             }
+
         } else {
             //default return values. added by rakesh - 03/10/23
             $current_season = '';
@@ -187,6 +196,7 @@ FROM ac_crop_practices acp
             'end_date' => $season_end_date,
         ];
 
+
     }
 
     public function getWeeks()
@@ -195,20 +205,25 @@ FROM ac_crop_practices acp
         $dates = $this->getCurrentYearDates();
 
         $start = $dates['start_date'];
+
         $end = $dates['end_date'];
+
         $week_start = $this->settings->start_week;
+
         $week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
 
         $output = [];
 
         while ($start && $start <= $end) {
             $day_of_week = (int) $start->format('w');
+
             if ($day_of_week === $week_start_index && $start >= $start && $start <= $end) {
                 $output[] = [
                     'start_date' => $start->format('Y-m-d'),
                     'end_date' => min($start->modify('+6 days'), $end)->format('Y-m-d')
                 ];
             }
+
             $start->modify('+1 day');
         }
 
