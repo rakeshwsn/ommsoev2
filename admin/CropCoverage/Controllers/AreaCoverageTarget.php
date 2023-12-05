@@ -55,7 +55,7 @@ class AreaCoverageTarget extends AdminController
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
 		$data['seasons'] = $this->acModel->getSeasons();
-		$data['current_season'] = "kharif";
+		$data['current_season'] = getCurrentSeason();
 		$croppractices = $this->targetModel->getPractices();
 
 		$data['target_url'] = admin_url('areacoverage/target/filter');
@@ -69,16 +69,20 @@ class AreaCoverageTarget extends AdminController
 		} else {
 			$data['district_id'] = 0;
 		}
+		$filter = [
+			'season' => $this->request->getGet('season') ?? $data['current_season'],
+			'year_id' => $this->request->getGet('year_id') ?? getCurrentYearId(),
+			'district_id' => $data['district_id']
+
+		];
+		// printr($filter);
+		// exit;
 		if ($data['district_id'] === 0) {
-			$distwisetarget = $this->targetModel->getDistrictWiseData([]);
+			$distwisetarget = $this->targetModel->getDistrictWiseData($filter);
 			// dd($distwisetarget);
 			// exit;
 		} else {
-			$blockstarget = $this->targetModel->viewBlockTarget([
-				'district_id' => $data['district_id'],
-				'season' => "kharif",
-				'year_id' => getCurrentYearId()
-			]);
+			$blockstarget = $this->targetModel->viewBlockTarget($filter);
 			// printr($blockstarget);
 			// exit;
 		}
@@ -177,8 +181,8 @@ class AreaCoverageTarget extends AdminController
 		$data['practicedata'] = $this->targetModel->getBlockTargets([
 
 			'block_id' => $data['block_id'],
-			'season' => "kharif",
-			'year_id' => getCurrentYearId()
+			'season' => $this->request->getGet('season') ?? getCurrentSeason(),
+			'year_id' => $this->request->getGet('year_id') ?? getCurrentYearId(),
 		]);
 		// printr($data['practicedata']);
 		// exit;

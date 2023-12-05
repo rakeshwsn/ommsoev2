@@ -4,48 +4,50 @@
         background-color: black;
     }
 </style>
-<div class="block">
-    <div class="block-header block-header-default">
-        <h3 class="block-title">
-            <?= $heading_title; ?>
-        </h3>
-    </div>
-    <div class="block-content block-content-full">
-        <div class="row mg-b-25">
-            <div class="col-lg-3">
-                <div class="form-group mg-b-10-force">
-                    <select name="year" id="year" class="form-control" disabled>
-                        <?php foreach ($years as $year) { ?>
-                            <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
-                                  echo 'selected';
-                              } ?>><?= $year['name'] ?>
-                            </option>
-                        <?php } ?>
-                    </select>
+<form>
+    <div class="block">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">
+                <?= $heading_title; ?>
+            </h3>
+        </div>
+        <div class="block-content block-content-full">
+            <div class="row mg-b-25">
+                <div class="col-lg-3">
+                    <div class="form-group mg-b-10-force">
+                        <select name="year" id="year" class="form-control" disabled>
+                            <?php foreach ($years as $year) { ?>
+                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
+                                      echo 'selected';
+                                  } ?>><?= $year['name'] ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="form-group mg-b-10-force">
-                    <select name="season" id="season" class="form-control">
-                        <option value="">Select Season</option>
-                        <?php foreach ($seasons as $value => $season) { ?>
-                            <option value="<?= $value ?>" <?php if ($value == $current_season) {
-                                  echo 'selected';
-                              } ?>>
-                                <?= $season ?>
-                            </option>
-                        <?php } ?>
-                    </select>
+                <div class="col-lg-3">
+                    <div class="form-group mg-b-10-force">
+                        <select name="season" id="season" class="form-control">
+
+                            <?php foreach ($seasons as $season) { ?>
+                                <option value="<?= $season ?>" <?php if ((!isset($_GET['season']) && $season == $current_season) || (isset($_GET['season']) && $season == $_GET['season']))
+                                      echo 'selected'; ?>>
+                                    <?= $season ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+
+
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3">
-                <button type="button" id="btn-filter" class="btn btn-outline btn-primary">
-                    <i class="fa fa-filter"></i> Filter</button>
-                <button type="button" id="btn-reset" class="btn btn-secondary">Reset</button>
+                <div class="col-lg-3">
+                    <button id="btn-filter" class="btn btn-outline btn-primary">
+                        <i class="fa fa-filter"></i> Filter</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 <div class="tableFixHead">
     <?php if (empty($district_id)) { ?>
         <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
@@ -397,7 +399,7 @@
             <?php foreach ($blockstarget as $data) { ?>
                 <tr>
                     <td>
-                        <?= $data["block"]; ?>
+                        <?= $data["block_name"]; ?>
                     </td>
                     <td>
                         <?= $data["RAGI_SMI"]; ?>
