@@ -128,10 +128,32 @@ if (!function_exists('getMonthIdByMonth')) {
     }
 }
 
-if (!function_exists('getMonthsArray')) {
+if (!function_exists('getMonthsUpto')) {
     function getMonthsUpto($upto_month){
         global $monthModel;
         return $monthModel->getMonthsUpto($upto_month);
+    }
+}
+
+if (!function_exists('getMonthsArray')) {
+    function getMonthsArray($till=-1){
+
+        if($till==0){
+            return [0];
+        }
+        $months = range(4,12);
+        $months = array_merge($months,[1,2,3]);
+        $data['months'] = [];
+        foreach ($months as $month) {
+            if($month!=$till){
+                $data['months'][] = $month;
+            } else {
+                $data['months'][] = $month;
+                break;
+            }
+        }
+
+        return $data['months'];
     }
 }
 
@@ -186,6 +208,7 @@ function getAllMonths(){
 function getCurrentYear(){
     return getYear(getCurrentYearId());
 }
+
 
 function getLastYear(){
     return getYear(getLastYearId());

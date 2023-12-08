@@ -40,5 +40,9 @@ class MonthModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 
-  
+	public function getCurrentMonth() {
+        $month = date('m');
+        $sql = "SELECT * FROM ".$this->table." WHERE number =".$month;
+        return $this->db->query($sql)->getFirstRow();
+	}
 }

@@ -69,12 +69,11 @@
         <div class="block-header block-header-default">
             <h3 class="block-title">Enterprise Establishment Report</h3>
             <div class="block-options">
-                <a href="" id="btn-pdf" class="btn btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
-                <a href="admin/report?request=download" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                <a href="<?= $download_pdf_url ?>" id="btn-pdf" class="btn btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
+                <a href="<?= $download_excel_url ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Excel</a>
             </div>
         </div>
         <div class="block-content block-content-full">
-
             <div class="row row-sm">
                 <div class="col-lg-12">
                     <div class="card pd-2 mg-b-5">
@@ -82,9 +81,27 @@
                             <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                                 <thead class="bg-light text-dark">
                                     <tr>
-                                        <th>
+                                        <?php if ($district_id) { ?>
+                                            <th colspan="13"  >
+                                                District: <?= $district_text; ?> ||
+                                            <?php  } ?>
+                                            <?php if ($block_id) { ?>
 
-                                        </th>
+                                                Block: <?= $block_text; ?> ||
+                                            <?php  } ?>
+                                            <?php if ($year_id) { ?>
+
+                                                Year: <?= $year_text; ?> ||
+                                            <?php  } ?>
+                                            <?php if ($month_id) { ?>
+
+                                                Month: <?= $month_text; ?>  ||
+                                        <?php  } ?>
+                                        <?php if ($management_unit_type =='management_unit_type') { ?>
+
+                                            Unit: <?= $unit_text; ?> </th>
+                                        <?php  } ?>
+
                                     </tr>
                                     <tr>
                                         <th rowspan="2">
