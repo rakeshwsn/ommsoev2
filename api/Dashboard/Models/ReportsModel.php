@@ -3778,4 +3778,12 @@ WHERE fr_upto.district_id = $district_id";
 
     return $this->db->query($sql)->getResult();
   }
+
+  public function getUserIdByName($filter = []){
+
+    $sql = "SELECT id FROM user WHERE username = '{$filter['user_name']}'";
+
+    return $this->db->query($sql)->getRow()->id;
+
+  }
 }
