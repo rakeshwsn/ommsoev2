@@ -136,14 +136,9 @@ if (!function_exists('getMonthIdByMonth')) {
     }
 }
 
-<<<<<<< HEAD
-if (!function_exists('getMonthsUpto')) {
-    function getMonthsUpto($upto_month){
-=======
 if (!function_exists('getMonthsArray')) {
     function getMonthsUpto($upto_month)
     {
->>>>>>> 7d422574007f79b88e52706f4f9b73a445c95e79
         global $monthModel;
         return $monthModel->getMonthsUpto($upto_month);
     }
