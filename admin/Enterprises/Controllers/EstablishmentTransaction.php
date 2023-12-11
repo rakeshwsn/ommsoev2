@@ -361,9 +361,6 @@ class EstablishmentTransaction extends AdminController
         );
 
         //start protection
-
-
-
         //
         $spreadsheet->setActiveSheetIndex(0);
 

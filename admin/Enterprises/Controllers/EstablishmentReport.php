@@ -5,28 +5,33 @@ namespace Admin\Enterprises\Controllers;
 use Admin\Enterprises\Models\BlockModel;
 use Admin\Enterprises\Models\DistrictModel;
 use Admin\Enterprises\Models\MonthModel;
-// use Admin\Enterprises\Models\EnterprisesBudgetModel;
+
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 // use Admin\Enterprises\Models\GpModel;
 // use Admin\Enterprises\Models\VillagesModel;
 use Admin\Enterprises\Models\YearModel;
 use App\Controllers\AdminController;
+use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-
-
 class EstablishmentReport extends AdminController
 {
 	public function index()
 	{
+		$distmodel = new DistrictModel();
+		$blockmodel = new BlockModel();
+		$yearmodel = new YearModel();
+		$monthmodel = new MonthModel();
+		$enterprisesmodel = new EnterprisesModel();
+
 		// $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 		$this->template->set('header', true);
-		// helper('form');
+
 		$enterprisesmodel = new EnterprisesModel();
 
 		$request = $this->request->getGet('request');
@@ -34,7 +39,39 @@ class EstablishmentReport extends AdminController
 		$data = [];
 
 		$data = $this->filterOptions($data);
+		//Block_text
+		$block_id = $this->request->getGet('block_id');
+		if ($block_id) {
+			$data['block_text'] = $blockmodel->find($block_id)->name;
+		}
+		//District text
+		$district_id = $this->request->getGet('district_id');
+		if ($district_id) {
+			$data['district_text'] = $distmodel->find($district_id)->name;
+		}
+		//year text
 
+		$year_id = $this->request->getGet('year_id');
+		if ($year_id) {
+			$data['year_text'] = $yearmodel->find($year_id)->name;
+		}
+		//unit text
+		$management_unit_type = $this->request->getGet('management_unit_type');
+
+		if ($management_unit_type == "fpo") {
+			$data['unit_text'] = "FPO";
+		} elseif ($management_unit_type == "shg") {
+			$data['unit_text'] = "SHG";
+		} elseif ($management_unit_type == "all") {
+			$data['unit_text'] = "FPO & SHG";
+		}
+
+
+		//month text
+		$month_id = $this->request->getGet('month_id');
+		if ($month_id) {
+			$data['month_text'] = $monthmodel->find($month_id)->name;
+		}
 		// dd($data['management_unit_type']);
 		$filter = [
 			'district_id' => $this->request->getGet('district_id'),
@@ -66,7 +103,7 @@ class EstablishmentReport extends AdminController
 				$_gp_units['total'] = $total;
 
 				$data['gpunits'][$gpunit->gp_id] = [
-				
+
 					'gp' => $gpunit->gp,
 					'g_units' => $_gp_units
 				];
@@ -89,6 +126,7 @@ class EstablishmentReport extends AdminController
 				'gp' => 'Total',
 				'g_units' => $_gp_units
 			];
+			$block_id = $this->request->getGet('block_id');
 		}
 
 		//Retrive data for blocks if district_id is present
@@ -114,6 +152,7 @@ class EstablishmentReport extends AdminController
 					'b_units' => $_block_units
 				];
 			}
+
 			//unitwise total for all district --add new row as total
 			$total_units = $_block_units = [];
 			$total = 0;
@@ -132,6 +171,12 @@ class EstablishmentReport extends AdminController
 				'block' => 'Total',
 				'b_units' => $_block_units
 			];
+
+
+			// dd($data['district_text']);
+
+
+			// dd($data);
 		} else {
 
 			$units = $enterprisesmodel->districtwiseUnits($filter);
@@ -159,7 +204,7 @@ class EstablishmentReport extends AdminController
 					'units' => $_units
 				];
 			}
-			
+
 
 			// dd($data['district_text']);
 			// dd($data['units']);
@@ -181,55 +226,75 @@ class EstablishmentReport extends AdminController
 				'district' => 'Total',
 				'units' => $_units
 			];
-		
-
-			// $data['year_text'] = $yearmodel->find($year_id)->name;
 		}
+
+
+
 		$data['unit_names'] = (new EnterprisesUnitModel)->orderBy('id')->findAll();
 
+		$data['download_excel_url'] = admin_url('report?request=download_excel') . '&' . http_build_query($filter);
+		$data['download_pdf_url'] = admin_url('report?request=download_pdf') . '&' . http_build_query($filter);
 
-		if ($request == 'download') {
-
+		// dd($data);
+		//for excel download
+		if ($request) {
 			$reader = new Html();
 			$doc = new \DOMDocument();
 			$spreadsheet = new Spreadsheet();
 			$sheetindex = 0;
+
 			$filename = 'Enterprise Establishment Report.xlsx';
-			// dd($data['unit_names']);
+
+			// dd($data);
 			$htmltable = view('Admin\Enterprises\Views\excelFormEntRpt', $data);
 			// echo $htmltable;exit;
-            $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
+			$htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
+			// dd($htmltable);
+			$worksheet = $spreadsheet->createSheet($sheetindex);
 
-            $worksheet = $spreadsheet->createSheet($sheetindex);
+			$worksheet->setTitle('Enterprise Establishment Report');
 
-            $worksheet->setTitle('Enterprise Establishment Report');
+			$reader->setSheetIndex($sheetindex);
 
-            $reader->setSheetIndex($sheetindex);
+			$spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
 
-            $spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
+			$worksheet = $spreadsheet->getActiveSheet();
 
-            $worksheet = $spreadsheet->getActiveSheet();
 
-			
-            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+			$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 
 			//
 			$spreadsheet->setActiveSheetIndex(0);
 
-			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-			header('Content-Disposition: attachment;filename="' . $filename . '"');
-			header('Cache-Control: max-age=0');
-			header('Cache-Control: max-age=1');
-			$writer = new Xlsx($spreadsheet);
-			$writer->save('php://output');
-			exit();
+			if ($request == 'download_excel') {
 
-			
+				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+				header('Content-Disposition: attachment;filename="' . $filename . '"');
+				header('Cache-Control: max-age=0');
+				header('Cache-Control: max-age=1');
+				$writer = new Xlsx($spreadsheet);
+				$writer->save('php://output');
+				exit();
+			} elseif ($request == 'download_pdf') {
+
+				$filename = 'Enterprise Establishment Report.pdf';
+
+				// Provide the download link for the generated PDF file
+				header('Content-Type: application/pdf');
+				header('Content-Disposition: attachment;filename="' . $filename . '"');
+				header('Cache-Control: max-age=0');
+				header('Cache-Control: max-age=1');
+
+				// Use PhpSpreadsheet's Dompdf writer to generate PDF
+				$writer = IOFactory::createWriter($spreadsheet, 'Mpdf');
+				$writer->save('php://output');
+
+				exit();
+			}
 		}
 
+		// dd($data);
 
-// dd($data);
-		
 		return $this->template->view('Admin\Enterprises\Views\establishmentReport', $data);
 	}
 
@@ -271,7 +336,6 @@ class EstablishmentReport extends AdminController
 			foreach ($blocks as $block) {
 				$data['blocks'][$block->id] = $block->name;
 			}
-
 		}
 
 		if ($this->request->getGet('month_id')) {
@@ -303,7 +367,7 @@ class EstablishmentReport extends AdminController
 		} else {
 			$data['unit_type'] = '';
 		}
-	
+
 
 		// dd($data);
 		return $data;
@@ -320,9 +384,6 @@ class EstablishmentReport extends AdminController
 		// printr($data);
 		return $this->response->setJSON($data);
 	}
-	public function excelDownload()
 
-	{
-		return $this->template->view('Admin\Enterprises\Views\excelFormEntRpt');
-	}
+	
 }

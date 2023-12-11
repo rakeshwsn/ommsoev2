@@ -10,26 +10,26 @@
                 <div class="row">
                     <div class="col-4">
                         <label class="form-label">Year</label>
-                        <input type="text" name="" class="form-control"  value="<?= $entranses['year_id']?>"readonly>          
+                        <input type="text" name="" class="form-control"  value=""readonly>          
                         <span id="em1" class="text-danger"></span>
 
                     </div>
                     <div class="col-4">
                         <label class="form-label">District</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['district_id']?>"readonly>                 
+                        <input type="text" name="" class="form-control" value=""readonly>                 
                         <span id="em2" class="text-danger"></span>
 
                     </div>
                     <div class="col-4">
                         <label class="form-label">Months</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['month_id']?>"readonly>                    
+                        <input type="text" name="" class="form-control" value=""readonly>                    
                         <span id="em3" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4">
                         <label class="form-label">Block</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['block_id']?>"readonly>                        
+                        <input type="text" name="" class="form-control" value=""readonly>                        
                         <span id="em6" class="text-danger"></span>
                     </div>
                     <div class="col-4">
@@ -67,7 +67,7 @@
 
     <div class="block">
         <div class="block-header block-header-default">
-            <h3 class="block-title"> Edit Transaction  Data</h3>
+            <h3 class="block-title"> Edit Data</h3>
         </div>
         <div class="block-content block-content-full">
             <div class="block">
@@ -101,7 +101,7 @@
 
                         </div>
                     </div>
-                    <div class="form-group text-right">
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
                 </form>

@@ -30,7 +30,7 @@
                     <div class="col-2">
                         <label class="form-label">Managing Unit Type</label>
                         <select class="form-control" name="management_unit_type" id="management_unit_type">
-                            <option value="all">all</option>
+                            <option value="0">all</option>
                             <option value="shg" <?= $management_unit_type == "shg" ? 'selected' : ''; ?>>SHG</option>
                             <option value="fpo" <?= $management_unit_type == "fpo" ? 'selected' : ''; ?>>FPO</option>
 
@@ -43,14 +43,14 @@
                         </select>
 
                     </div>
-                   
+
                     <div class="col-2 mt-4">
                         <button class="btn btn-primary">Submit</button>
                     </div>
-                  
+
                     <div class="col-2 mt-4">
 
-                        <a href="" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                        <a href="<?= $download_txn_excel_url ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Excel</a>
                     </div>
                 </div>
                 <?php echo form_close(); ?>
@@ -63,13 +63,44 @@
             <div class="row row-sm">
                 <div class="col-lg-12">
                     <div class="card pd-2 mg-b-5">
-                        <h2 class="text-center mg-b-10">MPR of Enterprises Established</h2>
-                        <h5 class="text-center">year : 2023-24 | month : October | district : Gajapati</h5>
-                        <div class="table-responsive">
-                            <table class="minimalistBlack mg-b-15 table-bordered1 table-striped1 border-dark" border="1">
+                        <table class="minimalistBlack mg-b-15 table-bordered1 table-striped1 border-dark" border="1">
+                            <div class=" table-responsive">
                                 <thead>
                                     <tr>
-                                        <th class="tg-8d8j" rowspan="3">Type of Unit </th>
+                                        <h2 class="text-center mg-b-10">MPR of Enterprises Established</h2>
+                                    </tr>
+                                    <tr>
+                                        <?php if ($year_id) { ?>
+                                            <th colspan="13" style="text-align:center">
+                                                Year: <?= $year_name_text; ?> ||
+                                            <?php  } ?>
+                                            <?php if ($district_id) { ?>
+
+                                                District: <?= $district_text; ?> ||
+                                            <?php  } ?>
+
+                                            <?php if ($month_id) { ?>
+
+                                                Month: <?= $month_text; ?> ||
+                                            <?php  } ?>
+
+                                            <?php if ($block_id) { ?>
+
+                                                Block: <?= $block_text; ?> ||
+                                            <?php  } ?>
+                                            <?php if ($management_unit_type) { ?>
+
+                                                Unit: <?= $managementunit_text; ?> </th>
+                                        <?php  } ?>
+
+
+                                    </tr>
+
+
+
+
+                                    <tr>
+                                        <th class=" tg-8d8j" rowspan="3">Type of Unit </th>
                                         <th class="tg-nrix text-center" colspan="3">No. of Functional Unit </th>
                                         <th class="tg-nrix text-center" colspan="6">Transaction Data </th>
                                     </tr>
@@ -89,59 +120,74 @@
                                         <th class="tg-nrix">Total Turnover (in Rs)</th>
                                         <th class="tg-nrix">Total Income (in Rs)</th>
                                     </tr>
+
                                 </thead>
-
                                 <tbody>
-
+                                    <?php foreach ($distwisetxns as $distwisetxn) { ?>
+                                        <tr>
+                                            <td><?= $distwisetxn['unit_name'] ?></td>
+                                            <td><?= $distwisetxn['total_units_upto'] ?></td>
+                                            <td><?= $distwisetxn['total_units_mon'] ?></td>
+                                            <td><?= $distwisetxn['total_units_cumm'] ?></td>
+                                            <td><?= $distwisetxn['turnover_upto'] ?></td>
+                                            <td><?= $distwisetxn['expn_upto'] ?></td>
+                                            <td><?= $distwisetxn['turnover_mon'] ?></td>
+                                            <td><?= $distwisetxn['expn_mon'] ?></td>
+                                            <td><?= $distwisetxn['turnover_cumm'] ?></td>
+                                            <td><?= $distwisetxn['expn_cumm'] ?></td>
+                                        </tr>
+                                    <?php  } ?>
                                 </tbody>
-                            </table>
-                        </div>
+
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $(document).ready(function() {
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
 
 
-            $(function() {
-                $('#districts').on('change', function() {
+        $(function() {
+            $('#districts').on('change', function() {
 
-                    var d_id = $(this).val(); // Declare d_id with var
+                var d_id = $(this).val(); // Declare d_id with var
 
-                    $.ajax({
-                        url: 'admin/enterprisesreport/blocks',
-                        data: {
-                            district_id: d_id
-                        },
-                        type: 'GET',
-                        dataType: 'JSON',
-                        beforeSend: function() {},
-                        success: function(response) {
-                            if (response.blocks) {
+                $.ajax({
+                    url: 'admin/enterprisesreport/blocks',
+                    data: {
+                        district_id: d_id
+                    },
+                    type: 'GET',
+                    dataType: 'JSON',
+                    beforeSend: function() {},
+                    success: function(response) {
+                        if (response.blocks) {
 
-                                var html = '<option value="">Select Block</option>'; // Declare html with var
-                                $.each(response.blocks, function(k, v) {
-                                    html += '<option value="' + v.id + '">' + v.name + '</option>';
-                                });
-                                $('#blocks').html(html);
-                            }
-                        },
-                        error: function() {
-                            alert('something went wrong');
-                        },
-                        complete: function() {
-
+                            var html = '<option value="">Select Block</option>'; // Declare html with var
+                            $.each(response.blocks, function(k, v) {
+                                html += '<option value="' + v.id + '">' + v.name + '</option>';
+                            });
+                            $('#blocks').html(html);
                         }
-                    });
+                    },
+                    error: function() {
+                        alert('something went wrong');
+                    },
+                    complete: function() {
 
-
-
+                    }
                 });
+
+
+
             });
+        });
 
 
 
-        })
-    </script>
+    })
+</script>
