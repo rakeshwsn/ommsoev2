@@ -3,27 +3,21 @@
         background-color: rgb(255, 0, 0);
         color: black;
     }
-
     .orange {
         background-color: rgb(250, 192, 144);
         color: black;
     }
-
     .yellow {
         background-color: rgb(255, 255, 0);
         color: black;
     }
-
     .green {
         background-color: #77933C;
         color: black;
     }
-
     .table thead th {
-
         text-transform: none !important;
     }
-
     #chart-container {
         position: relative;
         height: 100vh;

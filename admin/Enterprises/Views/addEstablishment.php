@@ -116,7 +116,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
                     <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                    <input type="text" max="999999999999.99" maxlength="14" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
+                    <input type="text" max="999999999999.99" maxlength="16" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
 
@@ -146,7 +146,7 @@ $validation = \Config\Services::validation();
                 <div class="row">
                     <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
                         <label for="Budget Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                        <input type="text" name="support_infr_amount" max="999999999999.99" maxlength="14" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
+                        <input type="text" name="support_infr_amount" max="999999999999.99" maxlength="16" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
                     </div>
                 </div>
