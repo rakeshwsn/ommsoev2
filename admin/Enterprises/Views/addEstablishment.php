@@ -54,11 +54,14 @@ $validation = \Config\Services::validation();
                 <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
                     <label for="gp_id">GP<span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <?php echo form_dropdown('gp_id', 
-                        $gps, set_value('gp_id', $gp_id), 
-                        ['class' => 'form-control', 'id' => 'gps']); ?>
+                        <?php echo form_dropdown(
+                            'gp_id',
+                            $gps,
+                            set_value('gp_id', $gp_id),
+                            ['class' => 'form-control', 'id' => 'gps']
+                        ); ?>
                         <div class="input-group-append">
-                            <a href="<?=$add_gp_url?>" class="btn btn-secondary" id="btn-add-gp">Add GP</a>
+                            <a href="<?= $add_gp_url ?>" class="btn btn-secondary" id="btn-add-gp">Add GP</a>
                         </div>
                     </div>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('gp_id'); ?></div>
@@ -75,11 +78,14 @@ $validation = \Config\Services::validation();
                 <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                     <label for="village_id">Village<span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <?php echo form_dropdown('village_id', 
-                        $villages, set_value('village_id', $village_id), 
-                        ['class' => 'form-control', 'id' => 'villages']); ?>
+                        <?php echo form_dropdown(
+                            'village_id',
+                            $villages,
+                            set_value('village_id', $village_id),
+                            ['class' => 'form-control', 'id' => 'villages']
+                        ); ?>
                         <div class="input-group-append">
-                            <a href="<?=$add_village_url?>" class="btn btn-secondary" id="btn-add-village">Add Village</a>
+                            <a href="<?= $add_village_url ?>" class="btn btn-secondary" id="btn-add-village">Add Village</a>
                         </div>
                     </div>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('village_id'); ?></div>
@@ -108,7 +114,7 @@ $validation = \Config\Services::validation();
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget') ? 'is-invalid' : '' ?>">
                     <label for="Established Unit Budget Head">Established Unit Budget Head<span class="text-danger">*</span></label>
-                    <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder=" " value="<?= set_value('unit_budget', $unit_budget) ?>">
+                    <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder="Enter Budget " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
 
@@ -151,8 +157,8 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="form-group">
+            <div class="row text-right">
+                <div class="form-group ">
                     <button type="submit" class="btn btn-primary" id="submit">Submit</button>
                     <a href="admin/enterprises/cancel" class="btn btn-primary">Cancel</a>
                 </div>
@@ -287,16 +293,16 @@ $validation = \Config\Services::validation();
         $('#is_support_basis_infr').trigger('change');
 
         //add gp btn click
-        $('#btn-add-gp').click(function(e){
+        $('#btn-add-gp').click(function(e) {
             e.preventDefault();
 
             url = $(this).attr('href');
             dist = $('#districts').val();
             block = $('#blocks').val();
 
-            url += "?district_id="+dist+"&block_id="+block;
+            url += "?district_id=" + dist + "&block_id=" + block;
 
-            var popupWindow = window.open(url,"Add GP","width=500,height=500");
+            var popupWindow = window.open(url, "Add GP", "width=500,height=500");
             if (popupWindow) {
                 //Browser has allowed it to be opened
                 popupWindow.focus();
@@ -305,7 +311,7 @@ $validation = \Config\Services::validation();
                 alert('Please allow popups for this website');
             }
             var popupTimer = setInterval(function() {
-            if (popupWindow.closed) {
+                if (popupWindow.closed) {
                     clearInterval(popupTimer);
                     // console.log('Popup window closed.');
                     // Add your event handling logic here
@@ -314,7 +320,7 @@ $validation = \Config\Services::validation();
             }, 500);
         });
         //add village btn click
-        $('#btn-add-village').click(function(e){
+        $('#btn-add-village').click(function(e) {
             e.preventDefault();
 
             url = $(this).attr('href');
@@ -322,9 +328,9 @@ $validation = \Config\Services::validation();
             block = $('#blocks').val();
             gp = $('#gps').val();
 
-            url += "?district_id="+dist+"&block_id="+block+"&gp_id="+gp;
+            url += "?district_id=" + dist + "&block_id=" + block + "&gp_id=" + gp;
 
-            var popupWindow = window.open(url,"Add Village","width=500,height=500");
+            var popupWindow = window.open(url, "Add Village", "width=500,height=500");
             if (popupWindow) {
                 //Browser has allowed it to be opened
                 popupWindow.focus();
@@ -333,7 +339,7 @@ $validation = \Config\Services::validation();
                 alert('Please allow popups for this website');
             }
             var popupTimer = setInterval(function() {
-            if (popupWindow.closed) {
+                if (popupWindow.closed) {
                     clearInterval(popupTimer);
                     // console.log('Popup window closed.');
                     // Add your event handling logic here
@@ -401,12 +407,21 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
+<<<<<<< HEAD
+                date_estd:{
+                    date:true
+                },
+                mou_date:{
+                    date:true
+=======
                 date_estd: {
                     required: true,
                 },
                 mou_date: {
                     required: true,
+>>>>>>> 7d422574007f79b88e52706f4f9b73a445c95e79
                 }
+
             },
             messages: {
                 managing_unit_name: {
@@ -421,6 +436,37 @@ $validation = \Config\Services::validation();
                 unit_budget: {
                     decimal: "Please enter only decimal numbers."
                 },
+<<<<<<< HEAD
+                unit_id: {
+                    required: "This field is required.",
+
+                },
+                district_id: {
+                    required: "This field is required.",
+
+                },
+                block_id: {
+                    required: "This field is required.",
+
+                },
+                gp_id: {
+                    required: "This field is required.",
+
+                },
+                village_id: {
+                    required: "This field is required.",
+
+                },
+                date_estd: {
+                    date: "Year must be greater than 2000",
+
+                },
+                mou_date: {
+                    date: "Year must be greater than 2000",
+
+                }
+=======
+>>>>>>> 7d422574007f79b88e52706f4f9b73a445c95e79
             },
             errorPlacement: function(error, element) {
                 //error.insertAfter(element); // Places the error message after the element
@@ -435,16 +481,16 @@ $validation = \Config\Services::validation();
     })
     $(document).ready(function() {
         jQuery.validator.addMethod("lettersonly", function(value, element) {
-            return this.optional(element) || /^[a-zA-Z\s]+$/.test(value);
+            return this.optional(element) || /^(?!.*(.)\1{3})[a-zA-Z\s]{1,40}$/.test(value);
         }, "Please enter only letters and spaces.");
         jQuery.validator.addMethod("digitsOnly", function(value, element) {
-            return this.optional(element) || /^\d{10}$/.test(value);
+            return this.optional(element) || /^(?:\+?91|0)?[6789]\d{9}$/.test(value);
         }, "Please enter exactly 10 digits.");
         jQuery.validator.addMethod("decimal", function(value, element) {
             return this.optional(element) || /^\d+\.\d$/.test(value);
         }, "Please enter decimal number ");
         jQuery.validator.addMethod("ruppes", function(value, element) {
-            return this.optional(element) || /^\d+\.\d+$/.test(value);
+            return this.optional(element) || /^\d{1,10}\.\d{1,2}$/.test(value);
         }, "Please enter  ruppes (ex-12.00) ");
         jQuery.validator.addMethod("ddrequired", function(value, element) {
             return this.optional(element) || (parseFloat(value) > 0);

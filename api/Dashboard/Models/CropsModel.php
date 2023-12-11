@@ -1,20 +1,19 @@
 <?php
-
-namespace Admin\Enterprises\Models;
+namespace Api\Dashboard\Models;
 
 use CodeIgniter\Model;
 
-class YearModel extends Model
+class CropsModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'dashboard_years';
+	protected $table                = 'ac_crops';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
 	protected $returnType           = 'object';
-    protected $useSoftDeletes        = false;
-    protected $protectFields        = false;
-//	protected $allowedFields        = [];
+	protected $useSoftDelete        = false;
+	protected $protectFields        = true;
+	protected $allowedFields        = [];
 
 	// Dates
 	protected $useTimestamps        = false;
@@ -24,7 +23,7 @@ class YearModel extends Model
 	protected $deletedField         = 'deleted_at';
 
 	// Validation
-    protected $validationRules      = [];
+	protected $validationRules      = [];
 	protected $validationMessages   = [];
 	protected $skipValidation       = false;
 	protected $cleanValidationRules = true;
@@ -40,11 +39,28 @@ class YearModel extends Model
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 
-	public function getCurrentYear() {
-        $date = date('Y-m-d');
-        $sql = "SELECT * FROM ".$this->table." WHERE DATE('$date') BETWEEN DATE(start_date) AND DATE(end_date)";
-        return $this->db->query($sql)->getFirstRow();
-	}
+	public function AddCrops($data) {
 
-	
+    $cropsdata=array(
+        "crops"=>$data['crops'],
+
+    );
+    $this->db->table('ac_crops')->insert($cropsdata);
 }
+    public function GetCrops() {
+        $builder = $this->db->table('ac_crops');
+        $crops   = $builder->get()->getResult();
+
+        $season_data = [];
+        foreach($crops as $crop){
+            $season_data[] = [
+            	'id'=> $crop->id,
+            	'crops' => $crop->crops,
+            ];
+        }
+       return $season_data;
+
+    }
+
+}
+?>

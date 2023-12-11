@@ -54,9 +54,14 @@ class AreaCoverageFinalData extends AdminController
         $data['permission_add'] = $this->user->agency_type_id;
         $data['heading_title'] = lang('Area Coverage Final Data');
         $data['years'] = getAllYears();
-        $data['year_id'] = getCurrentYearId();
+        // $data['year_id'] = getCurrentYearId();
         $data['seasons'] = $this->acModel->getSeasons();
         $data['current_season'] = strtolower(getCurrentSeason());
+        // printr($data['current_season']);
+        // exit;
+        // $data['uncurrent_season'] = strtolower(getUnCurrentSeason());
+        // printr($data['uncurrent_season']);
+        // exit;
         $data['get_blocks'] = Url::getBlocks;
         $data['get_blocks'] = Url::getBlocks;
         $data['district_id'] = '';
@@ -68,7 +73,9 @@ class AreaCoverageFinalData extends AdminController
             $data['district_id'] = 0;
         }
 
+
         $data['blocks'] = [];
+
         if ($data['district_id']) {
             $data['blocks'] = ($this->blockModel)->where('district_id', $data['district_id'])
                 ->orderBy('name')->asArray()->findAll();
@@ -81,7 +88,11 @@ class AreaCoverageFinalData extends AdminController
         } else {
             $data['block_id'] = 0;
         }
-
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+        } else {
+            $data['year_id'] = getCurrentYearId();
+        }
         $params = 'year_id=' . $this->request->getGet('yaer_id') ?? $data['year_id'];
         $params .= '&season=' . $data['current_season'];
         $params .= '&district_id=' . $data['district_id'];
@@ -109,10 +120,10 @@ class AreaCoverageFinalData extends AdminController
             $data['districts'] = ($this->districtModel)->orderBy('name')->asArray()->find();
         }
         $filter = [
-            'season' => $this->request->getGet('season') ?? $data['current_season'],
+            'season' => $this->request->getGet('season') ?? 'kharif',
             'district_id' => $data['district_id'],
             'block_id' => $data['block_id'],
-            'year_id' => $this->request->getGet('year_id') ?? $data['year_id'],
+            'year_id' => $data['year_id']
 
         ];
         // printr($filter);

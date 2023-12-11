@@ -33,7 +33,7 @@
                         <label>Season</label>
                         <select class="form-control" id="season" name="season">
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                <option value="<?= $value ?>" <?php if ($value !== strtolower($current_season)) {
                                       echo 'selected';
                                   } ?>>
                                     <?= $season ?>
@@ -44,7 +44,7 @@
                     <div class="col-md-2">
                         <label>Districts</label>
                         <select class="form-control" id="district" name="district_id">
-                            <option>Select District</option>
+                            <option value="">Select District</option>
 
                             <?php foreach ($districts as $district) { ?>
                                 <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
@@ -165,7 +165,7 @@
                                         <td>
                                     <?= $blockfd->district ?>
                                         </td>
-                                        <td>
+                                        <td class="blocks">
                                     <?= $blockfd->blocks ?>
                                         </td>
                                         <td class="total_gp">
@@ -251,7 +251,6 @@
                         <td id="allTotalNonRagi"></td>
                         <td id="allTotalFup"></td>
                         <td id="allTotalArea"></td>
-
                     </tr>
                 </tbody>
             </table>
@@ -305,7 +304,7 @@
             // Assign the sum to the specified total element
             var totalElement = document.getElementById(totalId);
             if (totalElement) {
-                totalElement.textContent = sum.toFixed(2); // Adjust the precision as needed
+                totalElement.textContent = sum.toFixed(); // Adjust the precision as needed
             }
         }
 

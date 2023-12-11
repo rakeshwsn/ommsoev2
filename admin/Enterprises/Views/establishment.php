@@ -51,7 +51,7 @@
 
 
                     </div>
-                    <div class="col-2 mt-4">
+                    <div class="col-2 mt-4 ">
                         <button class="btn btn-primary">Submit</button>
                     </div>
                 </div>

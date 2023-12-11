@@ -1,8 +1,8 @@
 <table class="table custom-table " id="txn-table">
     <thead>
-        <tr>
+        <tr class="highlight-heading1">
             <?php if ($block_id) { ?>
-                <th rowspan="3">GP</th>
+                <th rowspan=" 3">GP</th>
             <?php } else if ($district_id) { ?>
                     <th rowspan="3">Block</th>
                     <th rowspan="3">Total GPs</th>
@@ -22,7 +22,7 @@
             <th rowspan="3">Total Follow up Crops</th>
             <th rowspan="3">Total Area </th>
         </tr>
-        <tr>
+        <tr class="highlight-heading2">
             <?php foreach ($crop_practices as $crop_id => $practices): ?>
                 <th colspan="<?= count($practices) ?>">
                     <?= $crops[$crop_id] ?>
@@ -31,7 +31,7 @@
             <th rowspan="2">Total Ragi</th>
             <th rowspan="2">Total Non-Ragi </th>
         </tr>
-        <tr>
+        <tr class="highlight-heading3">
             <?php foreach ($crop_practices as $crop_id => $practices): ?>
                 <?php foreach ($practices as $practice): ?>
                     <th>
@@ -46,7 +46,7 @@
             <tr>
                 <?php if ($block_id) { ?>
                     <td>
-                        <?= $blockfd->gp ?>
+                        <?= $blockfd->gp_name ?>
                     </td>
                 <?php } else if ($district_id) { ?>
                         <td>
