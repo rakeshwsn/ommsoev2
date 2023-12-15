@@ -163,7 +163,7 @@ FROM ac_crop_practices acp
             && $given_date->format('n') <= $kharif_end_month_number
         ) {
             $current_season = 'Kharif';
-
+            $uncurrent_season = 'Rabi';
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_start_month_number . '-01');
 
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_end_month_number . '-30');
@@ -172,6 +172,7 @@ FROM ac_crop_practices acp
             || $given_date->format('n') <= $rabi_end_month_number
         ) {
             $current_season = 'Rabi';
+            $uncurrent_season = 'Kharif';
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_start_month_number . '-01');
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_end_month_number . '-30');
 
@@ -192,6 +193,7 @@ FROM ac_crop_practices acp
 
         return [
             'season' => $current_season,
+            'aftseason' => $uncurrent_season,
             'start_date' => $season_start_date,
             'end_date' => $season_end_date,
         ];

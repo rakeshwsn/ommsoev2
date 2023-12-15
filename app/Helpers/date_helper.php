@@ -293,7 +293,17 @@ function getYearIDByYear($year)
 function getCurrentSeason()
 {
     $cy = (new \Admin\CropCoverage\Models\AreaCoverageModel())->getCurrentYearDates();
+    //printr($cy);
+    // exit;
     return $cy['season'];
+}
+//Added by hemant
+function getAftCurrentSeason()
+{
+    $cy = (new \Admin\CropCoverage\Models\AreaCoverageModel())->getCurrentYearDates();
+    // printr($cy);
+    // exit;
+    return $cy['aftseason'];
 }
 
 
