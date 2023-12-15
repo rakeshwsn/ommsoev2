@@ -7,6 +7,29 @@
 
         </tr>
         <tr>
+            <?php if ($district_id) { ?>
+                <th colspan="15" style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; ">
+                    District: <?= $district_text; ?> ||
+                <?php  } ?>
+                <?php if ($block_id) { ?>
+
+                    Block: <?= $block_text; ?> ||
+                <?php  } ?>
+                <?php if ($year_id) { ?>
+
+                    Year: <?= $year_text; ?> ||
+                <?php  } ?>
+                <?php if ($month_id) { ?>
+
+                    Month: <?= $month_text; ?> ||
+                <?php  } ?>
+                <?php if ($management_unit_type =='management_unit_type') { ?>
+
+                    Unit: <?= $unit_text; ?> </th>
+            <?php  } ?>
+
+        </tr>
+        <tr>
             <td style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="15">
                 Type and number of units
             </td>

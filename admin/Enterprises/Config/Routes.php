@@ -45,8 +45,16 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     // $routes->post('incentive/searchall', 'Incentive\Controllers\Incentive::searchall');
     $routes->get('report', 'Enterprises\Controllers\EstablishmentReport::index');
     $routes->add('enterprisesreport/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
-    $routes->get('esttransreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    
+    $routes->get('enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    $routes->add('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
+
     // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');
+    $routes->add('demo', 'Enterprises\Controllers\EstablishmentReport::demo');
+    $routes->add('estmaster', 'Enterprises\Controllers\EnterprisesMaster::index');
+    $routes->add('distwisethr', 'Enterprises\Controllers\DistWiseThr::index');
+    
+    $routes->add('dwlndthr', 'Enterprises\Controllers\DistWiseThr::download_thr');
 
 
 });

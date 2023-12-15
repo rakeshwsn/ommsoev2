@@ -1,25 +1,19 @@
 <?php
-$user  = service('user');
-//printr($user->getId());
+    $user  = service('user');
 ?>
 <div class="block">
 <form id="formfilter">
     <div class="block">
         <div class="block-header block-header-default">
-            <!-- <h3 class="block-title">Data Filter</h3> -->
+            <h3 class="block-title"><?php echo $heading_title; ?></h3>
+            <div class="block-options">
+                <a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
+                <?php //$user->district_id?>
+                <a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
+            </div>
         </div>
-        <div class="block-header block-header-default">
-		<h3 class="block-title"><?php echo $heading_title; ?></h3>
-		<div class="block-options">
-			<a href="<?php echo $addform; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary">Add Incentive</i></a>
-            <?php //$user->district_id?>
-			<a href="<?php echo $searchview; ?>" data-toggle="tooltip" title="<?php echo $button_view; ?>" class="btn btn-primary">View All Incentive</i></a>
-          
-		</div>
-	</div>
     </div>
     <div class="block">
-   
         <div class="block-content block-content-full">
             <div class="row">
                 <div class="col-md-12">

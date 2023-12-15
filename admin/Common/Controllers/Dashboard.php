@@ -392,7 +392,8 @@ class Dashboard extends AdminController
         //$data['cb'] = $this->reportModel->getClosingBalanceTotal($filter);
 
         $data['upload_status'] = $this->upload_status([
-            'district_id' => $this->user->district_id
+            'district_id' => $this->user->district_id,
+            'fund_agency_id' => $this->user->fund_agency_id
         ]);
 
         $this->pendingUploads($data);
@@ -404,9 +405,7 @@ class Dashboard extends AdminController
 
     protected function upload_status($filter = [])
     {
-
         $data = $this->getUploadStatus($filter);
-
         return view('Admin\Reports\Views\upload_status', $data);
     }
 
