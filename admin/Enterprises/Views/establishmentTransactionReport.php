@@ -48,23 +48,25 @@
                         <button class="btn btn-primary">Submit</button>
                     </div>
 
-                    <div class="col-2 mt-4">
-
-                        <a href="<?= $download_txn_excel_url ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Excel</a>
-                    </div>
+                  
                 </div>
                 <?php echo form_close(); ?>
             </div>
         </div>
     </div>
     <div class="block">
+        <div class="block-header block-header-default">
+            <h3 class="block-title">Enterprise Establishment Transaction Report</h3>
+            <div class="block-options">
+                <a href="<?=$download_txn_excel_url ?>" id="btn-pdf" class="btn btn-outline-danger"><i class="fa fa-file-pdf-o"></i> Download Excel</a>
+            </div>
+        </div>
         <div class="block-content block-content-full">
-
             <div class="row row-sm">
                 <div class="col-lg-12">
                     <div class="card pd-2 mg-b-5">
-                        <table class="minimalistBlack mg-b-15 table-bordered1 table-striped1 border-dark" border="1">
-                            <div class=" table-responsive">
+                        <div class="table-responsive">
+                            <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                                 <thead>
                                     <tr>
                                         <h2 class="text-center mg-b-10">MPR of Enterprises Established</h2>

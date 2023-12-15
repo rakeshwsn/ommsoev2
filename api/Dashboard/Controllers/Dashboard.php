@@ -78,7 +78,7 @@ class Dashboard extends ResourceController
 			$filter['district_id'] = $this->request->getGet('district_id');
 			$district_id =  $this->request->getGet('district_id');
 		}
-
+		// dd($filter);
 		$procures = $procuremodel->getYearwisedata($filter);
 
 		$data['pyears'] = [];
@@ -236,7 +236,7 @@ class Dashboard extends ResourceController
 		$odmapdatas = $odmapmodel->getestablishmentmap();
 
 		$data['heading'] = 'Scale of Odisha Millets Mission';
-	
+
 		foreach ($odmapdatas as $mapdata) {
 			$data['data'][] = [
 				'district_id' => $mapdata->district_id,
@@ -430,12 +430,22 @@ class Dashboard extends ResourceController
 	}
 	public function currentyearchart()
 	{
+		$yearModel = new YearModel();
 
-		$districtmodel = new DistrictModel();
 		$currentyeardata = new CurrentYearChartModel();
+		$filter = [];
+		$year_id = 0;
 
-		$crntyrdatas = $currentyeardata->getcurrentyeardata();
+		if ($this->request->getGet('year_id') && $this->request->getGet('year_id') > 0) {
+			$data['year_id'] = $this->request->getGet('year_id');
 
+			$filter['year_id'] = $this->request->getGet('year_id');
+			$year_id =  $this->request->getGet('year_id');
+		}
+dd($filter);
+// dd($year_id);
+		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
+		
 		$data['currentdistrict'] = [];
 		$data['currentfarmers'] = [];
 		$data['currentachievements'] = [];

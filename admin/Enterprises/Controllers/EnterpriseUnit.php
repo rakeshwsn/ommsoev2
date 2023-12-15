@@ -13,10 +13,12 @@ class EnterpriseUnit extends AdminController
     {
         $this->enterprisesunitmodel = new EnterprisesUnitModel();
     }
+
     public function index()
     {
         return $this->getListForm();
     }
+
     private function getListForm()
     {
         $this->uri->setSilent();
@@ -32,9 +34,8 @@ class EnterpriseUnit extends AdminController
 
         if ($id && ($this->request->getMethod(true) != 'POST')) {
             $unit_info = $this->enterprisesunitmodel->find($id);
-            //printr($unit_info);
+            // printr($unit_info);
         }
-
         foreach ($this->enterprisesunitmodel->getFieldNames('enterprises_units') as $field) {
             if ($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
@@ -44,8 +45,24 @@ class EnterpriseUnit extends AdminController
                 $data[$field] = '';
             }
         }
-
+       
         $data['form'] = $this->getForm($data);
+
+        $units = $this->enterprisesunitmodel->getAll();
+
+        // for adding action to the result set
+        foreach($units as &$unit){
+            $action  = '<div class="btn-group btn-group-sm pull-right">';
+            $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterpriseunit/edit/' . $unit['id']) . '"><i class="fa fa-pencil"></i></a>';
+            
+            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterpriseunit/delete/' . $unit['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+            $action .= '</div>';
+
+            $unit['action'] = $action;
+        }
+        
+        $data['e_units'] = $units;
+       
         echo $this->template->view('Admin\Enterprises\Views\enterpriseUnit', $data);
     }
 
@@ -84,7 +101,7 @@ class EnterpriseUnit extends AdminController
                 $action
             );
         }
-        //printr($datatable);
+        // dd($datatable);
         $json_data = array(
             "draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
             "recordsTotal"    => intval($totalData),

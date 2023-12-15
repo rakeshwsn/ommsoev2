@@ -41,5 +41,11 @@ class EnterprisesTransactionModel extends Model
   protected $afterDelete          = [];
 
 
+  public function isExists($filter){
+    $builder = $this->db->table('enterprises_transaction');
+                $res = $builder->where($filter)->get();
+                return $res->getResult();
+  }
+
 
 }
