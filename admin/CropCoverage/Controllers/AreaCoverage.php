@@ -61,7 +61,7 @@ class AreaCoverage extends AdminController
 
         $data['currentDay'] = date('l');
 
-        $data['isActiveDay'] = in_array($data['currentDay'], array('Tuesday', 'Wednesday', 'Thursday', 'Friday'));
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'));
 
         $dates = $this->areacoveragemodel->getWeekDate();
 

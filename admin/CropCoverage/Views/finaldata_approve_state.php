@@ -5,12 +5,6 @@
                 <h3 class="block-title">
                     <?= $heading_title; ?>
                 </h3>
-                <div class="block-options">
-                    <?php if ($permission_add == 7): ?>
-                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
-                            class="btn btn-primary ajaxaction">Add/Edit</a>
-                    <?php endif; ?>
-                </div>
             </div>
             <div class="block-content block-content-full">
                 <div class="row">
@@ -77,12 +71,7 @@
 <div class="block">
     <div class="block-header block-header-default  bg-primary">
         <h3 class="block-title">View Area Coverage Final Data</h3>
-        <div class="block-options">
-            <a href="<?= $download_url ?>" class="btn btn-secondary" data-toggle="tooltip"
-                data-original-title="Download">
-                <i class="si si-cloud-download"></i>
-            </a>
-        </div>
+
     </div>
     <div class="block-content block-content-full">
         <div class="tableFixHead">
@@ -110,6 +99,8 @@
                             <th rowspan="3">Farmer covered under Follow Up Crop</th>
                             <th rowspan="3">Total Follow up Crops</th>
                             <th rowspan="3">Total Area </th>
+                            <th rowspan="3">Status</th>
+                            <th rowspan="3">Action</th>
                         </tr>
                         <tr>
                             <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -217,6 +208,16 @@
                                 </td>
                                 <td class="all-total-area">
                                     <?= $blockfd->ragi_total_smi + $blockfd->ragi_total_lt + $blockfd->ragi_ls + $blockfd->little_millet_lt + $blockfd->little_millet_ls + $blockfd->foxtail_millet_ls + $blockfd->sorghum_ls + $blockfd->kodo_millet_ls + $blockfd->barnyard_millet_ls + $blockfd->pearl_millet_ls + $blockfd->total_fup ?>
+                                </td>
+                                <td>
+                                    <label class="badge badge-<?= $blockfd->status_color; ?>">
+                                        <?= $blockfd->status; ?>
+                                    </label>
+                                </td>
+                                <td style="display: flex;">
+                                    <div class="btn-group btn-group-sm pull-right">
+                                        <?= $blockfd->action; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
