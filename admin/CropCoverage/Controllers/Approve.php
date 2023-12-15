@@ -9,6 +9,8 @@ use Admin\CropCoverage\Models\PracticesModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
 
+use function GuzzleHttp\Psr7\_parse_message;
+
 class Approve extends AdminController
 {
     private $error = array();
@@ -17,6 +19,7 @@ class Approve extends AdminController
     private $districtModel;
     private $cropsModel;
     private $practicesModel;
+    private $areacoveragemodel;
 
     function __construct()
     {
@@ -88,6 +91,10 @@ class Approve extends AdminController
         $acModel = new AreaCoverageModel();
         //update status
         if ($this->request->getMethod(1) == 'POST') {
+            echo "<pre>";
+            print_r($_POST);
+            echo "</pre>";
+            exit;
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
@@ -254,6 +261,8 @@ class Approve extends AdminController
 
         $data['show_approval'] = false;
         if ($this->user->district_id != $district_id) {
+            // echo "hello";
+            // exit;
             $data['show_approval'] = true;
             $data['reject_url'] = admin_url('areacoverage/approve/reject');
             $form_data = $this->getForm();
@@ -450,7 +459,8 @@ class Approve extends AdminController
 
         $district_status = $acModel->where('block_id', $block_id)
             ->where('start_date', $start_date)->first();
-
+        // printr($district_status);
+        // exit;
         $data['status'] = '';
         $data['remarks'] = '';
         $data['status_color'] = '';
@@ -535,7 +545,8 @@ class Approve extends AdminController
         ];
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
-
+        // printr($blocks);
+        // exit;
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
@@ -588,7 +599,8 @@ class Approve extends AdminController
                 'status_color' => $this->colors[$status],
                 'action' => $action,
             ];
-
+            // printr($data['districts']);
+            // exit;
             //calc total
             $total_blocks += (int) $block->total_blocks;
             $total_gps += (int) $block->total_gps;

@@ -70,7 +70,7 @@ class FinalDataModel extends Model
         
       fd.id,
 COALESCE(fd.year_id, " . getCurrentYearId() . ") AS year_id,
-      COALESCE(fd.season, '" . getCurrentSeason() . "') AS season,
+      COALESCE(fd.season, '" . getAftCurrentSeason() . "') AS season,
   gp.id AS gp_id,
   gp.name,
   COALESCE(no_of_village, 0) AS no_of_village,
@@ -100,7 +100,7 @@ LEFT JOIN (
   SELECT
   afdm.id,
    COALESCE(afdm.year_id, " . getCurrentYearId() . ") AS year_id,
-        COALESCE(afdm.season, '" . getCurrentSeason() . "') AS season,
+        COALESCE(afdm.season, '" . getAftCurrentSeason() . "') AS season,
     afdm.gp_id,
     afdm.no_of_village,
     afdm.farmers_covered_under_demonstration,
@@ -123,11 +123,11 @@ LEFT JOIN (
     }
 
     if (empty($filter['season'])) {
-      $filter['season'] = getCurrentSeason();
+      $filter['season'] = getAftCurrentSeason();
     }
 
     $sql .= " AND COALESCE(afdm.year_id, " . getCurrentYearId() . ") = " . $filter['year_id'];
-    $sql .= " AND COALESCE(afdm.season, '" . getCurrentSeason() . "') = '" . $filter['season'] . "'";
+    $sql .= " AND COALESCE(afdm.season, '" . getAftCurrentSeason() . "') = '" . $filter['season'] . "'";
 
 
 
@@ -297,11 +297,11 @@ order by sg.name";
   t1.block_id,
   t1.block,
   t1.total_gp,
-  t2.block_id,
   t2.total_village,
   t2.total_demon_farmer,
   t2.total_follow_farmer,
   t2.total_fup,
+  t2.status,
   SUM(CASE WHEN t3.crops = 'Ragi' THEN t3.smi END) AS ragi_total_smi,
   SUM(CASE WHEN t3.crops = 'Ragi' THEN t3.lt END) AS ragi_total_lt,
   SUM(CASE WHEN t3.crops = 'Ragi' THEN t3.ls END) AS ragi_ls,
@@ -331,6 +331,7 @@ LEFT JOIN (
   SELECT
     afdm.id,
     afdm.block_id,
+    afdm.status,
     SUM(afdm.no_of_village) AS total_village,
     SUM(afdm.farmers_covered_under_demonstration) AS total_demon_farmer,
     SUM(afdm.farmers_covered_under_followup) AS total_follow_farmer,
@@ -342,7 +343,8 @@ LEFT JOIN (
       SUM(afdm.fup_km) +
       SUM(afdm.fup_bm) +
       SUM(afdm.fup_pm)
-    ) AS total_fup
+    ) AS total_fup  
+    
   FROM ac_final_data_master afdm
   WHERE ";
     if (!empty($filter['district_id'])) {
@@ -406,9 +408,12 @@ GROUP BY t1.block_id
     $sql = "SELECT
   sd.id,
   sd.name AS district,
+ 
   COALESCE(block_data.block_count, 0) AS blocks,
   COALESCE(gp_data.gp_count, 0) AS gps,
   COALESCE(demonstration_data.total_village, 0) AS total_village,
+  COALESCE(demonstration_data.season,'" . getAftCurrentSeason() . "') AS season,
+  COALESCE(demonstration_data.year_id , " . getCurrentYearId() . ") AS year_id,  
   COALESCE(demonstration_data.total_demon_farmer, 0) AS total_demon_farmer,
   COALESCE(demonstration_data.total_follow_farmer, 0) AS total_follow_farmer,
   COALESCE(demonstration_data.total_fup, 0) AS total_fup,
@@ -421,7 +426,8 @@ GROUP BY t1.block_id
   SUM(CASE WHEN t3.crops = 'Sorghum' THEN t3.ls END) AS sorghum_ls,
   SUM(CASE WHEN t3.crops = 'Kodo Millet' THEN t3.ls END) AS kodo_millet_ls,
   SUM(CASE WHEN t3.crops = 'Barnyard Millet' THEN t3.ls END) AS barnyard_millet_ls,
-  SUM(CASE WHEN t3.crops = 'Pearl Millet' THEN t3.ls END) AS pearl_millet_ls
+  SUM(CASE WHEN t3.crops = 'Pearl Millet' THEN t3.ls END) AS pearl_millet_ls,
+  demonstration_data.status AS status
 FROM soe_districts sd
   LEFT JOIN (SELECT
       district_id,
@@ -437,10 +443,13 @@ FROM soe_districts sd
     ON sd.id = gp_data.district_id
   LEFT JOIN (SELECT
       afdm.district_id,
+      afdm.season,
+      afdm.year_id,
       SUM(afdm.no_of_village) AS total_village,
       SUM(afdm.farmers_covered_under_demonstration) AS total_demon_farmer,
       SUM(afdm.farmers_covered_under_followup) AS total_follow_farmer,
-      SUM(afdm.fup_ragi + afdm.fup_lm + afdm.fup_fm + afdm.fup_sorghum + afdm.fup_km + afdm.fup_bm + afdm.fup_pm) AS total_fup
+      SUM(afdm.fup_ragi + afdm.fup_lm + afdm.fup_fm + afdm.fup_sorghum + afdm.fup_km + afdm.fup_bm + afdm.fup_pm) AS total_fup,
+      afdm.status
     FROM ac_final_data_master afdm
     WHERE";
 

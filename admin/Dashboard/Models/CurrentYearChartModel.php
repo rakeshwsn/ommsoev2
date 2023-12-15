@@ -43,7 +43,7 @@ class CurrentYearChartModel extends Model
 	protected $bulider;
 
 
-	public function getcurrentyeardata()
+	public function getcurrentyeardata($filter=[])
 	{
 		$sql = "SELECT
 		ddm.id,
@@ -56,6 +56,11 @@ class CurrentYearChartModel extends Model
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
 	  WHERE ddm.deleted_at IS NULL";
+	   if(!empty($filter['year_id'])){
+		$sql .= " AND year_id=".$filter['year_id'];
+	  }
+	  $sql .= " GROUP BY ddm.district_id 
+	  ORDER BY ddm.district_id";
 			//   echo $sql;
 		return $this->db->query($sql)->getResult();
 	}

@@ -62,7 +62,7 @@ class EstablishmentTransaction extends AdminController
         $districtmodel = new DistrictModel();
         $data['districts'][0] = 'Select Districts';
 
-        $districts = $districtmodel->findAll();
+        $districts = $districtmodel->orderBy('name', 'asc')->findAll();
 
         foreach ($districts as $district) {
             $data['districts'][$district->id] = $district->name;
@@ -109,7 +109,7 @@ class EstablishmentTransaction extends AdminController
                 'villages' => $row->village_name,
                 'years' => $row->year_name,
                 'created_at' => ymdToDmy($row->created_at),
-                'edit_url' => admin_url('enterprisestrans/edit?id=' . $row->id),
+                'edit_url' => admin_url('enterprisestrans/edit?id=' . $row->est_id),
 
             ];
             // printr($data);exit;
@@ -117,7 +117,7 @@ class EstablishmentTransaction extends AdminController
         $data['excel_link'] = admin_url('enterprises/download');
         $data['upload_url'] = admin_url('enterprises/upload');
 
-       // dd($data['excel_link']);
+        // dd($data['excel_link']);
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
@@ -142,7 +142,8 @@ class EstablishmentTransaction extends AdminController
             // exit;
 
             $establishmenttrasdtl->update($id, $enterprisetransdata);
-            return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'successful');
+
+            return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'update successful');
         }
 
 
@@ -156,10 +157,10 @@ class EstablishmentTransaction extends AdminController
         // dd($id);
         if ($id) {
 
-            $entdata = $establishmenttrasdtl->periodswisetrans(['id' => $id]);
-            // printr($entdata);exit;
+            $entdata = $establishmenttrasdtl->periodswisetrans();
+            // dd($entdata);
             foreach ($entdata as $value) {
-              
+
                 $data['entranses'] = [
                     'year_id' => $value->year_name,
                     'unit_id' => $value->unit_name,
@@ -180,14 +181,13 @@ class EstablishmentTransaction extends AdminController
             }
         }
 
-// dd($data['entranses']);
+
         return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
     }
 
     public function download()
     {
 
-        //  printr($this->request->getGet()); exit;
         $enterprisesmodel = new EnterprisesModel();
         $enterprisestransaction = new EnterprisesTransactionModel();
         $monthmodel = new MonthModel();
@@ -197,7 +197,6 @@ class EstablishmentTransaction extends AdminController
         $units = $enterpriseunitsmodel->findAll();
 
         $district_id = $this->request->getGet('district_id');
-        //  dd($units);
 
         $worksheet_unit = [];
         foreach ($units as $key => $unit) {
@@ -207,7 +206,7 @@ class EstablishmentTransaction extends AdminController
                 'district_id' => $district_id
             ];
             $details = $enterpriseunitsmodel->getAll($filter);
-            // dd($details);
+
             $worksheet_unit[$key]['id'] = $unit->id;
             $worksheet_unit[$key]['name'] = $unit->name;
             $worksheet_unit[$key]['group_unit'] = $unit->group_unit;
@@ -223,15 +222,6 @@ class EstablishmentTransaction extends AdminController
         $month_name = $monthmodel->find($month_id)->name;
         $year_name = $yearmodel->find($year_id)->name;
         $filename = 'EntTxnTemplate_' . $month_name . '_' . $year_name . '_' . date('Y-m-d_His') . '.xlsx';
-        //dd($worksheet_unit);
-
-        // $spreadsheetMain = new Spreadsheet();
-
-        // $spreadsheetMain->removeSheetByIndex(
-        //     $spreadsheetMain->getIndex(
-        //         $spreadsheetMain->getSheetByName('Worksheet')
-        //     )
-        // );
 
         $sheetindex = 0;
         $reader = new Html();
@@ -345,6 +335,7 @@ class EstablishmentTransaction extends AdminController
                 $worksheet->getRowDimension('2')->setVisible(false);
 
                 if ($title == "Food Unit") {
+                    $worksheet->getColumnDimension('L')->setVisible(false);
                     $worksheet->getColumnDimension('M')->setVisible(false);
                 }
             }
@@ -429,36 +420,55 @@ class EstablishmentTransaction extends AdminController
                 //skip 3 rows
                 $row_data = array_slice($row_data, 3);
 
-                foreach ($row_data as $key => $transaction) {
-                    //only rows with gp_id
-                    if (is_numeric($transaction[0])) {
-                        $transaction_data = [
-                            'unit_id' => $transaction[0],
-                            'year_id' => $year_id,
-                            'district_id' => $district_id,
-                            'month_id' => $month_id,
-                            'period' => $period,
-                        ];
+                //check if exists
+                $data = [
+                    'year_id' => $year_id,
+                    'district_id' => $district_id,
+                    'month_id' => $month_id,
+                    'period' => $period,
+                ];
 
-                        $transaction_id = $enterprisestransaction->insert($transaction_data);
-                    } else if (is_numeric($transaction[1])) {
-                        $transaction_data = [
-                            'enterprise_id' => $transaction[1],
-                            'transaction_id' => $transaction_id,
-                            'block_id' => $transaction[4],
-                            'gp_id' => $transaction[6],
-                            'village_id' => $transaction[8],
-                            'no_of_days_functional' => $transaction[10],
-                            'produced' => $transaction[11],
-                            'charges_per_qtl' => $transaction[12],
-                            'total_expend' => $transaction[13],
-                            'total_turnover' => $transaction[14],
+                $exists = $enterprisestransaction->isExists([
+                    'year_id' => $year_id,
+                    'district_id' => $district_id,
+                    'month_id' => $month_id,
+                    'period' => $period,
+                ]);
+                if ($exists) {
+                    $status = false;
+                    $message = 'Enterprise data for the given period already exists.';
+                } else {
+                    foreach ($row_data as $key => $transaction) {
+                        //only rows with gp_id
+                        if (is_numeric($transaction[1])) {
+                            $data = [
+                                'unit_id' => $transaction[0],
+                                'year_id' => $year_id,
+                                'district_id' => $district_id,
+                                'month_id' => $month_id,
+                                'period' => $period,
+                            ];
 
-                        ];
+                            $transaction_id = $enterprisestransaction->insert($data);
 
-                        $enterprisetransdetails->insert($transaction_data);
-                        $status = true;
-                        $message = 'Uploaded successfully';
+                            $data = [
+                                'enterprise_id' => $transaction[1],
+                                'transaction_id' => $transaction_id,
+                                'block_id' => $transaction[4],
+                                'gp_id' => $transaction[6],
+                                'village_id' => $transaction[8],
+                                'no_of_days_functional' => $transaction[10],
+                                'produced' => $transaction[11],
+                                'charges_per_qtl' => $transaction[12],
+                                'total_expend' => $transaction[13],
+                                'total_turnover' => $transaction[14],
+
+                            ];
+
+                            $enterprisetransdetails->insert($data);
+                            $status = true;
+                            $message = 'Uploaded successfully';
+                        }
                     }
                 }
             }
@@ -469,6 +479,8 @@ class EstablishmentTransaction extends AdminController
             'url' => $url,
             'message' => $message
         ];
+
+        $this->session->setFlashdata('message', $message);
 
         return $this->response->setJSON($response);
     }

@@ -45,7 +45,7 @@ class EnterprisesUnitModel extends Model
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
 
-    public function getAll($data = array())
+    public function getAll_bk($data = array())
     {
         $builder = $this->db->table("{$this->table} eu");
         $builder->join('enterprises e', 'eu.id=e.unit_id', 'left');
@@ -56,7 +56,6 @@ class EnterprisesUnitModel extends Model
                         eu.name,
                         eu.sort_order,
                         eu.group_unit,
-                        eu.deleted_at,
                         COUNT(e.unit_id) as total_ent");
 
         // Set the sorting order
@@ -75,10 +74,34 @@ class EnterprisesUnitModel extends Model
 
         $builder->groupBy('e.unit_id');
 
-        // $query = $builder->getCompiledSelect();
-        // echo $query; exit;
+        $query = $builder->getCompiledSelect(); echo $query; exit;
+
         $res = $builder->get()->getResult();
         return $res;
+    }
+
+    public function getAll($data = array()){
+        $sql = "SELECT
+        `eu`.`id`,
+        `eu`.`name`,
+        `eu`.`group_unit`,
+        e.total_units
+      FROM `enterprises_units` `eu`
+        LEFT JOIN (SELECT
+        eu.id unit_id,
+        COALESCE(cnt.total_units, 0) total_units
+      FROM enterprises_units eu
+        LEFT JOIN (SELECT
+            unit_id,
+            COUNT(e.id) total_units
+          FROM enterprises e
+          GROUP BY unit_id) cnt
+          ON cnt.unit_id = eu.id) `e`
+          ON `eu`.`id` = `e`.`unit_id`
+      WHERE `eu`.`deleted_at` IS NULL
+      ORDER BY `eu`.`name` ASC";
+
+      return $this->db->query($sql)->getResultArray();
     }
 
     public function getTotal($data = array())

@@ -27,7 +27,7 @@
                 <th colspan="14" style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['unit_name'] ?></th>
             </tr>
             <tr>
-                <td></td>
+                <td><?= $tran['id'] ?></td>
                 <th style="text-align: center; background-color:#848403 ;border: 5px solid black; font-weight: bold;">ent_id</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Slno</th>
                 <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Block</th>
@@ -47,7 +47,7 @@
         <tbody>
             <?php foreach ($tran['enterprises'] as $enterprise) { ?>
                 <tr>
-                    <td></td>
+                    <td><?= $tran['id'] ?></td>
                     <td><?= $enterprise->id ?></td>
                     <td><?= $slno++ ?></td>
                     <td><?= $enterprise->block ?></td>

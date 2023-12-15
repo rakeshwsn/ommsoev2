@@ -24,7 +24,15 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        <?php foreach($e_units as $key => $unit): ?>
+                        <tr>
+                            <td><?=++$key?></td>
+                            <td><?=$unit['name']?></td>
+                            <td><?=$unit['group_unit']?></td>
+                            <td><?=$unit['total_units']?></td>
+                            <td><?=$unit['action']?></td>
+                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -38,6 +46,7 @@
 <script type="text/javascript">
     $(function() {
 
+        /*
         $('#datatable').DataTable({
             "processing": true,
             "serverSide": true,
@@ -55,6 +64,8 @@
                 dataType: 'json'
             },
         });
+        */
+       $('#datatable').DataTable();
     });
 </script>
 <?php js_end(); ?>
