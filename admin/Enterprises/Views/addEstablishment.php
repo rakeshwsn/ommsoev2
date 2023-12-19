@@ -317,7 +317,7 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#blocks').trigger('change');
                 }
-            }, 500);
+            });
         });
         //add village btn click
         $('#btn-add-village').click(function(e) {
@@ -345,7 +345,7 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#gps').trigger('change');
                 }
-            }, 500);
+            });
         });
     });
     $(document).ready(function() {
@@ -385,7 +385,7 @@ $validation = \Config\Services::validation();
                 },
                 unit_budget_amount: {
                     required: true,
-                    ruppes: true
+                    rupees: true
                 },
                 unit_budget: {
                     required: true,
@@ -401,7 +401,7 @@ $validation = \Config\Services::validation();
                 },
                 support_infr_amount: {
                     required: true,
-                    ruppes: true
+                    rupees: true
                 },
                 budget_fin_yr_id: {
                     required: true,
@@ -428,34 +428,6 @@ $validation = \Config\Services::validation();
                 unit_budget: {
                     decimal: "Please enter only decimal numbers."
                 },
-                unit_id: {
-                    required: "This field is required.",
-
-                },
-                district_id: {
-                    required: "This field is required.",
-
-                },
-                block_id: {
-                    required: "This field is required.",
-
-                },
-                gp_id: {
-                    required: "This field is required.",
-
-                },
-                village_id: {
-                    required: "This field is required.",
-
-                },
-                date_estd: {
-                    date: "Year must be greater than 2000",
-
-                },
-                mou_date: {
-                    date: "Year must be greater than 2000",
-
-                }
             },
             errorPlacement: function(error, element) {
                 //error.insertAfter(element); // Places the error message after the element
@@ -480,7 +452,7 @@ $validation = \Config\Services::validation();
         }, "Please enter decimal number ");
         jQuery.validator.addMethod("ruppes", function(value, element) {
             return this.optional(element) || /^\d{1,10}\.\d{1,2}$/.test(value);
-        }, "Please enter  ruppes (ex-12.00) ");
+        }, "Please enter  rupees (ex-12.00) ");
         jQuery.validator.addMethod("ddrequired", function(value, element) {
             return this.optional(element) || (parseFloat(value) > 0);
         }, "* This is a required field");

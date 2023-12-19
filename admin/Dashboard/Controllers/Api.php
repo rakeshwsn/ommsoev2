@@ -7,6 +7,7 @@ use Admin\Dashboard\Models\DistrictModel;
 use Admin\Dashboard\Models\ProcurementModel;
 use Admin\Dashboard\Models\EnterpriseModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Dashboard\Models\CurrentYearChartModel;
 
 use Admin\Dashboard\Models\EstablishmentModel;
 
@@ -40,7 +41,7 @@ class Api extends Controller
 			$data['areafarmers'][] = $achievement->total_farmers;
 			$data['areaachievements'][] = $achievement->total_ach;
 		}
-       
+
 		$data['heading'] = 'AREA COVERAGE CHART';
 		if ($district_id) {
 			$data['heading'] .= ' FOR:-' . $districtmodel->find($district_id)->name;
@@ -88,7 +89,7 @@ class Api extends Controller
 	public function pds()
 	{
 
-		$pdsmodel = new PdsModel();		
+		$pdsmodel = new PdsModel();
 		$pdses = $pdsmodel->getYearwisepds();
 
 		$data['pdsyear'] = [];
@@ -100,7 +101,7 @@ class Api extends Controller
 			$data['pdsquantity'][] = $pds->total_quantity;
 			$data['card_holders_benifited'][] = $pds->total_chb;
 		}
-		
+
 
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
@@ -123,6 +124,33 @@ class Api extends Controller
 			$data['blocks'][] = $establish->blocks;
 		}
 		// dd($data);
+		header('Content-Type: application/json');
+		echo json_encode($data, JSON_NUMERIC_CHECK);
+	}
+	public function currentyearchart()
+	{
+
+		$districtmodel = new DistrictModel();
+		$currentyeardata = new CurrentYearChartModel();
+	
+		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
+		if (!$this->request->getGet('year_id')) {
+			$filter['year_id'] = (new YearModel())->getCurrentYearId();
+		} else {
+			$filter['year_id'] = $this->request->getGet('year_id');
+		}
+		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
+		// dd($crntyrdatas);
+		$data['currentdistrict'] = [];
+		$data['currentfarmers'] = [];
+		$data['currentachievements'] = [];
+
+		foreach ($crntyrdatas as $crntyrdata) {
+			$data['currentdistrict'][] = $crntyrdata->districts;
+			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
+			$data['currentachievements'][] = (float)$crntyrdata->achievement;
+		}
+		
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}
@@ -170,7 +198,7 @@ class Api extends Controller
 		if ($district_id) {
 			$data['heading'] .= ' for district ' . $districtmodel->find($district_id)->name;
 		}
-	
+
 		//generate table
 		$data['table'] = view('Admin\Dashboard\Views\enterpriseTable', $data);
 
