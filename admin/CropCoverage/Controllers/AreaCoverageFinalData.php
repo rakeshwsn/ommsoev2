@@ -17,7 +17,6 @@ use Config\Url;
 
 class AreaCoverageFinalData extends AdminController
 {
-
     private $data;
     private $error = array();
     private $targetModel;
@@ -47,7 +46,6 @@ class AreaCoverageFinalData extends AdminController
         $this->template->set_meta_title(lang('Crop Coverage|Final Data'));
 
         return $this->getList();
-
     }
     protected function getList($action = '')
     {
@@ -56,14 +54,14 @@ class AreaCoverageFinalData extends AdminController
         $data['years'] = getAllYears();
         // $data['year_id'] = getCurrentYearId();
         $data['seasons'] = $this->acModel->getSeasons();
-        $data['current_season'] = strtolower(getCurrentSeason());
+        $data['aftcurrent_season'] = strtolower(getAftCurrentSeason());
         // printr($data['current_season']);
         // exit;
         // $data['uncurrent_season'] = strtolower(getUnCurrentSeason());
         // printr($data['uncurrent_season']);
         // exit;
         $data['get_blocks'] = Url::getBlocks;
-        $data['get_blocks'] = Url::getBlocks;
+
         $data['district_id'] = '';
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
@@ -72,8 +70,6 @@ class AreaCoverageFinalData extends AdminController
         } else {
             $data['district_id'] = 0;
         }
-
-
         $data['blocks'] = [];
 
         if ($data['district_id']) {
@@ -94,7 +90,7 @@ class AreaCoverageFinalData extends AdminController
             $data['year_id'] = getCurrentYearId();
         }
         $params = 'year_id=' . $this->request->getGet('yaer_id') ?? $data['year_id'];
-        $params .= '&season=' . $data['current_season'];
+        $params .= '&season=' . $data['aftcurrent_season'];
         $params .= '&district_id=' . $data['district_id'];
         $params .= '&block_id=' . $data['block_id'];
         $data['download_url'] = admin_url('areacoverage/finaldata/download?' . $params);
@@ -120,7 +116,7 @@ class AreaCoverageFinalData extends AdminController
             $data['districts'] = ($this->districtModel)->orderBy('name')->asArray()->find();
         }
         $filter = [
-            'season' => $this->request->getGet('season') ?? 'kharif',
+            'season' => $this->request->getGet('season') ?? getAftCurrentSeason(),
             'district_id' => $data['district_id'],
             'block_id' => $data['block_id'],
             'year_id' => $data['year_id']
@@ -191,6 +187,9 @@ class AreaCoverageFinalData extends AdminController
     {
         $data = [];
         $data['seasons'] = $this->acModel->getSeasons();
+        // $data['aftcurrentseason'] = getAftCurrentSeason();
+        // printr($data['aftcurrentseason']);
+        // exit;
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
         $crops = $this->cropsModel->findAll();
@@ -210,10 +209,10 @@ class AreaCoverageFinalData extends AdminController
         }
         $data['block_id'] = $this->request->getGet('block_id', null);
         $data['year_id'] = getCurrentYearId();
-        $data['current_season'] = getCurrentSeason();
+        $data['aftcurrent_season'] = getAftCurrentSeason();
         $filter = [
             'year_id' => $data['year_id'],
-            'season' => $data['current_season'],
+            'season' => $data['aftcurrent_season'],
             'block_id' => $data['block_id']
         ];
 
@@ -264,7 +263,7 @@ class AreaCoverageFinalData extends AdminController
                 // exit;
                 $gpMasterData = [
                     "year_id" => getCurrentYearId(),
-                    "season" => getCurrentSeason(),
+                    "season" => getAftCurrentSeason(),
                     "district_id" => $this->user->district_id,
                     "block_id" => $block_id,
                     "gp_id" => $gpdata['gp_id'],
