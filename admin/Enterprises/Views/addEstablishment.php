@@ -407,19 +407,11 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
-<<<<<<< HEAD
-                date_estd:{
-                    date:true
-                },
-                mou_date:{
-                    date:true
-=======
                 date_estd: {
                     required: true,
                 },
                 mou_date: {
                     required: true,
->>>>>>> 7d422574007f79b88e52706f4f9b73a445c95e79
                 }
 
             },
@@ -436,7 +428,6 @@ $validation = \Config\Services::validation();
                 unit_budget: {
                     decimal: "Please enter only decimal numbers."
                 },
-<<<<<<< HEAD
                 unit_id: {
                     required: "This field is required.",
 
@@ -465,8 +456,6 @@ $validation = \Config\Services::validation();
                     date: "Year must be greater than 2000",
 
                 }
-=======
->>>>>>> 7d422574007f79b88e52706f4f9b73a445c95e79
             },
             errorPlacement: function(error, element) {
                 //error.insertAfter(element); // Places the error message after the element
