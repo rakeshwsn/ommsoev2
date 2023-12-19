@@ -310,7 +310,7 @@
             zoomType: 'xy'
         },
         title: {
-            text: ' Crop Demonstration for Kharif 2023-24 under Odisha Millets Mission',
+            text: ' ',
             align: 'center'
         },
 

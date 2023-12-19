@@ -132,7 +132,13 @@ class Api extends Controller
 
 		$districtmodel = new DistrictModel();
 		$currentyeardata = new CurrentYearChartModel();
-		$filter = [];
+	
+		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
+		if (!$this->request->getGet('year_id')) {
+			$filter['year_id'] = (new YearModel())->getCurrentYearId();
+		} else {
+			$filter['year_id'] = $this->request->getGet('year_id');
+		}
 		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
 		// dd($crntyrdatas);
 		$data['currentdistrict'] = [];

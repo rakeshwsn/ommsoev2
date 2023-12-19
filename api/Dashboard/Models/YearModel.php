@@ -43,5 +43,7 @@ class YearModel extends Model
 	public function getCurrentYearId(){
 		return $this->where('DATE(start_date) <= DATE(NOW())')->where('DATE(end_date) >= DATE(NOW())')
 		->first()->id;
+		
 	}
+	
 }

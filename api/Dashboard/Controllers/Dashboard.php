@@ -430,22 +430,24 @@ class Dashboard extends ResourceController
 	}
 	public function currentyearchart()
 	{
-		$yearModel = new YearModel();
 
 		$currentyeardata = new CurrentYearChartModel();
-		$filter = [];
-		$year_id = 0;
 
-		if ($this->request->getGet('year_id') && $this->request->getGet('year_id') > 0) {
-			$data['year_id'] = $this->request->getGet('year_id');
-
-			$filter['year_id'] = $this->request->getGet('year_id');
-			$year_id =  $this->request->getGet('year_id');
-		}
-dd($filter);
-// dd($year_id);
-		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
+		$yearmodel = new YearModel();
 		
+		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
+		
+		$data['heading'] = 'Crop Demonstration for Kharif 2023  under Odisha Millets Mission:-';
+
+		
+		if (!$this->request->getGet('year_id')) {
+			$filter['year_id'] = (new YearModel())->getCurrentYearId();
+		} else {
+			$filter['year_id'] = $this->request->getGet('year_id');
+		}
+		
+		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
+
 		$data['currentdistrict'] = [];
 		$data['currentfarmers'] = [];
 		$data['currentachievements'] = [];
@@ -455,7 +457,8 @@ dd($filter);
 			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
 			$data['currentachievements'][] = (float)$crntyrdata->achievement;
 		}
-
+		
+	
 		return $this->respond($data);
 	}
 }

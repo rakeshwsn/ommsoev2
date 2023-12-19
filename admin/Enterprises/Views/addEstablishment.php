@@ -317,7 +317,7 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#blocks').trigger('change');
                 }
-            }, 500);
+            });
         });
         //add village btn click
         $('#btn-add-village').click(function(e) {
@@ -345,7 +345,7 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#gps').trigger('change');
                 }
-            }, 500);
+            });
         });
     });
     $(document).ready(function() {

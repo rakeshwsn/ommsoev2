@@ -5,6 +5,7 @@ namespace Front\Pages\Controllers;
 use Api\Dashboard\Models\DistrictModel;
 use Api\Dashboard\Models\OdMapModel;
 use Api\Dashboard\Models\YearModel;
+
 // use Admin\Pages\Models\PagesModel;
 use App\Controllers\BaseController;
 
@@ -15,7 +16,7 @@ class Dashboard extends BaseController
         $this->template->set_meta_title('OMM Dashboard');
 
 		helper('form');
-
+	
 		$districtmodel = new DistrictModel();
 		$data['districts'][0] = 'Select districts';
 		// $data = [];
@@ -32,6 +33,7 @@ class Dashboard extends BaseController
 		foreach ($years as $year) {
 			$data['years'][$year->id] = $year->name;
 		}
+		
 		$odmapmodel = new OdMapModel();
 		$data['maps'] = $odmapmodel->getestablishmentmap();
 // printr($data['maps']);exit;

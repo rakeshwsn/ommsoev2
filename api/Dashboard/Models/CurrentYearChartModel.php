@@ -60,10 +60,9 @@ class CurrentYearChartModel extends Model
 	  WHERE ddm.deleted_at IS NULL";
 	  
 	  if(!empty($filter['year_id'])){
-		$sql .= " AND year_id=".$filter['year_id'];
+		$sql .= " AND ddm.year_id=".$filter['year_id'];
 	  }
-	  $sql .= " GROUP BY p.district_id
-	  ORDER BY y.district_id";
+	
 		// printr($sql);exit;
 		return $this->db->query($sql)->getResult();
 	}
