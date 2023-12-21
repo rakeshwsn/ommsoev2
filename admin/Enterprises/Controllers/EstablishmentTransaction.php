@@ -3,17 +3,17 @@
 namespace Admin\Enterprises\Controllers;
 
 use Admin\Dashboard\Models\GpsModel;
-use Admin\Enterprises\Models\BlockModel;
+use Admin\Dashboard\Models\BlockModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Admin\Enterprises\Models\EstablishmentTransactionModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
-use Admin\Enterprises\Models\DistrictModel;
+use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesTransactionModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Enterprises\Models\VillagesModel;
-use Admin\Enterprises\Models\YearModel;
+use Admin\Dashboard\Models\YearModel;
 use Admin\Localisation\Controllers\Block;
 use Admin\Localisation\Controllers\District;
 use App\Controllers\AdminController;
