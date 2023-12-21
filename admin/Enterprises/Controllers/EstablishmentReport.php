@@ -2,15 +2,15 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Enterprises\Models\BlockModel;
-use Admin\Enterprises\Models\DistrictModel;
+use Admin\Dashboard\Models\BlockModel;
+use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\MonthModel;
 
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 // use Admin\Enterprises\Models\GpModel;
 // use Admin\Enterprises\Models\VillagesModel;
-use Admin\Enterprises\Models\YearModel;
+use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -81,7 +81,7 @@ class EstablishmentReport extends AdminController
 			'month' => $this->request->getGet('month_id'),
 			'unit_type' => $this->request->getGet('unit_type'),
 		];
-
+// dd($filter);
 		//Retrive data for gps if block_id present
 		if ($this->request->getGet('block_id')) {
 			$gpunits = $enterprisesmodel->gpwiseUnits($filter);
@@ -180,7 +180,8 @@ class EstablishmentReport extends AdminController
 		} else {
 
 			$units = $enterprisesmodel->districtwiseUnits($filter);
-			// dd($units);
+			//dd($units);
+			// printr($units);exit;
 			$data['units'] = [];
 			foreach ($units as $unit) {
 
@@ -205,9 +206,6 @@ class EstablishmentReport extends AdminController
 				];
 			}
 
-
-			// dd($data['district_text']);
-			// dd($data['units']);
 			//unitwise total for all district --add new row as total
 			$total_units = $_units = [];
 			$total = 0;

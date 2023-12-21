@@ -59,12 +59,13 @@ class EstablishmentTransactionModel extends Model
   FROM enterprises e
     LEFT JOIN soe_blocks sb
       ON e.block_id = sb.id
-    LEFT JOIN grampanchayat g
+    LEFT JOIN soe_grampanchayats g
       ON e.gp_id = g.id
     LEFT JOIN villages v
       ON e.village_id = v.id
     LEFT JOIN enterprises_units eu
       ON e.unit_id = eu.id where e.unit_id = $unit_id and e.district_id= $district_id ";
+
     return $this->db->query($sql)->getResult();
   }
 

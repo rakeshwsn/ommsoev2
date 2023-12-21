@@ -23,7 +23,7 @@
                         <label>Season</label>
                         <select class="form-control" id="season" name="season" disabled>
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value != strtolower($current_season)) {
+                                <option value="<?= $value ?>" <?php if ($value == strtolower($aftcurrent_season)) {
                                       echo 'selected';
                                   } ?>>
                                     <?= $season ?>
@@ -65,15 +65,16 @@
                     <tr>
                         <th rowspan="3">GP</th>
                         <th rowspan="3">No Of Villages</th>
-                        <th rowspan="3">Farmer covered under Demonstration</th>
-                        <th rowspan="3">Farmer covered under Follow Up Crop</th>
-                        <th colspan="12">Achievement under demonstration(in Ha.)</th>
-                        <th colspan="7">Follow Up Crops (with out incentive) (in Ha)
+                       
+                       
+                        <th colspan="13">Achievement under demonstration(in Ha.)</th>
+                        <th colspan="8">Follow Up Crops (with out incentive) (in Ha)
                         </th>
                         <th rowspan="3">Total Achievement under demonstration (in Ha.)</th>
                         <th rowspan="3">Total Follow Up Crops</th>
                     </tr>
                     <tr>
+                     <th rowspan="2">Farmer covered</th>
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
                             <th colspan="<?= count($practices) ?>">
                                 <?= $crops[$crop_id] ?>
@@ -81,6 +82,7 @@
                         <?php endforeach; ?>
                         <th rowspan="2">Total Ragi</th>
                         <th rowspan="2">Total Non Ragi</th>
+                        <th rowspan="2">Farmer covered</th>
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
                             <th rowspan="7">
                                 <?= $crops[$crop_id] ?>
@@ -109,7 +111,6 @@
                                     value="<?= $gpdata['gp_id']; ?>">
 
                             </td>
-                            <!-- Other fields related to GP data -->
                             <td>
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][no_of_village]"
                                     id="no_of_village_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['no_of_village']; ?>"
@@ -120,14 +121,9 @@
                                     name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_demonstration]"
                                     id="farmers_demonstration_<?= $gpdata['gp_id'] ?>"
                                     value="<?= $gpdata['farmers_covered_under_demonstration']; ?>"
-                                    oninput="validatePositiveInteger(this, 3)" class="sum-input-demon">
+                                    oninput="validatePositiveInteger(this, 3)" class="sum-input-demon dynamic-input">
                             </td>
-                            <td>
-                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_followup]"
-                                    id="farmers_followup_<?= $gpdata['gp_id'] ?>"
-                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>"
-                                    oninput="validatePositiveInteger(this, 3)" class="sum-input-fup">
-                            </td>
+                           
                             <!-- Other GP-specific fields -->
                             <?php
                             $keys = ['smi', 'lt', 'ls'];
@@ -156,14 +152,20 @@
                             <td>
                                 <p id="total_non_ragi_<?= $gpdata['gp_id'] ?>" class="sum-input-total-non-ragi"></p>
                             </td>
+                             <td>
+                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_followup]"
+                                    id="farmers_followup_<?= $gpdata['gp_id'] ?>"
+                                    value="<?= $gpdata['farmers_covered_under_followup']; ?>"
+                                    oninput="validatePositiveInteger(this, 3)" class="sum-input-fup">
+                            </td>
                             <td>
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_ragi]" class="fup-input sum-input-fup-ragi"
                                     id="fup_ragi_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_ragi']; ?>"
                                     oninput="validateField(this,5)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_lm]" class="fup-input sum-input-fup-lm"
-                                    id="fup_lm_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_lm']; ?>"
+                                <input type="number" name="area[<?= $gpdata['gp_id']; ?>][fup_lm]" class="fup-input sum-input-fup-lm"
+                                    id="fup_lm_<?= $gpdata['gp_id']; ?>" value="<?= $gpdata['fup_lm']; ?>"
                                     oninput="validateField(this,5)" data-gp-id="<?= $gpdata['gp_id']; ?>">
                             </td>
                             <td>
@@ -210,7 +212,6 @@
                         <td>All Total</td>
                         <td id="Total-Vlg"></td>
                         <td id="Total-Demon-Farmer"></td>
-                        <td id="Total-Fup-Farmer"></td>
                         <td id="Total-Ragi-Smi"></td>
                         <td id="Total-Ragi-Lt"></td>
                         <td id="Total-Ragi-Ls"></td>
@@ -223,6 +224,7 @@
                         <td id="Total-Pm"></td>
                         <td id="All-Total-Ragi"></td>
                         <td id="All-Total-Non-Ragi"></td>
+                        <td id="Total-Fup-Farmer"></td>
                         <td id="Total-Fup-Ragi"></td>
                         <td id="Total-Fup-Lm"></td>
                         <td id="Total-Fup-Fm"></td>
@@ -240,7 +242,7 @@
 
         </div>
         <div style="text-align: right;padding: 5px;">
-            <button type="submit" id="submit" form="form-finaldata" class="btn btn-primary">Save</button>
+            <button onclick="validateSave()" type="submit" id="submit" value="submit" form="form-finaldata"    class="btn btn-primary">Save</button>
         </div>
     </div>
 </div>
@@ -308,7 +310,7 @@ $gpIds = array_map(function ($gpdata) {
 <script>
     function validateField(field, maxDigits) {
         var inputValue = field.value.trim();
-        var decimalRegex = /^\d{0,3}(?:\.\d{1,2})?$/;
+        var decimalRegex = /^\d{1,3}(?:\.\d{1,2})?$/;
 
         if (!decimalRegex.test(inputValue) || inputValue.length > maxDigits) {
             field.setCustomValidity('Please enter a valid positive decimal number with up to 2 decimal places and a maximum of 5 digits.');
@@ -592,6 +594,7 @@ $(document).ready(function () {
         document.getElementById('Total-Ach-Fup').innerText = totalAchFup.toFixed(2);
     }
 </script>
+
 
 
 

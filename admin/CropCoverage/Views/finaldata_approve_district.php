@@ -1,74 +1,21 @@
 <div class="block block-themed">
-    <form>
+    <form action="" method="post">
         <div class="block">
             <div class="block-header block-header-default bg-success">
                 <h3 class="block-title">
                     <?= $heading_title; ?>
                 </h3>
-                <div class="block-options">
-                    <?php if ($permission_add == 7): ?>
-                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
-                            class="btn btn-primary ajaxaction">Add/Edit</a>
-                    <?php endif; ?>
-                </div>
             </div>
             <div class="block-content block-content-full">
                 <div class="row">
                     <div class="col-md-2">
-                        <label>Year</label>
-                        <select class="form-control" id="year_id" name="year_id">
-                            <?php foreach ($years as $year) { ?>
-                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year['id']) {
-                                      echo 'selected';
-                                  } ?>><?= $year['name'] ?>
-                                </option>
-                            <?php } ?>
-                        </select>
+                        <div class="form-group mg-b-10-force">
+                            <label class="form-control-label">District: <span class="tx-danger">*</span></label>
+                            <?= form_dropdown('district_id', $districts, $district_id, "id='filter_block' class='form-control js-select2'"); ?>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label>Season</label>
-                        <select class="form-control" id="season" name="season">
-                            <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?= $value ?>" <?php if ($value == strtolower($aftcurrent_season)) {
-                                      echo 'selected';
-                                  } ?>>
-                                    <?= $season ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Districts</label>
-                        <select class="form-control" id="district" name="district_id">
-                            <option value="">Select District</option>
-                            <?php foreach ($districts as $district) { ?>
-                                <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
 
-                                      echo 'selected';
-                                  } ?>>
-                                    <?= $district['name'] ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Block</label>
-                        <select class="form-control" id="block" name="block_id">
-                            <option value="">All Blocks</option>
-                            <?php foreach ($blocks as $block) { ?>
-                                <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
 
-                                      echo 'selected';
-                                  } ?>>
-                                    <?= $block['name'] ?>
-                                </option>
-                            <?php } ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2" style="margin-top:25px;">
-                        <button id="btn-filter" class="btn btn-outline btn-primary">
-                            <i class="fa fa-filter"></i> Filter</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -77,32 +24,46 @@
 <div class="block">
     <div class="block-header block-header-default  bg-primary">
         <h3 class="block-title">View Area Coverage Final Data</h3>
-        <div class="block-options">
-            <a href="<?= $download_url ?>" class="btn btn-secondary" data-toggle="tooltip"
-                data-original-title="Download">
-                <i class="si si-cloud-download"></i>
-            </a>
-        </div>
+        <form action="" method="post">
+            <?php if ($show_approval): ?>
+                <div class="block-options text-right">
+                    <a data-toggle="tooltip" title="" id="btn-action" class="btn btn-success btn-approve"><i
+                            class="fa fa-check"></i> Approve/Reject</a>
+                </div>
+            <?php endif; ?>
+        </form>
     </div>
     <div class="block-content block-content-full">
+        <table class="table table-bordered table-striped mb-20 custom-table">
+            <tr class="highlight-heading1">
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+            <tr>
+                <td>
+                    <?php if ($status): ?><label class="badge badge-<?= $status_color ?>">
+                            <?= $status ?>
+                        </label>
+                    <?php endif; ?>
+                </td>
+                <td>
+                    <?= $remarks ?>
+                </td>
+            </tr>
+        </table>
         <div class="tableFixHead">
             <form action="" method="post" enctype="multipart/form-data" id="form-grampanchayat">
+
+
+
                 <table class="table custom-table js-dataTable-full" id="datatable">
                     <thead>
                         <tr>
-                            <?php if ($block_id) { ?>
-                                <th rowspan="3">GP</th>
-                            <?php } else if ($district_id) { ?>
-                                    <th rowspan="3">Block</th>
-                                    <th rowspan="3">GPs</th>
-                            <?php } else if (isset($allblocks)) { ?>
-                                        <th rowspan="3">District</th>
-                                        <th rowspan="3">Block</th>
-                                        <th rowspan="3">GPs</th>
-                            <?php } else { ?>
-                                        <th rowspan="3">District</th>
-                                        <th rowspan="3">Total Blocks</th>
-                                        <th rowspan="3">Total GPs</th>
+
+                            <?php if ($district_id) { ?>
+                                <th rowspan="3">Block</th>
+                                <th rowspan="3">GPs</th>
+
                             <?php } ?>
                             <th rowspan="3">No Of Villages</th>
                             <th rowspan="3">Farmer covered under Demonstration</th>
@@ -110,6 +71,8 @@
                             <th rowspan="3">Farmer covered under Follow Up Crop</th>
                             <th rowspan="3">Total Follow up Crops</th>
                             <th rowspan="3">Total Area </th>
+                            <th rowspan="3">Status</th>
+
                         </tr>
                         <tr>
                             <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -134,37 +97,35 @@
                     <tbody>
                         <?php foreach ($blocksfd as $blockfd): ?>
                             <tr>
-                                <?php if ($block_id) { ?>
+
+
+                                <?php if ($district_id) { ?>
                                     <td>
-                                        <?= $blockfd->gp_name ?>
-                                    </td>
-                                <?php } else if ($district_id) { ?>
-                                        <td>
                                         <?= $blockfd->block ?>
+                                    </td>
+                                    <td class="total_gp">
+                                        <?= $blockfd->total_gp ?>
+                                    </td>
+                                <?php } else if (isset($allblocks)) { ?>
+                                        <td>
+                                        <?= $block['district'] ?>
+                                        </td>
+                                        <td>
+                                        <?= $block['block'] ?>
                                         </td>
                                         <td class="total_gp">
-                                        <?= $blockfd->total_gp ?>
-                                        </td>
-                                <?php } else if (isset($allblocks)) { ?>
-                                            <td>
-                                        <?= $block['district'] ?>
-                                            </td>
-                                            <td>
-                                        <?= $block['block'] ?>
-                                            </td>
-                                            <td class="total_gp">
                                         <?= $block['gps'] ?>
-                                            </td>
+                                        </td>
                                 <?php } else { ?>
-                                            <td>
+                                        <td>
                                         <?= $blockfd->district ?>
-                                            </td>
-                                            <td class="blocks">
+                                        </td>
+                                        <td class="blocks">
                                         <?= $blockfd->blocks ?>
-                                            </td>
-                                            <td class="total_gp">
+                                        </td>
+                                        <td class="total_gp">
                                         <?= $blockfd->gps ?>
-                                            </td>
+                                        </td>
                                 <?php } ?>
                                 <td class="total_village">
                                     <?= $blockfd->total_village ?>
@@ -218,17 +179,27 @@
                                 <td class="all-total-area">
                                     <?= $blockfd->ragi_total_smi + $blockfd->ragi_total_lt + $blockfd->ragi_ls + $blockfd->little_millet_lt + $blockfd->little_millet_ls + $blockfd->foxtail_millet_ls + $blockfd->sorghum_ls + $blockfd->kodo_millet_ls + $blockfd->barnyard_millet_ls + $blockfd->pearl_millet_ls + $blockfd->total_fup ?>
                                 </td>
+
+                                <td>
+                                    <label class="badge badge-<?= $blockfd->status_color; ?>">
+                                        <?= $blockfd->status; ?>
+                                    </label>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                         <tr>
                             <td>All Total</td>
+
                             <?php if (!$district_id && !$block_id) { ?>
                                 <td id="allTotalBlock"></td>
                             <?php }
-                            if (!$block_id) { ?>
-                                <td id="allTotalGp"></td>
+                            ?>
+                            <td id="allTotalGp"></td>
 
-                            <?php } ?>
+
+
+
+
                             <td id="allTotalVlg"></td>
                             <td id="allTotalDemonFar"></td>
 
@@ -247,6 +218,7 @@
                             <td id="allTotalFolFar"></td>
                             <td id="allTotalFup"></td>
                             <td id="allTotalArea"></td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -255,33 +227,7 @@
     </div>
 </div>
 <?php js_start(); ?>
-<script>
-    $(function () {
-        $('#district').on('change', function () {
-            district_id = $(this).val();
-            $.ajax({
-                url: '<?= $get_blocks ?>',
-                data: { district_id: district_id },
-                type: 'GET',
-                dataType: 'JSON',
-                success: function (res) {
-                    html = '<option value="">All Blocks</option>';
-                    if (res) {
-                        $.each(res, function (i, v) {
-                            html += '<option value="' + v.id + '">' + v.name + '</option>';
-                        });
-                    }
-                    $('#block').html(html);
-                },
-                error: function () {
-                    alert('Something went wrong');
-                }
-            });
-        });
-        // $('[id="district"]').trigger('change');
 
-    });
-</script>
 <?php js_end(); ?>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -416,11 +362,7 @@
 
         // Call the function for the specific class and assign to 'allTotalRagi'
         calculateAndAssignSum('ragi-all-total', 'allTotalRagi');
-<<<<<<< HEAD
-
-=======
         calculateAndAssignSum('non-ragi-all-total', 'allTotalNonRagi');
->>>>>>> test
         calculateAndAssignSum('all-total-fup', 'allTotalFup');
         calculateAndAssignSum('all-total-area', 'allTotalArea');
 
@@ -471,3 +413,6 @@
     });
 </script>
 <?php js_end(); ?>
+<?php if ($show_approval) { ?>
+    <?= $approve_form ?>
+<?php } ?>

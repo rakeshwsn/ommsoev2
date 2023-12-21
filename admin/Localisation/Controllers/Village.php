@@ -38,6 +38,7 @@ class Village extends AdminController
 			$this->session->setFlashdata('message', 'village Saved Successfully.');
 
 			return redirect()->to(base_url('admin/village'));
+			
 		}
 		return $this->getForm();
 	}

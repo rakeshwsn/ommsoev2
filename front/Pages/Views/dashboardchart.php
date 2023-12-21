@@ -149,6 +149,12 @@
 </style>
 
 <div class="row">
+    <div class="col-6">
+        <div class="col-3">
+            <label class="form-label">Year</label>
+            <?php echo form_dropdown('year_id', $years, [], ['class' => 'form-control mb-3', 'id' => 'currentcrop']); ?>
+        </div>
+    </div>
     <div class="col-12">
 
         <div id="currentchart">
@@ -299,12 +305,12 @@
 
 <script>
     //AREACOVERAGE START
-    var crntchart = {
+    var districtwiseChartOption = {
         districtwiseChart: {
             zoomType: 'xy'
         },
         title: {
-            text: ' Crop Demonstration for Kharif 2023-24 under Odisha Millets Mission',
+            text: ' ',
             align: 'center'
         },
 
@@ -339,20 +345,20 @@
             backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'rgba(255,255,255,0.25)'
         },
         series: [{
-            name: 'Area Achievement (in hectare)', 
-            type: 'column', 
+            name: 'Area Achievement (in hectare)',
+            type: 'column',
             data: [
 
             ]
         }, {
-            name: 'No. of Farmer ', 
-            type: 'spline', 
+            name: 'No. of Farmer ',
+            type: 'spline',
             data: [
 
             ]
         }]
     };
-    var districtwiseChart = Highcharts.chart('currentchart', crntchart);
+    var districtwiseChart = Highcharts.chart('currentchart', districtwiseChartOption);
 
     var areachartOptions = {
         areachart: {
@@ -531,7 +537,7 @@
             categories: [],
             crosshair: true
         }],
-        
+
         yAxis: [{ // Primary yAxis
             labels: {
                 format: '',
@@ -580,8 +586,8 @@
                 name: 'CHC (in Number)',
                 type: 'spline',
                 data: [],
-                color:'rgb(246, 143, 70)',
-               
+                color: 'rgb(246, 143, 70)',
+
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -590,7 +596,7 @@
                 name: 'CMSC (in number)',
                 type: 'spline',
                 data: [],
-                color:'rgb(229, 12, 225)',
+                color: 'rgb(229, 12, 225)',
                 tooltip: {
                     valueSuffix: ''
                 }
@@ -671,6 +677,30 @@
     // ENTERPRISE END
 
     $(function() {
+        //current crop
+        $('#currentcrop').on('change', function() {
+            year_id = $(this).val();
+            $.ajax({
+                url: '<?= $currentyr_url ?>',
+                data: {
+                    'year_id': year_id,
+                    chart_type: 'districtwiseChart'
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                success: function(response) {
+                    districtwiseChart.xAxis[0].setCategories(response.currentdistrict);
+                    districtwiseChart.series[0].setData(response.currentfarmers);
+                    districtwiseChart.series[1].setData(response.currentachievements);
+                    districtwiseChart.setTitle({
+                        text: response.heading
+                    });
+
+                }
+
+            });
+        });
+        $('#currentcrop').change();
         //AREA
         $('#districts_area').on('change', function() {
             district_id = $(this).val();
@@ -803,6 +833,7 @@
 
 
     });
+    
 
 
     window.onload = function() {

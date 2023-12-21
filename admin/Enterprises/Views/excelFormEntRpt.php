@@ -1,14 +1,14 @@
 <table class="table table-bordered border-dark border-3">
     <thead>
         <tr>
-            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="15">
+            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="<?= count($unit_names)?>">
                 <h4>Enterprise Establishment Report</h4>
             </th>
 
         </tr>
         <tr>
             <?php if ($district_id) { ?>
-                <th colspan="15" style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; ">
+                <th colspan="<?= count($unit_names)?>" style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; ">
                     District: <?= $district_text; ?> ||
                 <?php  } ?>
                 <?php if ($block_id) { ?>
@@ -30,7 +30,7 @@
 
         </tr>
         <tr>
-            <td style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="15">
+            <td style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names)?>">
                 Type and number of units
             </td>
         </tr>

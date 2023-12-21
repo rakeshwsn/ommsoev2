@@ -102,7 +102,7 @@ class EnterprisesModel extends Model
     return $this->db->query($sql)->getResult();
   }
   public function yearWise($district_id)
-  { 
+  {
     $sql = "SELECT
     e.id,
     e.district_id,
@@ -140,7 +140,7 @@ class EnterprisesModel extends Model
       sd.id district_id,
       sd.name district
     FROM soe_districts sd
-      CROSS JOIN enterprises_units eu) disunit
+      CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) disunit
     LEFT JOIN (SELECT
         unit_id,
         COUNT(e.unit_id) total_units,
@@ -152,16 +152,18 @@ class EnterprisesModel extends Model
       FROM enterprises e
         LEFT JOIN dashboard_years dy
           ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+          LEFT JOIN soe_months sm
+        ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-   if (isset($filter['year_id'])) {
-    $sql .= " AND dy.id = " . $filter['year_id'];
-  }
-  if (isset($filter['month'])) {
-    $sql .= " AND 'MONTH(e.date_estd)' = " . $filter['month'];
-  }
-  if (isset($filter["management_unit_type"])) {
-    $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
-  }
+    if (isset($filter['year_id']) && $filter['year_id']) {
+      $sql .= " AND dy.id = " . $filter['year_id'];
+    }
+    if (isset($filter['month']) && $filter['month']) {
+      $sql .= " AND sm.id = " . $filter['month'];
+    }
+    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+    }
     if (isset($filter['unit_type'])) {
       if ($filter['unit_type'] == 'without_establishment_date') {
         $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
@@ -173,10 +175,7 @@ class EnterprisesModel extends Model
         $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
       }
     }
-    $sql .=   "
-   
-      GROUP BY e.unit_id,
-               e.district_id
+    $sql .= " GROUP BY e.unit_id, e.district_id
       ORDER BY e.district_id) res
       ON disunit.district_id = res.district_id
       AND disunit.unit_id = res.unit_id
@@ -215,7 +214,7 @@ class EnterprisesModel extends Model
         sb.name block,
         sb.district_id
       FROM soe_blocks sb
-        CROSS JOIN enterprises_units eu) blkunit
+        CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) blkunit
     LEFT JOIN (SELECT
         e.unit_id,
         COUNT(e.unit_id) total_units,
@@ -227,17 +226,19 @@ class EnterprisesModel extends Model
       FROM enterprises e
         LEFT JOIN dashboard_years dy
           ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+          LEFT JOIN soe_months sm
+        ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
     if (isset($filter['year_id'])) {
       $sql .= " AND dy.id = " . $filter['year_id'];
     }
     if (isset($filter['month'])) {
-      $sql .= " AND 'MONTH(e.date_estd)' = " . $filter['month'];
+      $sql .= " AND sm.id = " . $filter['month'];
     }
-    if (isset($filter["management_unit_type"])) {
-      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
     }
-  
+
     if (isset($filter['unit_type'])) {
       if ($filter['unit_type'] == 'without_establishment_date') {
         $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
@@ -304,17 +305,18 @@ class EnterprisesModel extends Model
       FROM enterprises e
       LEFT JOIN dashboard_years dy
           ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+          LEFT JOIN soe_months sm
+        ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
     if (isset($filter['year_id'])) {
       $sql .= " AND dy.id = " . $filter['year_id'];
     }
     if (isset($filter['month'])) {
-      $sql .= " AND 'MONTH(e.date_estd)' = " . $filter['month'];
+      $sql .= " AND sm.id = " . $filter['month'];
     }
-    if (isset($filter["management_unit_type"])) {
-      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
     }
-    
     if (isset($filter['unit_type'])) {
       if ($filter['unit_type'] == 'without_establishment_date') {
         $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
@@ -336,5 +338,4 @@ class EnterprisesModel extends Model
     // dd($sql);
     return $this->db->query($sql)->getResult();
   }
- 
 }

@@ -2,14 +2,14 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Enterprises\Models\BlockModel;
-use Admin\Enterprises\Models\DistrictModel;
+use Admin\Dashboard\Models\BlockModel;
+use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesBudgetModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Enterprises\Models\GpModel;
 use Admin\Enterprises\Models\VillagesModel;
-use Admin\Enterprises\Models\YearModel;
+use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -268,7 +268,7 @@ class Enterprises extends AdminController
 
 			$enterprisesmodel->insert($enterprisesdata);
 
-			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
+			return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Added Successfully');
 		}
 
 		return $this->getForm();
@@ -323,7 +323,7 @@ class Enterprises extends AdminController
 
 			$data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
 
-			return redirect()->to(admin_url('enterprises'))->with('message', 'successful');
+			return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Updated Successfully');
 		}
 
 
@@ -496,15 +496,9 @@ class Enterprises extends AdminController
 		}
 
 		//Add GP url
+		
 		$data['add_gp_url'] = admin_url('grampanchayat/add');
-		/*
-		if($data['district_id']){
-			$data['add_gp_url'] .= "district_id=".$data['district_id'];
-		}
-		if($data['block_id']){
-			$data['add_gp_url'] .= "block_id=".$data['block_id'];
-		}
-		*/
+	
 		//Add village Url
 		$data['add_village_url'] = admin_url('village/add');
 

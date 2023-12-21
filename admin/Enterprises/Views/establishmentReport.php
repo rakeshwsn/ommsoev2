@@ -82,7 +82,7 @@
                                 <thead class="bg-light text-dark">
                                     <tr>
                                         <?php if ($district_id) { ?>
-                                            <th colspan="13"  >
+                                            <th colspan="<?= count($unit_names)?>"  >
                                                 District: <?= $district_text; ?> ||
                                             <?php  } ?>
                                             <?php if ($block_id) { ?>
@@ -115,7 +115,7 @@
                                             ?>
 
                                         </th>
-                                        <th colspan="13" class="text-center">Type and No. of Units</th>
+                                        <th colspan="<?= count($unit_names)?>" class="text-center">Type and No. of Units</th>
                                         <th rowspan="2">Total</th>
                                     </tr>
 

@@ -40,4 +40,14 @@ class YearModel extends Model
 	protected $bulider;
 
 
+	public function getCurrentYearId(){
+		return $this->where('DATE(start_date) <= DATE(NOW())')->where('DATE(end_date) >= DATE(NOW())')
+		->first()->id;
+	}
+	public function getCurrentYear() {
+        $date = date('Y-m-d');
+        $sql = "SELECT * FROM ".$this->table." WHERE DATE('$date') BETWEEN DATE(start_date) AND DATE(end_date)";
+        return $this->db->query($sql)->getFirstRow();
+	}
+
 }
