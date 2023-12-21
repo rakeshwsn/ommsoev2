@@ -130,14 +130,16 @@ class Api extends Controller
 	public function currentyearchart()
 	{
 
-		$districtmodel = new DistrictModel();
+		$yearmodel = new YearModel();
 		$currentyeardata = new CurrentYearChartModel();
 	
 		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
 		if (!$this->request->getGet('year_id')) {
 			$filter['year_id'] = (new YearModel())->getCurrentYearId();
+			$year_id =  (new YearModel())->getCurrentYearId();
 		} else {
 			$filter['year_id'] = $this->request->getGet('year_id');
+			$year_id =  $this->request->getGet('year_id');
 		}
 		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
 		// dd($crntyrdatas);
@@ -150,7 +152,14 @@ class Api extends Controller
 			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
 			$data['currentachievements'][] = (float)$crntyrdata->achievement;
 		}
+		$data['heading'] = 'Crop Demonstration Of Kharif under Odisha Millets Mission';
+
 		
+		if ($year_id) {
+			$data['heading'] .= ' Of:-' . $yearmodel->find($year_id)->name;
+		}else{
+			$data['heading'] .= ' Of:-' . (new YearModel())->getCurrentYearId()->name;
+		}
 		header('Content-Type: application/json');
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 	}

@@ -181,7 +181,7 @@ FROM (SELECT
     if (!empty($filter['block_id'])) {
       $sql .= " AND (e.block_id = {$filter['block_id']})";
     }
-
+   
 
     $sql .= " GROUP BY e.unit_id) func_unit_upto
     ON func_unit_upto.unit_id = units.unit_id
@@ -200,7 +200,7 @@ FROM (SELECT
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
     if (!empty($filter['year_id'])) {
-      $sql .= " AND (dy.id = {$filter['year_id']} AND sm.id = {$filter['month_id']})";
+      $sql .= " AND (dy.id = {$filter['year_id']} AND sm.id = $pmonth)";
     }
     if (!empty($filter['district_id'])) {
       $sql .= " AND (e.district_id = {$filter['district_id']})";
@@ -256,7 +256,7 @@ FROM (SELECT
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
     if (!empty($filter['year_id'])) {
-      $sql .= " AND (et.year_id = {$filter['year_id']} AND et.month_id = {$filter['month_id']})";
+      $sql .= " AND (et.year_id = {$filter['year_id']} AND et.month_id = $pmonth)";
     }
     if (!empty($filter['district_id'])) {
       $sql .= " AND (et.district_id = {$filter['district_id']})";

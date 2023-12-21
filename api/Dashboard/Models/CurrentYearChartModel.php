@@ -59,9 +59,10 @@ class CurrentYearChartModel extends Model
 		  ON ddm.district_id = sd.id
 	  WHERE ddm.deleted_at IS NULL";
 	  
-	  if(!empty($filter['year_id'])){
-		$sql .= " AND ddm.year_id=".$filter['year_id'];
-	  }
+	  if (!empty($filter['year_id'])) {
+		$sql .= " AND ddm.year_id=" . $filter['year_id'];
+	}
+	
 	
 		// printr($sql);exit;
 		return $this->db->query($sql)->getResult();
