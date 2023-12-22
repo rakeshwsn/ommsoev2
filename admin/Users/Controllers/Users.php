@@ -258,6 +258,7 @@ class Users extends AdminController
 		if ($this->validate($rules)) {
 			return true;
 		} else {
+		dd($validation->getErrors());
 			//printr($validation->getErrors());
 			$this->error['warning'] = "Warning: Please check the form carefully for errors!";
 			return false;

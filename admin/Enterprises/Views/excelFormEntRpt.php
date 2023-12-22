@@ -1,38 +1,41 @@
 <table class="table table-bordered border-dark border-3">
+
     <thead>
         <tr>
-            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="<?= count($unit_names)?>">
+            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="<?= count($unit_names) ?>">
                 <h4>Enterprise Establishment Report</h4>
             </th>
 
         </tr>
         <tr>
-            <?php if ($district_id) { ?>
-                <th colspan="<?= count($unit_names)?>" style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; ">
-                    District: <?= $district_text; ?> ||
-                <?php  } ?>
-                <?php if ($block_id) { ?>
+            <th style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; " colspan="<?= count($unit_names) ?>">
+
+                <?php if ($district_id) { ?>
+                    District: <?= $district_text; ?>
+                <?php  }
+                if ($block_id) { ?>
 
                     Block: <?= $block_text; ?> ||
-                <?php  } ?>
-                <?php if ($year_id) { ?>
+                <?php  }
+                if ($year_id) { ?>
 
                     Year: <?= $year_text; ?> ||
-                <?php  } ?>
-                <?php if ($month_id) { ?>
+                <?php  }
+                if ($month_id) { ?>
 
                     Month: <?= $month_text; ?> ||
+                <?php  }
+                if ($management_unit_type == 'management_unit_type') { ?>
+
+                    Unit: <?= $unit_text; ?>
                 <?php  } ?>
-                <?php if ($management_unit_type =='management_unit_type') { ?>
 
-                    Unit: <?= $unit_text; ?> </th>
-            <?php  } ?>
-
+            </th>
         </tr>
         <tr>
-            <td style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names)?>">
+            <th style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names) ?>">
                 Type and number of units
-            </td>
+            </th>
         </tr>
 
         <tr>
