@@ -54,10 +54,36 @@
         </div>
     </form>
 </div>
-
 <div class="block">
-
     <div class="block-content block-content-full">
+    <?php if($block_id){ ?>
+    <div class="col-md-2">
+    <form class="dm-uploader" id="uploader">
+                        <div role="button" class="btn btn-outline btn-warning">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
+                                <input type="file" title="Click to add Files">
+                        </div>
+                        <div class="status"></div>
+                    </form>
+                    </div>
+               <?php  }else{     ?>
+                <div class="col-md-2" style="display: none;">
+    <form class="dm-uploader" id="uploader">
+                        <div role="button" class="btn btn-outline btn-warning">
+                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
+                                <input type="file" title="Click to add Files">
+                        </div>
+                        <?php }  ?>
+                    
+                    </form>
+                    </div>
+                    <div id="loading-overlay">
+    <div class="progress" style="width: 100%">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" style="width:0%">
+            <span id="progress-percent">0</span>
+        </div>
+    </div>
+</div>
 
         <div class="tableFixHead">
             <table class="table custom-table " id="final-table">
@@ -65,8 +91,6 @@
                     <tr>
                         <th rowspan="3">GP</th>
                         <th rowspan="3">No Of Villages</th>
-                       
-                       
                         <th colspan="13">Achievement under demonstration(in Ha.)</th>
                         <th colspan="8">Follow Up Crops (with out incentive) (in Ha)
                         </th>
@@ -109,7 +133,6 @@
                                     value="<?= $gpdata['id']; ?>">
                                 <input type="hidden" name="area[<?= $gpdata['gp_id'] ?>][gp_id]"
                                     value="<?= $gpdata['gp_id']; ?>">
-
                             </td>
                             <td>
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][no_of_village]"
@@ -123,7 +146,6 @@
                                     value="<?= $gpdata['farmers_covered_under_demonstration']; ?>"
                                     oninput="validatePositiveInteger(this, 3)" class="sum-input-demon dynamic-input">
                             </td>
-                           
                             <!-- Other GP-specific fields -->
                             <?php
                             $keys = ['smi', 'lt', 'ls'];
@@ -164,7 +186,7 @@
                                     oninput="validateField(this,5)" data-gp-id="<?= $gpdata['gp_id'] ?>">
                             </td>
                             <td>
-                                <input type="number" name="area[<?= $gpdata['gp_id']; ?>][fup_lm]" class="fup-input sum-input-fup-lm"
+                            <input type="number" name="area[<?= $gpdata['gp_id']; ?>][fup_lm]" class="fup-input sum-input-fup-lm"
                                     id="fup_lm_<?= $gpdata['gp_id']; ?>" value="<?= $gpdata['fup_lm']; ?>"
                                     oninput="validateField(this,5)" data-gp-id="<?= $gpdata['gp_id']; ?>">
                             </td>
@@ -182,7 +204,6 @@
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_km]" class="fup-input sum-input-fup-km"
                                     id="fup_km_<?= $gpdata['gp_id'] ?>" value="<?= $gpdata['fup_km']; ?>"
                                     oninput="validateField(this,5)" data-gp-id="<?= $gpdata['gp_id'] ?>">
-                                    
                             </td>
                             <td>
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][fup_bm]" class="fup-input sum-input-fup-bm"
@@ -235,18 +256,14 @@
                         <td id="Total-Ach-Demon"></td>
                         <td id="Total-Ach-Fup"></td>
                     </tr>
-
                 </tbody>
-
             </table>
-
         </div>
         <div style="text-align: right;padding: 5px;">
-            <button onclick="validateSave()" type="submit" id="submit" value="submit" form="form-finaldata"    class="btn btn-primary">Save</button>
+            <button onclick="validateSave()" type="submit" id="submit" value="submit" form="form-finaldata" class="btn btn-primary">Save</button>
         </div>
     </div>
 </div>
-
 <script>
     function validatePositiveInteger(input, maxLength) {
         // Remove non-numeric characters (except ".") from the input
@@ -306,7 +323,6 @@ $gpIds = array_map(function ($gpdata) {
         });
     });
 </script>
-
 <script>
     function validateField(field, maxDigits) {
         var inputValue = field.value.trim();
@@ -317,7 +333,6 @@ $gpIds = array_map(function ($gpdata) {
         } else {
             field.setCustomValidity('');
         }
-
         
         var gpId = field.dataset.gpId;
         updateTotals(gpId);
@@ -554,9 +569,9 @@ $(document).ready(function () {
         $('#Total-Km').text(totalKmLs.toFixed(2));
         $('#Total-Bm').text(totalBmLs.toFixed(2));
         $('#Total-Pm').text(totalPmLs.toFixed(2));
-          $('#All-Total-Ragi').text(totalAllRagi.toFixed(2));
+        $('#All-Total-Ragi').text(totalAllRagi.toFixed(2));
         $('#All-Total-Non-Ragi').text(totalAllNonRagi.toFixed(2));
-         $('#Total-Ach-Demon').text(totalAchDemon.toFixed(2));
+        $('#Total-Ach-Demon').text(totalAchDemon.toFixed(2));
     }
 </script>
 <script>
@@ -594,6 +609,102 @@ $(document).ready(function () {
         document.getElementById('Total-Ach-Fup').innerText = totalAchFup.toFixed(2);
     }
 </script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+    function getQueryParameter(name) {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+        $('#uploader').dmUploader({
+            dnd: false,
+            url: '<?= $upload_url ?>',
+            dataType: 'json',
+            maxFileSize: 1000000, // 1MB
+            multiple: false,
+            allowedTypes: 'application/*',
+            extFilter: ['pdf'],
+            onInit: function () {
+                // Plugin is ready to use
+                // console.log('initialized');
+            },
+            onComplete: function () {
+                // All files in the queue are processed (success or error)
+                $('#upload-controls').loading('stop');
+            },
+            onNewFile: function (id, file) {
+                // When a new file is added using the file selector or the DnD area
+                show_status('');
+            },
+            onBeforeUpload: function (id) {
+                // about to start uploading a file
+                setProgress(0);
+                var block_id = getQueryParameter('block_id');
+                  console.log('block_id:', block_id);
+                if (typeof (loading) === 'undefined') {
+                    loading = $('#upload-controls').loading({
+                        overlay: $('#loading-overlay')
+                    });
+                } else {
+                    $('#upload-controls').loading();
+                }
+                
+            },
+            
+            onUploadCanceled: function (id) {
+                // Happens when a file is directly canceled by the user.
+            },
+            onUploadProgress: function (id, percent) {
+                // Updating file progress
+                setProgress(percent);
+            },
+            onUploadSuccess: function (id, data) {
+                // A file was successfully uploaded server response
+                if (data.status) {
+                    show_status('File uploaded successfully', 'text-success');
+                    //location.href = data.url;
+                } else {
+                    show_status(data.message, 'text-danger');
+                }
+                $('#progress-bar').width(0 + '%');
+            },
+            onUploadError: function (id, xhr, status, message) {
+                console.log(message);
+                show_status(message, 'text-danger');
+                $('#upload-controls').loading('stop');
+            },
+            onFileSizeError: function (file) {
+                // file.name
+                show_status('Invalid file size', 'text-danger');
+            },
+            onFileExtError: function (file) {
+                // file.name
+                show_status('Invalid file type', 'text-danger');
+            },
+            onFileTypeError: function (file) {
+                // file.name
+                show_status('Invalid file type', 'text-danger');
+            }
+        });
+
+        function show_status(msg, className) {
+            $('.dm-uploader .status').addClass(className).text(msg);
+        }
+
+        function setProgress(percent) {
+            $('#progress-bar').width(percent + '%');
+            $('#progress-percent').text(percent + '%');
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
 
 
 
