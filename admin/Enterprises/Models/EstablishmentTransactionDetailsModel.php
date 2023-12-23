@@ -44,7 +44,7 @@ class EstablishmentTransactionDetailsModel extends Model
   public function periodswisetrans($filter = [])
   {
     $sql = "SELECT
-    e.id,
+    e.id ent_id,
     txn_dtl.txn_id,
     txn_dtl.est_id,
     sd.name district_name,
@@ -94,7 +94,7 @@ class EstablishmentTransactionDetailsModel extends Model
       ON sb.id = txn_dtl.block_id
     LEFT JOIN soe_districts sd
       ON sd.id = txn_dtl.district_id
-    LEFT JOIN grampanchayat g
+    LEFT JOIN soe_grampanchayats g
       ON g.id = txn_dtl.gp_id
     LEFT JOIN villages v
       ON v.id = txn_dtl.village_id
@@ -107,7 +107,7 @@ class EstablishmentTransactionDetailsModel extends Model
     if (isset($filter['id'])) {
       $sql .= " AND e.id = " . $filter['id'];
     }
-    if (isset($filter['year_id'])) {
+    if (isset($filter['year_id']) && $filter['year_id']) {
       $sql .= " AND txn_dtl.year_id = " . $filter['year_id'];
     }
     if (isset($filter['district_id'])) {
@@ -121,169 +121,153 @@ class EstablishmentTransactionDetailsModel extends Model
     }
     // $sql .=  " GROUP BY unit.units";
     //  echo $sql;exit;
-    return $this->db->query($sql)->getResult();
+    if (isset($filter['id'])) {
+      return $this->db->query($sql)->getRow();
+    } else {
+      return $this->db->query($sql)->getResult();
+    }
   }
+
+
   public function unitwisereport($filter = [])
   {
+    $last_year = 0;
+    if (!empty($filter['year_id'])) {
+      $last_year = $filter['year_id'] - 1;
+    }
+    $pmonth = 0;
+    if (!empty($filter['month_id'])) {
+      $pmonth = $filter['month_id'] - 1;
+    }
     $sql = "SELECT
-    units.unit_id,
-    units.unit_name,
-    COALESCE(func_unit_upto.total_units, 0) total_units_upto,
-    COALESCE(func_unit_mon.total_units, 0) total_units_mon,
-    COALESCE(func_unit_upto.total_units, 0) + COALESCE(func_unit_mon.total_units, 0) total_units_cumm,
-    COALESCE(trxn_upto.turn_over, 0) turnover_upto,
-    COALESCE(txn_mon.turn_over, 0) turnover_mon,
-    COALESCE(trxn_upto.turn_over, 0) + COALESCE(txn_mon.turn_over, 0) turnover_cumm,
-    COALESCE(trxn_upto.expense, 0) expn_upto,
-    COALESCE(txn_mon.expense, 0) expn_mon,
-    COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
-    COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
-    COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
-    FROM (SELECT
-      eu.id unit_id,
-      eu.name unit_name
-    FROM enterprises_units eu
-    ORDER BY eu.name) units
-    LEFT JOIN (SELECT
-        et.unit_id,
-        COUNT(et.id) total_units,
-        et.district_id,
-        etd.block_id ,
-        e.management_unit_type
-    FROM enterprises_transaction et
-      LEFT JOIN enterprises e
-        ON et.unit_id = e.unit_id
-      LEFT JOIN enterprises_transactiondetails etd
-        ON et.id = etd.transaction_id
-     
-      WHERE et.deleted_at IS NULL";
-    if ($filter['year_id']) {
-      $sql .= " AND ((year_id BETWEEN 0 AND {$filter['year_id']})";
-    }
-    if ($filter['month_id']) {
-      $pmonth = $filter['month_id'] - 1;
-      $sql .= " OR (year_id = {$filter['year_id']} AND month_id BETWEEN 0 AND $pmonth))";
-    }
-    if ($filter['district_id']) {
-      $sql .= " AND (et.district_id = {$filter['district_id']})";
-    }
-    if ($filter['block_id']) {
-      $sql .= " AND (etd.block_id = {$filter['block_id']})";
-    }
-    if ($filter['management_unit_type']) {
+  units.unit_id,
+  units.unit_name,
+  COALESCE(func_unit_upto.total_units, 0) total_units_upto,
+  COALESCE(func_unit_mon.total_units, 0) total_units_mon,
+  COALESCE(func_unit_upto.total_units, 0) + COALESCE(func_unit_mon.total_units, 0) total_units_cumm,
+  COALESCE(trxn_upto.turn_over, 0) turnover_upto,
+  COALESCE(txn_mon.turn_over, 0) turnover_mon,
+  COALESCE(trxn_upto.turn_over, 0) + COALESCE(txn_mon.turn_over, 0) turnover_cumm,
+  COALESCE(trxn_upto.expense, 0) expn_upto,
+  COALESCE(txn_mon.expense, 0) expn_mon,
+  COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
+  COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
+  COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
+FROM (SELECT
+    eu.id unit_id,
+    eu.name unit_name
+  FROM enterprises_units eu
+  ORDER BY eu.name) units
+  LEFT JOIN (SELECT
+      e.unit_id,
+      COUNT(e.id) total_units
+    FROM enterprises e
+      LEFT JOIN dashboard_years dy
+        ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+      LEFT JOIN soe_months sm
+        ON MONTH(e.mou_date) = sm.number
+    WHERE e.deleted_at IS NULL
+    AND e.unit_id > 0
+    AND YEAR(e.mou_date) > 2000";
+    if (!empty($filter['management_unit_type'])) {
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
-    // AND ((year_id BETWEEN 0 AND 6)
-    // OR (year_id = 7
-    // AND month_id BETWEEN 0 AND 7))
-    $sql .= " AND et.unit_id > 0
-      GROUP BY et.unit_id) func_unit_upto
-      ON func_unit_upto.unit_id = units.unit_id
-    LEFT JOIN (SELECT
-        et.unit_id,
-        COUNT(et.id) total_units,
-        et.district_id,
-        etd.block_id,
-        e.management_unit_type
-    FROM enterprises_transaction et
-      LEFT JOIN enterprises e
-        ON et.unit_id = e.unit_id
-      LEFT JOIN enterprises_transactiondetails etd
-        ON et.id = etd.transaction_id
-     
-      WHERE et.deleted_at IS NULL";
-    if (($filter['year_id']) && ($filter['month_id'])) {
-      $sql .= " AND (year_id = {$filter['year_id']} AND month_id = {$filter['month_id']})";
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND ((dy.id BETWEEN 0 AND $last_year) OR (dy.id = {$filter['year_id']} AND sm.id BETWEEN 0 AND $pmonth))";
     }
-    if ($filter['district_id']) {
-      $sql .= " AND (et.district_id = {$filter['district_id']})";
+    if (!empty($filter['district_id'])) {
+      $sql .= " AND (e.district_id = {$filter['district_id']})";
     }
-    if ($filter['block_id']) {
-      $sql .= " AND (etd.block_id = {$filter['block_id']})";
+    if (!empty($filter['block_id'])) {
+      $sql .= " AND (e.block_id = {$filter['block_id']})";
     }
-    if ($filter['management_unit_type']) {
+   
+
+    $sql .= " GROUP BY e.unit_id) func_unit_upto
+    ON func_unit_upto.unit_id = units.unit_id
+  LEFT JOIN (SELECT
+      e.unit_id,
+      COUNT(e.id) total_units
+    FROM enterprises e
+      LEFT JOIN dashboard_years dy
+        ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+      LEFT JOIN soe_months sm
+        ON MONTH(e.mou_date) = sm.number
+    WHERE e.deleted_at IS NULL
+    AND e.unit_id > 0
+    AND YEAR(e.mou_date) > 2000";
+    if (!empty($filter['management_unit_type'])) {
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
-    // AND (year_id = 7
-    // AND month_id = 8)
-    $sql .= " AND et.unit_id > 0
-      GROUP BY et.unit_id) func_unit_mon
-      ON func_unit_mon.unit_id = units.unit_id
-    LEFT JOIN (SELECT
-        et.unit_id,
-        SUM(etd.total_turnover) turn_over,
-        SUM(etd.total_expend) expense,
-        et.district_id,etd.block_id,
-        mangment_type.management_unit_type
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND (dy.id = {$filter['year_id']} AND sm.id = $pmonth)";
+    }
+    if (!empty($filter['district_id'])) {
+      $sql .= " AND (e.district_id = {$filter['district_id']})";
+    }
+    if (!empty($filter['block_id'])) {
+      $sql .= " AND (e.block_id = {$filter['block_id']})";
+    }
+
+    $sql .= " GROUP BY e.unit_id) func_unit_mon
+    ON func_unit_mon.unit_id = units.unit_id
+  LEFT JOIN (SELECT
+      et.unit_id,
+      SUM(etd.total_turnover) turn_over,
+      SUM(etd.total_expend) expense,
+      et.district_id,
+      etd.block_id
     FROM enterprises_transactiondetails etd
-      LEFT JOIN (SELECT
-          et.id,
-          e.management_unit_type
-        FROM enterprises_transaction et
-          LEFT JOIN enterprises e
-            ON et.unit_id = e.unit_id) mangment_type
-        ON etd.transaction_id = mangment_type.id
-        LEFT JOIN enterprises_transaction et
-          ON etd.transaction_id = et.id
-      WHERE etd.deleted_at IS NULL
-      AND et.deleted_at IS NULL";
-    if ($filter['year_id']) {
-      $sql .= " AND ((et.year_id BETWEEN 0 AND {$filter['year_id']})";
+      LEFT JOIN enterprises_transaction et
+        ON etd.transaction_id = et.id
+      LEFT JOIN enterprises e
+        ON etd.enterprise_id = e.id
+    WHERE etd.deleted_at IS NULL
+    AND et.deleted_at IS NULL";
+    if (!empty($filter['management_unit_type'])) {
+      $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
-    if ($filter['month_id']) {
-      $pmonth = $filter['month_id'] - 1;
-      $sql .= " OR (et.year_id = {$filter['year_id']} AND et.month_id BETWEEN 0 AND $pmonth))";
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND ((et.year_id BETWEEN 0 AND $last_year) OR (et.year_id = {$filter['year_id']} AND et.month_id BETWEEN 0 AND $pmonth))";
     }
-    if ($filter['district_id']) {
+    if (!empty($filter['district_id'])) {
       $sql .= " AND (et.district_id = {$filter['district_id']})";
     }
-    if ($filter['block_id']) {
+    if (!empty($filter['block_id'])) {
       $sql .= " AND (etd.block_id = {$filter['block_id']})";
     }
-    if ($filter['management_unit_type']) {
-      $sql .= " AND (mangment_type.management_unit_type = '" . $filter['management_unit_type'] . "')";
-    }
-    // AND ((et.year_id BETWEEN 0 AND 6)
-    // OR (et.year_id = 7
-    // AND et.month_id BETWEEN 0 AND 7))
+
     $sql .= " GROUP BY et.unit_id) trxn_upto
-      ON trxn_upto.unit_id = units.unit_id
-    LEFT JOIN (SELECT
-        et.unit_id,
-        et.district_id,
-        SUM(etd.total_turnover) turn_over,
-        SUM(etd.total_expend) expense,etd.block_id,
-        mangment_type.management_unit_type
-        FROM enterprises_transactiondetails etd
-          LEFT JOIN (SELECT
-              et.id,
-              e.management_unit_type
-            FROM enterprises_transaction et
-              LEFT JOIN enterprises e
-                ON et.unit_id = e.unit_id) mangment_type
-            ON etd.transaction_id = mangment_type.id
-        LEFT JOIN enterprises_transaction et
-          ON etd.transaction_id = et.id
-      WHERE etd.deleted_at IS NULL
-      AND et.deleted_at IS NULL";
-    if (($filter['year_id']) && ($filter['month_id'])) {
-      $sql .= " AND (et.year_id = {$filter['year_id']} AND et.month_id = {$filter['month_id']})";
+    ON trxn_upto.unit_id = units.unit_id
+  LEFT JOIN (SELECT
+      et.unit_id,
+      et.district_id,
+      SUM(etd.total_turnover) turn_over,
+      SUM(etd.total_expend) expense,
+      etd.block_id
+    FROM enterprises_transactiondetails etd
+      LEFT JOIN enterprises_transaction et
+        ON etd.transaction_id = et.id
+      LEFT JOIN enterprises e
+        ON etd.enterprise_id = e.id
+    WHERE etd.deleted_at IS NULL
+    AND et.deleted_at IS NULL";
+    if (!empty($filter['management_unit_type'])) {
+      $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
-    if ($filter['district_id']) {
+    if (!empty($filter['year_id'])) {
+      $sql .= " AND (et.year_id = {$filter['year_id']} AND et.month_id = $pmonth)";
+    }
+    if (!empty($filter['district_id'])) {
       $sql .= " AND (et.district_id = {$filter['district_id']})";
     }
-    if ($filter['block_id']) {
+    if (!empty($filter['block_id'])) {
       $sql .= " AND (etd.block_id = {$filter['block_id']})";
     }
-    if ($filter['management_unit_type']) {
-      $sql .= " AND (mangment_type.management_unit_type = '" . $filter['management_unit_type'] . "')";
-    }
-    // AND (et.year_id = 7
-    // AND et.month_id = 8)
+
     $sql .= " GROUP BY et.unit_id) txn_mon
-      ON txn_mon.unit_id = units.unit_id";
-    // echo $sql;
-    // exit;
+    ON txn_mon.unit_id = units.unit_id";
+    // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
 }

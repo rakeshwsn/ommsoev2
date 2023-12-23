@@ -49,7 +49,7 @@
 
 <div class="block">
     <div class="block-header block-header-default">
-        <h3 class="block-title">Data List</h3>
+        <h3 class="block-title">Enterprise Transaction List</h3>
         <div class="block-options d-flex">
             <div>
             
@@ -263,10 +263,7 @@
         },
         onUploadSuccess: function(id, data) {
             // A file was successfully uploaded server response
-            if (data.status) {
-                show_error('File uploaded successfully');
-                console.log(data.data);
-                $('.dm-uploader .status').addClass('text-success');
+            if (data.url) {
                 location.href = data.url;
             } else {
                 show_error(data.message)

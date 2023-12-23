@@ -1,5 +1,7 @@
 <?php
+
 namespace Api\Dashboard\Models;
+
 use CodeIgniter\Model;
 
 class YearModel extends Model
@@ -40,8 +42,10 @@ class YearModel extends Model
 	protected $bulider;
 
 
-	public function getCurrentYearId(){
+	public function getCurrentYearId()
+	{
 		return $this->where('DATE(start_date) <= DATE(NOW())')->where('DATE(end_date) >= DATE(NOW())')
 		->first()->id;
+		
 	}
 }

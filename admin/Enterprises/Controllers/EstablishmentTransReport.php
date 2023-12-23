@@ -3,15 +3,15 @@
 namespace Admin\Enterprises\Controllers;
 
 use Admin\Dashboard\Models\EnterpriseModel;
-use Admin\Enterprises\Models\BlockModel;
-use Admin\Enterprises\Models\DistrictModel;
+use Admin\Dashboard\Models\BlockModel;
+use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 // use Admin\Enterprises\Models\EnterprisesUnitModel;
 // use Admin\Enterprises\Models\GpModel;
 // use Admin\Enterprises\Models\VillagesModel;
-use Admin\Enterprises\Models\YearModel;
+use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -97,7 +97,7 @@ class EstablishmentTransReport extends AdminController
 
 		$month_id = $this->request->getGet('month_id');
 
-		if ($month_id !== null && $month_id !== getCurrentMonthId()) {
+		if ($month_id && $month_id !== getCurrentMonthId()) {
 			$data['month_text'] = $monthmodel->find($month_id)->name;
 		} else {
 			$data['month_text'] = $monthmodel->getCurrentMonth()->name;
@@ -119,10 +119,16 @@ class EstablishmentTransReport extends AdminController
 
 		$data['district_id'] = $filter['district_id'] = $this->request->getGet('district_id') ?? 0;
 		$data['year_id'] = $filter['year_id'] = $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYear())->id;
-		$data['month_id'] = $filter['month_id'] = $this->request->getGet('month_id') ?? ((new MonthModel())->getCurrentMonth())->id;
+		$data['month_id'] = $this->request->getGet('month_id') ?? ((new MonthModel())->getCurrentMonth())->id;
 		$data['block_id'] = $filter['block_id'] = $this->request->getGet('block_id') ?? 0;
 		$data['management_unit_type'] = $filter['management_unit_type'] = $this->request->getGet('management_unit_type') ?? '';
 		//print_r($filter);
+		if(!$this->request->getGet('month_id')){
+			$filter['month_id'] = getCurrentMonthId();
+		} else {
+			$filter['month_id'] = $this->request->getGet('month_id');
+		}
+
 		$distwisetxnreports = $enetrprisetrxnreprt->unitwisereport($filter);
 		// dd($distwisetxnreports);
 		foreach ($distwisetxnreports as $distwisetxnreport) {

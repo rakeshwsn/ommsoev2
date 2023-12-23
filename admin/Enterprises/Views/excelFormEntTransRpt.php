@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="10">
-                    <h4>MPR of Enterprises Established</h4>
+                    <h4>MPR Of Enterprises Established</h4>
                 </th>
             </tr>
             <tr>
