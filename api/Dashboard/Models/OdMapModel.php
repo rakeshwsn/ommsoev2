@@ -41,7 +41,7 @@ class OdMapModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 
-	public function getestablishmentmap()
+	public function getmapdata()
 	{
 		$sql = "SELECT
 		ddm.id,
@@ -56,8 +56,8 @@ class OdMapModel extends Model
 	  FROM dashboard_district_map ddm
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
-	  WHERE ddm.deleted_at IS NULL";
-
+	  WHERE ddm.deleted_at IS NULL AND ddm.year_id=7";
+// printr($sql);exit;
 		return $this->db->query($sql)->getResult();
 	}
 
@@ -72,6 +72,27 @@ class OdMapModel extends Model
 		FROM dashboard_district_map
 		WHERE deleted_at IS NULL";
 
+		return $this->db->query($sql)->getResult();
+	}
+	public function getcurrentyeardata($filter=[]) {
+		$sql = "SELECT
+		ddm.id,
+		ddm.district_id,
+		ddm.year_id,
+		ddm.tentative_farmers total_farmers,
+		ddm.acheivement achievement,
+		sd.name districts
+	  FROM dashboard_district_map ddm
+		LEFT JOIN soe_districts sd
+		  ON ddm.district_id = sd.id
+	  WHERE ddm.deleted_at IS NULL";
+	  
+	  if (!empty($filter['year_id'])) {
+		$sql .= " AND ddm.year_id=" . $filter['year_id'];
+	}
+	
+	
+		
 		return $this->db->query($sql)->getResult();
 	}
 }
