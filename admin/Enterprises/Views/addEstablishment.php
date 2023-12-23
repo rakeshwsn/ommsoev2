@@ -117,6 +117,11 @@ $validation = \Config\Services::validation();
                     <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder="Enter Budget " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
+                <div class="col-6 form-group <?= $validation->hasError('own_share') ? 'is-invalid' : '' ?>">
+                    <label for="total own share">Total Own Share<span class="text-danger">*</span></label>
+                    <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>"required>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('own_share'); ?></div>
+                </div>
 
             </div>
             <div class="row">
@@ -124,6 +129,11 @@ $validation = \Config\Services::validation();
                     <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
                     <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
+                </div>
+                <div class="col-6 form-group <?= $validation->hasError('total govt share') ? 'is-invalid' : '' ?>">
+                    <label for="Total govt share">Total Govt Share<span class="text-danger">*</span></label>
+                    <input type="text"  name="govt_share" class="form-control" id="govt_share" placeholder=" Enter total govt share" value="<?= set_value('govt_share', $govt_share) ?>"required>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('govt_share'); ?></div>
                 </div>
 
             </div>

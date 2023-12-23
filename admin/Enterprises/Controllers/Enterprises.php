@@ -262,7 +262,10 @@ class Enterprises extends AdminController
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
 				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
 				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
-				'support_infr_amount' => $this->request->getPost('support_infr_amount')
+				'support_infr_amount' => $this->request->getPost('support_infr_amount'),
+				'own_share' => $this->request->getPost('own_share'),
+				'govt_share' => $this->request->getPost('govt_share')
+
 			];
 			// dd($enterprisesdata);
 
@@ -318,7 +321,9 @@ class Enterprises extends AdminController
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
 				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
 				'purpose_infr_support' =>$data['purpose_infr_support'],
-				'support_infr_amount' => $data['support_infr_amount']
+				'support_infr_amount' => $data['support_infr_amount'],
+				'own_share' => $this->request->getPost('own_share'),
+				'govt_share' => $this->request->getPost('govt_share')
 			];
 
 			$data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);

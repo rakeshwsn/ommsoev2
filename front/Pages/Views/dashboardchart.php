@@ -345,14 +345,16 @@
             backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'rgba(255,255,255,0.25)'
         },
         series: [{
-            name: 'Area Achievement (in hectare)',
-            type: 'column',
+            name: 'No. of Farmer',
+            type: 'spline',
             data: [
 
             ]
+           
+           
         }, {
-            name: 'No. of Farmer ',
-            type: 'spline',
+            name: 'Area Achievement (in hectare) ',
+            type: 'column',
             data: [
 
             ]

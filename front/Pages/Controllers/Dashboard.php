@@ -35,7 +35,7 @@ class Dashboard extends BaseController
 		}
 		
 		$odmapmodel = new OdMapModel();
-		$data['maps'] = $odmapmodel->getestablishmentmap();
+		$data['maps'] = $odmapmodel->getmapdata();
 // printr($data['maps']);exit;
 
 		$data['area_url'] = site_url('api/areacoverage');
