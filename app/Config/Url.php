@@ -2,7 +2,8 @@
 
 namespace Config;
 
-class Url {
+class Url
+{
 
     const baseUrl = '';
     const dashboard = 'admin';
@@ -58,16 +59,17 @@ class Url {
     const mprUpload = 'admin/reports/mprupload/upload';
     const mis = 'admin/mis';
     const misAdd = 'admin/mis/add';
-	const misEdit = 'admin/mis/edit';
-	const misDelete = 'admin/mis/delete';
+    const misEdit = 'admin/mis/edit';
+    const misDelete = 'admin/mis/delete';
     const MISUpload = 'admin/mis/upload';
-	const misDatatable = 'admin/mis/search';
+    const misDatatable = 'admin/mis/search';
     const getBlocks = 'admin/district/block';
     const getDistricts = 'admin/district/fundagency';
     const misIsUploaded = 'admin/transaction/isuploaded';
     const userAllowUpload = 'admin/users/allowupload/update';
     const userUploadStatus = 'admin/users/uploadstatus/update';
     const areaCoverageUpload = 'admin/areacoverage/upload';
+    const areaCoverageFinalDataDocUpload = 'admin/areacoverage/finaldata/upload';
 
     const correction = 'admin/correction';
     const correctionTransaction = 'admin/correction/transaction';

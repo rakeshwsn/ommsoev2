@@ -185,6 +185,8 @@ class AreaCoverageFinalData extends AdminController
 
     protected function getForm()
     {
+        $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
+
         $data = [];
         $data['seasons'] = $this->acModel->getSeasons();
         // $data['aftcurrentseason'] = getAftCurrentSeason();
@@ -192,6 +194,8 @@ class AreaCoverageFinalData extends AdminController
         // exit;
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
+        $block_id = $this->request->getGet('block_id');
+
         $crops = $this->cropsModel->findAll();
         $data['crops'] = $crops;
         foreach ($crops as $crop) {
@@ -250,7 +254,6 @@ class AreaCoverageFinalData extends AdminController
         // printr($data['gpsfinaldata']);
         // exit;
         if ($this->request->getMethod(1) === 'POST') {
-            $block_id = $this->request->getGet('block_id');
             $data['block_id'] = $block_id;
             $gpMasterData = [];
             // printr($_POST);
@@ -304,13 +307,57 @@ class AreaCoverageFinalData extends AdminController
                 }
 
                 $this->fdModel->addGpCropsData($mergedData);
-
             }
 
-            $this->session->setFlashdata('message', 'Target Updated Successfully.');
+            $this->session->setFlashdata('message', 'Final Data Updated Successfully.');
             return redirect()->to(base_url('admin/areacoverage/finaldata'));
         }
+        $data['upload_url'] = Url::areaCoverageFinalDataDocUpload . '?block_id=' . $block_id;
         echo $this->template->view('Admin\CropCoverage\Views\areacoverage_final_data_form', $data);
+    }
+    public function upload()
+    {
+        $block_id = $this->request->getGet('block_id');
+
+        $input = $this->validate([
+            'file' => [
+                'uploaded[file]',
+                'mime_in[file,application/pdf]',
+                'max_size[file,1024]',
+                'ext_in[file,pdf]',
+            ]
+        ]);
+
+        if (!$input) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
+            ]);
+        } else {
+
+            $file = $this->request->getFile('file');
+            if ($file->isValid()) {
+                $file->move(DIR_UPLOAD . 'finaldatadoc');
+                ;
+            }
+
+            $filedata = [
+                'block_id' => $block_id,
+                'filename' => $file->getName()
+
+            ];
+
+            $this->fdModel->addFileData($filedata);
+            $filename = $this->fdModel->getFilenameByBlockId($block_id);
+            printr($filename);
+            exit;
+        }
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => 'Upload successful.',
+            'url' => admin_url()
+        ]);
     }
 
 }
