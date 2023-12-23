@@ -35,9 +35,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('areacoverage/finaldata', 'CropCoverage\Controllers\AreaCoverageFinalData::index');
     $routes->get('areacoverage/finaldata/approve', 'CropCoverage\Controllers\FinalDataApprove::index');
     $routes->add('areacoverage/finaldata/approve/district', 'CropCoverage\Controllers\FinalDataApprove::district');
+    $routes->match(['get', 'post'], 'areacoverage/finaldata/upload', 'CropCoverage\Controllers\AreaCoverageFinalData::upload');
 
     $routes->match(['get', 'post'], 'areacoverage/finaldata/add', 'CropCoverage\Controllers\AreaCoverageFinalData::getForm');
-    $routes->get('areacoverage/finaldata/download', 'CropCoverage\Controllers\AreaCoverageFinalData::getList/download');
+
 
 
 

@@ -33,7 +33,6 @@
                         echo '<button class="btn btn-square btn-danger min-width-125 mb-10" disabled><i class="fa fa-download mr-5"></i> Download</button>';
                     }
                     ?>
-
                 </div>
                 <div class="col-md-2 mt-4">
                     <form class="dm-uploader" id="uploader">
@@ -49,7 +48,6 @@
                     </form>
                 </div>
             </div>
-
         </div>
 
         <?php if (!empty($blocks)) { ?>
@@ -91,7 +89,6 @@
         </div>
 
         <div class="block-content">
-
 
             <table class="table">
                 <thead>
