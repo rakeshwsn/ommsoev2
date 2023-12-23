@@ -60,6 +60,12 @@ class FinalDataModel extends Model
     foreach ($mergedData as $data) {
       $this->db->table('ac_final_area_data')->insert($data);
     }
+
+
+  }
+  public function addFileData($filedata)
+  {
+    $this->db->table('ac_finaldata_doc')->insert($filedata);
   }
 
 
