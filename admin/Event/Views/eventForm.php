@@ -21,15 +21,15 @@ $validation = \Config\Services::validation();
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('name'); ?></div>
           </div>
         </div>
-                <div class="form-group row <?= $validation->hasError('objective') ? 'is-invalid' : '' ?>">
+        <div class="form-group row <?= $validation->hasError('objective') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Objective Of The Event</label>
           <div class="col-sm-10">
 
             <?= form_input(array('class' => 'form-control', 'name' => 'objective', 'type' => 'text', 'id' => 'objective', 'placeholder' => 'Objective Of The Event', 'value' => set_value('objective', $objective))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('objective'); ?></div>
-    </div>
+          </div>
         </div>
-             <div class="form-group row <?= $validation->hasError('occasion') ? 'is-invalid' : '' ?>">
+        <div class="form-group row <?= $validation->hasError('occasion') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Occasion Of Event</label>
           <div class="col-sm-10">
 
@@ -37,28 +37,28 @@ $validation = \Config\Services::validation();
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('occasion'); ?></div>
           </div>
         </div>
-         <div class="form-group row <?= $validation->hasError('event_date_from') ? 'is-invalid' : '' ?>">
+        <div class="form-group row <?= $validation->hasError('event_date_from') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Date Of Event From</label>
           <div class="col-sm-10">
             <?= form_input(array('class' => 'form-control', 'name' => 'event_date_from', 'type' => 'date', 'id' => 'event_date_from', 'placeholder' => 'Date Of Event From', 'value' => set_value('event_date_from', $event_date_from))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('event_date_from'); ?></div>
           </div>
         </div>
-         <div class="form-group row <?= $validation->hasError('event_date_to') ? 'is-invalid' : '' ?>">
+        <div class="form-group row <?= $validation->hasError('event_date_to') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Date Of Event To</label>
           <div class="col-sm-10">
             <?= form_input(array('class' => 'form-control', 'name' => 'event_date_to', 'type' => 'date', 'id' => 'event_date_to', 'placeholder' => 'Date Of Event To', 'value' => set_value('event_date_to', $event_date_to))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('event_date_to'); ?></div>
           </div>
         </div>
-       <div class="form-group row <?= $validation->hasError('place') ? 'is-invalid' : '' ?>">
-              <label class="col-sm-2 control-label" for="input-name">Place Of Event</label>
+        <div class="form-group row <?= $validation->hasError('place') ? 'is-invalid' : '' ?>">
+          <label class="col-sm-2 control-label" for="input-name">Place Of Event</label>
           <div class="col-sm-10">
             <?= form_input(array('class' => 'form-control', 'name' => 'place', 'type' => 'text', 'id' => 'place', 'placeholder' => 'Place Of Event', 'value' => set_value('place', $place))); ?>
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('place'); ?></div>
           </div>
         </div>
-        
+
         <div class="form-group row <?= $validation->hasError('event_days') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">No Of Event Days</label>
           <div class="col-sm-10">
@@ -91,7 +91,7 @@ $validation = \Config\Services::validation();
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('stakeholder'); ?></div>
           </div>
         </div>
-   
+
 
         <div class="form-group row <?= $validation->hasError('guest') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Special Guest To Event(Name and Designation)</label>
@@ -109,7 +109,7 @@ $validation = \Config\Services::validation();
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('feedback'); ?></div>
           </div>
         </div>
-         <div class="form-group row <?= $validation->hasError('involved') ? 'is-invalid' : '' ?>">
+        <div class="form-group row <?= $validation->hasError('involved') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">SHG/FPO/FA (Involved):Name</label>
           <div class="col-sm-10">
 
@@ -118,10 +118,15 @@ $validation = \Config\Services::validation();
           </div>
         </div>
         <div class="form-group row <?= $validation->hasError('report') ? 'is-invalid' : '' ?>">
-            <label class="col-sm-2 control-label" for="input-name">Event Report</label>
-            <div class="col-sm-10">
-                <input type="file" name="report" id="report" value="<?= set_value('report', $report); ?>">
-            </div>
+          <label class="col-sm-2 control-label" for="input-name">Event Report</label>
+          <div class="col-sm-10">
+            <input type="file" name="report" id="report">
+            <input type="hidden" name="report_file" value="<?= set_value('report', $report); ?>">
+            <span><?php echo $report; ?></span>
+            <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('report'); ?></div>
+            <div class="text-danger"><?= $validation->getError('report'); ?></div>
+          </div>
+
         </div>
         <div class="form-group row">
           <label class="col-sm-2 control-label" for="input-status">Status</label>
@@ -160,8 +165,8 @@ $validation = \Config\Services::validation();
                   </div>
                 </td>
                 <td class="text-left">
-                  <input type="text" name="event_image[<?= $image_row; ?>][title]" value="<?=  $event_image['title']; ?>" placeholder="Title" class="form-control" />
-                  <input type="text" name="event_image[<?= $image_row; ?>][link]" value="<?=  $event_image['link']; ?>" placeholder="Link" class="form-control" />
+                  <input type="text" name="event_image[<?= $image_row; ?>][title]" value="<?= $event_image['title']; ?>" placeholder="Title" class="form-control" />
+                  <input type="text" name="event_image[<?= $image_row; ?>][link]" value="<?= $event_image['link']; ?>" placeholder="Link" class="form-control" />
                 </td>
                 <td class="text-left">
                   <textarea name="event_image[<?= $image_row; ?>][description]" class="description form-control"><?= $event_image['description']; ?> </textarea>

@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\Event\Controllers;
 
 use App\Controllers\AdminController;
@@ -14,7 +15,7 @@ class Event extends AdminController
 {
 
     private $error = array();
-
+    private $eventModel;
     function __construct()
     {
         $this->eventModel = new EventModel();
@@ -93,7 +94,6 @@ class Event extends AdminController
                 $result->status ? 'Enabled' : 'Disabled',
                 $action
             );
-
         }
         //printr($datatable);
         $json_data = array(
@@ -104,7 +104,6 @@ class Event extends AdminController
         );
         return $this->response->setContentType('application/json')
             ->setJSON($json_data);
-
     }
 
     public function add()
@@ -130,8 +129,6 @@ class Event extends AdminController
             $this->session->setFlashdata('message', 'Event Saved Successfully.');
 
             return redirect()->to(admin_url('event'));
-
-
         }
         $this->getForm();
     }
@@ -147,7 +144,6 @@ class Event extends AdminController
             $this->session->setFlashdata('message', 'Event Updated Successfully.');
 
             return redirect()->to(admin_url('event'));
-
         }
         $this->getForm();
     }
@@ -165,7 +161,6 @@ class Event extends AdminController
 
         $this->session->setFlashdata('message', 'Event deleted Successfully.');
         return redirect()->to(admin_url('event'));
-
     }
 
     protected function getForm()
@@ -200,6 +195,7 @@ class Event extends AdminController
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $event_info = $this->eventModel->getEvent($this->uri->getSegment(4));
         }
+        
         foreach ($this->eventModel->getFieldNames('events') as $field) {
             if ($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
@@ -249,17 +245,18 @@ class Event extends AdminController
 
         $validation = \Config\Services::validation();
         $id = $this->uri->getSegment(4);
-
+// printr($_POST);
+// printr($_FILES);
+// exit;
         $rules = $this->eventModel->validationRules;
 
         if ($this->validate($rules)) {
             return true;
         } else {
-            //printr($validation->getErrors());
+            printr($validation->getErrors());
             $this->error['warning'] = "Warning: Please check the form carefully for errors!";
             return false;
         }
         return !$this->error;
     }
 }
-?>

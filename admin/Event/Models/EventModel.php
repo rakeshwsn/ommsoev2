@@ -78,9 +78,15 @@ class EventModel extends Model
 			'label' => 'SHG/FPO/FA (Involved):Name',
 			'rules' => 'trim|required|min_length[3]|max_length[50]'
 		),
-		'report' => array(
+		'report_file' => array(
 			'label' => 'Event Report',
 			'rules' => 'trim|required'
+			// 'rules' => 'uploaded[report]|max_size[report,1024]',
+		),
+		'report' => array(
+			'label' => 'Event Report',
+			// 'rules' => 'trim|required'
+			'rules' => 'max_size[report,1024]',
 		)
 		// 'status' => array(
 		// 	'field' => 'status', 
