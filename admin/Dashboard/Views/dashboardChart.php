@@ -253,6 +253,7 @@
                 </div>
                 <div class="maptable col-6">
                     <!-- <div class="table-responsive" > -->
+                      
                     <table class="table">
                         <thead>
                             <tr>
@@ -266,10 +267,10 @@
                         <tbody>
                             <?php foreach ($maps as $map) { ?>
                                 <tr data-dist="<?= $map->district_id ?>">
-                                    <td><?= $map->district ?></td>
+                                    <td><?= $map->districts ?></td>
                                     <td><?= $map->blocks ?></td>
-                                    <td><?= $map->chc ?></td>
-                                    <td><?= $map->cmsc ?></td>
+                                    <td><?= $map->chcs ?></td>
+                                    <td><?= $map->cmscs ?></td>
                                     <td><?= $map->total_farmer ?></td>
                                 </tr>
                             <?php  } ?>

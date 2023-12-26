@@ -186,11 +186,15 @@ class Dashboard extends AdminController
         ];
 
         if ($this->user->district_id) {
-
+            $filter['district_id'] = $this->user->district_id;
         }
 
         if ($this->user->block_id) {
+            $filter['block_id'] = $this->user->block_id;
+        }
 
+        if ($this->user->fund_agency_id) {
+            $filter['fund_agency_id'] = $this->user->fund_agency_id;
         }
 
         $abstract = $this->reportModel->getAbstractTotal($filter);

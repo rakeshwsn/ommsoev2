@@ -233,7 +233,7 @@ class Dashboard extends ResourceController
 	{
 
 		$odmapmodel = new OdMapModel();
-		$odmapdatas = $odmapmodel->getestablishmentmap();
+		$odmapdatas = $odmapmodel->getmapdata();
 
 		$data['heading'] = 'Scale of Odisha Millets Mission';
 
@@ -383,8 +383,9 @@ class Dashboard extends ResourceController
 	public function mapdata()
 	{
 
-		$distmapmodel = new DistrictMapModel();
-		$mapdatas = $distmapmodel->getMapData();
+		// $distmapmodel = new DistrictMapModel();
+		$odmapmodel = new OdMapModel();
+		$mapdatas = $odmapmodel->getMapData();
 
 		$data['heading'] = 'Map Data';
 
@@ -408,9 +409,10 @@ class Dashboard extends ResourceController
 
 	public function summary()
 	{
-		$distmapmodel = new DistrictMapModel();
+		
+		$odmapmodel = new OdMapModel();
 		$yearModel = new YearModel();
-		$summery = $distmapmodel->getSummary();
+		$summery = $odmapmodel->getSummary();
 
 		$data['data'] = [
 			'total_districts' => $summery->total_districts,
@@ -431,7 +433,8 @@ class Dashboard extends ResourceController
 	public function currentyearchart()
 	{
 
-		$currentyeardata = new CurrentYearChartModel();
+		
+		$odmapmodel = new OdMapModel();
 
 		$yearmodel = new YearModel();
 		$year_id = 0;
@@ -446,7 +449,7 @@ class Dashboard extends ResourceController
 		}
 
 		// dd($filter);
-		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
+		$crntyrdatas = $odmapmodel->getcurrentyeardata($filter);
 		// dd($crntyrdatas);
 		$data['currentdistrict'] = [];
 		$data['currentfarmers'] = [];

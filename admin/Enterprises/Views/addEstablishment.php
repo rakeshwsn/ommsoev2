@@ -9,7 +9,7 @@ $validation = \Config\Services::validation();
 <div class="block">
     <form method="post" id="establishmentform">
         <div class="block-header block-header-default">
-            <h4><?php echo $enterprise_text ?></h4>
+            <h3 class="block-title"><?php echo $enterprise_text ?></h3>
         </div>
 
         <div class="container ">
@@ -117,6 +117,11 @@ $validation = \Config\Services::validation();
                     <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder="Enter Budget " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
+                <div class="col-6 form-group <?= $validation->hasError('own_share') ? 'is-invalid' : '' ?>">
+                    <label for="total own share">Total Own Share<span class="text-danger">*</span></label>
+                    <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>"required>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('own_share'); ?></div>
+                </div>
 
             </div>
             <div class="row">
@@ -125,7 +130,6 @@ $validation = \Config\Services::validation();
                     <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
-
             </div>
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
