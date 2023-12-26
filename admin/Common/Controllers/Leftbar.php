@@ -648,6 +648,18 @@ class Leftbar extends AdminController
             ];
         }
 
+
+        if ($this->user->hasPermission("events")) {
+            $data["menus"][] = [
+                "id" => "menu-event",
+                "icon" => "md-account-child",
+                "name" => lang("Events"),
+                "heading" => 0,
+                "href" => admin_url("event"),
+                "children" => [],
+            ];
+        }
+
         $mprcomponent = [];
 
         if ($this->user->hasPermission("physicalcomponents")) {

@@ -38,6 +38,7 @@ class Grampanchayat extends AdminController
 			$this->session->setFlashdata('message', 'Grampanchayat Saved Successfully.');
 
 			return redirect()->to(base_url('admin/areacoverage/grampanchayat'));
+			
 		}
 		$this->getForm();
 	}
@@ -56,6 +57,8 @@ class Grampanchayat extends AdminController
 			$this->session->setFlashdata('message', 'Grampanchayat Updated Successfully.');
 
 			return redirect()->to(base_url('admin/areacoverage/grampanchayat'));
+
+		
 		}
 		$this->getForm();
 	}

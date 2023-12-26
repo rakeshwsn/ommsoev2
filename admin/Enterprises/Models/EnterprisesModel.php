@@ -56,6 +56,8 @@ class EnterprisesModel extends Model
     e.contact_mobile,
     e.date_estd,
     e.mou_date,
+    e.own_share,
+    e.govt_share,
     e.unit_budget,
     e.addl_budget,
     e.unit_budget_amount,

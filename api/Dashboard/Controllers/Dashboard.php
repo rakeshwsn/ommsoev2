@@ -233,7 +233,7 @@ class Dashboard extends ResourceController
 	{
 
 		$odmapmodel = new OdMapModel();
-		$odmapdatas = $odmapmodel->getestablishmentmap();
+		$odmapdatas = $odmapmodel->getmapdata();
 
 		$data['heading'] = 'Scale of Odisha Millets Mission';
 
@@ -383,8 +383,9 @@ class Dashboard extends ResourceController
 	public function mapdata()
 	{
 
-		$distmapmodel = new DistrictMapModel();
-		$mapdatas = $distmapmodel->getMapData();
+		// $distmapmodel = new DistrictMapModel();
+		$odmapmodel = new OdMapModel();
+		$mapdatas = $odmapmodel->getMapData();
 
 		$data['heading'] = 'Map Data';
 
@@ -408,9 +409,10 @@ class Dashboard extends ResourceController
 
 	public function summary()
 	{
-		$distmapmodel = new DistrictMapModel();
+		
+		$odmapmodel = new OdMapModel();
 		$yearModel = new YearModel();
-		$summery = $distmapmodel->getSummary();
+		$summery = $odmapmodel->getSummary();
 
 		$data['data'] = [
 			'total_districts' => $summery->total_districts,
@@ -430,22 +432,25 @@ class Dashboard extends ResourceController
 	}
 	public function currentyearchart()
 	{
-		$yearModel = new YearModel();
 
-		$currentyeardata = new CurrentYearChartModel();
-		$filter = [];
+		
+		$odmapmodel = new OdMapModel();
+
+		$yearmodel = new YearModel();
 		$year_id = 0;
-
-		if ($this->request->getGet('year_id') && $this->request->getGet('year_id') > 0) {
-			$data['year_id'] = $this->request->getGet('year_id');
-
+		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
+		
+		if (!$this->request->getGet('year_id')) {
+			$filter['year_id'] = (new YearModel())->getCurrentYearId();
+			$year_id =  (new YearModel())->getCurrentYearId();
+		} else {
 			$filter['year_id'] = $this->request->getGet('year_id');
 			$year_id =  $this->request->getGet('year_id');
 		}
-dd($filter);
-// dd($year_id);
-		$crntyrdatas = $currentyeardata->getcurrentyeardata($filter);
-		
+
+		// dd($filter);
+		$crntyrdatas = $odmapmodel->getcurrentyeardata($filter);
+		// dd($crntyrdatas);
 		$data['currentdistrict'] = [];
 		$data['currentfarmers'] = [];
 		$data['currentachievements'] = [];
@@ -455,7 +460,16 @@ dd($filter);
 			$data['currentfarmers'][] = (int)$crntyrdata->total_farmers;
 			$data['currentachievements'][] = (float)$crntyrdata->achievement;
 		}
+		$data['heading'] = 'Crop Demonstration Of Kharif under Odisha Millets Mission';
 
+		
+		if ($year_id) {
+			$data['heading'] .= ' Of:-' . $yearmodel->find($year_id)->name;
+		}else{
+			$data['heading'] .= ' Of:-' . (new YearModel())->getCurrentYearId()->name;
+		}
+
+		// dd($data);
 		return $this->respond($data);
 	}
 }

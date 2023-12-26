@@ -117,13 +117,23 @@ $validation = \Config\Services::validation();
                     <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder="Enter Budget " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
+                <div class="col-6 form-group <?= $validation->hasError('own_share') ? 'is-invalid' : '' ?>">
+                    <label for="total own share">Total Own Share<span class="text-danger">*</span></label>
+                    <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>"required>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('own_share'); ?></div>
+                </div>
 
             </div>
             <div class="row">
                 <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
                     <label for="Budget Utilized in Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                    <input type="text" max="999999999999.99" maxlength="16" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>">
+                    <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
+                </div>
+                <div class="col-6 form-group <?= $validation->hasError('total govt share') ? 'is-invalid' : '' ?>">
+                    <label for="Total govt share">Total Govt Share<span class="text-danger">*</span></label>
+                    <input type="text"  name="govt_share" class="form-control" id="govt_share" placeholder=" Enter total govt share" value="<?= set_value('govt_share', $govt_share) ?>"required>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('govt_share'); ?></div>
                 </div>
 
             </div>
@@ -145,22 +155,23 @@ $validation = \Config\Services::validation();
                 <div class="row">
                     <div class="  col-6 form-group <?= $validation->hasError('addl_budget') ? 'is-invalid' : '' ?>">
                         <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support<span class="text-danger">*</span></label>
-                        <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Enter Budget " value="<?= set_value('addl_budget', $addl_budget) ?>">
+                        <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Enter Budget " value="<?= set_value('addl_budget', $addl_budget) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('addl_budget'); ?></div>
                     </div>
                 </div>
                 <div class="row">
                     <div class=" col-6 form-group <?= $validation->hasError('support_infr_amount') ? 'is-invalid' : '' ?>">
                         <label for="Budget Ruppes">Budget Utilized in Ruppes<span class="text-danger">*</span></label>
-                        <input type="text" name="support_infr_amount" max="999999999999.99" maxlength="16" class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>">
+                        <input type="text" name="support_infr_amount"  class="form-control" id="support_infr_amount" placeholder=" Amount" value="<?= set_value('support_infr_amount', $support_infr_amount) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('support_infr_amount'); ?></div>
                     </div>
                 </div>
             </div>
-            <div class="row text-right">
-                <div class="form-group ">
+            <div class="row ">
+                <div class="col-9"></div>
+                <div class="col-3 form-group text-right ">
                     <button type="submit" class="btn btn-primary" id="submit">Submit</button>
-                    <a href="admin/enterprises/cancel" class="btn btn-primary">Cancel</a>
+                    <a href="admin/enterprises/cancel" class="btn btn-danger">Cancel</a>
                 </div>
             </div>
 
@@ -317,7 +328,7 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#blocks').trigger('change');
                 }
-            }, 500);
+            });
         });
         //add village btn click
         $('#btn-add-village').click(function(e) {
@@ -345,8 +356,31 @@ $validation = \Config\Services::validation();
                     // Add your event handling logic here
                     $('#gps').trigger('change');
                 }
-            }, 500);
+            });
         });
+    });
+     $(document).ready(function() {
+        jQuery.validator.addMethod("lettersonly", function(value, element) {
+            return this.optional(element) || /^(?!.*(?:([A-Za-z,])\1{2}))[A-Za-z, ]{3,20}$/.test(value);
+        }, "Please enter only letters and spaces.");
+        jQuery.validator.addMethod("letters", function(value, element) {
+            return this.optional(element) || /^(?!.*(?:([A-Za-z])\1{2}))[A-Za-z ]{3,20}$/.test(value);
+        }, "Please enter only letters and spaces.");
+        jQuery.validator.addMethod("digitsOnly", function(value, element) {
+            return this.optional(element) || /^(?:\+?91|0)?[6789]\d{9}$/.test(value);
+        }, "Please enter exactly 10 digits.");
+        jQuery.validator.addMethod("decimal", function(value, element) {
+            return this.optional(element) || /^\d+\.\d$/.test(value);
+        }, "Please enter decimal number ");
+        jQuery.validator.addMethod("rupees", function(value, element) {
+            return this.optional(element) || /^(16\d{0,14}(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)$/.test(value);
+        }, "Please enter  rupees (ex-12.00) ");
+        jQuery.validator.addMethod("ddrequired", function(value, element) {
+            return this.optional(element) || (parseFloat(value) > 0);
+        }, "* This is a required field");
+        jQuery.validator.addMethod("mobile", function(value, element) {
+            return this.optional(element) || /([0-9]{11}$)|(^[5-9][0-9]{9}$)/.test(value);
+        }, "Please enter a valid mobile number");
     });
     $(document).ready(function() {
         $("#establishmentform").validate({
@@ -377,7 +411,7 @@ $validation = \Config\Services::validation();
                 },
                 contact_person: {
                     required: true,
-                    lettersonly: true
+                    letters: true
                 },
                 contact_mobile: {
                     required: true,
@@ -412,18 +446,22 @@ $validation = \Config\Services::validation();
                 },
                 mou_date: {
                     required: true,
-                }
+                },
+               
 
             },
             messages: {
                 managing_unit_name: {
                     lettersonly: "Please enter only letters and spaces."
                 },
+                contact_person: {
+                    letters: "Please enter only letters and spaces."
+                },
                 contact_mobile: {
                     mobile: "This is not a valid mobile number "
                 },
                 unit_budget_amount: {
-                    ruppes: "Please enter  ruppes (ex-00.00) "
+                    rupees: "Please enter  ruppes (ex-00.00) "
                 },
                 unit_budget: {
                     decimal: "Please enter only decimal numbers."
@@ -438,27 +476,9 @@ $validation = \Config\Services::validation();
                 }
             },
         });
+        
 
     })
-    $(document).ready(function() {
-        jQuery.validator.addMethod("lettersonly", function(value, element) {
-            return this.optional(element) || /^(?!.*(.)\1{3})[a-zA-Z\s]{1,40}$/.test(value);
-        }, "Please enter only letters and spaces.");
-        jQuery.validator.addMethod("digitsOnly", function(value, element) {
-            return this.optional(element) || /^(?:\+?91|0)?[6789]\d{9}$/.test(value);
-        }, "Please enter exactly 10 digits.");
-        jQuery.validator.addMethod("decimal", function(value, element) {
-            return this.optional(element) || /^\d+\.\d$/.test(value);
-        }, "Please enter decimal number ");
-        jQuery.validator.addMethod("ruppes", function(value, element) {
-            return this.optional(element) || /^\d{1,10}\.\d{1,2}$/.test(value);
-        }, "Please enter  rupees (ex-12.00) ");
-        jQuery.validator.addMethod("ddrequired", function(value, element) {
-            return this.optional(element) || (parseFloat(value) > 0);
-        }, "* This is a required field");
-        jQuery.validator.addMethod("mobile", function(value, element) {
-            return this.optional(element) || /([0-9]{11}$)|(^[5-9][0-9]{9}$)/.test(value);
-        }, "Please enter a valid mobile number");
-    });
+   
 </script>
 <?php js_end(); ?>

@@ -138,10 +138,10 @@
                             <?php foreach ($maps as $map) { ?>
                                 <tr data-dist="<?= $map->district_id ?>">
                                     <td><?= $map->districts ?></td>
-                                    <td><?= $map->total_blocks ?></td>
+                                    <td><?= $map->blocks ?></td>
                                     <td><?= $map->total_gps ?></td>
                                     <td><?= $map->total_villages ?></td>
-                                    <td><?= $map->total_farmer ?></td>
+                                    <td><?= $map->total_farmers ?></td>
                                 </tr>
                             <?php  } ?>
                         </tbody>

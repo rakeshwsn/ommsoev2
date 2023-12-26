@@ -28,7 +28,7 @@ class UserModel extends Model
 
     // Validation
     protected $validationRules = [
-        'id' => 'is_natural_no_zero',
+        'id' => 'permit_empty|is_natural_no_zero',
         'firstname' => array(
             'label' => 'Name',
             'rules' => 'trim|required|max_length[100]'
