@@ -4,10 +4,10 @@ namespace Admin\Enterprises\Models;
 
 use CodeIgniter\Model;
 
-class GpModel extends Model
+class EnterpriseVillagesModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'soe_grampanchayats';
+	protected $table                = 'enterprise_villages';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
