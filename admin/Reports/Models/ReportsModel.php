@@ -2508,7 +2508,7 @@ GROUP BY st.agency_type_id,
     if (!empty($filter['district_id'])) {
       $sql .= " AND district_id=" . $filter['district_id'];
     }
-    echo $sql;exit;
+//    echo $sql;exit;
     return $sql;
   }
 
