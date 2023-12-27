@@ -23,13 +23,13 @@ class EnterpriseUnit extends AdminController
     {
         $this->uri->setSilent();
         $this->template->add_package(array('datatable'), true);
-        $data['datatable_url'] = admin_url('enterpriseunit/search');
-        $id = $this->uri->getSegment(4);
+        $data['datatable_url'] = admin_url('enterprises/unit/search');
+        $id = $this->uri->getSegment(5);
 
         if ($id) {
-            $data['action'] = admin_url("enterpriseunit/edit/{$id}");
+            $data['action'] = admin_url("enterprises/unit/edit/{$id}");
         } else {
-            $data['action'] = admin_url('enterpriseunit/add');
+            $data['action'] = admin_url('enterprises/unit/add');
         }
 
         if ($id && ($this->request->getMethod(true) != 'POST')) {
@@ -53,9 +53,9 @@ class EnterpriseUnit extends AdminController
         // for adding action to the result set
         foreach($units as &$unit){
             $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterpriseunit/edit/' . $unit['id']) . '"><i class="fa fa-pencil"></i></a>';
+            $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterprises/unit/edit/' . $unit['id']) . '"><i class="fa fa-pencil"></i></a>';
             
-            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterpriseunit/delete/' . $unit['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterprises/unit/delete/' . $unit['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
 
             $unit['action'] = $action;
@@ -88,9 +88,9 @@ class EnterpriseUnit extends AdminController
         foreach ($filteredData as $key => $result) {
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
-            $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterpriseunit/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
+            $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterprises/unit/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
             
-            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterpriseunit/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+            $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterprises/unit/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
             $sequentialNumber = $startIndex + $key + 1;
             $datatable[] = array(
@@ -114,13 +114,12 @@ class EnterpriseUnit extends AdminController
 
     public function add()
     {
-
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
 
             $id = $this->enterprisesunitmodel->insert($this->request->getPost());
             $this->session->setFlashdata('message', 'EnterprisesUnit Saved Successfully.');
 
-            return redirect()->to(admin_url('enterpriseunit'));
+            return redirect()->to(admin_url('enterprises/unit'));
         }
         $this->getListForm();
     }
@@ -129,28 +128,28 @@ class EnterpriseUnit extends AdminController
     {
 
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
-            $id = $this->uri->getSegment(4);
+            $id = $this->uri->getSegment(5);
 
             $this->enterprisesunitmodel->update($id, $this->request->getPost());
             $this->session->setFlashdata('message', 'Component Updated Successfully.');
 
-            return redirect()->to(admin_url('enterpriseunit'));
+            return redirect()->to(admin_url('enterprises/unit'));
         }
         $this->getListForm();
     }
     public function delete()
     {
 
-        $id = $this->uri->getSegment(4);
+        $id = $this->uri->getSegment(5);
         $this->enterprisesunitmodel->where('id', $id)->delete();
-        return redirect()->to(admin_url('enterpriseunit'));
+        return redirect()->to(admin_url('enterprises/unit'));
     }
 
     protected function validateForm()
     {
 
         $validation =  \Config\Services::validation();
-        $id = $this->uri->getSegment(4);
+        $id = $this->uri->getSegment(5);
 
         $rules = $this->enterprisesunitmodel->validationRules;
 

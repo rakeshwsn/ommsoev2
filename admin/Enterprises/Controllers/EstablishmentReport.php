@@ -230,8 +230,8 @@ class EstablishmentReport extends AdminController
 
 		$data['unit_names'] = (new EnterprisesUnitModel)->orderBy('id')->findAll();
 
-		$data['download_excel_url'] = admin_url('report?request=download_excel') . '&' . http_build_query($filter);
-		$data['download_pdf_url'] = admin_url('report?request=download_pdf') . '&' . http_build_query($filter);
+		$data['download_excel_url'] = admin_url('enterprises/report?request=download_excel') . '&' . http_build_query($filter);
+		$data['download_pdf_url'] = admin_url('enterprises/report?request=download_pdf') . '&' . http_build_query($filter);
 
 		// dd($data);
 		//for excel download

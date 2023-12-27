@@ -7,11 +7,11 @@ if (!isset($routes)) {
 }
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
-    $routes->add('enterpriseunit', 'Enterprises\Controllers\EnterpriseUnit::index');
-    $routes->add('enterpriseunit/edit/(:num)', 'Enterprises\Controllers\EnterpriseUnit::edit/$1');
-    $routes->add('enterpriseunit/add', 'Enterprises\Controllers\EnterpriseUnit::add');
-    $routes->add('enterpriseunit/search', 'Enterprises\Controllers\EnterpriseUnit::search');
-    $routes->add('enterpriseunit/delete/(:num)', 'Enterprises\Controllers\EnterpriseUnit::delete/$1');
+    $routes->add('enterprises/unit', 'Enterprises\Controllers\EnterpriseUnit::index');
+    $routes->add('enterprises/unit/edit/(:num)', 'Enterprises\Controllers\EnterpriseUnit::edit/$1');
+    $routes->add('enterprises/unit/add', 'Enterprises\Controllers\EnterpriseUnit::add');
+    $routes->add('enterprises/unit/search', 'Enterprises\Controllers\EnterpriseUnit::search');
+    $routes->add('enterprises/unit/delete/(:num)', 'Enterprises\Controllers\EnterpriseUnit::delete/$1');
     // enterprises
     $routes->add('enterprises/add', 'Enterprises\Controllers\Enterprises::add');
     $routes->add('enterprises', 'Enterprises\Controllers\Enterprises::index');
@@ -34,17 +34,9 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/villages', 'Enterprises\Controllers\Enterprises::ajaxvillages');
 
     $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
-    // $routes->post('incentive/searchmain', 'Incentive\Controllers\Incentive::searchMain');
-    // $routes->match(['get', 'post'], 'incentive/view/(:segment)', 'Incentive\Controllers\Incentive::view/$1');
-    // $routes->match(['get', 'post'], 'incentive/add', 'Incentive\Controllers\Incentive::add');
-    // $routes->match(['get', 'post'], 'incentive/addform', 'Incentive\Controllers\Incentive::addform');
-    // $routes->match(['get', 'post'], 'incentive/edit/(:segment)', 'Incentive\Controllers\Incentive::edit/$1');
-    // $routes->get('incentivemain/delete/(:segment)',   'Incentive\Controllers\Incentive::delete/$1');
-    // $routes->post('incentive/delete', 'Incentive\Controllers\Incentive::delete');
-    // $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
-    // $routes->post('incentive/searchall', 'Incentive\Controllers\Incentive::searchall');
-    $routes->get('report', 'Enterprises\Controllers\EstablishmentReport::index');
-    $routes->add('enterprisesreport/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
+
+    $routes->get('enterprises/report', 'Enterprises\Controllers\EstablishmentReport::index');
+    $routes->add('enterprises/report/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
     
     $routes->get('enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
     $routes->add('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
