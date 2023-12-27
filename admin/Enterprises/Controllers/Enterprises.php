@@ -7,8 +7,8 @@ use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesBudgetModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
-use Admin\Enterprises\Models\GpModel;
-use Admin\Enterprises\Models\VillagesModel;
+use Admin\Enterprises\Models\EnterpriseGpModel;
+use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -20,8 +20,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class Enterprises extends AdminController
 {
-	public function index()
-	{
+	public function index() {
 		$this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 		$this->template->set('header', true);
 		helper('form');
@@ -57,7 +56,6 @@ class Enterprises extends AdminController
 			}
 		}
 
-
 		//get years from district selected
 		$data['years'][0] = 'Select DOE';
 		if ($this->request->getGet('district_id')) {
@@ -90,7 +88,7 @@ class Enterprises extends AdminController
 
 
 		$filteredData = $this->filter();
-		// printr($filteredData);exit;
+
 		$data['enterprises'] = [];
 
 		foreach ($filteredData as $row) {
@@ -105,15 +103,12 @@ class Enterprises extends AdminController
 				'date_estd' => $row->date_estd,
 				'mou_date' => $row->mou_date,
 				'edit_url' => admin_url('enterprises/edit?id=' . $row->id),
-
 			];
 		}
-		// dd($data);
-		// 
+
 		$data['excel_link'] = admin_url('enterprises/exceldownld');
 
-		// dd($data);
-		return $this->template->view('Admin\Enterprises\Views\establishment', $data);
+		return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
 	}
 
 	private function filter()
@@ -237,8 +232,6 @@ class Enterprises extends AdminController
 
 	public function add()
 	{
-
-
 		if ($this->request->getMethod(1) == 'POST') {
 
 			$enterprisesmodel = new EnterprisesModel();
@@ -358,9 +351,8 @@ class Enterprises extends AdminController
 	}
 	public function ajaxgps()
 	{
-
 		$data['gps'] = [];
-		$gpmodel = new GpModel();
+		$gpmodel = new EnterpriseGpModel();
 
 		$block_id = $this->request->getGet('block_id');
 
@@ -370,14 +362,13 @@ class Enterprises extends AdminController
 	}
 	public function ajaxvillages()
 	{
-
 		$data['villages'] = [];
-		$villagemodel = new VillagesModel();
+		$villagemodel = new EnterpriseVillagesModel();
 
 		$gp_id = $this->request->getGet('gp_id');
-		// dd($gp_id);
-		$data['villages'] = $villagemodel->where('gp_id', $gp_id)->orderBy('name', 'asc')->findAll();
-		// dd($data['villages']);
+
+        $data['villages'] = $villagemodel->where('gp_id', $gp_id)
+            ->orderBy('name', 'asc')->findAll();
 
 		return $this->response->setJSON($data);
 	}
@@ -391,8 +382,8 @@ class Enterprises extends AdminController
 		$enterprisesmodel = new EnterprisesModel();
 		$enterprisesbudgetmodel = new EnterprisesBudgetModel();
 		$enterprisesunitmodel = new EnterprisesUnitModel();
-		$gpmodel = new GpModel();
-		$villagemodel = new VillagesModel();
+		$gpmodel = new EnterpriseGpModel();
+		$villagemodel = new EnterpriseVillagesModel();
 		$districtmodel = new DistrictModel();
 		$blockModel = new BlockModel();
 

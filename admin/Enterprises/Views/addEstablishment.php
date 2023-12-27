@@ -9,7 +9,7 @@ $validation = \Config\Services::validation();
 <div class="block">
     <form method="post" id="establishmentform">
         <div class="block-header block-header-default">
-            <h4><?php echo $enterprise_text ?></h4>
+            <h3 class="block-title"><?php echo $enterprise_text ?></h3>
         </div>
 
         <div class="container ">
@@ -130,12 +130,6 @@ $validation = \Config\Services::validation();
                     <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
-                <div class="col-6 form-group <?= $validation->hasError('total govt share') ? 'is-invalid' : '' ?>">
-                    <label for="Total govt share">Total Govt Share<span class="text-danger">*</span></label>
-                    <input type="text"  name="govt_share" class="form-control" id="govt_share" placeholder=" Enter total govt share" value="<?= set_value('govt_share', $govt_share) ?>"required>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('govt_share'); ?></div>
-                </div>
-
             </div>
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
