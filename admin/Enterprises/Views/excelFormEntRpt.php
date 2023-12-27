@@ -8,30 +8,34 @@
 
         </tr>
         <tr>
-            <th style="background-color:#1ee3a1 ;font-weight: bold; text-align: center; " colspan="<?= count($unit_names) ?>">
+            <th style="background-color:#1ee3a1;font-weight: bold;text-align: center;" colspan="<?= count($unit_names) ?>">
+                <?php
+                if ($district_id) {
+                    echo 'District: ' . $district_text;
+                } else {
+                    // If filtering only by district, show the District filter in the row
+                    echo 'District Filter';
+                }
 
-                <?php if ($district_id) { ?>
-                    District: <?= $district_text; ?>
-                <?php  }
-                if ($block_id) { ?>
+                if ($block_id) {
+                    echo ' || Block: ' . $block_text;
+                }
 
-                    Block: <?= $block_text; ?> ||
-                <?php  }
-                if ($year_id) { ?>
+                if ($year_id) {
+                    echo ' || Year: ' . $year_text;
+                }
 
-                    Year: <?= $year_text; ?> ||
-                <?php  }
-                if ($month_id) { ?>
+                if ($month_id) {
+                    echo ' || Month: ' . $month_text;
+                }
 
-                    Month: <?= $month_text; ?> ||
-                <?php  }
-                if ($management_unit_type == 'management_unit_type') { ?>
-
-                    Unit: <?= $unit_text; ?>
-                <?php  } ?>
-
+                if ($management_unit_type == 'management_unit_type') {
+                    echo ' || Unit: ' . $unit_text;
+                }
+                ?>
             </th>
         </tr>
+
         <tr>
             <th style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names) ?>">
                 Type and number of units

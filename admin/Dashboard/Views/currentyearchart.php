@@ -112,20 +112,21 @@
         },
         series: [{
             name: 'Total farmers',
-            type: 'column',
-            yAxis: 1,
-            data: <?= json_encode($currentfarmers) ?>,
+            type: 'spline',
+            data:<?= json_encode($currentfarmers) ?> ,
             tooltip: {
-                valueSuffix: ' '
+                valueSuffix: ''
             }
 
         }, {
             name: 'Total acheivement',
-            type: 'spline',
+            type: 'column',
+            yAxis: 1,
             data: <?= json_encode($currentachievements) ?>,
             tooltip: {
-                valueSuffix: ''
+                valueSuffix: ' '
             }
+           
         }]
     });
 </script>
