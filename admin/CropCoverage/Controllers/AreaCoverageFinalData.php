@@ -198,6 +198,8 @@ class AreaCoverageFinalData extends AdminController
         $data['years'] = getAllYears();
         $data['year_id'] = getCurrentYearId();
         $block_id = $this->request->getGet('block_id');
+        $year_id = getCurrentYearId();
+        $season = getAftCurrentSeason();
 
         $crops = $this->cropsModel->findAll();
         $data['crops'] = $crops;
@@ -253,9 +255,11 @@ class AreaCoverageFinalData extends AdminController
             $gpsfinal['crops_data'] = $gps_demon_data;
         }
 
-
-        // printr($data['gpsfinaldata']);
+        // printr($data['filename']);
         // exit;
+
+
+
         if ($this->request->getMethod(1) === 'POST') {
             $data['block_id'] = $block_id;
             $gpMasterData = [];
@@ -315,12 +319,19 @@ class AreaCoverageFinalData extends AdminController
             $this->session->setFlashdata('message', 'Final Data Updated Successfully.');
             return redirect()->to(base_url('admin/areacoverage/finaldata'));
         }
-        $data['upload_url'] = Url::areaCoverageFinalDataDocUpload . '?block_id=' . $block_id;
+        $data['upload_url'] = Url::areaCoverageFinalDataDocUpload . '?block_id=' . $block_id . '&season=' . $season . '&year_id=' . $year_id;
+        $data['filename'] = $this->fdDocModel->getFileName($filter);
+        // echo $data['filename'];
+        // exit;
+        $data['file_url'] = anchor(base_url('uploads/finaldatadoc/' . $data['filename']), $data['filename'], 'target="_blank"');
+
         echo $this->template->view('Admin\CropCoverage\Views\areacoverage_final_data_form', $data);
     }
     public function upload()
     {
         $block_id = $this->request->getGet('block_id');
+        $season = $this->request->getGet('season');
+        $year_id = $this->request->getGet('year_id');
 
         $input = $this->validate([
             'file' => [
@@ -340,6 +351,7 @@ class AreaCoverageFinalData extends AdminController
         } else {
 
             $file = $this->request->getFile('file');
+            $data['report'] = $file->getName();
             if ($file->isValid()) {
                 $file->move(DIR_UPLOAD . 'finaldatadoc');
                 ;
@@ -347,6 +359,8 @@ class AreaCoverageFinalData extends AdminController
 
             $filedata = [
                 'block_id' => $block_id,
+                'season' => $season,
+                'year_id' => $year_id,
                 'filename' => $file->getName()
 
             ];
@@ -359,8 +373,9 @@ class AreaCoverageFinalData extends AdminController
         return $this->response->setJSON([
             'status' => true,
             'message' => 'Upload successful.',
-            'url' => admin_url()
+            'url' => admin_url('areacoverage/finaldata/add?block_id=' . $block_id)
         ]);
+
     }
 
 }
