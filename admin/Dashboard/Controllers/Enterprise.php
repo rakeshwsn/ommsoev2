@@ -70,7 +70,37 @@ class Enterprise extends AdminController
 		//  dd($data);
 		return $this->template->view('Admin\Dashboard\Views\enterprise', $data);
 	}
+	public function add()
+	{
+	
+		$enterprisesmodel = new EnterpriseModel();
+		if ($this->request->getMethod(1) == 'POST') {
 
+			$year_id = $this->request->getGet('year_id');
+			$district_id = $this->request->getGet('district_id');
+			$enterprisesmodel->where('year_id', $year_id)->where('district_id', $district_id)->delete();
+
+			foreach ($this->request->getPost('unit_name') as $key => $enterprise) {
+				$enterprisesdata[] = [
+					'year_id' => $year_id,
+					'district_id' => $district_id,
+					'unit_id' => $key,
+					'unit_name' => $enterprise['name'],
+					'wshg' => $enterprise['wshg'],
+					'fpos' => $enterprise['fpos'],
+				];
+				// dd($enterprisesdata);
+			}
+			// echo "<pre>";
+			// print_r($enterprisesdata);
+			// exit;
+			$data['enterprises'] = $enterprisesmodel->insertBatch($enterprisesdata);
+			//   dd($data);
+			return redirect()->to(admin_url('dashboard/enterprise'))->with('message', 'update successful');
+		}
+
+		return $this->getForm();
+	}
 
 	public function edit()
 	{
@@ -139,8 +169,8 @@ class Enterprise extends AdminController
 
 			];
 		}
-		$data['year_text'] = $yearmodel->find($year_id)->name;
-		$data['district_text'] = $districtmodel->find($district_id)->name;
+		// $data['year_text'] = $yearmodel->find($year_id)->name;
+		// $data['district_text'] = $districtmodel->find($district_id)->name;
 
 
 		return $this->template->view('Admin\Dashboard\Views\enterpriseForm', $data);

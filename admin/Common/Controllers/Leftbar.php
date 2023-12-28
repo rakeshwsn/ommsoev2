@@ -469,7 +469,11 @@ class Leftbar extends AdminController
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprises Units',
+<<<<<<< HEAD
+                "href" => admin_url("enterprises/enterpriseunit"),
+=======
                 "href" => admin_url("enterprises/unit"),
+>>>>>>> 24aed1efbe3cfd68e78b29e744ae78bdc0bc3457
                 "heading" => 0,
                 "children" => [],
             ];
@@ -767,6 +771,28 @@ class Leftbar extends AdminController
             $localisation[] = [
                 "name" => lang("Leftbar.text_village"),
                 "href" => admin_url("village"),
+                "children" => [],
+            ];
+        }
+        //LGD 
+        if ($this->user->hasPermission("LGD District")) {
+            $localisation[] = [
+                "name" => lang("LGD District"),
+                "href" => admin_url("lgdblock"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Block")) {
+            $localisation[] = [
+                "name" => lang("LGD Block"),
+                "href" => admin_url("lgdgp"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Villages")) {
+            $localisation[] = [
+                "name" => lang("LGD Villages"),
+                "href" => admin_url("lgdvillage"),
                 "children" => [],
             ];
         }
