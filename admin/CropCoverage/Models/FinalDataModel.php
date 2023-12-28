@@ -63,11 +63,6 @@ class FinalDataModel extends Model
 
 
   }
-  public function addFileData($filedata)
-  {
-    $this->db->table('ac_finaldata_doc')->insert($filedata);
-  }
-
 
 
   public function getGpsFinalData($filter = [])

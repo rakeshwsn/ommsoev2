@@ -2348,8 +2348,11 @@ AND stc.deleted_at IS NULL AND st.status = 1";
 
     if (!empty($filter['block_id'])) {
       $sql = $this->getBlockAbstractTotal($filter);
-    } else {
+    } else if(!empty($filter['district_id'])){
       $sql = $this->getDistrictAbstractTotal($filter);
+    } else {
+        $sql = $this->getDistrictAbstractTotal($filter);
+//      $sql = $this->getAbstractTotal($filter);
     }
     //echo $sql;exit;
     return $this->db->query($sql)->getResult();
@@ -2505,7 +2508,7 @@ GROUP BY st.agency_type_id,
     if (!empty($filter['district_id'])) {
       $sql .= " AND district_id=" . $filter['district_id'];
     }
-    //echo $sql;exit;
+//    echo $sql;exit;
     return $sql;
   }
 

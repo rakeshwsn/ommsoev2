@@ -9,7 +9,7 @@ $validation = \Config\Services::validation();
 <div class="block">
     <form method="post" id="establishmentform">
         <div class="block-header block-header-default">
-            <h4><?php echo $enterprise_text ?></h4>
+            <h3 class="block-title"><?php echo $enterprise_text ?></h3>
         </div>
 
         <div class="container ">
@@ -130,15 +130,6 @@ $validation = \Config\Services::validation();
                     <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
-                <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
-                    <label for="Budget Utilized in Ruppes">Which type of center?<span class="text-danger">*</span></label>
-                   <select name=""  class="form-control"  id="">
-                    <option value="0">Main center</option>
-                    <option value="1">Sub center</option>
-                   </select>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('center_type'); ?></div>
-                </div>
-
             </div>
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">

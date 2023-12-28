@@ -12,7 +12,7 @@ use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesTransactionModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
-use Admin\Enterprises\Models\VillagesModel;
+use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
 use Admin\Localisation\Controllers\Block;
 use Admin\Localisation\Controllers\District;

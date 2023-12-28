@@ -11,6 +11,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use Admin\CropCoverage\Models\FinalDataModel;
+use Admin\CropCoverage\Models\FinalDataDocModel;
 use Admin\CropCoverage\Models\PracticesModel;
 use Admin\CropCoverage\Models\TargetModel;
 use Config\Url;
@@ -25,6 +26,7 @@ class AreaCoverageFinalData extends AdminController
     private $cropsModel;
     private $practicesModel;
     private $acModel;
+    private $fdDocModel;
 
     private $gpModel;
     private $fdModel;
@@ -37,6 +39,7 @@ class AreaCoverageFinalData extends AdminController
         $this->districtModel = new DistrictModel();
         $this->gpModel = new GrampanchayatModel();
         $this->fdModel = new FinalDataModel();
+        $this->fdDocModel = new FinalDataDocModel();
         $this->practicesModel = new PracticesModel();
         $this->targetModel = new TargetModel();
 
@@ -348,10 +351,10 @@ class AreaCoverageFinalData extends AdminController
 
             ];
 
-            $this->fdModel->addFileData($filedata);
-            $filename = $this->fdModel->getFilenameByBlockId($block_id);
-            printr($filename);
-            exit;
+            $this->fdDocModel->addFileData($filedata);
+
+            // printr($filename);
+            // exit;
         }
         return $this->response->setJSON([
             'status' => true,

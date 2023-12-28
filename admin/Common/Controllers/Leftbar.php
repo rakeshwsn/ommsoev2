@@ -469,7 +469,11 @@ class Leftbar extends AdminController
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprises Units',
+<<<<<<< HEAD
                 "href" => admin_url("enterprises/enterpriseunit"),
+=======
+                "href" => admin_url("enterprises/unit"),
+>>>>>>> 24aed1efbe3cfd68e78b29e744ae78bdc0bc3457
                 "heading" => 0,
                 "children" => [],
             ];
