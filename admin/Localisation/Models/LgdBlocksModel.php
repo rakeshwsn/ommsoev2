@@ -4,10 +4,10 @@ namespace Admin\Localisation\Models;
 
 use CodeIgniter\Model;
 
-class BlockModel extends Model
+class LgdBlocksModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'soe_blocks';
+	protected $table                = 'lgd_blocks';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
@@ -53,15 +53,15 @@ class BlockModel extends Model
 	
 	
 	public function getAll($data = array()){
-		$builder=$this->db->table("{$this->table} b");
+		$builder=$this->db->table("{$this->table} lb");
 		$this->filter($builder,$data);
 		
-		$builder->select("b.*,d.name as district");
+		$builder->select("lb.*,d.name as district");
 		
 		if (isset($data['sort']) && $data['sort']) {
 			$sort = $data['sort'];
 		} else {
-			$sort = "b.name";
+			$sort = "lb.name";
 		}
 
 		if (isset($data['order']) && ($data['order'] == 'desc')) {
@@ -88,33 +88,34 @@ class BlockModel extends Model
 	}
 	
 	public function getTotals($data = array()) {
-		$builder=$this->db->table("{$this->table} b");
+		$builder=$this->db->table("{$this->table} lb");
 		$this->filter($builder,$data);
 		$count = $builder->countAllResults();
+		// echo $this->db->getLastQuery();exit;
 		return $count;
 	}
 	
 	private function filter($builder,$data){
-		$builder->join('soe_districts d', 'b.district_id = d.id');
+		$builder->join('soe_districts d', 'lb.district_lgd_code = d.lgd_code');
         
 		if(!empty($data['filter_district'])){
-            $builder->where("b.district_id  = '".$data['filter_district']."'");
+            $builder->where("lb.district_lgd_code  = '".$data['filter_district']."'");
         }
 
 		if (!empty($data['filter_search'])) {
 			$builder->where("
-				b.name LIKE '%{$data['filter_search']}%' OR
-				b.id = '{$data['filter_search']}'
+				lb.name LIKE '%{$data['filter_search']}%' OR
+				lb.lgd_code = '{$data['filter_search']}'
 			");
 		}
     }
 
 	protected  function getBlockCode(array $data){
 
-		$builder=$this->db->table("{$this->table} b");
-		$builder->select("b.code");
-		$builder->where("b.district_id  = '".$data['data']['district_id']."'");
-		$builder->orderBy('b.code', 'desc');
+		$builder=$this->db->table("{$this->table} lb");
+		$builder->select("lb.code");
+		$builder->where("lb.district_lgd_code  = '".$data['data']['district_lgd_code']."'");
+		$builder->orderBy('lb.code', 'desc');
 		$builder->limit(1);
 		$res = $builder->get()->getRow();
 		
@@ -140,19 +141,18 @@ class BlockModel extends Model
 		$res = $builder->get()->getResult();
 		return $res;
 	}
-
     public function getFundAgencies($filter=[]) {
         $sql = "SELECT
-  sd.name district,
-  sfa.id fund_agency_id,
-  CONCAT(sfa.name, CONCAT(' (', COUNT(sb.id), ')')) fund_agency,
-  COUNT(sb.id) total_blocks
-FROM soe_blocks sb
-  LEFT JOIN soe_districts sd
-    ON sb.district_id = sd.id
-  LEFT JOIN soe_fund_agency sfa
-    ON sb.fund_agency_id = sfa.id
-WHERE 1=1";
+		sd.name district,
+		sfa.id fund_agency_id,
+		CONCAT(sfa.name, CONCAT(' (', COUNT(sb.id), ')')) fund_agency,
+		COUNT(sb.id) total_blocks
+		FROM soe_blocks sb
+		LEFT JOIN soe_districts sd
+			ON sb.district_id = sd.id
+		LEFT JOIN soe_fund_agency sfa
+			ON sb.fund_agency_id = sfa.id
+		WHERE 1=1";
         if(!empty($filter['district_id'])){
             $sql .= " AND sd.id = ".$filter['district_id'];
         }

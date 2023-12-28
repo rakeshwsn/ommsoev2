@@ -469,7 +469,7 @@ class Leftbar extends AdminController
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprises Units',
-                "href" => admin_url("enterpriseunit"),
+                "href" => admin_url("enterprises/enterpriseunit"),
                 "heading" => 0,
                 "children" => [],
             ];
@@ -486,7 +486,7 @@ class Leftbar extends AdminController
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprise Establishment Report',
-                "href" => admin_url("report"),
+                "href" => admin_url("enterprises/report"),
                 "heading" => 0,
                 "children" => [],
             ];
@@ -494,7 +494,7 @@ class Leftbar extends AdminController
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprise Transaction Report',
-                "href" => admin_url("enttxnreport"),
+                "href" => admin_url("enterprises/enttxnreport"),
                 "heading" => 0,
                 "children" => [],
             ];
@@ -767,6 +767,28 @@ class Leftbar extends AdminController
             $localisation[] = [
                 "name" => lang("Leftbar.text_village"),
                 "href" => admin_url("village"),
+                "children" => [],
+            ];
+        }
+        //LGD 
+        if ($this->user->hasPermission("LGD District")) {
+            $localisation[] = [
+                "name" => lang("LGD District"),
+                "href" => admin_url("lgdblock"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Block")) {
+            $localisation[] = [
+                "name" => lang("LGD Block"),
+                "href" => admin_url("lgdgp"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Villages")) {
+            $localisation[] = [
+                "name" => lang("LGD Villages"),
+                "href" => admin_url("lgdvillage"),
                 "children" => [],
             ];
         }

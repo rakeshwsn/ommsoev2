@@ -120,7 +120,7 @@ class EnterpriseUnit extends AdminController
             $id = $this->enterprisesunitmodel->insert($this->request->getPost());
             $this->session->setFlashdata('message', 'EnterprisesUnit Saved Successfully.');
 
-            return redirect()->to(admin_url('enterpriseunit'));
+            return redirect()->to(admin_url('enterprises/enterpriseunit'));
         }
         $this->getListForm();
     }
@@ -134,7 +134,7 @@ class EnterpriseUnit extends AdminController
             $this->enterprisesunitmodel->update($id, $this->request->getPost());
             $this->session->setFlashdata('message', 'Component Updated Successfully.');
 
-            return redirect()->to(admin_url('enterpriseunit'));
+            return redirect()->to(admin_url('enterprises/enterpriseunit'));
         }
         $this->getListForm();
     }
@@ -143,7 +143,7 @@ class EnterpriseUnit extends AdminController
 
         $id = $this->uri->getSegment(4);
         $this->enterprisesunitmodel->where('id', $id)->delete();
-        return redirect()->to(admin_url('enterpriseunit'));
+        return redirect()->to(admin_url('enterprises/enterpriseunit'));
     }
 
     protected function validateForm()

@@ -7,7 +7,7 @@ if (!isset($routes)) {
 }
 
 $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function ($routes) {
-    $routes->add('enterpriseunit', 'Enterprises\Controllers\EnterpriseUnit::index');
+    $routes->add('enterprises/enterpriseunit', 'Enterprises\Controllers\EnterpriseUnit::index');
     $routes->add('enterpriseunit/edit/(:num)', 'Enterprises\Controllers\EnterpriseUnit::edit/$1');
     $routes->add('enterpriseunit/add', 'Enterprises\Controllers\EnterpriseUnit::add');
     $routes->add('enterpriseunit/search', 'Enterprises\Controllers\EnterpriseUnit::search');
@@ -43,10 +43,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     // $routes->post('incentive/delete', 'Incentive\Controllers\Incentive::delete');
     // $routes->add('incentive/incentivesearch', 'Incentive\Controllers\Incentive::incentivesearch');
     // $routes->post('incentive/searchall', 'Incentive\Controllers\Incentive::searchall');
-    $routes->get('report', 'Enterprises\Controllers\EstablishmentReport::index');
+    $routes->get('enterprises/report', 'Enterprises\Controllers\EstablishmentReport::index');
     $routes->add('enterprisesreport/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
     
-    $routes->get('enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    $routes->get('enterprises/enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
     $routes->add('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
 
     // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');

@@ -118,7 +118,7 @@ $validation = \Config\Services::validation();
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget'); ?></div>
                 </div>
                 <div class="col-6 form-group <?= $validation->hasError('own_share') ? 'is-invalid' : '' ?>">
-                    <label for="total own share">Total Own Share<span class="text-danger">*</span></label>
+                    <label for="total own share">Investment by the WSHG/FPO<span class="text-danger">*</span></label>
                     <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('own_share'); ?></div>
                 </div>
@@ -130,18 +130,27 @@ $validation = \Config\Services::validation();
                     <input type="text"  name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>"required>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('unit_budget_amount'); ?></div>
                 </div>
-                <div class="col-6 form-group <?= $validation->hasError('total govt share') ? 'is-invalid' : '' ?>">
-                    <label for="Total govt share">Total Govt Share<span class="text-danger">*</span></label>
-                    <input type="text"  name="govt_share" class="form-control" id="govt_share" placeholder=" Enter total govt share" value="<?= set_value('govt_share', $govt_share) ?>"required>
-                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('govt_share'); ?></div>
+                <div class="col-6 form-group <?= $validation->hasError('unit_budget_amount') ? 'is-invalid' : '' ?>">
+                    <label for="Budget Utilized in Ruppes">Which type of center?<span class="text-danger">*</span></label>
+                   <select name=""  class="form-control"  id="">
+                    <option value="0">Main center</option>
+                    <option value="1">Sub center</option>
+                   </select>
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('center_type'); ?></div>
                 </div>
 
             </div>
             <div class="row">
                 <div class="col-6 form-group mt-15 <?= $validation->hasError('is_support_basis_infr') ? 'is-invalid' : '' ?>">
-                    <label for="management_unit">Is basic infrastructure support required?</label>
+                    <label for="management_unit">Is any additional support provided from Govt. ?</label>
                     <?php echo form_dropdown('is_support_basis_infr', $is_support, set_value('is_support_basis_infr', $is_support_basis_infr), ['class' => 'form-control', 'id' => 'is_support_basis_infr']); ?>
                     <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('is_support_basis_infr'); ?></div>
+                </div>
+                <div class="col-6 form-group mt-15 <?= $validation->hasError('main_center_type') ? 'is-invalid' : '' ?>">
+                    <label for="management_unit">Which one is your main center?</label>
+                    <input type="text"  name="center_type" class="form-control" id="center_type" placeholder=" Enter main center name" required>
+
+                    <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('main_center_type'); ?></div>
                 </div>
             </div>
             <div class="block" id="budget_utilize">
