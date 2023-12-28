@@ -896,6 +896,3 @@ class Leftbar extends AdminController
         return view("Admin\Common\Views\leftbar", $data);
     }
 }
-
-/* End of file templates.php */
-/* Location: ./application/modules/templates/controllers/templates.php */
