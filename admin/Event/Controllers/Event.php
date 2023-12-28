@@ -121,14 +121,21 @@ class Event extends AdminController
             }
 
             $name = $filename->getName();
-            // $temp_name = $filename->getTempName();
-            // $arr_file = explode(".",$name);
-            // $extension = end($arr_file);
+            $temp_name = $filename->getTempName();
+            $arr_file = explode(".",$name);
+            $extension = end($arr_file);
 
             $id = $this->eventModel->addEvent($this->request->getPost(), $originalname);
             $this->session->setFlashdata('message', 'Event Saved Successfully.');
 
             return redirect()->to(admin_url('event'));
+            if (!$this->validate($validationRule)) {
+                $data = ['errors' => $this->validator->getErrors()];
+
+                return view('registration', $data);
+            }
+
+         
         }
         $this->getForm();
     }
@@ -195,7 +202,7 @@ class Event extends AdminController
         if ($this->uri->getSegment(4) && ($this->request->getMethod(true) != 'POST')) {
             $event_info = $this->eventModel->getEvent($this->uri->getSegment(4));
         }
-        
+
         foreach ($this->eventModel->getFieldNames('events') as $field) {
             if ($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
@@ -245,9 +252,9 @@ class Event extends AdminController
 
         $validation = \Config\Services::validation();
         $id = $this->uri->getSegment(4);
-// printr($_POST);
-// printr($_FILES);
-// exit;
+        // printr($_POST);
+        // printr($_FILES);
+        // exit;
         $rules = $this->eventModel->validationRules;
 
         if ($this->validate($rules)) {

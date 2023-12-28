@@ -2,8 +2,6 @@
 	<div class="block-header block-header-default">
 		<h3 class="block-title"><?php echo $heading_title; ?></h3>
 		<div class="block-options">
-			<a href="<?php echo $add; ?>" data-toggle="tooltip" title="<?php echo $button_add; ?>" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-			<button type="button" data-toggle="tooltip" title="<?php echo $button_delete; ?>" class="btn btn-danger" onclick="confirm('<?php echo $text_confirm; ?>') ? $('#form-district').submit() : false;"><i class="fa fa-trash-o"></i></button>
 		</div>
 	</div>
 	<div class="block-content block-content-full">
@@ -13,28 +11,23 @@
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
-							<?php echo form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', ''), "id='filter_district' class='form-control js-select2'"); ?>
+							<?php echo form_dropdown('district_id', option_array_value($districts, 'lgd_code', 'name', array('0' => 'Select Districts')), set_value('district_lgd_code', ''), "id='filter_district' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Block: <span class="tx-danger">*</span></label>
-							<?php echo form_dropdown('block_id', array(), set_value('block_id', ''), "id='filter_block' class='form-control js-select2'"); ?>
+							<?php echo form_dropdown('block_id', option_array_value($blocks, 'block_lgd_code', 'name', array('0' => 'Select Blocks')), set_value('block_lgd_code', ''), "id='filter_block' class='form-control js-select2'"); ?>
 						</div>
 					</div><!-- col-4 -->
 					<div class="col-lg-3">
 						<div class="form-group mg-b-10-force">
 							<label class="form-control-label">Grampanchayat: <span class="tx-danger">*</span></label>
-							<?php echo form_dropdown('gp_id', array(), set_value('gp_id', ''), "id='filter_grampanchayat' class='form-control js-select2'"); ?>
-						</div>
-					</div><!-- col-4 -->
-					<div class="col-lg-3">
-						<div class="form-group mg-b-10-force">
-							<label class="form-control-label">Village: <span class="tx-danger">*</span></label>
-							<input type="text" name="name" class="form-control" placeholder="Village" id="filter_village" />
+							<?= form_dropdown('gp_id', option_array_value($grampanchayat, 'gp_lgd_code', 'name', array('0' => 'Select Gp')), set_value('gp_lgd_code', ''), "id='filter_grampanchayat' class='form-control js-select2'"); ?>
 
 						</div>
-					</div>
+					</div><!-- col-4 -->
+					
 					<!-- col-4 -->
 					<div class="col-lg-3 center">
 						<label class="form-control-label">&nbsp;</label>
@@ -48,19 +41,18 @@
 		</form>
 		<hr />
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/district/be_tables_datatables.min.js which was auto compiled from _es6/district/be_tables_datatables.js -->
-		<form action="<?php echo $delete; ?>" method="post" enctype="multipart/form-data" id="form-grampanchayat">
-			<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
-				<thead>
-					<tr>
-						<th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
-						<th>Village Name</th>
-						<th>District</th>
-						<th>Block</th>
-						<th>GP</th>
-						<th class="text-right no-sort">Actions</th>
-					</tr>
-				</thead>
-			</table>
+		<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
+			<thead>
+				<tr>
+					<th style="width: 1px;" class="text-center no-sort"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></th>
+					<th>Village Name</th>
+					<th>District</th>
+					<th>Block</th>
+					<th>GP</th>
+					
+				</tr>
+			</thead>
+		</table>
 		</form>
 	</div>
 </div>
@@ -74,7 +66,7 @@
 			var d_id = $(this).val(); // Declare d_id with var
 
 			$.ajax({
-				url: 'admin/districts/block',
+				url: 'admin/lgd_district/block',
 				data: {
 					district_id: d_id
 
@@ -89,7 +81,7 @@
 
 						var html = '<option value="">Select Block</option>'; // Declare html with var
 						$.each(response.blocks, function(k, v) {
-							html += '<option value="' + v.id + '">' + v.name + '</option>';
+							html += '<option value="' + v.lgd_code + '">' + v.name + '</option>';
 						});
 						$('#filter_block').html(html);
 					}
@@ -105,7 +97,7 @@
 		$('#filter_block').on('change', function() {
 			var b_id = $(this).val();
 			$.ajax({
-				url: 'admin/blocks/grampanchayat',
+				url: 'admin/lgd_blocks/grampanchayat',
 				data: {
 					block_id: b_id
 				},
@@ -113,12 +105,10 @@
 				dataType: 'JSON',
 				beforeSend: function() {},
 				success: function(response) {
-					// console.log(response);
-
-					if (response.gps) {
+					if (response.grampanchayat) {
 						var html = '<option value="">Select GP</option>';
-						$.each(response.gps, function(k, v) {
-							html += '<option value="' + v.id + '">' + v.name + '</option>';
+						$.each(response.grampanchayat, function(k, v) {
+							html += '<option value="' + v.lgd_code + '">' + v.name + '</option>';
 						});
 						$('#filter_grampanchayat').html(html);
 					}
@@ -149,7 +139,7 @@
 					data.district = $('#filter_district').val();
 					data.block = $('#filter_block').val();
 					data.grampanchayat = $('#filter_grampanchayat').val();
-					data.village = $('#filter_village').val();
+					
 				},
 				beforeSend: function() {
 					$('.alert-dismissible, .text-danger').remove();
