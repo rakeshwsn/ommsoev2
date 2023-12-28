@@ -770,6 +770,28 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
+        //LGD 
+        if ($this->user->hasPermission("LGD District")) {
+            $localisation[] = [
+                "name" => lang("LGD District"),
+                "href" => admin_url("lgdblock"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Block")) {
+            $localisation[] = [
+                "name" => lang("LGD Block"),
+                "href" => admin_url("lgdgp"),
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("LGD Villages")) {
+            $localisation[] = [
+                "name" => lang("LGD Villages"),
+                "href" => admin_url("lgdvillage"),
+                "children" => [],
+            ];
+        }
 
         if ($localisation) {
             $data["menus"][] = [
@@ -874,6 +896,3 @@ class Leftbar extends AdminController
         return view("Admin\Common\Views\leftbar", $data);
     }
 }
-
-/* End of file templates.php */
-/* Location: ./application/modules/templates/controllers/templates.php */

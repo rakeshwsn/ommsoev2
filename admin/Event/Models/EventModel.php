@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\Event\Models;
 
 use CodeIgniter\Model;
@@ -78,15 +79,19 @@ class EventModel extends Model
 			'label' => 'SHG/FPO/FA (Involved):Name',
 			'rules' => 'trim|required|min_length[3]|max_length[50]'
 		),
-		'report_file' => array(
-			'label' => 'Event Report',
-			'rules' => 'trim|required'
-			// 'rules' => 'uploaded[report]|max_size[report,1024]',
-		),
+		// 'report_file' => array(
+		// 	'label' => 'Event Report',
+		// 	'rules' => 'trim|required'
+		// 	// 'rules' => 'uploaded[report]|max_size[report,1024]',
+		// ),
 		'report' => array(
-			'label' => 'Event Report',
-			// 'rules' => 'trim|required'
-			'rules' => 'max_size[report,1024]',
+			'label' => 'Image File',
+			'rules' => [
+				'uploaded[report]',
+				'is_image[report]',
+				'mime_in[report,image/jpg,image/jpeg,image/gif,image/png,image/webp]',
+				'max_size[report,1000]',
+			],
 		)
 		// 'status' => array(
 		// 	'field' => 'status', 
@@ -153,7 +158,6 @@ class EventModel extends Model
 
 		$res = $builder->get()->getResult();
 		return $res;
-
 	}
 
 	public function getTotalEvents($data = array())
@@ -288,7 +292,8 @@ class EventModel extends Model
 
 
 		if (!empty($data['filter_search'])) {
-			$builder->where("
+			$builder->where(
+				"
 				b.title LIKE '%{$data['filter_search']}%'"
 			);
 		}
@@ -301,8 +306,5 @@ class EventModel extends Model
 
 		$builder = $this->db->table('events_gallery ');
 		$builder->whereIn("event_id", $selected)->delete();
-
 	}
-
 }
-?>

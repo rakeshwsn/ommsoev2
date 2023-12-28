@@ -260,17 +260,7 @@ class Village extends AdminController
 		return $this->response->setJSON($data);
 	
 	}
-	public function block()
-	{
-
-		$data['blocks'] = [];
-		$BlocksModel = new BlockModel();
-
-		$district_id = $this->request->getGet('district_id');
-		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->orderBy('name', 'asc')->findAll();
-		// printr($data);
-		return $this->response->setJSON($data);
-	}
+	
 
 	protected function validateForm()
 	{

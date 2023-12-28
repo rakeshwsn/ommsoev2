@@ -38,7 +38,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('enterprises/report', 'Enterprises\Controllers\EstablishmentReport::index');
     $routes->add('enterprises/report/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
     
-    $routes->get('enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
+    $routes->get('enterprises/enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
     $routes->add('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
 
     // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');
