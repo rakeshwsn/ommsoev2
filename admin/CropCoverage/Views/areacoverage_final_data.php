@@ -374,7 +374,7 @@
         // Call the function for each specific class
         calculateAndAssignSum('ragi_total_smi', 'allTotalRagiSMI');
         calculateAndAssignSum('ragi_total_lt', 'allTotalRagiLT');
-        calculateAndAssignSum('ragi_ls', 'allTotalRagiLs');
+        calculateAndAssignSum('ragi_total_ls', 'allTotalRagiLs');
         calculateAndAssignSum('little_millet_lt', 'allTotalLittleMilletLt');
         calculateAndAssignSum('little_millet_ls', 'allTotalLittleMilletLs');
         calculateAndAssignSum('foxtail_millet_ls', 'allTotalFoxtailMilletLs');
@@ -416,11 +416,7 @@
 
         // Call the function for the specific class and assign to 'allTotalRagi'
         calculateAndAssignSum('ragi-all-total', 'allTotalRagi');
-<<<<<<< HEAD
-
-=======
         calculateAndAssignSum('non-ragi-all-total', 'allTotalNonRagi');
->>>>>>> test
         calculateAndAssignSum('all-total-fup', 'allTotalFup');
         calculateAndAssignSum('all-total-area', 'allTotalArea');
 
