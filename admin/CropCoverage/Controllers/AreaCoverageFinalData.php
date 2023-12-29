@@ -323,7 +323,7 @@ class AreaCoverageFinalData extends AdminController
         $data['filename'] = $this->fdDocModel->getFileName($filter);
         // echo $data['filename'];
         // exit;
-        $data['file_url'] = anchor(base_url('uploads/finaldatadoc/' . $data['filename']), $data['filename'], 'target="_blank"');
+
 
         echo $this->template->view('Admin\CropCoverage\Views\areacoverage_final_data_form', $data);
     }
