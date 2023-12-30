@@ -374,7 +374,7 @@
         // Call the function for each specific class
         calculateAndAssignSum('ragi_total_smi', 'allTotalRagiSMI');
         calculateAndAssignSum('ragi_total_lt', 'allTotalRagiLT');
-        calculateAndAssignSum('ragi_ls', 'allTotalRagiLs');
+        calculateAndAssignSum('ragi_total_ls', 'allTotalRagiLs');
         calculateAndAssignSum('little_millet_lt', 'allTotalLittleMilletLt');
         calculateAndAssignSum('little_millet_ls', 'allTotalLittleMilletLs');
         calculateAndAssignSum('foxtail_millet_ls', 'allTotalFoxtailMilletLs');

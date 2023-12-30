@@ -120,11 +120,11 @@ $validation = \Config\Services::validation();
         <div class="form-group row <?= $validation->hasError('report') ? 'is-invalid' : '' ?>">
           <label class="col-sm-2 control-label" for="input-name">Event Report</label>
           <div class="col-sm-10">
-            <input type="file" name="report" id="report">
-            <input type="hidden" name="report_file" value="<?= set_value('report', $report); ?>">
-            <span><?php echo $report; ?></span>
+            <!-- <input type="file" name="report" id="report"> -->
+            <input type="file" name="report" value="<?= set_value('report', $report); ?>">
+           
             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('report'); ?></div>
-            <div class="text-danger"><?= $validation->getError('report'); ?></div>
+           
           </div>
 
         </div>

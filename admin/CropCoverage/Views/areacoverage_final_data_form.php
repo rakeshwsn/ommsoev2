@@ -56,36 +56,39 @@
 </div>
 <div class="block">
     <div class="block-content block-content-full">
-    <?php if($block_id){ ?>
-    <div class="col-md-2">
-    <form class="dm-uploader" id="uploader">
-                        <div role="button" class="btn btn-outline btn-warning">
-                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
-                                <input type="file" title="Click to add Files">
-                        </div>
-                        <div class="status"></div>
-                    </form>
+        <?php if($block_id){ ?>
+            <div class="col-md-2">
+                <form class="dm-uploader" id="uploader">
+                    <div role="button" class="btn btn-outline btn-warning">
+                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
+                            <input type="file" title="Click to add Files">
+   
+                             <input type="hidden" name="report_file" value="<?= set_value('report', $filename); ?>">
+            
                     </div>
-               <?php  }else{     ?>
-                <div class="col-md-2" style="display: none;">
-    <form class="dm-uploader" id="uploader">
-                        <div role="button" class="btn btn-outline btn-warning">
-                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
-                                <input type="file" title="Click to add Files">
-                        </div>
-                        <?php }  ?>
-                    
-                    </form>
+                         <span><a href="<?= base_url('uploads/finaldatadoc/' . $filename); ?>"><?php echo  $filename; ?></a></span>
+                    <div class="status"></div>
+                </form>
+            </div>
+        <?php  }else{     ?>
+            <div class="col-md-2" style="display: none;">
+                <form class="dm-uploader" id="uploader">
+                    <div role="button" class="btn btn-outline btn-warning">
+                        <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Upload pdf
+                            <input type="file" title="Click to add Files">
+                           
                     </div>
-                    <div id="loading-overlay">
-    <div class="progress" style="width: 100%">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" style="width:0%">
-            <span id="progress-percent">0</span>
+        <?php }  ?>
+                </form>
+            </div>
+            <div id="loading-overlay">
+            <div class="progress" style="width: 100%">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" style="width:0%">
+                <span id="progress-percent">0</span>
+            </div>
         </div>
     </div>
-</div>
-
-        <div class="tableFixHead">
+    <div class="tableFixHead">
             <table class="table custom-table " id="final-table">
                 <thead>
                     <tr>
@@ -640,7 +643,9 @@ $(document).ready(function () {
                 // about to start uploading a file
                 setProgress(0);
                 var block_id = getQueryParameter('block_id');
-                  console.log('block_id:', block_id);
+                var season = getQueryParameter('season');
+                var year_id = getQueryParameter('year_id');
+                //   console.log('block_id:', block_id);
                 if (typeof (loading) === 'undefined') {
                     loading = $('#upload-controls').loading({
                         overlay: $('#loading-overlay')
@@ -662,7 +667,7 @@ $(document).ready(function () {
                 // A file was successfully uploaded server response
                 if (data.status) {
                     show_status('File uploaded successfully', 'text-success');
-                    //location.href = data.url;
+                    location.href = data.url;
                 } else {
                     show_status(data.message, 'text-danger');
                 }

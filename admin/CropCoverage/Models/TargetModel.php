@@ -512,7 +512,7 @@ LEFT JOIN (
 
         $sql .= " AND acc.status = 1
     GROUP BY aap.crop_id
-) ach ON ac.id = ach.crop_id
+) ach ON ac.id = ach.crop_id;
 ";
 
         // Execute $sql query
@@ -525,7 +525,6 @@ LEFT JOIN (
         $year_id = $filter['year_id'];
         $season = $filter['season'];
         $district_id = $filter['district_id'];
-
         $sql = "SELECT
     sb.id AS block_id,
     sb.name AS block,
@@ -617,6 +616,8 @@ WHERE";
 
         $sql .= " ORDER BY block;";
 
+        // echo $sql;
+        // exit;
 
         return $this->db->query($sql)->getResultArray();
 
