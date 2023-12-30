@@ -40,7 +40,7 @@ class Filters extends BaseConfig
 			 'openingbalance' => ['except'=>['*/openingbalance']],
 		],
 		'after'  => [
-			'toolbar',
+//			'toolbar',
 			// 'honeypot',
 		],
 	];
