@@ -67,7 +67,7 @@ $user  = service('user');
 
                     </tr>
                     <tr>
-                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-<?php echo $first_year_name?></td>
+                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month-<?php echo $first_year_name?></td>
 
                     </tr>
                     <tr>
