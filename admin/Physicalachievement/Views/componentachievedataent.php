@@ -63,13 +63,13 @@ $user  = service('user');
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="testTable">
                 <thead>
                     <tr>
-                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Target vs Ach. for different Training programme, Awareness and other activity under OMM during 2023-24</td>
+                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Target vs Ach. for different Training programme, Awareness and other activity under OMM during <?php echo $year_name?></td>
 
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-2023</td>
+                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-<?php echo $first_year_name?></td>
 
                     </tr>
                     <tr>

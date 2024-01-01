@@ -63,11 +63,11 @@ $user  = service('user');
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="testTable">
                 <thead>
                 <tr>
-                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Target vs Ach. for different Training programme, Awareness and other activity under OMM during 2023-24</td>
+                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Target vs Ach. for different Training programme, Awareness and other activity under OMM during <?php echo $year_name?></td>
 
                     </tr>
                     <tr>
-                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-2023</td>
+                        <td colspan="<?php echo count($componentsAll) * 9 + 3; ?>">Month- <?php echo $getMonths['name'] ?>-<?php echo $first_year_name?></td>
 
                     </tr>
                     <tr>
@@ -102,21 +102,21 @@ $user  = service('user');
                     <tr>
                         <td><?php echo $index++ ?></td>
                         <td><?php echo $target_acv_datas['district'] ?></td>
-                        <td><?php echo $target_acv_datas['total_block'] ?></td>
+                        <td type="number"><?php echo $target_acv_datas['total_block'] ?></td>
                         <?php $arraysecond = $target_acv_datas['arraysecond']; ?>
                         <?php foreach ($arraysecond as $value) { ?>
-                        <td><?php echo $value; ?></td>
+                        <td type="number"><?php echo $value; ?></td>
                         <?php } ?>
                     </tr>
                     <?php } ?>
                     <tr>
                     <td colspan="2">Total</td>
-                    <td sdval="<?php echo array_sum(array_column($target_acv_data, 'total_block')); ?>" sdnum="1033;"><b><?php echo array_sum(array_column($target_acv_data, 'total_block')); ?></b></td>
+                    <td  type="number" sdval="<?php echo array_sum(array_column($target_acv_data, 'total_block')); ?>" sdnum="1033;"><b><?php echo array_sum(array_column($target_acv_data, 'total_block')); ?></b></td>
                     <?php if (!$user->district_id) { ?>
 
                         <?php
                         foreach (array_map('array_sum', array_map(null, ...array_column($target_acv_data, 'arraysecond'))) as $sumValue) { ?>
-                            <td sdval="<?php echo $sumValue; ?>" sdnum="1033;"><b><?php echo $sumValue; ?></b></td>
+                            <td type="number" sdval="<?php echo $sumValue; ?>" sdnum="1033;"><b><?php echo $sumValue; ?></b></td>
                         <?php } ?>
 
                     <?php } else { ?>
@@ -124,7 +124,7 @@ $user  = service('user');
                         $sumValues = array_map('intval', array_map(null, ...array_column($target_acv_data, 'arraysecond')));
 
                         foreach ($sumValues as $sumValue) { ?>
-                            <td sdval="<?php echo $sumValue; ?>" sdnum="1033;"><b><?php echo $sumValue; ?></b></td>
+                            <td type="number" sdval="<?php echo $sumValue; ?>" sdnum="1033;"><b><?php echo $sumValue; ?></b></td>
                         <?php } ?>
 
                     <?php } ?>
