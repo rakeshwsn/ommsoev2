@@ -339,4 +339,6 @@ class EnterprisesModel extends Model
     // dd($sql);
     return $this->db->query($sql)->getResult();
   }
+
+
 }
