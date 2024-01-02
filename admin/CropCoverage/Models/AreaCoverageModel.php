@@ -147,6 +147,7 @@ FROM ac_crop_practices acp
         $kharif_end_month = getMonthById((int) $this->settings->kharif_end_month);
 
         $rabi_start_month = getMonthById((int) $this->settings->rabi_start_month);
+
         $rabi_end_month = getMonthById((int) $this->settings->rabi_end_month);
 
         $date = $date ?: date('Y-m-d');
@@ -165,24 +166,35 @@ FROM ac_crop_practices acp
             $current_season = 'Kharif';
             $uncurrent_season = 'Rabi';
             $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_start_month_number . '-01');
+            // print_r($season_start_date);
+            // exit;
 
             $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $kharif_end_month_number . '-30');
         } elseif (
             $given_date->format('n') >= $rabi_start_month_number
             || $given_date->format('n') <= $rabi_end_month_number
         ) {
+
             $current_season = 'Rabi';
             $uncurrent_season = 'Kharif';
-            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_start_month_number . '-01');
-            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_end_month_number . '-30');
+            //Code by Hemanta kumar sahoo
 
+            $season_start_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_start_month_number . '-01');
+            // print_r($season_start_date);
+            // exit;
+            $season_end_date = \DateTime::createFromFormat('Y-m-d', $given_date->format('Y') . '-' . $rabi_end_month_number . '-30');
+            // print_r($season_start_date);
+            // exit;
+            //This code edited by Hemanta for rabi season
             if ($given_date->format('n') <= 3) {
-                $season_start_date->modify('+1 year');
-                $season_end_date->modify('+1 year');
+                $season_start_date->modify('-1 year');
+
                 //This code Added by Hemanta for rabi season
             } elseif ($given_date->format('n') >= 11) {
                 $season_end_date->modify('+1 year');
             }
+            // print_r($season_end_date);
+            // exit;
 
         } else {
             //default return values. added by rakesh - 03/10/23
@@ -197,6 +209,7 @@ FROM ac_crop_practices acp
             'start_date' => $season_start_date,
             'end_date' => $season_end_date,
         ];
+
 
 
     }
