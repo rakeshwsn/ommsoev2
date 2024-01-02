@@ -461,7 +461,7 @@ FROM soe_districts sd
       $sql .= " AND afdm.season = '" . $filter['season'] . "'";
     }
 
-    $sql .= " AND afdm.deleted_at IS NULL GROUP BY afdm.district_id) AS demonstration_data
+    $sql .= " AND afdm.deleted_at IS NULL AND afdm.status = 1 GROUP BY afdm.district_id) AS demonstration_data
     ON sd.id = demonstration_data.district_id
   LEFT JOIN (SELECT
       afdm.district_id,
@@ -490,7 +490,7 @@ FROM soe_districts sd
       $sql .= " AND afdm.season = '" . $filter['season'] . "'";
     }
 
-    $sql .= " AND afdm.deleted_at IS NULL
+    $sql .= " AND afdm.deleted_at IS NULL AND afdm.status = 1
     GROUP BY afdm.district_id,
              t3.crops) AS t3
     ON sd.id = t3.district_id

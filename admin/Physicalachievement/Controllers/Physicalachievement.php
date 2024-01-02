@@ -35,14 +35,26 @@ class Physicalachievement extends AdminController
         $data['get_months'] = getMonths();
         //$data['monthId'] = $this->request->getGet('month_id');
         $currentMonth = date('n') - 1;
+        if ($currentMonth === 0) {
+            $currentMonth = 12; // Set it to December
+        }
         $data['monthId'] =  $currentMonth;
+        $data['year_name'] = '2023-2024';
+        $data['first_year_name'] = '2023';
+        if($this->request->getGet('year_id') === '2'){
+            $data['year_name'] = '2023-2024';
+            $data['first_year_name'] = '2023';
+        } elseif($this->request->getGet('year_id') === '3') {
+            $data['year_name'] = '2024-2025';
+            $data['first_year_name'] = '2024';
+        }
 
 
         $data['getMonths'] = getMonthById(getMonthIdByMonth($currentMonth));
         if ($this->request->getGet('month_id')) {
             $data['getMonths'] = getMonthById(getMonthIdByMonth($this->request->getGet('month_id')));
         }
-        // printr($getMonths['name']); exit;
+        // printr($data['getMonths']); exit;
 
         if ($this->request->getGet('month_id')) {
             $data['monthId'] = $this->request->getGet('month_id');
@@ -78,7 +90,7 @@ class Physicalachievement extends AdminController
         $data['componentsAll'] = $compo = $this->pcmachieve->getMprComponentsall($filter);
         $this->getTableHeaders($data);
         $data['results'] = $results = $this->pcmachieve->showTargetAchData($filter);
-      //  printr($data['results']); exit;
+        //printr($data['results']); exit;
         $data['target_acv_data'] = array();
 
         foreach ($results as $result) {
@@ -102,7 +114,7 @@ class Physicalachievement extends AdminController
                 'arraysecond' => $arraysecond,
             );
         }
-        //printr($data['target_acv_data']); exit;
+        //printr($data['getMonths']); exit;
         return $this->template->view('Admin\Physicalachievement\Views\componentachievedata', $data);
     }
 
@@ -117,8 +129,19 @@ class Physicalachievement extends AdminController
         $data['get_months'] = getMonths();
         //$data['monthId'] = $this->request->getGet('month_id');
         $currentMonth = date('n') - 1;
+        if ($currentMonth === 0) {
+            $currentMonth = 12; // Set it to December
+        }
         $data['monthId'] =  $currentMonth;
-
+        $data['year_name'] = '2023-2024';
+        $data['first_year_name'] = '2023';
+        if($this->request->getGet('year_id') === '2'){
+            $data['year_name'] = '2023-2024';
+            $data['first_year_name'] = '2023';
+        } elseif($this->request->getGet('year_id') === '3') {
+            $data['year_name'] = '2024-2025';
+            $data['first_year_name'] = '2024';
+        }
 
         $data['getMonths'] = getMonthById(getMonthIdByMonth($currentMonth));
         if ($this->request->getGet('month_id')) {
@@ -314,19 +337,20 @@ class Physicalachievement extends AdminController
         $currentYearStartMonth = 4;
         $currentMonth = date('n');
         $currentYear = getCurrentYearId();
+        //echo $yearId; exit;
 
         $futureYear = $currentYear + 1;
         $nextYearAprilMonth = 4;
         //$currentYear = 3;
         $checkExistsmonthData = $this->pcmachieve->showGetExsistsMonthData($filter);
-        // printr(!empty($checkExistsmonthData->month_id)) ; exit;
+
+       // printr($checkExistsmonthData) ; exit;
 
         // $day = date('j');
         // if ($day <= 1 || $day >= 5) {
         //     echo '<h3 style="text-align: center; margin-top: 20px;">Fill-up month date should be from 1 to 5.</h3>';
         //     exit;
         // }
-
 
         if ($yearId > $currentYear) {
             echo '<h3 style="text-align: center; margin-top: 20px;">Selected year is not allowed.</h3>';
@@ -337,23 +361,23 @@ class Physicalachievement extends AdminController
                 echo '<h3 style="text-align: center; margin-top: 20px;">Selected month already Has Data.</h3>';
                 exit;
             }
-            //  printr($checkExistsmonthData); exit;
-            if ($yearId == $currentYear && ($monthId >= $currentMonth || $monthId < $nextYearAprilMonth)) {
+            $currentFinancialYear = ($currentMonth >= $currentYearStartMonth) ? $currentYear : $currentYear - 1;
 
+            if ($yearId == $currentFinancialYear && $monthId > $currentMonth) {
                 echo '<h3 style="text-align: center; margin-top: 20px;">Selected month is not allowed.</h3>';
                 exit;
             }
-        } else if (empty($usercheck)) {
-            if ($yearId == $currentYear && ($monthId >= $currentMonth || $monthId < $nextYearAprilMonth)) {
 
-                echo '<h3 style="text-align: center; margin-top: 20px;">Selected month is not allowed.</h3>';
+            // Check if data already exists for the selected month in the current financial year
+            if (!empty($checkExistsmonthData) && $checkExistsmonthData->month_id == $monthId) {
+                echo '<h3 style="text-align: center; margin-top: 20px;">Selected month already has data.</h3>';
                 exit;
             }
         }
         $checkExistsData = $this->pcmTarget->showGetExsistsData($filter);
         $components = $this->physicalcomponents->getComponents();
         $componentsData = $this->pcmachieve->getComponentsAllData($filter);
-        //printr($componentsData); exit;
+       // printr($componentsData); exit;
         $tableHeaderHtml = '<thead><tr>
                         <th style="text-align: center;">Components</th>
                         <th style="text-align: center;">Target for ' . $yearName . '</th>
@@ -419,7 +443,7 @@ class Physicalachievement extends AdminController
         }
 
         $data['checkExists'] = $this->pcmTarget->showCheckExistsData($filter);
-         $data['get_months'] = getMonths();
+        $data['get_months'] = getMonths();
         $this->getTableHeadersMonth($data);
         $data['monthdata'] = $this->pcmachieve->showTrackreport($filter);
         //  printr($data['monthdata']); exit;

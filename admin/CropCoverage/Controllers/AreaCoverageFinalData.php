@@ -67,11 +67,11 @@ class AreaCoverageFinalData extends AdminController
 
         $data['district_id'] = '';
         if ($this->request->getGet('district_id')) {
-            $data['district_id'] = $this->request->getGet('district_id');
+            $data['district_id'] = $district_id = $this->request->getGet('district_id');
         } elseif ($this->user->district_id) {
-            $data['district_id'] = $this->user->district_id;
+            $data['district_id'] = $district_id = $this->user->district_id;
         } else {
-            $data['district_id'] = 0;
+            $data['district_id'] = $district_id = 0;
         }
         $data['blocks'] = [];
 
@@ -131,6 +131,17 @@ class AreaCoverageFinalData extends AdminController
 
         $blocks = $this->fdModel->getAreaCoverageFinalReport($filter);
         $data['blocksfd'] = $blocks;
+        $district_status = $this->fdModel->where('district_id', $district_id)->first();
+
+
+        $data['status'] = '';
+        $data['remarks'] = '';
+        $data['status_color'] = '';
+        if ($district_status) {
+            $data['status'] = $this->statuses[$district_status->status];
+            $data['status_color'] = $this->colors[$district_status->status];
+            $data['remarks'] = $district_status->remarks;
+        }
         // printr($data['blocksfd']);
         // exit;
 

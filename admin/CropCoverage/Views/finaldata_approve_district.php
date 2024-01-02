@@ -72,7 +72,7 @@
                             <th rowspan="3">Total Follow up Crops</th>
                             <th rowspan="3">Total Area </th>
                             <th rowspan="3">Status</th>
-
+                            <th rowspan="3">Documents</th>
                         </tr>
                         <tr>
                             <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -184,6 +184,11 @@
                                     <label class="badge badge-<?= $blockfd->status_color; ?>">
                                         <?= $blockfd->status; ?>
                                     </label>
+                                </td>
+                                <td>
+                                    <a href="<?= base_url('uploads/finaldatadoc/' . $blockfd->filename); ?>">
+                                        <?= $blockfd->filename; ?>
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
