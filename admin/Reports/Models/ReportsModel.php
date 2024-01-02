@@ -2348,11 +2348,15 @@ AND stc.deleted_at IS NULL AND st.status = 1";
         if (!empty($filter['block_id'])) {
             $sql = $this->getBlockAbstractTotal($filter);
         } else if (!empty($filter['district_id'])) {
-            $sql = $this->getDistrictAbstractTotal($filter['district_id'],$filter);
+            if(isset($filter['blockwise']) && $filter['blockwise']==true) {
+                $sql = $this->getDistrictAbstractTotal($filter['district_id'],$filter);
+            } else {
+                $sql = $this->getStateAbstractTotal($filter);
+            }
         } else {
             $sql = $this->getStateAbstractTotal($filter);
         }
-        //echo $sql;exit;
+//        echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
