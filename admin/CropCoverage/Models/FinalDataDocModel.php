@@ -52,7 +52,34 @@ class FinalDataDocModel extends Model
 
     public function addFileData($filedata)
     {
+        $this->where('block_id', $filedata['block_id'])
+            ->where('season', $filedata['season'])
+            ->where('year_id', $filedata['year_id'])
+            ->delete();
         $this->insert($filedata);
+    }
+    public function getFileName($filter)
+    {
+        $sql = "SELECT filename FROM ac_finaldata_doc afd WHERE afd.deleted_at IS null";
+
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND afd.block_id = " . $filter['block_id'];
+        } else {
+            $sql .= " AND afd.block_id = " . 0;
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND afd.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND afd.season = '" . $filter['season'] . "'";
+        }
+
+
+        $result = $this->db->query($sql)->getRow();
+        // echo $sql;
+        // exit;
+        return $result ? $result->filename : null;
+
     }
 
 }

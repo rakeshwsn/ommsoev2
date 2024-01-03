@@ -187,6 +187,7 @@ class Dashboard extends AdminController
 
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
+            $filter['blockwise'] = true;
         }
 
         if ($this->user->block_id) {

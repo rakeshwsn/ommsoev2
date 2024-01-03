@@ -85,6 +85,25 @@
         </div>
     </div>
     <div class="block-content block-content-full">
+        <?php if ($district_id) { ?>
+            <table class="table table-bordered table-striped mb-20 custom-table">
+                <tr class="highlight-heading1">
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+                <tr>
+                    <td>
+                        <?php if ($status): ?><label class="badge badge-<?= $status_color ?>">
+                                <?= $status ?>
+                            </label>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?= $remarks ?>
+                    </td>
+                </tr>
+            </table>
+        <? } ?>
         <div class="tableFixHead">
             <form action="" method="post" enctype="multipart/form-data" id="form-grampanchayat">
                 <table class="table custom-table js-dataTable-full" id="datatable">
@@ -374,7 +393,7 @@
         // Call the function for each specific class
         calculateAndAssignSum('ragi_total_smi', 'allTotalRagiSMI');
         calculateAndAssignSum('ragi_total_lt', 'allTotalRagiLT');
-        calculateAndAssignSum('ragi_ls', 'allTotalRagiLs');
+        calculateAndAssignSum('ragi_total_ls', 'allTotalRagiLs');
         calculateAndAssignSum('little_millet_lt', 'allTotalLittleMilletLt');
         calculateAndAssignSum('little_millet_ls', 'allTotalLittleMilletLs');
         calculateAndAssignSum('foxtail_millet_ls', 'allTotalFoxtailMilletLs');

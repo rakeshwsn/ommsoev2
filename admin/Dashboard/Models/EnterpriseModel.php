@@ -131,64 +131,67 @@ class EnterpriseModel extends Model
 		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
-	//saraswatee code
-	public function getList($filter = [])
-	{
-		$sql = "SELECT
-		eu.id unit_id,
-		eu.name unit_name,
-		eu.group_unit,
-		COALESCE(ent.total_units,0) total_units
-	  FROM enterprises_units eu
-		LEFT JOIN (SELECT
-			de.unit_id,
-			SUM(de.wshg + de.fpos) total_units
-		  FROM dashboard_enterprises de
-		  WHERE de.deleted_at IS NULL";
-		if (!empty($filter['year_id'])) {
-			$sql .= " AND de.year_id = " . $filter['year_id'];
-		}
-		$sql .= " GROUP BY de.unit_id) ent
-		  ON ent.unit_id = eu.id WHERE eu.deleted_at IS NULL ORDER BY eu.name";
 
-		// echo $sql;exit;
-		return $this->db->query($sql)->getResult();
-	}
+    /** Sync data from table
+     * This function is used to sync data from table to dashboard_enterprises from enterprises table
+     * This is not implemented yet. Please remove this line after implementing
+     * author: Rakesh Sahu
+     */
+    public function syncFromTable() {
+        $sql = "INSERT INTO dashboard_enterprises_copy (year_id, district_id, unit_id, unit_name, wshg, fpos, created_at, updated_at)
+  SELECT
+    ydu.year_id,
+    ydu.district_id,
+    ydu.unit_id,
+    ydu.unit_name,
+    COALESCE(res.shg_units, 0) wshg,
+    COALESCE(res.fpo_units, 0) fpo,NOW(),NOW()
+  FROM (SELECT
+      dy.id year_id,
+      sd.id district_id,
+      eu.id unit_id,
+      eu.name unit_name
+    FROM enterprises_units eu
+      CROSS JOIN soe_districts sd
+      CROSS JOIN (SELECT
+          *
+        FROM dashboard_years
+        WHERE id < 8) dy) ydu
+    LEFT JOIN (SELECT
+        unit_id,
+        year,
+        year_id,
+        district_id,
+        MAX(CASE WHEN management_unit_type = 'shg' THEN total_units ELSE 0 END) AS shg_units,
+        MAX(CASE WHEN management_unit_type = 'fpo' THEN total_units ELSE 0 END) AS fpo_units
+      FROM (SELECT
+          e.unit_id,
+          COUNT(e.unit_id) total_units,
+          dy.name year,
+          dy.id year_id,
+          e.district_id,
+          e.management_unit_type
+        FROM (SELECT
+            *
+          FROM enterprises
+          WHERE deleted_at IS NULL
+          AND unit_id > 0
+          AND YEAR(date_estd) >= 2017) e
+          LEFT JOIN dashboard_years dy
+            ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+        GROUP BY e.unit_id,
+                 e.district_id,
+                 e.management_unit_type,
+                 year_id) rs
+      GROUP BY unit_id,
+               year,
+               year_id,
+               district_id
+      ORDER BY year_id, district_id) res
+      ON res.unit_id = ydu.unit_id
+      AND res.district_id = ydu.district_id
+      AND res.year_id = ydu.year_id";
 
-	public function getYears()
-	{
-		$sql = "SELECT
-		de.year_id,
-		dy.name years,
-		de.id
-	  FROM dashboard_enterprises de
-		LEFT JOIN dashboard_years dy
-		  ON de.year_id = dy.id
-	  WHERE de.deleted_at IS NULL
-	  AND dy.deleted_at IS NULL";
-		$sql .=  " GROUP BY years ";
-		return $this->db->query($sql)->getResult();
-	}
-	public function getDataBYUnit($year_id,$unit_id)
-	{
-		$sql = "SELECT
-		de.id,
-		de.year_id,
-		de.district_id,
-		de.unit_id,
-		de.wshg,
-		de.fpos,
-		de.unit_name,
-		dy.name year,
-		sd.name district,sd.id d_id
-	  FROM dashboard_enterprises de
-		LEFT JOIN dashboard_years dy
-		  ON dy.id = de.year_id
-		LEFT JOIN soe_districts sd
-		  ON sd.id = de.district_id
-	  WHERE de.year_id = $year_id
-	  AND de.unit_id = $unit_id  AND de.deleted_at IS NULL";
-	//   echo $sql;exit;
-		return $this->db->query($sql)->getResult();
-	}
+
+    }
 }
