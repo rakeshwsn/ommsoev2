@@ -311,7 +311,7 @@ FROM (SELECT
   ms.block_id,
   ms.agency_type_id,
   created_at,
-  'mis' modulecode
+  'mis' modulecode,ms.fund_agency_id
 FROM mis_submissions ms
 WHERE ms.deleted_at IS NULL
 AND ms.month = $month
@@ -325,7 +325,7 @@ SELECT
   st.block_id,
   st.agency_type_id,
   date_added created_at,
-  'expense' modulecode
+  'expense' modulecode,st.fund_agency_id
 FROM soe_transactions st
 WHERE st.deleted_at IS NULL
 AND st.transaction_type = 'expense'
@@ -337,7 +337,7 @@ SELECT
   st.id,
   st.status,st.district_id,st.block_id,
   st.agency_type_id,date_added created_at,
-  'fund_receipt' modulecode
+  'fund_receipt' modulecode,st.fund_agency_id
 FROM soe_transactions st
 WHERE st.deleted_at IS NULL
 AND st.transaction_type = 'fund_receipt'
@@ -349,7 +349,7 @@ SELECT
   smt.id,
   smt.status,smt.district_id,smt.block_id,
   smt.agency_type_id,created_at,
-  'other_receipt' modulecode
+  'other_receipt' modulecode,smt.fund_agency_id
 FROM soe_misc_transactions smt
 WHERE smt.deleted_at IS NULL
 AND smt.year = $year
@@ -360,7 +360,7 @@ SELECT
   scb.id,
   scb.status, scb.district_id,scb.block_id,
   scb.agency_type_id,created_at,
-  'closing_balance' modulecode
+  'closing_balance' modulecode,scb.fund_agency_id
 FROM soe_closing_balances scb
 WHERE scb.deleted_at IS NULL
 AND scb.month = $month
@@ -369,8 +369,8 @@ AND scb.district_id = $district_id) sts
     ON sts.modulecode = umym.modulecode
     AND sts.district_id = umym.district_id
     AND sts.block_id = umym.block_id
-    AND sts.agency_type_id = umym.user_group_id";
-
+    AND sts.agency_type_id = umym.user_group_id AND sts.fund_agency_id=umym.fund_agency_id";
+//echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 }
