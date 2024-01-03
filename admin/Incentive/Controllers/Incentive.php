@@ -1051,6 +1051,7 @@ class Incentive extends AdminController
 		// If the 'district_id' parameter is present in the request, update the district ID in the filter
 
 		$filteredData = $this->incentivemainModel->FarmerCheckstatus($filter);
+		//printr($filteredData); exit;
 		// Retrieve filtered data by calling the FarmerCheckstatus() method on the incentivemainModel, passing the filter
 		$data['district_id'] = '';
 		// Set the initial value of district_id to an empty string
@@ -1111,6 +1112,10 @@ class Incentive extends AdminController
 				$season = 'Rabi';
 			}
 			// Assign a specific string value to $season based on the value of the 'season' field in $filteredDatas
+			$pdf_att = '';
+			if($filteredDatas['pdf'] != null){
+				$pdf_att = base_url() . '/uploads/farmerincentive/' . $filteredDatas['pdf'];
+			}
 
 			$data['farmerData'][] = [
 				'district_id' => $filteredDatas['district_id'],
@@ -1120,9 +1125,11 @@ class Incentive extends AdminController
 				'incentiveid' => $filteredDatas['incentiveid'],
 				'year' => $year,
 				'season' => $season,
+				'pdf' => $pdf_att
 			];
 			// Add an associative array with various fields and their corresponding values to the $data['farmerData'] array
 		};
+		//printr($data['farmerData']); exit;
 		return $this->template->view('Admin\Incentive\Views\upload_status', $data);
 	}
 
