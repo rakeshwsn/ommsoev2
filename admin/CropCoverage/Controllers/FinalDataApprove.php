@@ -11,6 +11,7 @@ use Admin\Localisation\Models\DistrictModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\GrampanchayatModel;
 use Admin\CropCoverage\Models\FinalDataModel;
+use Admin\CropCoverage\Models\FinalDataApproveModel;
 use Admin\CropCoverage\Models\PracticesModel;
 use Admin\CropCoverage\Models\TargetModel;
 use Config\Url;
@@ -35,6 +36,7 @@ class FinalDataApprove extends AdminController
     private $practicesModel;
     private $gpModel;
     private $fdModel;
+    private $fdApproveModel;
     function __construct()
     {
         $this->acModel = new AreaCoverageModel();
@@ -43,6 +45,7 @@ class FinalDataApprove extends AdminController
         $this->districtModel = new DistrictModel();
         $this->gpModel = new GrampanchayatModel();
         $this->fdModel = new FinalDataModel();
+        $this->fdApproveModel = new FinalDataApproveModel();
         $this->practicesModel = new PracticesModel();
         $this->targetModel = new TargetModel();
     }
@@ -104,7 +107,7 @@ class FinalDataApprove extends AdminController
 
         ];
         $data['get_blocks'] = Url::getBlocks;
-        $blocks = $this->fdModel->getAreaCoverageFinalReport($filter);
+        $blocks = $this->fdApproveModel->getAreaCoverageFinalReport($filter);
         // printr($blocks);
         // exit;
         foreach ($blocks as $key => $block) {
@@ -181,7 +184,7 @@ class FinalDataApprove extends AdminController
             return redirect()->to(admin_url('areacoverage/finaldata/approve/district?district_id=' . $district_id . '&season=' . $season))
                 ->with('message', 'Status has been updated.');
         }
-        $blocks = $this->fdModel->getAreaCoverageFinalReport($filter);
+        $blocks = $this->fdApproveModel->getAreaCoverageFinalReport($filter);
         // printr($blocks);
         // exit;
         foreach ($blocks as $key => $block) {
