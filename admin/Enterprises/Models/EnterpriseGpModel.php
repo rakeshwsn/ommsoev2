@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class EnterpriseGpModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'enterprise_gps';
+	protected $table                = 'grampanchayat';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;
