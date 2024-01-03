@@ -3,7 +3,6 @@
 namespace Admin\Dashboard\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class EnterpriseModel extends Model
 {
@@ -101,10 +100,11 @@ class EnterpriseModel extends Model
 		if (isset($filter['district_id'])) {
 			$sql .= " AND e.district_id = " . $filter['district_id'];
 		}
-// echo $sql;exit;
+		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
-    public function getYearwisedata($filter = [])
+
+	public function getYearwisedata($filter = [])
 	{
 		$sql = "SELECT
 		e.year_id,

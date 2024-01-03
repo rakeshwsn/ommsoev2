@@ -771,16 +771,16 @@ class Leftbar extends AdminController
             ];
         }
         //LGD 
-        if ($this->user->hasPermission("LGD District")) {
+        if ($this->user->hasPermission("LGD Block")) {
             $localisation[] = [
-                "name" => lang("LGD District"),
+                "name" => lang("LGD Block"),
                 "href" => admin_url("lgdblock"),
                 "children" => [],
             ];
         }
-        if ($this->user->hasPermission("LGD Block")) {
+        if ($this->user->hasPermission("LGD GP ")) {
             $localisation[] = [
-                "name" => lang("LGD Block"),
+                "name" => lang("LGD GP"),
                 "href" => admin_url("lgdgp"),
                 "children" => [],
             ];
