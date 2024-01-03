@@ -30,11 +30,11 @@
                     <div class="col-md-2">
                         <button class="btn btn-primary"><i class="si si-magnifier"></i> Submit</button>
                     </div>
-                  
+
                 </div>
             </form>
 
-            
+
         </div>
     </div>
     <div class="block">
@@ -50,6 +50,7 @@
                     <th class="text-center">Block</th>
                     <th class="text-center">Season</th>
                     <th class="text-center">Farmer Incentive Upload</th>
+                    <th class="text-center">Pdf View</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -59,8 +60,11 @@
                         <td class="text-center"><?=$farmerDatas['block_name']?></td>
                         <td class="text-center"><label class="<?php echo $farmerDatas['season'] === 0 ? 'badge badge-danger' : 'text-center'; ?>"><?php echo $farmerDatas['season'] === 0 ? 'Not Uploaded' : $farmerDatas['season']; ?></label></td>
                         <td class="text-center"><label class="text-center <?php echo $farmerDatas['incentiveid'] == null ? 'badge badge-danger' : 'badge badge-success'; ?>"><?php echo $farmerDatas['incentiveid'] == null ? 'Not Uploaded' : 'Uploaded'; ?></label></td>
-                        
-                        
+                        <?php if($farmerDatas['pdf'] != null){?>
+                            <td class="text-center"><div class="_df_button btn"  source="<?php echo $farmerDatas['pdf'] ?>" title="Brochure"><i class="fa fa-file-pdf-o" style="font-size:48px;color:red"></i></div></td>
+                            <?php } else { ?>
+                                <td class="text-center"><label class="text-center badge badge-danger">No Pdf</label></td>
+                            <?php } ?>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
