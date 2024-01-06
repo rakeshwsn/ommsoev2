@@ -10,23 +10,31 @@ use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Enterprises\Models\EnterpriseGpModel;
 use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Localisation\Models\LgdBlocksModel;
+use Admin\Localisation\Models\LgdGpsModel;
+use Admin\Localisation\Models\LgdVillagesModel;
 use App\Controllers\AdminController;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use Admin\Equipment\Models\EquipmentModel;
+
 
 
 class Enterprises extends AdminController
 {
-	public function index() {
+	public function index()
+	{
 		$this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 		$this->template->set('header', true);
 		helper('form');
 		$enterprisesmodel = new EnterprisesModel();
 		$distModel = new DistrictModel();
 		$blockmodel = new BlockModel();
+		$gpmodel = new LgdGpsModel();
+
 		$enterprisesunitmodel = new EnterprisesUnitModel();
 		//populate districts
 		$data['districts'][0] = 'Select District';
@@ -284,7 +292,7 @@ class Enterprises extends AdminController
 				$data = [
 					'purpose_infr_support' => '',
 					'support_infr_amount' => '',
-					'addl_budget'=>'',
+					'addl_budget' => '',
 				];
 			} else {
 
@@ -313,7 +321,7 @@ class Enterprises extends AdminController
 				'addl_budget' => $data['addl_budget'],
 				'unit_budget_amount' => $this->request->getPost('unit_budget_amount'),
 				'is_support_basis_infr' => (int)$this->request->getPost('is_support_basis_infr'),
-				'purpose_infr_support' =>$data['purpose_infr_support'],
+				'purpose_infr_support' => $data['purpose_infr_support'],
 				'support_infr_amount' => $data['support_infr_amount'],
 				'own_share' => $this->request->getPost('own_share'),
 				'govt_share' => $this->request->getPost('govt_share')
@@ -332,11 +340,13 @@ class Enterprises extends AdminController
 	{
 
 		$data['blocks'] = [];
-		$BlocksModel = new BlockModel();
+		// $BlocksModel = new BlockModel();
+		$blockModel = new LgdBlocksModel();
 
 		$district_id = $this->request->getGet('district_id');
-		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->orderBy('name', 'asc')->findAll();
-		// printr($data);
+
+		$data['blocks'] = $blockModel->where('district_lgd_code', $district_id)->orderBy('name', 'asc')->findAll();
+		// printr($data);exit;
 		return $this->response->setJSON($data);
 	}
 	public function ajaxDoe()
@@ -352,23 +362,25 @@ class Enterprises extends AdminController
 	public function ajaxgps()
 	{
 		$data['gps'] = [];
-		$gpmodel = new EnterpriseGpModel();
+		// $gpmodel = new EnterpriseGpModel();
+		$lgdgpmodel = new LgdGpsModel();
+
 
 		$block_id = $this->request->getGet('block_id');
 
-		$data['gps'] = $gpmodel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
+		$data['gps'] = $lgdgpmodel->where('block_lgd_code', $block_id)->orderBy('name', 'asc')->findAll();
 
 		return $this->response->setJSON($data);
 	}
 	public function ajaxvillages()
 	{
 		$data['villages'] = [];
-		$villagemodel = new EnterpriseVillagesModel();
-
+		// $villagemodel = new EnterpriseVillagesModel();
+		$lgdvillagemodel = new LgdVillagesModel();
 		$gp_id = $this->request->getGet('gp_id');
 
-        $data['villages'] = $villagemodel->where('gp_id', $gp_id)
-            ->orderBy('name', 'asc')->findAll();
+		$data['villages'] = $lgdvillagemodel->where('gp_lgd_code', $gp_id)
+			->orderBy('name', 'asc')->findAll();
 
 		return $this->response->setJSON($data);
 	}
@@ -377,15 +389,17 @@ class Enterprises extends AdminController
 
 	public function getForm()
 	{
-		$this->template->add_package(['uploader', 'jquery_loading'], true);
+		$this->template->add_package(['uploader', 'jquery_loading', 'select2'], true);
+		// $this->template->add_package(array('datatable','select2'),true);
 		helper('form');
 		$enterprisesmodel = new EnterprisesModel();
 		$enterprisesbudgetmodel = new EnterprisesBudgetModel();
 		$enterprisesunitmodel = new EnterprisesUnitModel();
-		$gpmodel = new EnterpriseGpModel();
-		$villagemodel = new EnterpriseVillagesModel();
+		$lgdgpmodel = new LgdGpsModel();
+		$lgdvillagemodel = new LgdVillagesModel();
 		$districtmodel = new DistrictModel();
-		$blockModel = new BlockModel();
+		$blockmodel = new LgdBlocksModel();
+		$equipmentmodel = new EquipmentModel();
 
 		if (isset($this->error['warning'])) {
 			$data['error'] 	= $this->error['warning'];
@@ -425,46 +439,34 @@ class Enterprises extends AdminController
 			'SHG' => 'SHG',
 			'FPO' => 'FPO',
 		];
-		$data['is_support'] = [
-			'0' => 'No',
-			'1' => 'Yes',
-		];
+		// 
 		//district
 		$data['districts'][] = 'Select districts';
 
 		$districts = $districtmodel->orderBy('name', 'asc')->findAll();
 
 		foreach ($districts as $district) {
-			$data['districts'][$district->id] = $district->name;
+			$data['districts'][$district->lgd_code] = $district->name;
 		}
 
-		//blocks
-		$data['blocks'][] = 'Select blocks';
+		$data['blocks'][] = 'Select Block';
 
-		if ($data['district_id']) {
-			$blocks = $blockModel->where('district_id', $data['district_id'])->findAll();
-			foreach ($blocks as $block) {
-				$data['blocks'][$block->id] = $block->name;
-			}
-		}
-		//GPS
 		$data['gps'][] = 'Select Gp';
-		if ($data['block_id']) {
-			$gps = $gpmodel->where('block_id', $data['block_id'])->findAll();
-			foreach ($gps as $gp) {
-				$data['gps'][$gp->id] = $gp->name;
-			}
-		}
-		//Villages
+
 		$data['villages'][] = 'Select Village';
-		if ($data['gp_id']) {
-			$villages = $villagemodel->where('gp_id', $data['gp_id'])->findAll();
 
-			foreach ($villages as $village) {
 
-				$data['villages'][$village->id] = $village->name;
-			}
+		//equipment
+
+		$data['equipments'][] = 'Select Equipment name';
+
+		$equipments = $equipmentmodel->findAll();
+
+		foreach ($equipments as $equipment) {
+			$data['equipments'][$equipment->id] = $equipment->name;
 		}
+		// $equipment_id = 0;
+		$data['equipment_id'] = 0;
 		//Budget fin yrs
 		$data['unit_budgets'][] = 'Select budgets';
 		// $budget_id = [];
@@ -492,13 +494,14 @@ class Enterprises extends AdminController
 		}
 
 		//Add GP url
-		
+
 		$data['add_gp_url'] = admin_url('grampanchayat/add');
-	
+
 		//Add village Url
 		$data['add_village_url'] = admin_url('village/add');
 
-		// dd($data);
+		
+
 
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}

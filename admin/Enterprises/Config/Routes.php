@@ -26,6 +26,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
     $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
+    $routes->add('enterprises/delete', 'Enterprises\Controllers\EstablishmentTransaction::delete');
 
     $routes->add('enterprises/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 
