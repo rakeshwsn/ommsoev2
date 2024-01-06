@@ -647,7 +647,19 @@ class Leftbar extends AdminController
                 "children" => $areacoverage,
             ];
         }
+        //Equipment
+        $equipment = [];
 
+        if ($this->user->hasPermission("equipment")) {
+
+            $data["menus"][] = [
+                "id" => "menu-equipment",
+                "icon" => "md-equipment",
+                "name" => lang("Equipment"),
+                "href" => admin_url("equipment"),
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("events")) {
             $data["menus"][] = [

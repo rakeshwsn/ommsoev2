@@ -25,7 +25,7 @@
 						</div>
 					</div>
 
-					
+
 
 					<div class="col-lg-3 center">
 						<label class="form-control-label">&nbsp;</label>
@@ -37,7 +37,11 @@
 				</div>
 			</div>
 		</form>
+	</div>
+</div>
+<div class="block">
 
+	<div class="block-content block-content-full">
 
 		<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 			<thead>
@@ -51,7 +55,9 @@
 		</table>
 		</form>
 	</div>
+
 </div>
+
 <?php js_start(); ?>
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -69,9 +75,9 @@
 				type: 'GET',
 				dataType: 'JSON',
 				beforeSend: function() {},
-				
+
 				success: function(response) {
-					
+
 					if (response.blocks) {
 
 						var html = '<option value="">Select Block</option>'; // Declare html with var
@@ -104,7 +110,7 @@
 				data: function(data) {
 					data.district = $('#filter_district').val();
 					data.block = $('#filter_block').val();
-					
+
 				},
 				beforeSend: function() {
 					$('.alert-dismissible, .text-danger').remove();
@@ -132,7 +138,5 @@
 
 		Codebase.helpers(['select2']);
 	});
-
-
 </script>
 <?php js_end(); ?>
