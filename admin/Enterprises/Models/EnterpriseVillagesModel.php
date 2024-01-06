@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class EnterpriseVillagesModel extends Model
 {
 	protected $DBGroup              = 'default';
-	protected $table                = 'enterprise_villages';
+	protected $table                = 'villages';
 	protected $primaryKey           = 'id';
 	protected $useAutoIncrement     = true;
 	protected $insertID             = 0;

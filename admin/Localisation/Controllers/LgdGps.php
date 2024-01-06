@@ -22,12 +22,7 @@ class LgdGps extends AdminController
 	public function index()
 	{
 		$this->template->set_meta_title(lang('Grampanchayat|Millets'));
-		return $this->getList();
-	}
-	
-	protected function getList()
-	{
-
+		
 		$data['breadcrumbs'] = array();
 		$data['breadcrumbs'][] = array(
 			'text' => lang('Grampanchayat.heading_title'),
@@ -61,6 +56,15 @@ class LgdGps extends AdminController
 		$data['blocks'] = [];
 
 		return $this->template->view('Admin\Localisation\Views\lgdgrampanchayat', $data);
+	}
+	
+	public function getList()
+	{
+		$district_id = $this->request->getGet('district_id');
+		$block_id = $this->request->getGet('block_id');
+
+		$gps=$this->grampanchayatModel->where('block_id',$block_id);
+
 	}
 
 	public function search()
