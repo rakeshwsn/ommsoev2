@@ -87,12 +87,11 @@ class DistrictMap extends AdminController
 
 	public function edit()
 	{
-		              	
 		$DistrictMapModel = new DistrictMapModel();
 		if ($this->request->getMethod(1) == 'POST') {
 
 			$year_id = $this->request->getGet('year_id');
-			
+
 			$DistrictMapModel->where('year_id', $year_id)->delete();
 
 			foreach ($this->request->getPost('district') as $key => $values) {
@@ -106,7 +105,6 @@ class DistrictMap extends AdminController
 					'chcs' => $values['chcs'],
 					'cmscs' => $values['cmscs'],
 					'acheivement' => $values['acheivement'],
-
 				];
 			}
 			$data['maps']=$DistrictMapModel->insertBatch($mapdata);
