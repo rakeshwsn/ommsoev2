@@ -27,7 +27,7 @@
 
 						</div>
 					</div><!-- col-4 -->
-					
+
 					<!-- col-4 -->
 					<div class="col-lg-3 center">
 						<label class="form-control-label">&nbsp;</label>
@@ -40,6 +40,11 @@
 			</div>
 		</form>
 		<hr />
+	</div>
+</div>
+<div class="block">
+
+	<div class="block-content block-content-full">
 		<!-- DataTables functionality is initialized with .js-dataTable-full class in js/district/be_tables_datatables.min.js which was auto compiled from _es6/district/be_tables_datatables.js -->
 		<table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full">
 			<thead>
@@ -49,7 +54,7 @@
 					<th>District</th>
 					<th>Block</th>
 					<th>GP</th>
-					
+
 				</tr>
 			</thead>
 		</table>
@@ -139,7 +144,7 @@
 					data.district = $('#filter_district').val();
 					data.block = $('#filter_block').val();
 					data.grampanchayat = $('#filter_grampanchayat').val();
-					
+
 				},
 				beforeSend: function() {
 					$('.alert-dismissible, .text-danger').remove();
