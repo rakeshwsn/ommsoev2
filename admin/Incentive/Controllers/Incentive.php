@@ -2,6 +2,7 @@
 
 namespace Admin\Incentive\Controllers;
 
+use Admin\Dashboard\Models\YearModel;
 use Admin\Incentive\Models\IncentivemainModel;
 use Admin\Incentive\Models\IncentiveModel;
 use Admin\Localisation\Models\BlockModel;
@@ -22,6 +23,7 @@ class Incentive extends AdminController
 	{
 		$this->incentiveModel = new IncentiveModel();
 		$this->incentivemainModel = new IncentivemainModel();
+		$this->years = new YearModel();
 	}
 
 	public function index()
@@ -41,7 +43,7 @@ class Incentive extends AdminController
 		$data['addform'] = admin_url('incentive/addform');
 		$user  = service('user');
 		$userDis = $user->district_id;
-
+		$data['years'] = $this->years->getAllYear();
 		$data['searchview'] = admin_url('incentive/incentivesearch/');
 
 		$data['heading_title'] = lang('Incentive.heading_title');
@@ -62,6 +64,7 @@ class Incentive extends AdminController
 		}
 
 		$this->filterOptionsMain($data);
+		//printr($data); exit;
 
 		return $this->template->view('Admin\Incentive\Views\incentivemain', $data);
 	}
@@ -87,20 +90,17 @@ class Incentive extends AdminController
 		$filteredData = $this->incentivemainModel->getAll($filter_data);
 
 		//  printr($filteredData); exit;
+		$years = $this->years->getAllYear();
+		//printr($data['years']);exit;
+		$year = "";
 		$datatable = array();
 		foreach ($filteredData as $result) {
+			$key = array_search($result->year, array_column($years, 'id'));
+			if($key !== false){
 
-			if ($result->year == 1) {
-				$year = '2017-18';
-			} elseif ($result->year == 2) {
-				$year = '2018-19';
-			} elseif ($result->year == 3) {
-				$year = '2019-20';
-			} elseif ($result->year == 4) {
-				$year = '2020-21';
-			} elseif ($result->year == 5) {
-				$year = '2021-22';
+				$year = $years[$key]['name'];
 			}
+
 
 
 			if ($result->season == 1) {
@@ -178,6 +178,7 @@ class Incentive extends AdminController
 		$data['button_view'] = lang('Incentive.button_view');
 		$data['button_edit'] = lang('Incentive.button_edit');
 		$data['button_delete'] = lang('Incentive.button_delete');
+		$data['years'] = $this->years->getAllYear();
 		// $data['datatable_url'] = admin_url('incentive/searchall');
 		if (isset($this->error['warning'])) {
 			$data['error'] 	= $this->error['warning'];
@@ -233,19 +234,14 @@ class Incentive extends AdminController
 		}
 
 		//printr($filteredData);
+		$years = $this->years->getAllYear();
 		$data['datatable'] = array();
 		$year = '';
 		foreach ($filteredData as $result) {
-			if ($result['year'] == 1) {
-				$year = '2017-18';
-			} elseif ($result['year'] == 2) {
-				$year = '2018-19';
-			} elseif ($result['year'] == 3) {
-				$year = '2019-20';
-			} elseif ($result['year'] == 4) {
-				$year = '2020-21';
-			} elseif ($result['year'] == 5) {
-				$year = '2021-22';
+			$key = array_search($result['year'], array_column($years, 'id'));
+			if($key !== false){
+
+				$year = $years[$key]['name'];
 			}
 
 
@@ -285,14 +281,14 @@ class Incentive extends AdminController
 		}
 
 		// echo "<pre>";
-		// print_r($data['datatable']); exit;
+		//printr($data); exit;
 
 		return $this->template->view('Admin\Incentive\Views\incentiveallview', $data);
 	}
 	protected function dataToExcel($data)
 	{
 		$spreadsheet = new Spreadsheet();
-
+		$years = $this->years->getAllYear();
 		// Create a new sheet
 		$sheet = $spreadsheet->getActiveSheet();
 
@@ -322,16 +318,10 @@ class Incentive extends AdminController
 		$row = 2; // Start from row 2
 		foreach ($data as $result) {
 
-			if ($result['year'] == 1) {
-				$year = '2017-18';
-			} elseif ($result['year'] == 2) {
-				$year = '2018-19';
-			} elseif ($result['year'] == 3) {
-				$year = '2019-20';
-			} elseif ($result['year'] == 4) {
-				$year = '2020-21';
-			} elseif ($result['year'] == 5) {
-				$year = '2021-22';
+			$key = array_search($result['year'], array_column($years, 'id'));
+			if($key !== false){
+
+				$year = $years[$key]['name'];
 			}
 
 			if ($result['season'] == 1) {
@@ -396,21 +386,16 @@ class Incentive extends AdminController
 
 		//$totalFiltered = $this->incentiveModel->getTotal($filter_data);
 		$filteredData = $this->incentivemainModel->getAllsearch($filter_data);
-
+		$years = $this->years->getAllYear();
 		//printr($filteredData);
 		$datatable = array();
+		$year = '';
 		foreach ($filteredData as $result) {
 
-			if ($result->year == 1) {
-				$year = '2017-18';
-			} elseif ($result->year == 2) {
-				$year = '2018-19';
-			} elseif ($result->year == 3) {
-				$year = '2019-20';
-			} elseif ($result->year == 4) {
-				$year = '2020-21';
-			} elseif ($result->year == 5) {
-				$year = '2021-22';
+			$key = array_search($result->year, array_column($years, 'id'));
+			if($key !== false){
+
+				$year = $years[$key]['name'];
 			}
 
 			if ($result->season == 1) {
@@ -462,7 +447,7 @@ class Incentive extends AdminController
 	protected function filterOptionsMain(&$data)
 	{
 
-		$data['years'] = getAllYears();
+		$data['years'] = $this->years->getAllYear();
 		$data['months'] = getAllMonths();
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
@@ -526,15 +511,17 @@ class Incentive extends AdminController
 
 	public function addform()
 	{
+		// echo "dada"; exit;
 		$this->template->add_package(array('select2'), true);
 		$user_upload =  $this->session->get('user')->id;
 		$this->template->set_meta_title(lang('Incentive.heading_title'));
 		$data['text_form'] = $this->uri->getSegment(4) ? "INCENTIVE EDIT" : "INCENTIVE ADD";
 		$data['cancel'] = admin_url('incentive');
-		$data['years'] = getAllYears();
+		$data['years'] = $this->years->getAllYear();
 		$data['months'] = getAllMonths();
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
+		//printr($data['years']); exit;
 
 		$data['blocks'] = [];
 		if (isset($data['district_id']) && $data['district_id']) {
@@ -676,7 +663,7 @@ class Incentive extends AdminController
 			}
 		}
 
-		if(isset($this->error['warning'])){
+		if (isset($this->error['warning'])) {
 			$data['error'] 	= $this->error['warning'];
 		}
 
@@ -696,7 +683,8 @@ class Incentive extends AdminController
 		if ($valid) {
 			return true;
 		} else {
-			//printr($validation->getErrors());
+			printr($validation->getErrors());
+			exit;
 			$this->error['warning'] = "upload file more than 40 mb";
 			return false;
 		}
@@ -976,7 +964,7 @@ class Incentive extends AdminController
 	protected function filterOptions(&$data)
 	{
 
-		$data['years'] = getAllYears();
+		$data['years'] = $this->years->getAllYear();
 		$data['months'] = getAllMonths();
 		$districtModel = new DistrictModel();
 		$data['districts'] = $districtModel->getAll();
@@ -1085,21 +1073,17 @@ class Incentive extends AdminController
 		};
 		$data['farmerData'] = [];
 		// Initialize an empty array to store the farmer data
-
+		$years = $this->years->getAllYear();
+		//printr($data['years']);exit;
+		$year = "";
 		foreach ($filteredData as $filteredDatas) {
 			$year = 0;
 			// Initialize the year variable with a default value of 0
 
-			if ($filteredDatas['year'] == 1) {
-				$year = '2017-18';
-			} elseif ($filteredDatas['year'] == 2) {
-				$year = '2018-19';
-			} elseif ($filteredDatas['year'] == 3) {
-				$year = '2019-20';
-			} elseif ($filteredDatas['year'] == 4) {
-				$year = '2020-21';
-			} elseif ($filteredDatas['year'] == 5) {
-				$year = '2021-22';
+			$key = array_search($filteredDatas['year'], array_column($years, 'id'));
+			if($key !== false){
+
+				$year = $years[$key]['name'];
 			}
 			// Assign a specific string value to $year based on the value of the 'year' field in $filteredDatas
 
@@ -1113,7 +1097,7 @@ class Incentive extends AdminController
 			}
 			// Assign a specific string value to $season based on the value of the 'season' field in $filteredDatas
 			$pdf_att = '';
-			if($filteredDatas['pdf'] != null){
+			if ($filteredDatas['pdf'] != null) {
 				$pdf_att = base_url() . '/uploads/farmerincentive/' . $filteredDatas['pdf'];
 			}
 

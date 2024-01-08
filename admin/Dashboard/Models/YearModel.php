@@ -50,4 +50,9 @@ class YearModel extends Model
         return $this->db->query($sql)->getFirstRow();
 	}
 
+	public function getAllYear() {
+        $sql = "SELECT * FROM ".$this->table." where deleted_at is null";
+        return $this->db->query($sql)->getResultArray();
+	}
+
 }
