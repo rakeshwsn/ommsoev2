@@ -73,11 +73,10 @@ $user  = service('user');
                                     <td>
                                         <select class="form-control" id="" name="year" required>
                                             <option value="">select</option>
-                                            <option value="1">2017-18</option>
-                                            <option value="2">2018-19</option>
-                                            <option value="3">2019-20</option>
-                                            <option value="4">2020-21</option>
-                                            <option value="5">2021-22</option>
+
+                                            <?php foreach ($years as $allYear) { ?>
+                                                <option value="<?php echo $allYear['id']; ?>"><?php echo $allYear['name']; ?></option>
+                                            <?php } ?>
                                         </select>
                                     </td>
 
@@ -92,8 +91,19 @@ $user  = service('user');
 
                             <table class="table table-bordered">
                                 <tr>
-                                    <th style="width: 310px;">Excel(data) Upload</th>
-                                    <th style="width: 320px;">Pdf Upload(Document For verify)<p class="text-danger">40 Mb Upload size</p></th>
+                                    <th style="width: 310px;">Excel(data) Upload
+                                        <p class="text-danger"> <?php
+                                                                if ($validation->hasError('file')) {
+                                                                    echo $validation->getError('file');
+                                                                }
+                                                                ?></p>
+                                    </th>
+                                    <th style="width: 320px;">Pdf Upload(Document For verify)<p class="text-danger"><?php
+                                                                                                                    if ($validation->hasError('pdf')) {
+                                                                                                                        echo $validation->getError('pdf');
+                                                                                                                    }
+                                                                                                                    ?></p>
+                                    </th>
                                     <th>Upload</th>
                                 </tr>
                                 <tr>
