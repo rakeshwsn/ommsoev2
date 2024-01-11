@@ -3275,7 +3275,7 @@ FROM (SELECT
                   AND ms.agency_type_id = 7
                   GROUP BY ms.district_id,fund_agency_id) mis
                   ON dist.district_id = mis.district_id AND dist.fund_agency_id = mis.fund_agency_id)
-            ORDER BY district ASC";
+            ORDER BY district ASC, block ASC";
 //echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
