@@ -3,7 +3,6 @@
 namespace Admin\Dashboard\Models;
 
 use CodeIgniter\Model;
-use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\F;
 
 class EnterpriseModel extends Model
 {
@@ -101,10 +100,11 @@ class EnterpriseModel extends Model
 		if (isset($filter['district_id'])) {
 			$sql .= " AND e.district_id = " . $filter['district_id'];
 		}
-// echo $sql;exit;
+		// echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
-    public function getYearwisedata($filter = [])
+
+	public function getYearwisedata($filter = [])
 	{
 		$sql = "SELECT
 		e.year_id,
@@ -192,6 +192,66 @@ class EnterpriseModel extends Model
       AND res.district_id = ydu.district_id
       AND res.year_id = ydu.year_id";
 
-
     }
+
+	//saraswatee code
+	public function getList($filter = [])
+	{
+		$sql = "SELECT
+		eu.id unit_id,
+		eu.name unit_name,
+		eu.group_unit,
+		COALESCE(ent.total_units,0) total_units
+	  FROM enterprises_units eu
+		LEFT JOIN (SELECT
+			de.unit_id,
+			SUM(de.wshg + de.fpos) total_units
+		  FROM dashboard_enterprises de
+		  WHERE de.deleted_at IS NULL";
+		if (!empty($filter['year_id'])) {
+			$sql .= " AND de.year_id = " . $filter['year_id'];
+		}
+		$sql .= " GROUP BY de.unit_id) ent
+		  ON ent.unit_id = eu.id WHERE eu.deleted_at IS NULL ORDER BY eu.name";
+
+		// echo $sql;exit;
+		return $this->db->query($sql)->getResult();
+	}
+	
+	public function getYears()
+	{
+		$sql = "SELECT
+		de.year_id,
+		dy.name years,
+		de.id
+	  FROM dashboard_enterprises de
+		LEFT JOIN dashboard_years dy
+		  ON de.year_id = dy.id
+	  WHERE de.deleted_at IS NULL
+	  AND dy.deleted_at IS NULL";
+		$sql .=  " GROUP BY years ";
+		return $this->db->query($sql)->getResult();
+	}
+	public function getDataBYUnit($year_id,$unit_id)
+	{
+		$sql = "SELECT
+		de.id,
+		de.year_id,
+		de.district_id,
+		de.unit_id,
+		de.wshg,
+		de.fpos,
+		de.unit_name,
+		dy.name year,
+		sd.name district,sd.id d_id
+	  FROM dashboard_enterprises de
+		LEFT JOIN dashboard_years dy
+		  ON dy.id = de.year_id
+		LEFT JOIN soe_districts sd
+		  ON sd.id = de.district_id
+	  WHERE de.year_id = $year_id
+	  AND de.unit_id = $unit_id  AND de.deleted_at IS NULL";
+	//   echo $sql;exit;
+		return $this->db->query($sql)->getResult();
+	}
 }

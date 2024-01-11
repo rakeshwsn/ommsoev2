@@ -154,7 +154,7 @@ class IncentivemainModel extends Model
 
     public function FarmerCheckstatus($filter=[])
     {
-         
+
         $sql = "SELECT
         main_tbl.district_id,
         main_tbl.district,
@@ -162,6 +162,7 @@ class IncentivemainModel extends Model
         main_tbl.block_name,
         imd.id incentiveid,
         imd.year,
+        imd.pdf,
        imd.season season
       FROM (SELECT
           sd.id district_id,
@@ -175,6 +176,7 @@ class IncentivemainModel extends Model
           ON main_tbl.district_id = imd.district_id
           AND main_tbl.block_id = imd.block_id
       ORDER BY main_tbl.district,main_tbl.block_name";
+     // echo $sql; exit;
         return $this->db->query($sql)->getResultArray();
     }
 
@@ -203,6 +205,6 @@ class IncentivemainModel extends Model
             );
         }
 
-        
+
     }
 }

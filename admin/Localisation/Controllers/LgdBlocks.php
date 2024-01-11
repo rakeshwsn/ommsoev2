@@ -58,8 +58,7 @@ class LgdBlocks extends AdminController
 
         $districtModel = new DistrictModel();
         $data['districts'] = $districtModel->orderBy('name')->findAll();
-
-// dd($data);
+   
         return $this->template->view('Admin\Localisation\Views\lgdBlock', $data);
     }
 

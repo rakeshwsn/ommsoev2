@@ -16,7 +16,7 @@ class CustomRules
         $ignoreValue = $uri->getSegment(4);
         // Break the table and field apart
         sscanf($field, '%[^.].%[^.]', $table, $field);
-
+        
         $db = Database::connect($data['DBGroup'] ?? null);
 
         $builder = $db->table($table)

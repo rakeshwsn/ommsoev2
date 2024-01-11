@@ -43,12 +43,9 @@ $user  = service('user');
                                 <td>
                                     <select class="form-control" id="year" name="year">
                                         <option value="">select</option>
-                                        <option value="1" <?php if ($selectedYear==1){ echo 'selected'; } ?>>2017-18</option>
-                                        <option value="2" <?php if ($selectedYear==2){ echo 'selected'; } ?>>2018-19</option>
-                                        <option value="3" <?php if ($selectedYear==3){ echo 'selected'; } ?>>2019-20</option>
-                                        <option value="4" <?php if ($selectedYear==4){ echo 'selected'; } ?>>2020-21</option>
-                                        <option value="5" <?php if ($selectedYear==5){ echo 'selected'; } ?>>2021-22</option>
-
+                                        <?php foreach ($years as $allYear) { ?>
+                                    <option value="<?php echo $allYear['id']; ?>" <?php if ($selectedYear == $allYear['id']) echo 'selected'; ?>><?php echo $allYear['name']; ?></option>
+                                <?php } ?>
                                     </select>
                                 </td>
                                 <!-- <td>

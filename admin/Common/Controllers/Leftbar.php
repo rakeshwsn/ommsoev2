@@ -647,7 +647,19 @@ class Leftbar extends AdminController
                 "children" => $areacoverage,
             ];
         }
+        //Equipment
+        $equipment = [];
 
+        if ($this->user->hasPermission("equipment")) {
+
+            $data["menus"][] = [
+                "id" => "menu-equipment",
+                "icon" => "md-equipment",
+                "name" => lang("Equipment"),
+                "href" => admin_url("equipment"),
+                "children" => [],
+            ];
+        }
 
         if ($this->user->hasPermission("events")) {
             $data["menus"][] = [
@@ -771,16 +783,16 @@ class Leftbar extends AdminController
             ];
         }
         //LGD 
-        if ($this->user->hasPermission("LGD District")) {
+        if ($this->user->hasPermission("LGD Block")) {
             $localisation[] = [
-                "name" => lang("LGD District"),
+                "name" => lang("LGD Block"),
                 "href" => admin_url("lgdblock"),
                 "children" => [],
             ];
         }
-        if ($this->user->hasPermission("LGD Block")) {
+        if ($this->user->hasPermission("LGD GP ")) {
             $localisation[] = [
-                "name" => lang("LGD Block"),
+                "name" => lang("LGD GP"),
                 "href" => admin_url("lgdgp"),
                 "children" => [],
             ];
