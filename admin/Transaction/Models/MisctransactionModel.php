@@ -85,17 +85,18 @@ FROM soe_misc_transactions mt
             $sql .= " AND mt.user_id=".$filter['user_id'];
         }
 
+        $order = '';
         if (isset($filter['sort']) && $filter['sort']) {
             $sort = $filter['sort'];
+            if (isset($filter['order']) && ($filter['order'] == 'asc')) {
+                $order = "ASC";
+            } else {
+                $order = "DESC";
+            }
         } else {
-            $sort = "mt.year DESC,mt.month ";
+            $sort = "mt.year DESC,mt.month DESC";
         }
 
-        if (isset($filter['order']) && ($filter['order'] == 'asc')) {
-            $order = "ASC";
-        } else {
-            $order = "DESC";
-        }
         $sql .= " ORDER BY $sort $order ";
 
         if (isset($filter['start']) || isset($filter['limit'])) {
@@ -111,7 +112,6 @@ FROM soe_misc_transactions mt
         $sql .= " LIMIT ".$filter['start'].', '.$filter['limit'];
 
         return $this->db->query($sql)->getResult();
-//        return
     }
 
     public function getTotal($filter=[]) {

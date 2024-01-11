@@ -43,8 +43,8 @@
             <table class="table table-bordered table-striped table-vcenter js-dataTable-full" id="datatable">
                 <thead>
                 <tr>
-                    <th>Month</th>
                     <th>Year</th>
+                    <th>Month</th>
                     <th>Agency Type</th>
                     <th>Fund Agency</th>
                     <th>Date Added</th>
@@ -123,6 +123,7 @@
             "serverSide": true,
             "responsive": false,
             "filter":false,
+            "order": false,
             "columnDefs": [
                 { targets: [3,4,5,6], orderable: false },
                 { targets: [], visible: false },
