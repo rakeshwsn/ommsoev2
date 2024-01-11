@@ -19,11 +19,11 @@ class Filters extends BaseConfig
 	 * @var array
 	 */
 	public $aliases = [
-		'csrf'     => CSRF::class,
-		'toolbar'  => DebugToolbar::class,
+		'csrf' => CSRF::class,
+		'toolbar' => DebugToolbar::class,
 		'honeypot' => Honeypot::class,
-        'login' 	=> LoginFilter::class,
-		'permission' 	=> PermissionFilter::class,
+		'login' => LoginFilter::class,
+		'permission' => PermissionFilter::class,
 		'openingbalance' => OBFilter::class
 	];
 
@@ -37,10 +37,10 @@ class Filters extends BaseConfig
 		'before' => [
 			// 'honeypot',
 			// 'csrf',
-			 'openingbalance' => ['except'=>['*/openingbalance']],
+			'openingbalance' => ['except' => ['*/openingbalance']],
 		],
-		'after'  => [
-//			'toolbar',
+		'after' => [
+			'toolbar',
 			// 'honeypot',
 		],
 	];
