@@ -48,7 +48,7 @@
                     <tbody>
                         <tr>
                             <td>Farmers Covered</td>
-                            <td><input type="text" name="crop_coverage[farmers_covered]" value="<?=$crop_coverage['farmers_covered']?>" class="form-control physical"></td>
+                            <td><input type="text" name="crop_coverage[farmers_covered]" value="<?= $crop_coverage['farmers_covered'] ?>" class="form-control physical"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -56,15 +56,16 @@
                     <tbody>
                         <tr>
                             <td>Nursery</td>
-                            <td><input type="text" name="nursery[nursery_raised]" value="<?=$nursery_info['nursery_raised']?>" class="form-control financial"></td>
+                            <td><input type="text" name="nursery[nursery_raised]" value="
+                            <?= $nursery_info['nursery_raised'] ?? ''; ?>" class="form-control financial"></td>
                         </tr>
                         <tr>
                             <td>Balance SMI</td>
-                            <td><input type="text" name="nursery[balance_smi]" value="<?=$nursery_info['balance_smi']?>" class="form-control financial"></td>
+                            <td><input type="text" name="nursery[balance_smi]" value="<?= $nursery_info['balance_smi'] ?? ''; ?>" class="form-control financial"></td>
                         </tr>
                         <tr>
                             <td>Balance LT</td>
-                            <td><input type="text" name="nursery[balance_lt]" value="<?=$nursery_info['balance_lt']?>" class="form-control financial"></td>
+                            <td><input type="text" name="nursery[balance_lt]" value="<?= $nursery_info['balance_lt'] ?? ''; ?>" class="form-control financial"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -83,12 +84,12 @@
                     <tbody>
                         <?php foreach ($crops as $crop): ?>
                             <tr>
-                                <td><?=$crop['crop']?></td>
+                                <td><?= $crop['crop'] ?></td>
                                 <?php foreach ($crop['practices'] as $practice_id => $practice): ?>
                                     <td><input type="text" class="form-control financial"
                                             <?php if(!$practice['status']){echo 'disabled';}?>
-                                                name="area[<?=$crop['crop_id']?>][<?=$practice_id?>]"
-                                               value="<?=$practice['area']?>"></td>
+                                                name="area[<?= $crop['crop_id']?>][<?= $practice_id ?>]"
+                                               value="<?= $practice['area']?>"></td>
                                 <?php endforeach; ?>
                             </tr>
                         <?php endforeach; ?>
@@ -120,19 +121,64 @@
                     </tr>
                     </tfoot>
                 </table>
+                <table class="table custom-table " id="diversification-table">
+                    <div class="block-header bg-dark">
+                        <h3 class="block-title text-white">Crop Diversification Details</h3>
+                    </div>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Farmers No
+                            </td>
+                            <td>
+                                <input type="text" name="crop_coverage[crop_diversification_farmers]" value="<?= $crop_coverage['crop_diversification_farmers'] ?>" class="form-control physical">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Area (In Hectare)
+                            </td>
+                            <td>
+                                 <input type="text" name="crop_coverage[crop_diversification_area]" value="<?= $crop_coverage['crop_diversification_area'] ?>" class="form-control physical">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table custom-table " id="rice-fallow-table">
+                    <div class="block-header bg-dark">
+                        <h3 class="block-title text-white">Rice Fallow Details</h3>
+                    </div>
+                    <tbody>
+                        <tr>
+                            <td>
+                                Farmers No
+                            </td>
+                            <td>
+                                 <input type="text" name="crop_coverage[rice_fallow_farmers]" value="<?= $crop_coverage['rice_fallow_farmers'] ?>" class="form-control physical">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Area (In Hectare)
+                            </td>
+                            <td>
+                                 <input type="text" name="crop_coverage[rice_fallow_area]" value="<?= $crop_coverage['rice_fallow_area'] ?>" class="form-control physical">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <?php if($show_form): ?>
-                <div class="row">
-                    <div class="col mt-4">
-                        <button type="submit" class="btn btn-alt-primary float-right">Submit</button>
+            <div class="row">
+                <div class="col mt-4">
+                    <button type="submit" class="btn btn-alt-primary float-right">Submit</button>
                     </div>
                 </div>
-                <?php echo form_close(); ?>
-            <?php endif; ?>
-        </div>
+            <?php echo form_close(); ?>
+        <?php endif; ?>
+            </div>
     </div>
 </section>
-
 <?php js_start(); ?>
 <script>
     $(function () {
@@ -192,7 +238,6 @@
             }
         });
     }
-
     function decimalOnly() {
         // Get the input field
         var input = $('.financial');
@@ -219,7 +264,6 @@
             }
         });
     }
-
     //disable inputs
     <?php if(!$show_form){ ?>
     $(function () {
@@ -228,7 +272,5 @@
         });
     });
     <?php } ?>
-
 </script>
-
 <?php js_end(); ?>
