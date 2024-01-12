@@ -247,7 +247,7 @@ $validation = \Config\Services::validation();
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Additional Info</h3>
                 <div class="row">
                     <div class="col-6">
-                        <input type="checkbox" id="is_support_basis_infr" name="is_support_basis_infr" value="is_support_basis_infr" <?php echo ($is_support_basis_infr == 1) ? 'checked' : ''; ?>>
+                        <input type="checkbox" id="is_support_basis_infr" name="is_support_basis_infr" value="1" <?php echo ($is_support_basis_infr == 1) ? 'checked' : ''; ?>>
                         <label for="is_support_basis_infr"> Is any additional support provided from Govt. ?</label>
                     </div><br><br>
 
