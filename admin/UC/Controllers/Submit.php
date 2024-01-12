@@ -45,7 +45,12 @@ class Submit extends AdminController{
             $data['total_uc_submitted'] += $allotment->uc_submit;
             $data['total_uc_balance'] += $allotment->balance;
         }
-        $data['total_uc_percentage'] = round($data['total_uc_submitted']/$data['total_allotment']*100,2);
+
+        if($data['total_allotment']){
+            $data['total_uc_percentage'] = round($data['total_uc_submitted']/$data['total_allotment']*100,2);
+        } else {
+            $data['total_uc_percentage'] = 0;
+        }
 
         if($this->user->fund_agency_id==1){
             $data['allotment_from_text'] = 'Allotment From SPMU';
