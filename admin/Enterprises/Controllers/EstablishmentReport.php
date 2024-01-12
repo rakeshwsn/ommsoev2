@@ -312,7 +312,7 @@ class EstablishmentReport extends AdminController
 
 		//month
 		$data['months'][0] = 'Select Month';
-		$months = $monthmodel->orderBy('name', 'asc')->findAll();
+		$months = $monthmodel->findAll();
 		foreach ($months as $month) {
 			$data['months'][$month->id] = $month->name;
 		}

@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Admin\Enterprises\Models\EnterprisesEquipmentModel;
 
 use Admin\Equipment\Models\EquipmentModel;
 
@@ -96,7 +97,7 @@ class Enterprises extends AdminController
 
 
 		$filteredData = $this->filter();
-
+		// dd($filteredData);
 		$data['enterprises'] = [];
 
 		foreach ($filteredData as $row) {
@@ -243,12 +244,15 @@ class Enterprises extends AdminController
 		if ($this->request->getMethod(1) == 'POST') {
 
 			$enterprisesmodel = new EnterprisesModel();
+			$entequipmentmodel = new EnterprisesEquipmentModel();
+
 			$enterprisesmodel->where('id', $this->request->getGet('id'))->delete();
+			
 
 			$enterprisesdata = [
 				'unit_id' => $this->request->getPost('unit_id'),
 				'district_id' => $this->request->getPost('district_id'),
-				'block_id' => $this->request->getPost('block_id'),
+				'block_id' =>  $this->request->getPost('block_id'),
 				'gp_id' => $this->request->getPost('gp_id'),
 				'village_id' => $this->request->getPost('village_id'),
 				'budget_fin_yr_id' => $this->request->getPost('budget_fin_yr_id'),
@@ -265,12 +269,41 @@ class Enterprises extends AdminController
 				'purpose_infr_support' => $this->request->getPost('purpose_infr_support'),
 				'support_infr_amount' => $this->request->getPost('support_infr_amount'),
 				'own_share' => $this->request->getPost('own_share'),
-				'govt_share' => $this->request->getPost('govt_share')
+				'center_type' => $this->request->getPost('center_type'),
+				'main_center_id' => $this->request->getPost('main_center_id'),
+
 
 			];
-			// dd($enterprisesdata);
 
 			$enterprisesmodel->insert($enterprisesdata);
+
+			$unitId = $enterprisesmodel->insertID();
+
+			$equipmentData = [];
+
+			if ($unitId) {
+				$equipments = $this->request->getPost('equipments');
+				$quantities = $this->request->getPost('quantity');
+
+				// Check if equipment details are available and they are arrays
+				if ($equipments && $quantities && is_array($equipments) && is_array($quantities)) {
+					// Loop through equipment details and quantities
+					foreach ($equipments as $index => $equipment) {
+						// Use the same index for both equipments and quantities arrays
+						$quantity = $quantities[$index] ?? 0;
+
+						$equipmentData[] = [
+							'ent_id' => $unitId,
+							'equipment_id' => $equipment,
+							'quantity' => $quantity,
+						];
+					}
+					$entequipmentmodel->insertBatch($equipmentData);
+				}
+
+			}
+
+
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Added Successfully');
 		}
@@ -279,6 +312,7 @@ class Enterprises extends AdminController
 	}
 	public function edit()
 	{
+		$entequipmentmodel = new EnterprisesEquipmentModel();
 
 		$enterprisesmodel = new EnterprisesModel();
 		if ($this->request->getMethod(1) == 'POST') {
@@ -324,10 +358,39 @@ class Enterprises extends AdminController
 				'purpose_infr_support' => $data['purpose_infr_support'],
 				'support_infr_amount' => $data['support_infr_amount'],
 				'own_share' => $this->request->getPost('own_share'),
-				'govt_share' => $this->request->getPost('govt_share')
+				'center_type' => $this->request->getPost('center_type'),
+				'main_center_id' => $this->request->getPost('main_center_id'),
+
 			];
 
 			$data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
+			$unitId = $enterprisesmodel->insertID();
+			$id = $this->request->getGet('id');
+
+			$entequipmentmodel->where('id', $id)->delete();
+			$equipmentData = [];
+
+			if ($unitId) {
+
+				$equipments = $this->request->getPost('equipments');
+				$quantities = $this->request->getPost('quantity');
+
+				// Check if equipment details are available and they are arrays
+				if ($equipments && $quantities && is_array($equipments) && is_array($quantities)) {
+					// Loop through equipment details and quantities
+					foreach ($equipments as $index => $equipment) {
+						// Use the same index for both equipments and quantities arrays
+						$quantity = $quantities[$index] ?? 0;
+
+						$equipmentData[] = [
+							'ent_id' => $unitId,
+							'equipment_id' => $equipment,
+							'quantity' => $quantity,
+						];
+					}
+					$data['enterprises'] = $entequipmentmodel->insertBatch($equipmentData);
+				}
+			}
 
 			return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Updated Successfully');
 		}
@@ -340,12 +403,12 @@ class Enterprises extends AdminController
 	{
 
 		$data['blocks'] = [];
-		// $BlocksModel = new BlockModel();
-		$blockModel = new LgdBlocksModel();
+		$BlocksModel = new BlockModel();
+		// $blockModel = new LgdBlocksModel();
 
 		$district_id = $this->request->getGet('district_id');
 
-		$data['blocks'] = $blockModel->where('district_lgd_code', $district_id)->orderBy('name', 'asc')->findAll();
+		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->orderBy('name', 'asc')->findAll();
 		// printr($data);exit;
 		return $this->response->setJSON($data);
 	}
@@ -362,29 +425,47 @@ class Enterprises extends AdminController
 	public function ajaxgps()
 	{
 		$data['gps'] = [];
-		// $gpmodel = new EnterpriseGpModel();
-		$lgdgpmodel = new LgdGpsModel();
+		$gpmodel = new EnterpriseGpModel();
+		// $lgdgpmodel = new LgdGpsModel();
 
 
 		$block_id = $this->request->getGet('block_id');
 
-		$data['gps'] = $lgdgpmodel->where('block_lgd_code', $block_id)->orderBy('name', 'asc')->findAll();
+		$data['gps'] = $gpmodel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
 
 		return $this->response->setJSON($data);
 	}
 	public function ajaxvillages()
 	{
 		$data['villages'] = [];
-		// $villagemodel = new EnterpriseVillagesModel();
-		$lgdvillagemodel = new LgdVillagesModel();
+		$villagemodel = new EnterpriseVillagesModel();
+		// $lgdvillagemodel = new LgdVillagesModel();
 		$gp_id = $this->request->getGet('gp_id');
 
-		$data['villages'] = $lgdvillagemodel->where('gp_lgd_code', $gp_id)
+		$data['villages'] = $villagemodel->where('gp_id', $gp_id)
 			->orderBy('name', 'asc')->findAll();
 
 		return $this->response->setJSON($data);
 	}
+	public function ajaxcenter()
+	{
 
+		$enterprisesmodel = new EnterprisesModel();
+		$enterprisesunitmodel = new EnterprisesUnitModel();
+
+		$data['main_center_name'] = [];
+		$district_id = $this->request->getGet('district_id');
+		$block_id = $this->request->getGet('block_id');
+		$unit_id = $this->request->getGet('unit_id');
+		$units = 0;
+		if ($unit_id) {
+			$units = $enterprisesunitmodel->find($unit_id)->name;
+		}
+
+		$data['main_center_name'] = $enterprisesmodel->main_center($district_id, $block_id, $units);
+
+		return $this->response->setJSON($data);
+	}
 
 
 	public function getForm()
@@ -395,10 +476,12 @@ class Enterprises extends AdminController
 		$enterprisesmodel = new EnterprisesModel();
 		$enterprisesbudgetmodel = new EnterprisesBudgetModel();
 		$enterprisesunitmodel = new EnterprisesUnitModel();
-		$lgdgpmodel = new LgdGpsModel();
-		$lgdvillagemodel = new LgdVillagesModel();
+		$entequipmentmodel = new EnterprisesEquipmentModel();
+		$villagemodel = new EnterpriseVillagesModel();
+		$gpmodel = new EnterpriseGpModel();
 		$districtmodel = new DistrictModel();
-		$blockmodel = new LgdBlocksModel();
+		$blockmodel = new BlockModel();
+
 		$equipmentmodel = new EquipmentModel();
 
 		if (isset($this->error['warning'])) {
@@ -412,7 +495,7 @@ class Enterprises extends AdminController
 
 			$data['enterprise_text'] = "Edit Enterprise Data";
 		}
-
+		// dd($enterprisesmodel->db->getFieldNames('enterprises'));
 		foreach ($enterprisesmodel->db->getFieldNames('enterprises') as $field) {
 			if ($this->request->getPost($field)) {
 
@@ -423,6 +506,14 @@ class Enterprises extends AdminController
 				$data[$field] = '';
 			}
 		}
+		//
+		$id = $this->request->getGet('id');
+		$data['enterpriseequipments'] = [];
+		if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
+			$data['enterpriseequipments'] = $enterprisesmodel->equipment($id);
+		}
+
+
 
 		//units
 		$data['units'] = [];
@@ -439,22 +530,52 @@ class Enterprises extends AdminController
 			'SHG' => 'SHG',
 			'FPO' => 'FPO',
 		];
+		
+	
+			
+	
 		// 
 		//district
 		$data['districts'][] = 'Select districts';
-
+		$district_id = 0;
 		$districts = $districtmodel->orderBy('name', 'asc')->findAll();
 
 		foreach ($districts as $district) {
-			$data['districts'][$district->lgd_code] = $district->name;
+			$data['districts'][$district->id] = $district->name;
 		}
 
-		$data['blocks'][] = 'Select Block';
+		$data['blocks'][0] = 'Select Block';
+		// dd($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST'));
+
+		if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
+			$enterprise = $enterprisesmodel->find($id);
+			$district_id = $enterprise->district_id;
+			$block_id = $enterprise->block_id;
+			$gp_id = $enterprise->gp_id;
+
+			$blocks = $blockmodel->where('district_id', $district_id)->findAll();
+
+			foreach ($blocks as $block) {
+				$data['blocks'][$block->id] = $block->name;
+			}
+			$gps = $gpmodel->where('block_id', $data['block_id'])->findAll();
+
+			foreach ($gps as $gp) {
+				$data['gps'][$gp->id] = $gp->name;
+			}
+			$villages = $villagemodel->where('gp_id', $data['gp_id'])->findAll();
+
+			foreach ($villages as $village) {
+				$data['villages'][$village->id] = $village->name;
+			}
+		}
+		// dd($data);
+
+
 
 		$data['gps'][] = 'Select Gp';
 
 		$data['villages'][] = 'Select Village';
-
 
 		//equipment
 
@@ -492,16 +613,18 @@ class Enterprises extends AdminController
 		foreach ($budget_fin_yrs as $budget_fin_yr) {
 			$data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
 		}
+		//main center dropdown
+		$data['main_center_name'][] = 'Select main center name';
 
-		//Add GP url
+
 
 		$data['add_gp_url'] = admin_url('grampanchayat/add');
 
 		//Add village Url
 		$data['add_village_url'] = admin_url('village/add');
 
-		
 
+		// dd($data);
 
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}

@@ -135,7 +135,7 @@ class EnterprisesModel extends Model
     res.date_estd,
     res.year_id,
     res.month
-  FROM (SELECT
+    FROM (SELECT
       eu.id unit_id,
       eu.name unit,
       sd.id district_id,
@@ -284,7 +284,7 @@ class EnterprisesModel extends Model
     res.date_estd,
     res.year_id,
     res.month
-  FROM (SELECT
+     FROM (SELECT
       gp.id gp_id,
       gp.name gp,
       gp.block_id,
@@ -339,6 +339,36 @@ class EnterprisesModel extends Model
     // dd($sql);
     return $this->db->query($sql)->getResult();
   }
-
-
+  public function main_center($district_id, $block_id, $units)
+  {
+    $sql = "SELECT
+      e.id ent_id,
+      e.managing_unit_name,
+      e.management_unit_type
+      FROM enterprises e
+      INNER JOIN enterprises_units eu
+        ON e.unit_id = eu.id
+      WHERE e.deleted_at IS NULL
+      AND eu.deleted_at IS NULL
+      AND e.district_id = $district_id
+      AND e.block_id = $block_id
+      AND eu.name LIKE '" . $units . "'
+      ";
+    //  print_r($sql);exit;
+    return $this->db->query($sql)->getResult();
+  }
+  public function equipment($id)
+  {
+    $sql = "SELECT
+    e.ent_id,
+    e.equipment_id,
+    e.quantity,
+    eq.name equipment
+  FROM enterprise_equipment e
+    LEFT JOIN equipment eq
+      ON e.equipment_id = eq.id  WHERE e.ent_id = $id";
+    // printr($sql);
+    // exit;
+    return $this->db->query($sql)->getResult();
+  }
 }
