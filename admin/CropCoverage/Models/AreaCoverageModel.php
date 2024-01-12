@@ -326,7 +326,8 @@ FROM soe_districts sd
             $sql .= " LEFT JOIN vw_districtwise_blocks_gps dbg 
     ON sd.id=dbg.district_id ORDER BY sd.name";
         }
-
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResult();
     }
 

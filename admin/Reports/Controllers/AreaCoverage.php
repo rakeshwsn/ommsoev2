@@ -47,7 +47,6 @@ class AreaCoverage extends AdminController
             $data['year_id'] = $this->request->getGet('year_id');
         }
 
-
         if ($this->request->getGet('season')) {
             $data['current_season'] = $this->request->getGet('season');
         }
@@ -56,7 +55,6 @@ class AreaCoverage extends AdminController
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
-
 
         $data['block_id'] = '';
         if ($this->request->getGet('block_id')) {
@@ -97,8 +95,6 @@ class AreaCoverage extends AdminController
         }
 
         $blocks = $this->acModel->getAreaCoverageReport($filter);
-
-
 
         if ($data['block_id']) {
             $this->gps($blocks, $data);

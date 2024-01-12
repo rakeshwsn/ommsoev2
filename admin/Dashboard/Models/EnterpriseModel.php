@@ -192,7 +192,6 @@ class EnterpriseModel extends Model
       AND res.district_id = ydu.district_id
       AND res.year_id = ydu.year_id";
 
-
     }
 
 	//saraswatee code
