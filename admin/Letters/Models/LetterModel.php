@@ -87,7 +87,7 @@ class LetterModel extends Model
     }
 
     public function getNewLetterNo() {
-        $sql = "SELECT COALESCE((MAX(letter_no)+1),1) letter_no FROM vw_letters WHERE letter_no <900 AND year_id=".getCurrentYearId();
+        $sql = "SELECT COALESCE((MAX(letter_no)+1),1) letter_no FROM vw_letters WHERE letter_no <600 AND year_id=".getCurrentYearId();
 
         return $this->db->query($sql)->getFirstRow()->letter_no;
     }
