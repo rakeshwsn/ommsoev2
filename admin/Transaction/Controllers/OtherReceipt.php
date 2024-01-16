@@ -57,17 +57,25 @@ class OtherReceipt extends AdminController
         $filter_search = $requestData['search']['value'];
 
         $order_columns = array(
-            'month','year','date_added'
+            'year','month','date_added'
         );
+        $order = '';
+        $order_dir = '';
+        //if $requestData['order'] is not null
+        if(!empty($requestData['order'])) {
+            $order = $order_columns[$requestData['order'][0]['column']];
+            $order_dir = $requestData['order'][0]['dir'];
+        }
+
         $filter_data = array(
             'user_id' => $this->user->user_id,
             'filter_search' => $filter_search,
-            'order' => $requestData['order'][0]['dir'],
-            'sort' => $order_columns[$requestData['order'][0]['column']],
+            'order' => $order_dir,
+            'sort' => $order,
             'start' => $requestData['start'],
             'limit' => $requestData['length']
         );
-//        $totalFiltered = 0;
+
         $totalFiltered = $this->txnModel->getTotal($filter_data);
 
         $filteredData = $this->txnModel->getAll($filter_data);
@@ -81,8 +89,8 @@ class OtherReceipt extends AdminController
             $action .= '</div>';
 
             $datatable[]=array(
-                $result->month,
                 $result->year,
+                $result->month,
                 $result->agency_type,
                 $result->fund_agency,
                 ymdToDmy($result->created_at),
@@ -275,7 +283,7 @@ class OtherReceipt extends AdminController
         $data['agency_types'] = [];
         $amts = [];
 
-        $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+        $data['fund_agency_id'] = $this->user->fund_agency_id;
         if($this->user->agency_type_id==$this->settings->block_user) {
             $data['agency_types'] = (new UserGroupModel())->getBlockUsers();
             $block = (new BlockModel())->find($this->user->block_id);
@@ -359,7 +367,6 @@ class OtherReceipt extends AdminController
         $txn = $this->txnModel
             ->where($condition)
             ->find();
-
         $cb = $this->cbModel
             ->where($condition)
             ->first();
