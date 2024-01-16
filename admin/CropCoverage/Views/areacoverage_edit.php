@@ -144,6 +144,7 @@
                         </tr>
                     </tbody>
                 </table>
+                <?php if ($season === 'Rabi') { ?>
                 <table class="table custom-table " id="rice-fallow-table">
                     <div class="block-header bg-dark">
                         <h3 class="block-title text-white">Rice Fallow Details</h3>
@@ -167,6 +168,7 @@
                         </tr>
                     </tbody>
                 </table>
+                 <?php } ?>
             </div>
             <?php if($show_form): ?>
             <div class="row">

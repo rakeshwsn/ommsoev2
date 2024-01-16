@@ -1,8 +1,5 @@
 <style>
-    .cl-head {
-        color: white;
-        background-color: black;
-    }
+
 </style>
 <form>
     <div class="block">
@@ -50,7 +47,7 @@
 </form>
 <div class="tableFixHead">
     <?php if (empty($district_id)) { ?>
-        <table id="block-coverage" class="table table-bordered table-striped table-vcenter ">
+        <table id="block-coverage" class="table table-bordered table-striped table-vcenter">
             <thead>
                 <tr>
                     <th rowspan="2" class="cl-head">District</th>
