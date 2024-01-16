@@ -71,7 +71,9 @@
                 </tr>
                 <tr>
                     <td>
-                        <?php if ($status): ?><label class="badge badge-<?= $status_color ?>"><?= $status ?></label>
+                        <?php if ($status): ?><label class="badge badge-<?= $status_color ?>">
+                                <?= $status ?>
+                            </label>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -98,11 +100,17 @@
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>
                         <th rowspan="3">Total Area </th>
+                        <th rowspan="3">Total Crop Diversification Farmers</th>
+                        <th rowspan="3">Total Crop Diversification Areas</th>
+                        <th rowspan="3">Total Rice Fallow Farmers</th>
+                        <th rowspan="3">Total Rice Fallow Areas</th>
                         <th rowspan="3" class="text-right no-sort">Actions</th>
                     </tr>
                     <tr>
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
-                            <th colspan="<?= count($practices) ?>"><?= $crops[$crop_id] ?></th>
+                            <th colspan="<?= count($practices) ?>">
+                                <?= $crops[$crop_id] ?>
+                            </th>
                         <?php endforeach; ?>
                     </tr>
                     <tr>
@@ -178,6 +186,18 @@
                                 </td>
                                 <td>
                                     <?= $block['total_area'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['crop_diversification_farmers'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['crop_diversification_area'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['rice_fallow_farmers'] ?>
+                                </td>
+                                <td>
+                                    <?= $block['rice_fallow_area'] ?>
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm pull-right">
