@@ -45,6 +45,7 @@ class AreaCoverage extends AdminController
 
     protected function getList()
     {
+        $data['season'] = getCurrentSeason();
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 
         $data['filtered_data_url'] = admin_url('areacoverage/filtered');

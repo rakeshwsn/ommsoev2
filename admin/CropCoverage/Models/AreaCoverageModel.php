@@ -312,6 +312,10 @@ FROM ac_crop_practices acp
   ac.barnyard_ls,
   ac.pearl_ls,
   ac.fc_area,
+  ac.crop_diversification_farmers,
+  ac.crop_diversification_area,
+  ac.rice_fallow_farmers,
+  ac.rice_fallow_area,
   ac.status
 FROM soe_districts sd
   LEFT JOIN (SELECT
@@ -360,6 +364,10 @@ FROM soe_districts sd
   nur.balance_smi,
   nur.balance_lt,
   nur.farmers_covered,
+  nur.crop_diversification_farmers,
+  nur.crop_diversification_area,
+  nur.rice_fallow_farmers,
+  nur.rice_fallow_area,
   m.fc_area,
   m.ragi_smi,
   m.ragi_lt,
@@ -380,6 +388,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
+    SUM(crop_diversification_farmers) crop_diversification_farmers,
+    SUM(crop_diversification_area) crop_diversification_area,
+    SUM(rice_fallow_farmers) rice_fallow_farmers,
+    SUM(rice_fallow_area) rice_fallow_area,
     SUM(fc_area) fc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
@@ -424,6 +436,10 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
+            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
+            SUM(acc.crop_diversification_area) crop_diversification_area,
+            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
+            SUM(acc.rice_fallow_area) rice_fallow_area,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -452,7 +468,11 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-       n1.farmers_covered
+      n1.farmers_covered,
+      n1.crop_diversification_farmers,
+      n1.crop_diversification_area,
+      n1.rice_fallow_farmers,
+      n1.rice_fallow_area,
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -474,6 +494,10 @@ ORDER BY district,m.block";
   m.gp_id,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
+  nur.crop_diversification_farmers,
+  nur.crop_diversification_area,
+  nur.rice_fallow_farmers,
+  nur.rice_fallow_area,
   m.fc_area,
   m.ragi_smi,
   m.ragi_lt,
@@ -492,6 +516,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
+    SUM(crop_diversification_farmers) crop_diversification_farmers,
+    SUM(crop_diversification_area) crop_diversification_area,
+    SUM(rice_fallow_farmers) rice_fallow_farmers,
+    SUM(rice_fallow_area) rice_fallow_area,
     SUM(fc_area) fc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
@@ -530,6 +558,10 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
+            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
+            SUM(acc.crop_diversification_area) crop_diversification_area,
+            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
+            SUM(acc.rice_fallow_area) rice_fallow_area,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -557,7 +589,11 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered
+      n1.farmers_covered,
+      n1.crop_diversification_farmers,
+      n1.crop_diversification_area,
+      n1.rice_fallow_farmers,
+      n1.rice_fallow_area,
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -580,6 +616,10 @@ ORDER BY m.gp";
   bgp.total_gps,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
+  nur.crop_diversification_farmers,
+  nur.crop_diversification_area,
+  nur.rice_fallow_farmers,
+  nur.rice_fallow_area,
   m.fc_area,
   m.ragi_smi,
   m.ragi_lt,
@@ -597,6 +637,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
+    SUM(crop_diversification_farmers) crop_diversification_farmers,
+    SUM(crop_diversification_area) crop_diversification_area,
+    SUM(rice_fallow_farmers) rice_fallow_farmers,
+    SUM(rice_fallow_area) rice_fallow_area,
     SUM(fc_area) fc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
@@ -636,6 +680,10 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
+            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
+            SUM(acc.crop_diversification_area) crop_diversification_area,
+            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
+            SUM(acc.rice_fallow_area) rice_fallow_area,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -664,7 +712,11 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-       n1.farmers_covered
+      n1.farmers_covered,
+      n1.crop_diversification_farmers,
+      n1.crop_diversification_area,
+      n1.rice_fallow_farmers,
+      n1.rice_fallow_area
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))

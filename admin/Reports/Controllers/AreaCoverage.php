@@ -201,7 +201,7 @@ class AreaCoverage extends AdminController
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
 
         $data['rows'] = [];
         foreach ($blocks as $block) {
@@ -243,7 +243,11 @@ class AreaCoverage extends AdminController
                 'total_ragi' => $total_ragi,
                 'total_non_ragi' => $total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area
+                'total_area' => $total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
             ];
 
             //calc total
@@ -265,6 +269,10 @@ class AreaCoverage extends AdminController
             $total_total_non_ragi += $total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
 
         }
 
@@ -287,7 +295,11 @@ class AreaCoverage extends AdminController
             'total_ragi' => $total_total_ragi,
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area
+            'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
         ];
     }
 
@@ -298,7 +310,7 @@ class AreaCoverage extends AdminController
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
 
         $data['rows'] = [];
         $gps = 0;
@@ -341,7 +353,11 @@ class AreaCoverage extends AdminController
                 'total_ragi' => $total_ragi,
                 'total_non_ragi' => $total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area
+                'total_area' => $total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
             ];
 
             //calc total
@@ -363,7 +379,10 @@ class AreaCoverage extends AdminController
             $total_total_non_ragi += $total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
-
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
             $gps += $block->total_gps;
 
         }
@@ -388,7 +407,11 @@ class AreaCoverage extends AdminController
             'total_ragi' => $total_total_ragi,
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area
+            'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
         ];
     }
 
@@ -506,7 +529,7 @@ class AreaCoverage extends AdminController
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
 
         $data['rows'] = [];
         $gps = $tblocks = 0;
@@ -551,7 +574,11 @@ class AreaCoverage extends AdminController
                 'total_ragi' => $total_ragi,
                 'total_non_ragi' => $total_non_ragi,
                 'total_fc' => $block->fc_area,
-                'total_area' => $total_area
+                'total_area' => $total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
             ];
 
             //calc total
@@ -573,7 +600,10 @@ class AreaCoverage extends AdminController
             $total_total_non_ragi += $total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $total_area;
-
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
             $gps += $block->total_gps;
             $tblocks += $block->total_blocks;
 
@@ -600,7 +630,11 @@ class AreaCoverage extends AdminController
             'total_ragi' => $total_total_ragi,
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area
+            'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
         ];
     }
 
