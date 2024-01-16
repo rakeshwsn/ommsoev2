@@ -233,18 +233,18 @@ class Dashboard extends ResourceController
 	{
 
 		$odmapmodel = new OdMapModel();
-		$odmapdatas = $odmapmodel->getmapdata();
+		$odmapdatas = $odmapmodel->getMapData();
 
 		$data['heading'] = 'Scale of Odisha Millets Mission';
 
 		foreach ($odmapdatas as $mapdata) {
 			$data['data'][] = [
 				'district_id' => $mapdata->district_id,
-				'districts' => $mapdata->districts,
+				'districts' => $mapdata->district,
 				'total_blocks' => $mapdata->blocks,
-				'total_gps' => $mapdata->total_gps,
-				'total_villages' => $mapdata->total_villages,
-				'total_farmers' => $mapdata->total_farmers,
+				'total_gps' => $mapdata->gps,
+				'total_villages' => $mapdata->villages,
+				'total_farmers' => $mapdata->farmers,
 			];
 		}
 
@@ -409,7 +409,7 @@ class Dashboard extends ResourceController
 
 	public function summary()
 	{
-		
+
 		$odmapmodel = new OdMapModel();
 		$yearModel = new YearModel();
 		$summery = $odmapmodel->getSummary();
@@ -433,13 +433,13 @@ class Dashboard extends ResourceController
 	public function currentyearchart()
 	{
 
-		
+
 		$odmapmodel = new OdMapModel();
 
 		$yearmodel = new YearModel();
 		$year_id = 0;
 		$data['year_id'] =  $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYearId());
-		
+
 		if (!$this->request->getGet('year_id')) {
 			$filter['year_id'] = (new YearModel())->getCurrentYearId();
 			$year_id =  (new YearModel())->getCurrentYearId();
@@ -462,7 +462,7 @@ class Dashboard extends ResourceController
 		}
 		$data['heading'] = 'Crop Demonstration Of Kharif under Odisha Millets Mission';
 
-		
+
 		if ($year_id) {
 			$data['heading'] .= ' Of:-' . $yearmodel->find($year_id)->name;
 		}else{
