@@ -41,7 +41,8 @@ class OdMapModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 
-	public function getmapdata()
+	//changed by niranjan
+	public function getmapdata_old()
 	{
 		$sql = "SELECT
 		ddm.id,
@@ -86,13 +87,76 @@ class OdMapModel extends Model
 		LEFT JOIN soe_districts sd
 		  ON ddm.district_id = sd.id
 	  WHERE ddm.deleted_at IS NULL";
-	  
+
 	  if (!empty($filter['year_id'])) {
 		$sql .= " AND ddm.year_id=" . $filter['year_id'];
 	}
-	
-	
-		
+
+
+
 		return $this->db->query($sql)->getResult();
+	}
+
+	//added by niranjan
+	public function getMapData(){
+		$sql="SELECT
+  sd.id district_id,
+  sd.name district,
+  ddm.blocks,
+  ddm.gps,
+  ddm.villages,
+  ddm.tentative_farmers farmers,
+  e.total_cmsc chcs,
+  e.total_chc cmscs
+FROM soe_districts sd
+  LEFT JOIN dashboard_district_map ddm
+    ON sd.id = ddm.district_id
+  LEFT JOIN (SELECT
+      id,
+      district_id,
+    SUM(CASE WHEN establishment_type = 'CHC' THEN main_center + sub_center ELSE 0 END) AS total_chc,
+    SUM(CASE WHEN establishment_type = 'CMSC' THEN main_center + sub_center ELSE 0 END) AS total_cmsc
+    FROM dashboard_establishment
+    WHERE deleted_at IS NULL
+    GROUP BY district_id) e
+    ON sd.id = e.district_id WHERE ddm.deleted_at IS NULL";
+		 return $this->db->query($sql)->getResult();
+	}
+
+	public function getSummary($year_id=''){
+		$sql="SELECT
+  dm.total_districts,
+  dm.total_blocks,
+  dm.total_gps,
+  dm.total_villages,
+  dm.total_farmers,
+  dm.total_chc,
+  dm.total_cmsc,
+  SUM(ac.demo_area) demo_area
+FROM (SELECT
+    year_id,
+    COUNT(district_id) total_districts,
+    SUM(blocks) total_blocks,
+    SUM(gps) total_gps,
+    SUM(villages) total_villages,
+    SUM(tentative_farmers) total_farmers,
+    SUM(chcs) total_chc,
+    SUM(cmscs) total_cmsc
+  FROM dashboard_district_map
+  WHERE deleted_at IS NULL";
+        if($year_id){
+            $sql .= " AND year_id =$year_id";
+        }
+		$sql .= " ) dm
+  JOIN (SELECT
+      SUM(achievement) demo_area
+    FROM dashboard_areacoverage
+    WHERE deleted_at IS NULL";
+		if($year_id){
+            $sql .= " AND year_id =$year_id";
+        }
+        $sql .= ") ac";
+
+		return $this->db->query($sql)->getFirstRow();
 	}
 }
