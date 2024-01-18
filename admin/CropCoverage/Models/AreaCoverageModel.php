@@ -472,7 +472,7 @@ FROM (SELECT
       n1.crop_diversification_farmers,
       n1.crop_diversification_area,
       n1.rice_fallow_farmers,
-      n1.rice_fallow_area,
+      n1.rice_fallow_area
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))

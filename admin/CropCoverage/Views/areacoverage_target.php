@@ -1,6 +1,3 @@
-<style>
-
-</style>
 <form>
     <div class="block">
         <div class="block-header block-header-default">
@@ -466,14 +463,11 @@
                                 title="<?= $button_edit; ?>"><i class="fa fa-pencil"></i></a>
                         </div>
                     </td>
-
                 </tr>
-
             <?php } ?>
             <tr>
                 <td colspan="18" class="text-right">Total District Target</td>
                 <td colspan="5" class="all-total-block"></td>
-
             </tr>
         </tbody>
     </table>
