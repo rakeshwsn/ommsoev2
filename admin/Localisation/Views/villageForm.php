@@ -66,10 +66,10 @@ $validation = \Config\Services::validation();
 				beforeSend: function() {},
 				success: function(response) {
 
-					if (response.blocks) {
+					if (response) {
 
 						var html = '<option value="">Select Block</option>'; // Declare html with var
-						$.each(response.blocks, function(k, v) {
+						$.each(response, function(k, v) {
 							html += '<option value="' + v.id + '">' + v.name + '</option>';
 						});
 						$('#block_id').html(html);
