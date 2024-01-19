@@ -113,6 +113,8 @@ class Approve extends AdminController
         ];
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        // printr($blocks);
+        // exit;
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
