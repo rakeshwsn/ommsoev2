@@ -12,19 +12,18 @@
         <td><?=$period ?></td>
     </tr>
     <tr>
-        <td colspan="15" style="text-align: center; font-weight: bold; background-color:#EFA105">
+        <td colspan="17" style="text-align: center; font-weight: bold; background-color:#EFA105">
             <div>
                 <h4><?= $heading_title; ?></h4>
             </div>
         </td>
     </tr>
-
     <?php foreach ($trans as $tran) { ?>
         <?php $slno = 1; ?>
         <thead>
             <tr>
                 <th style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['id'] ?></th>
-                <th colspan="14" style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['unit_name'] ?></th>
+                <th colspan="16" style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['unit_name'] ?></th>
             </tr>
             <tr>
                 <td><?= $tran['id'] ?></td>
@@ -42,6 +41,8 @@
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Charges per Quintal</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Total Expenditure in the fortnight</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Total Turn Over in the fortnight</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">No. of times under maintenance</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">No. of event attend</th>
             </tr>
         </thead>
         <tbody>
@@ -57,6 +58,8 @@
                     <td><?= $enterprise->villages ?></td>
                     <td><?= $enterprise->village_id ?></td>
                     <td><?= $enterprise->shg_name ?></td>
+                    <td></td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>

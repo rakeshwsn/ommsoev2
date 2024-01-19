@@ -600,7 +600,7 @@ $validation = \Config\Services::validation();
             return this.optional(element) || /^(?:\+?91|0)?[6789]\d{9}$/.test(value);
         }, "Please enter exactly 10 digits.");
         jQuery.validator.addMethod("decimal", function(value, element) {
-            return this.optional(element) || /^\d+(\.\d+)?$/.test(value);
+            return this.optional(element) || /^(\d+(\.\d+)*)?$/.test(value);
         }, "Please enter decimal number ");
         jQuery.validator.addMethod("rupees", function(value, element) {
             return this.optional(element) || /^(16\d{0,14}(?:\.\d{1,2})?|\d+(?:\.\d{1,2})?)$/.test(value);

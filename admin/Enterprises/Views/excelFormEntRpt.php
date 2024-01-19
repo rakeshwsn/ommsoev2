@@ -2,19 +2,19 @@
 
     <thead>
         <tr>
-            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="<?= count($unit_names) ?>">
+            <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="<?= count($unit_names)+2 ?>">
                 <h4>Enterprise Establishment Report</h4>
             </th>
 
         </tr>
         <tr>
-            <th style="background-color:#1ee3a1;font-weight: bold;text-align: center;" colspan="<?= count($unit_names) ?>">
+            <th style="background-color:#1ee3a1;font-weight: bold;text-align: center;" colspan="<?= count($unit_names)+2 ?>">
                 <?php
                 if ($district_id) {
                     echo 'District: ' . $district_text;
                 } else {
                     // If filtering only by district, show the District filter in the row
-                    echo 'District Filter';
+                    echo 'District ';
                 }
 
                 if ($block_id) {
@@ -37,7 +37,7 @@
         </tr>
 
         <tr>
-            <th style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names) ?>">
+            <th style="text-align: center; font-weight: bold; background-color:#d1cdc5;" colspan="<?= count($unit_names)+2 ?>">
                 Type and number of units
             </th>
         </tr>

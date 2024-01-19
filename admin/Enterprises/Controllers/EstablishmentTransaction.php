@@ -19,6 +19,7 @@ use Admin\Localisation\Controllers\District;
 use App\Controllers\AdminController;
 use App\Libraries\Export;
 use Config\ExcelStyles;
+use Mpdf\Tag\Tr;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -72,6 +73,21 @@ class EstablishmentTransaction extends AdminController
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
+        //unit
+        $entunitmodel = new EnterprisesUnitModel();
+        $data['units'][0] = 'Select units';
+
+        $units = $entunitmodel->orderBy('name', 'asc')->findAll();
+
+        foreach ($units as $unit) {
+            $data['units'][$unit->id] = $unit->name;
+        }
+
+        $data['unit_id'] = 0;
+        if ($this->request->getGet('unit_id')) {
+            $data['unit_id'] = $this->request->getGet('unit_id');
+        }
+
 
         $data['period'] = 0;
         if ($this->request->getGet('period')) {
@@ -89,6 +105,9 @@ class EstablishmentTransaction extends AdminController
 
         if ($data['month_id'] > 0) {
             $filter['month_id'] = $data['month_id'];
+        }
+        if ($data['unit_id'] > 0) {
+            $filter['unit_id'] = $data['unit_id'];
         }
         if ($data['period'] > 0) {
             $filter['period'] = $data['period'];
@@ -253,7 +272,7 @@ class EstablishmentTransaction extends AdminController
                 ];
             }
             $data['heading_title'] = $heading;
-
+// dd($data);
             $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
 
             $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
@@ -312,7 +331,7 @@ class EstablishmentTransaction extends AdminController
             }
 
             // Set auto-size column widths for all columns
-            $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O'];
+            $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O','P','Q'];
 
             $highestRow = $worksheet->getHighestRow();
 
@@ -333,10 +352,16 @@ class EstablishmentTransaction extends AdminController
                 $worksheet->getColumnDimension('I')->setVisible(false);
                 $worksheet->getRowDimension('1')->setVisible(false);
                 $worksheet->getRowDimension('2')->setVisible(false);
+                $worksheet->getColumnDimension('Q')->setVisible(false);
 
+               
                 if ($title == "Food Unit") {
                     $worksheet->getColumnDimension('L')->setVisible(false);
                     $worksheet->getColumnDimension('M')->setVisible(false);
+                    $worksheet->getColumnDimension('P')->setVisible(false);
+                    $worksheet->getColumnDimension('Q')->setVisible(true);
+
+
                 }
             }
 

@@ -1,3 +1,4 @@
+
 <div class="main-container">
     <div class="block">
         <div class="block-header block-header-default">
@@ -38,8 +39,8 @@
                         <label class="form-label">Managing Unit Type</label>
                         <select class="form-control" name="management_unit_type" id="management_unit_type">
                             <option value="all">all</option>
-                            <option value="shg" <?= $management_unit_type == "shg" ? 'selected' : ''; ?>>SHG</option>
-                            <option value="fpo" <?= $management_unit_type == "fpo" ? 'selected' : ''; ?>>FPO</option>
+                            <option value="SHG" <?= $management_unit_type == "SHG" ? 'selected' : ''; ?>>SHG</option>
+                            <option value="FPO" <?= $management_unit_type == "FPO" ? 'selected' : ''; ?>>FPO</option>
 
                         </select>
                     </div>
@@ -81,28 +82,25 @@
                             <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                                 <thead class="bg-light text-dark">
                                     <tr>
-                                        <?php if ($district_id) { ?>
-                                            <th colspan="<?= count($unit_names)?>"  >
+                                        <?php if ($district_id) : ?>
+                                            <th colspan="<?= count($unit_names)+2 ?>"style="text-align:center;">
                                                 District: <?= $district_text; ?> ||
-                                            <?php  } ?>
-                                            <?php if ($block_id) { ?>
-
+                                            <?php endif; ?>
+                                            <?php if ($block_id) : ?>
                                                 Block: <?= $block_text; ?> ||
-                                            <?php  } ?>
-                                            <?php if ($year_id) { ?>
-
+                                            <?php endif; ?>
+                                            <?php if ($year_id) : ?>
                                                 Year: <?= $year_text; ?> ||
-                                            <?php  } ?>
-                                            <?php if ($month_id) { ?>
-
-                                                Month: <?= $month_text; ?>  ||
-                                        <?php  } ?>
-                                        <?php if ($management_unit_type =='management_unit_type') { ?>
-
-                                            Unit: <?= $unit_text; ?> </th>
-                                        <?php  } ?>
-
+                                            <?php endif; ?>
+                                            <?php if ($month_id) : ?>
+                                                Month: <?= $month_text; ?> ||
+                                            <?php endif; ?>
+                                            <?php if ($management_unit_type === 'SHG') : ?>
+                                                Unit: <?= $unit_text; ?>
+                                            <?php endif; ?>
+                                            </th>
                                     </tr>
+
                                     <tr>
                                         <th rowspan="2">
                                             <?php if ($district_id) {
@@ -115,7 +113,7 @@
                                             ?>
 
                                         </th>
-                                        <th colspan="<?= count($unit_names)?>" class="text-center">Type and No. of Units</th>
+                                        <th colspan="<?= count($unit_names) ?>" class="text-center">Type and No. of Units</th>
                                         <th rowspan="2">Total</th>
                                     </tr>
 
@@ -168,47 +166,40 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $(document).ready(function() {
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
 
+        $('#districts').on('change', function() {
 
-            $(function() {
-                $('#districts').on('change', function() {
+            var d_id = $(this).val(); // Declare d_id with var
 
-                    var d_id = $(this).val(); // Declare d_id with var
+            $.ajax({
+                url: 'admin/enterprisesreport/blocks',
+                data: {
+                    district_id: d_id
+                },
+                type: 'GET',
+                dataType: 'JSON',
+                beforeSend: function() {},
+                success: function(response) {
+                    if (response.blocks) {
 
-                    $.ajax({
-                        url: 'admin/enterprisesreport/blocks',
-                        data: {
-                            district_id: d_id
-                        },
-                        type: 'GET',
-                        dataType: 'JSON',
-                        beforeSend: function() {},
-                        success: function(response) {
-                            if (response.blocks) {
+                        var html = '<option value="">Select Block</option>'; // Declare html with var
+                        $.each(response.blocks, function(k, v) {
+                            html += '<option value="' + v.id + '">' + v.name + '</option>';
+                        });
+                        $('#blocks').html(html);
+                    }
+                },
+                error: function() {
+                    alert('something went wrong');
+                },
+                complete: function() {
 
-                                var html = '<option value="">Select Block</option>'; // Declare html with var
-                                $.each(response.blocks, function(k, v) {
-                                    html += '<option value="' + v.id + '">' + v.name + '</option>';
-                                });
-                                $('#blocks').html(html);
-                            }
-                        },
-                        error: function() {
-                            alert('something went wrong');
-                        },
-                        complete: function() {
-
-                        }
-                    });
-
-
-
-                });
+                }
             });
+        });
 
-
-
-        })
-    </script>
+    })
+</script>

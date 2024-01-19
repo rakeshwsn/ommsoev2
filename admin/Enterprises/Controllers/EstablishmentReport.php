@@ -57,12 +57,12 @@ class EstablishmentReport extends AdminController
 		}
 		//unit text
 		$management_unit_type = $this->request->getGet('management_unit_type');
-
-		if ($management_unit_type == "fpo") {
+// dd($management_unit_type);
+		if ($management_unit_type === "FPO") {
 			$data['unit_text'] = "FPO";
-		} elseif ($management_unit_type == "shg") {
+		} elseif ($management_unit_type === "SHG") {
 			$data['unit_text'] = "SHG";
-		} elseif ($management_unit_type == "all") {
+		} elseif ($management_unit_type === "all") {
 			$data['unit_text'] = "FPO & SHG";
 		}
 
@@ -81,7 +81,7 @@ class EstablishmentReport extends AdminController
 			'month' => $this->request->getGet('month_id'),
 			'unit_type' => $this->request->getGet('unit_type'),
 		];
-// dd($filter);
+
 		//Retrive data for gps if block_id present
 		if ($this->request->getGet('block_id')) {
 			$gpunits = $enterprisesmodel->gpwiseUnits($filter);
@@ -172,15 +172,10 @@ class EstablishmentReport extends AdminController
 				'b_units' => $_block_units
 			];
 
-
-			// dd($data['district_text']);
-
-
-			// dd($data);
 		} else {
 
 			$units = $enterprisesmodel->districtwiseUnits($filter);
-			//dd($units);
+			// dd($units);
 			// printr($units);exit;
 			$data['units'] = [];
 			foreach ($units as $unit) {
