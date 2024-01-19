@@ -55,7 +55,7 @@ $validation = \Config\Services::validation();
 			var d_id = $(this).val(); // Declare d_id with var
 
 			$.ajax({
-				url: 'admin/districts/block',
+				url: 'admin/district/block',
 				data: {
 					district_id: d_id
 
