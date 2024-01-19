@@ -52,13 +52,12 @@
             </h3>
             <?php if (!$approved) { ?>
                 <div class="block-options">
-                    <?php
-                    if ($isActiveDay) {
-                        echo '<a data-toggle="tooltip" title="" id="btn-action" class="btn btn-square btn-success min-width-125 mb-10 btn-approve"><i class="fa fa-check"></i> Approve/Reject</a>';
-                    } else {
-                        echo '<button data-toggle="tooltip" title="" id="btn-action" class="btn btn-square btn-danger min-width-125 mb-10 btn-approve" disabled><i class="fa fa-check"></i> Approve/Reject</button>';
-                    }
-                    ?>
+
+                    <a data-toggle="tooltip" title="" id="btn-action"
+                        class="btn btn-square btn-success min-width-125 mb-10 btn-approve"><i class="fa fa-check"></i>
+                        Approve/Reject</a>
+
+
 
                 </div>
             <?php } ?>
