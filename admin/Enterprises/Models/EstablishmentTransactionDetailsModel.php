@@ -119,6 +119,7 @@ class EstablishmentTransactionDetailsModel extends Model
     if (isset($filter['period'])) {
       $sql .= " AND txn_dtl.period = " . $filter['period'];
     }
+  
     // $sql .=  " GROUP BY unit.units";
     //  echo $sql;exit;
     if (isset($filter['id'])) {

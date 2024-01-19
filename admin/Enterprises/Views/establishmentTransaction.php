@@ -27,6 +27,12 @@
 
                     </div>
                     <div class="col-2">
+                        <label class="form-label">Unit type</label>
+                        <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'unit']); ?>
+                        <span id="em3" class="text-danger"></span>
+
+                    </div>
+                    <div class="col-2">
                         <label class="form-label">Fortnight</label>
                         <select class="form-control" name="period" id="period">
                             <option value="all">all</option>
@@ -36,7 +42,7 @@
                         </select>
                         <span id="em" class="text-danger"></span>
                     </div>
-                    <div class="col-4 mt-4">
+                    <div class="col-2 mt-4">
                         <button class="btn btn-primary">Filter</button>
                     </div>
 

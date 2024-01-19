@@ -45,8 +45,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->match(['get', 'post'], 'village/edit/(:segment)', 'Localisation\Controllers\Village::edit/$1');
 
     $routes->get('blocks/grampanchayat/', 'Localisation\Controllers\Village::grampanchayat', ['permission' => false]);
-
-    $routes->add('districts/block', 'Localisation\Controllers\Village::block', ['permission' => false]);
+    //edited by hemant
+    $routes->add('districts/block', 'Localisation\Controllers\District::block');
 
     //LGD Url by saraswatee
     $routes->add('lgdblock', 'Localisation\Controllers\LgdBlocks::index');
