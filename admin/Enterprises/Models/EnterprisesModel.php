@@ -163,7 +163,7 @@ class EnterprisesModel extends Model
       $sql .= " AND sm.id = " . $filter['month'];
     }
     if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
     }
     if (isset($filter['unit_type'])) {
       if ($filter['unit_type'] == 'without_establishment_date') {
@@ -208,7 +208,7 @@ class EnterprisesModel extends Model
     res.date_estd,
     res.year_id,
     res.month
-  FROM (SELECT
+     FROM (SELECT
         eu.id unit_id,
         eu.name unit,
         sb.id block_id,
@@ -216,7 +216,7 @@ class EnterprisesModel extends Model
         sb.district_id
       FROM soe_blocks sb
         CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) blkunit
-    LEFT JOIN (SELECT
+        LEFT JOIN (SELECT
         e.unit_id,
         COUNT(e.unit_id) total_units,
         e.block_id,
