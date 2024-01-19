@@ -1,13 +1,3 @@
-<style>
-    #loading-overlay {
-        background: rgb(255 255 255 / 80%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        z-index: 9999;
-    }
-</style>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
@@ -82,7 +72,7 @@
 
             <div class="block-content">
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table table-bordered table-striped table-vcenter">
                         <thead>
                             <tr>
                                 <th>Week</th>
@@ -97,8 +87,10 @@
                                 <th>Total Area</th>
                                 <th>Total Crop Diversification Farmers</th>
                                 <th>Total Crop Diversification Area</th>
-                                <th>Total Rice Fallow Farmers</th>
-                                <th>Total Rice Fallow Area</th>
+                                <?php if ($season === 'Rabi') { ?>
+                                    <th>Total Rice Fallow Farmers</th>
+                                    <th>Total Rice Fallow Area</th>
+                                <?php } ?>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -145,12 +137,14 @@
                                         <td>
                                             <?= $block['crop_diversification_area'] ?>
                                         </td>
-                                        <td>
-                                            <?= $block['rice_fallow_farmers'] ?>
-                                        </td>
-                                        <td>
-                                            <?= $block['rice_fallow_area'] ?>
-                                        </td>
+                                        <?php if ($season === 'Rabi') { ?>
+                                            <td>
+                                                <?= $block['rice_fallow_farmers'] ?>
+                                            </td>
+                                            <td>
+                                                <?= $block['rice_fallow_area'] ?>
+                                            </td>
+                                        <?php } ?>
                                         <td>
                                             <?= $block['status'] ?>
                                         </td>

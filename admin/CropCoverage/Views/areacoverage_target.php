@@ -1,9 +1,3 @@
-<style>
-    .cl-head {
-        color: white;
-        background-color: black;
-    }
-</style>
 <form>
     <div class="block">
         <div class="block-header block-header-default">
@@ -50,7 +44,7 @@
 </form>
 <div class="tableFixHead">
     <?php if (empty($district_id)) { ?>
-        <table id="block-coverage" class="table table-bordered table-striped table-vcenter ">
+        <table id="block-coverage" class="table table-bordered table-striped table-vcenter">
             <thead>
                 <tr>
                     <th rowspan="2" class="cl-head">District</th>
@@ -469,14 +463,11 @@
                                 title="<?= $button_edit; ?>"><i class="fa fa-pencil"></i></a>
                         </div>
                     </td>
-
                 </tr>
-
             <?php } ?>
             <tr>
                 <td colspan="18" class="text-right">Total District Target</td>
                 <td colspan="5" class="all-total-block"></td>
-
             </tr>
         </tbody>
     </table>

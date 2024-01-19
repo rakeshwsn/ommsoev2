@@ -91,10 +91,10 @@ class Approve extends AdminController
         $acModel = new AreaCoverageModel();
         //update status
         if ($this->request->getMethod(1) == 'POST') {
-            echo "<pre>";
-            print_r($_POST);
-            echo "</pre>";
-            exit;
+            // echo "<pre>";
+            // print_r($_POST);
+            // echo "</pre>";
+            // exit;
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
@@ -113,12 +113,14 @@ class Approve extends AdminController
         ];
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        // printr($blocks);
+        // exit;
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
         $total_gps = 0;
 
         $data['blocks'] = [];
@@ -159,6 +161,10 @@ class Approve extends AdminController
                 'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
                 'total_area' => $block->total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
                 'status' => $this->statuses[$status],
                 'action' => $action,
             ];
@@ -183,7 +189,10 @@ class Approve extends AdminController
             $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $block->total_area;
-
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
         }
 
         $data['blocks'][] = [
@@ -207,6 +216,10 @@ class Approve extends AdminController
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
             'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
             'status' => '',
             'action' => ''
         ];
@@ -322,7 +335,7 @@ class Approve extends AdminController
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
 
         $data['blocks'] = [];
         $data['approved'] = false;
@@ -367,6 +380,12 @@ class Approve extends AdminController
                 'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
                 'total_area' => $block->total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
+                'status' => $this->statuses[$status],
+                'status_color' => $this->colors[$status],
                 'action' => $action,
             ];
 
@@ -389,7 +408,10 @@ class Approve extends AdminController
             $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $block->total_area;
-
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
             $data['approved'] = $block->status == 1;
         }
 
@@ -415,6 +437,10 @@ class Approve extends AdminController
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
             'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
             'action' => ''
         ];
 
@@ -551,7 +577,7 @@ class Approve extends AdminController
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = 0;
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
         $total_gps = 0;
         $total_blocks = 0;
 
@@ -595,6 +621,10 @@ class Approve extends AdminController
                 'total_non_ragi' => $block->total_non_ragi,
                 'total_fc' => $block->fc_area,
                 'total_area' => $block->total_area,
+                'crop_diversification_farmers' => $block->crop_diversification_farmers,
+                'crop_diversification_area' => $block->crop_diversification_area,
+                'rice_fallow_farmers' => $block->rice_fallow_farmers,
+                'rice_fallow_area' => $block->rice_fallow_area,
                 'status' => $this->statuses[$status],
                 'status_color' => $this->colors[$status],
                 'action' => $action,
@@ -622,6 +652,10 @@ class Approve extends AdminController
             $total_total_non_ragi += $block->total_non_ragi;
             $total_fc_area += $block->fc_area;
             $total_total_area += $block->total_area;
+            $total_crop_diversification_farmers += $block->crop_diversification_farmers;
+            $total_crop_diversification_area += $block->crop_diversification_area;
+            $total_rice_fallow_farmers += $block->rice_fallow_farmers;
+            $total_rice_fallow_area += $block->rice_fallow_area;
 
         }
 
@@ -647,6 +681,10 @@ class Approve extends AdminController
             'total_non_ragi' => $total_total_non_ragi,
             'total_fc' => $total_fc_area,
             'total_area' => $total_total_area,
+            'crop_diversification_farmers' => $total_crop_diversification_farmers,
+            'crop_diversification_area' => $total_crop_diversification_area,
+            'rice_fallow_farmers' => $total_rice_fallow_farmers,
+            'rice_fallow_area' => $total_rice_fallow_area,
             'status' => '',
             'status_color' => '',
             'action' => ''

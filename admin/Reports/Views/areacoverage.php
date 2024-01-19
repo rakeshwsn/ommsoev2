@@ -40,6 +40,12 @@
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>
                         <th rowspan="3">Total Area </th>
+                        <th rowspan="3">Total Crop Diversification Farmers</th>
+                        <th rowspan="3">Total Crop Diversification Area</th>
+                        <?php if ($current_season === 'rabi') { ?>
+                            <th rowspan="3">Rice Fallow Farmers</th>
+                            <th rowspan="3">Rice Fallow Area</th>
+                        <?php } ?>
                     </tr>
                     <tr>
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -146,6 +152,18 @@
                             </td>
                             <td>
                                 <?= $block['total_area'] ?>
+                            </td>
+                            <td>
+                                <?= $block['crop_diversification_farmers'] ?>
+                            </td>
+                            <td>
+                                <?= $block['crop_diversification_area'] ?>
+                            </td>
+                            <td>
+                                <?= $block['rice_fallow_farmers'] ?>
+                            </td>
+                            <td>
+                                <?= $block['rice_fallow_area'] ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
