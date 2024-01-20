@@ -148,7 +148,7 @@ WHERE sg.deleted_at IS NULL";
 		} else {
 			$sql .= " AND sg.block_id = " . 0;
 		}
-
+		$sql .= " ORDER BY sg.name";
 		// echo $sql;
 		// exit;
 		$res = $this->db->query($sql)->getResult();
