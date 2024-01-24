@@ -69,7 +69,7 @@ class EnterprisesModel extends Model
     v.name villages,
     sg.name gps,
     eu.name unit_name,
-    eu.group_unit,
+    eu.unit_group_id,
     YEAR(e.date_estd) year
     FROM enterprises e
     LEFT JOIN soe_districts sd ON sd.id = e.district_id
