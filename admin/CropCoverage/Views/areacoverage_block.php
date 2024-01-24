@@ -1,3 +1,9 @@
+<style>
+    .down-btn,
+    .up-btn {
+        padding-top: 24px;
+    }
+</style>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
@@ -15,16 +21,16 @@
                     <label>To Date</label>
                     <input type="text" readonly value="<?= $to_date ?>" class="form-control">
                 </div>
-                <div class="col-md-2 mt-4">
+                <div class="col-md-2 down-btn">
                     <?php
                     if ($isActiveDay) {
                         echo '<a href="' . $download_url . '" class="btn btn-square btn-info min-width-125 mb-10"><i class="fa fa-download mr-5"></i> Download</a>';
                     } else {
-                        echo '<button class="btn btn-square btn-danger min-width-125 mb-10" disabled><i class="fa fa-download mr-5"></i> Download</button>';
+                        echo '<button class="btn btn-square btn-danger min-width-125" disabled><i class="fa fa-download mr-5"></i> Download</button>';
                     }
                     ?>
                 </div>
-                <div class="col-md-2 mt-4">
+                <div class="col-md-2 up-btn">
                     <form class="dm-uploader" id="uploader">
                         <div role="button" class="btn btn-outline <?= $isActiveDay ? 'btn-warning' : 'btn-danger'; ?>">
                             <i class="fa fa-folder-o fa-fw"></i> Upload Excel
