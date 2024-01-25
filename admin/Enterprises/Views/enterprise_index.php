@@ -29,7 +29,7 @@
                     <div class="col-2">
                         <label class="form-label">Managing Unit Type</label>
                         <select class="form-control" name="management_unit_type" id="management_unit_type">
-                            <option value="all">all</option>
+                            <option value="all">ALL</option>
                             <option value="shg" <?= $management_unit_type == "shg" ? 'selected' : ''; ?>>SHG</option>
                             <option value="fpo" <?= $management_unit_type == "fpo" ? 'selected' : ''; ?>>FPO</option>
 

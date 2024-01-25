@@ -1,6 +1,7 @@
 <?php
 
 namespace Admin\Enterprises\Controllers;
+use Admin\Enterprises\Models\EnterpriseUnitGroup;
 
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use App\Controllers\AdminController;
@@ -34,8 +35,10 @@ class EnterpriseUnit extends AdminController
 
         if ($id && ($this->request->getMethod(true) != 'POST')) {
             $unit_info = $this->enterprisesunitmodel->find($id);
-            // printr($unit_info);
+            // printr($unit_info);exit;
         }
+       
+        // dd($this->enterprisesunitmodel->getFieldNames('enterprises_units'));
         foreach ($this->enterprisesunitmodel->getFieldNames('enterprises_units') as $field) {
             if ($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
@@ -96,7 +99,7 @@ class EnterpriseUnit extends AdminController
             $datatable[] = array(
                 $sequentialNumber,
                 $result->name,
-                $result->group_unit,
+                $result->unit_group,
                 $result->total_ent,
                 $action
             );
@@ -114,9 +117,11 @@ class EnterpriseUnit extends AdminController
 
     public function add()
     {
+        // dd($this->request->getPost());
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
-
+        //    dd($this->request->getPost());
             $id = $this->enterprisesunitmodel->insert($this->request->getPost());
+         
             $this->session->setFlashdata('message', 'EnterprisesUnit Saved Successfully.');
 
             return redirect()->to(admin_url('enterprises/unit'));
@@ -165,6 +170,14 @@ class EnterpriseUnit extends AdminController
 
     public function getForm($data)
     {
+        $enterpriseunitgroup = new EnterpriseUnitGroup();
+        $data['unit_groups'][] = 'Select units';
+		$unit_group_id = 0;
+		$unit_groups = $enterpriseunitgroup->orderBy('name', 'asc')->findAll();
+
+		foreach ($unit_groups as $unit_group) {
+			$data['unit_groups'][$unit_group->id] = $unit_group->name;
+		}
 
         return view('Admin\Enterprises\Views\enterprisesForm', $data);
     }

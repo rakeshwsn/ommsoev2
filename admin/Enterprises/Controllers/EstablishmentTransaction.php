@@ -14,6 +14,7 @@ use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Enterprises\Models\EnterpriseUnitGroup;
 use Admin\Localisation\Controllers\Block;
 use Admin\Localisation\Controllers\District;
 use App\Controllers\AdminController;
@@ -213,25 +214,33 @@ class EstablishmentTransaction extends AdminController
         $yearmodel = new YearModel();
         $enterpriseunitsmodel = new EnterprisesUnitModel();
         $establishmentransaction = new EstablishmentTransactionModel();
-        $units = $enterpriseunitsmodel->findAll();
+        $ugModel = new EnterpriseUnitGroup();
 
-        $district_id = $this->request->getGet('district_id');
+
+        $unit_groups = $ugModel->findAll();
 
         $worksheet_unit = [];
-        foreach ($units as $key => $unit) {
 
-            $filter = [
-                'id' => $unit->id,
-                'district_id' => $district_id
-            ];
-            $details = $enterpriseunitsmodel->getAll($filter);
-
-            $worksheet_unit[$key]['id'] = $unit->id;
-            $worksheet_unit[$key]['name'] = $unit->name;
-            $worksheet_unit[$key]['group_unit'] = $unit->group_unit;
-            $worksheet_unit[$key]['details'] = $details;
+        foreach ($unit_groups as $group) {
+            $units = $enterpriseunitsmodel->getAll(['unit_group_id'=>$group->id]);
+            $group->units = $units;
         }
-        $worksheet_unit = $this->_group_by($worksheet_unit, 'group_unit');
+        
+        // foreach ($unit_groups as $group) {
+
+        //     $filter = [
+        //         'id' => $unit->id,
+        //         'district_id' => $district_id
+        //     ];
+        //     $details = $enterpriseunitsmodel->getAll($filter);
+
+        //     $group = $ugModel->find($unit->unit_group_id);
+
+        //     $worksheet_unit[$key]['id'] = $unit->id;
+        //     $worksheet_unit[$key]['name'] = $unit->name;
+        //     $worksheet_unit[$key]['unit_group'] = $group->name;
+        //     $worksheet_unit[$key]['details'] = $details;
+        // }
 
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
@@ -247,15 +256,40 @@ class EstablishmentTransaction extends AdminController
         $doc = new \DOMDocument();
         $spreadsheet = new Spreadsheet();
 
-        foreach ($worksheet_unit as $key => $units) {
-            if ($key == "p") {
-                $title = "Machinaries";
-                $end = "K";
-            } else {
-                $title = "Food Unit";
-                $end = "I";
-            }
-            $heading = "Enterprise Transaction $title Data";
+        $columns = [
+            'machinary' => [
+                'no_of_days_functional' => 'No. of Days Functional',
+                'total_turnover' => 'Total turnover / sale value',
+                'produced' => 'Quintals of Produce processed',
+                'total_expend' => 'Total expenditure',
+                'under_maintenance' => 'No. of times under maintenance',
+            ],
+            'food' => [
+                'no_of_days_functional' => 'No. of Days Functional',
+                'total_turnover' => 'Total turnover / sale value',
+                'total_expend' => 'Total expenditure',
+                'event_attend' => 'No. of event attend',
+            ],
+            'chc' => [
+                'farmer_user' => 'NO. of farmer user',
+                'service_charge' => 'Value of service charge collected (in rupees)',
+                'total_expend' => 'Expenditure if any(rupees)',
+            ],
+            'cmsc' => [
+                'farmer_user' => 'NO. of farmer user',
+                'seed_support' => 'Quantity of seed supported (in quintals)',
+                'seed_store' => 'Quantity of seed in store (in quintals)',
+                'service_charge' => 'Value of service charges & sale of seed',
+                'total_expend' => 'Expenditure if any (in rupees)',
+            ],
+        ];
+
+
+        foreach ($unit_groups as $group) {
+
+            $title = $group->name;
+            
+            $heading = "Enterprise Transaction ".ucfirst($title)." Data";
 
             $data = [
                 'month_id' => $month_id,
@@ -263,18 +297,33 @@ class EstablishmentTransaction extends AdminController
                 'district_id' => $district_id,
                 'period' => $period
             ];
+            $data['heading_title'] = $heading;
 
+            // fetch enterprises by district_id and unit_id
+            
+            foreach($group->units as &$unit){
+                $ents = $enterprisesmodel->where([
+                    'district_id'=>15,
+                    'unit_id' => $unit['id']
+                ])->findAll();
+                $unit['enterprises'] = $ents;
+            }
+
+            $data['units'] = [];
             foreach ($units as $unit) {
-                $data['trans'][$unit['id']] = [
-                    'unit_name' => $unit['name'],
-                    'id' => $unit['id'],
-                    'enterprises' => $establishmentransaction->getAll($unit['id'], $district_id)
+                $data['units'][$unit->id] = [
+                    'unit_name' => $unit->name,
+                    'id' => $unit->id,
+                    'enterprises' => $establishmentransaction->getAll($unit->id, $district_id)
                 ];
             }
-            $data['heading_title'] = $heading;
-// dd($data);
-            $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
 
+            $data['columns'] = $columns[$unit->name];
+
+            $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
+            echo $htmltable;
+            continue;
+            exit;
             $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
             $worksheet = $spreadsheet->createSheet($sheetindex);
@@ -328,44 +377,40 @@ class EstablishmentTransaction extends AdminController
                         $worksheet->getStyle($range)->applyFromArray($fillColor);
                     }
                 }
-            }
 
-            // Set auto-size column widths for all columns
-            $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O','P','Q'];
+                // Set auto-size column widths for all columns
+                $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
 
-            $highestRow = $worksheet->getHighestRow();
+                $highestRow = $worksheet->getHighestRow();
 
-            foreach ($colsToWrap as $colToWrap) {
-                $range = $colToWrap . '1:' . $colToWrap . $highestRow;
+                foreach ($colsToWrap as $colToWrap) {
+                    $range = $colToWrap . '1:' . $colToWrap . $highestRow;
 
-                $style = $worksheet->getStyle($range);
-                $style->getAlignment()->setWrapText(true);
-            }
+                    $style = $worksheet->getStyle($range);
+                    $style->getAlignment()->setWrapText(true);
+                }
 
-            //$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-            //$writer->save('output_file.xlsx');
-            if ($worksheet) {
-                $worksheet->getColumnDimension('A')->setVisible(false);
-                $worksheet->getColumnDimension('B')->setVisible(false);
-                $worksheet->getColumnDimension('E')->setVisible(false);
-                $worksheet->getColumnDimension('G')->setVisible(false);
-                $worksheet->getColumnDimension('I')->setVisible(false);
-                $worksheet->getRowDimension('1')->setVisible(false);
-                $worksheet->getRowDimension('2')->setVisible(false);
-                $worksheet->getColumnDimension('Q')->setVisible(false);
-
-               
-                if ($title == "Food Unit") {
-                    $worksheet->getColumnDimension('L')->setVisible(false);
-                    $worksheet->getColumnDimension('M')->setVisible(false);
-                    $worksheet->getColumnDimension('P')->setVisible(false);
-                    $worksheet->getColumnDimension('Q')->setVisible(true);
+                //$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                //$writer->save('output_file.xlsx');
+                if ($worksheet) {
+                    $worksheet->getColumnDimension('A')->setVisible(false);
+                    $worksheet->getColumnDimension('B')->setVisible(false);
+                    $worksheet->getColumnDimension('E')->setVisible(false);
+                    $worksheet->getColumnDimension('G')->setVisible(false);
+                    $worksheet->getColumnDimension('I')->setVisible(false);
+                    $worksheet->getRowDimension('1')->setVisible(false);
+                    $worksheet->getRowDimension('2')->setVisible(false);
+                    $worksheet->getColumnDimension('Q')->setVisible(false);
 
 
+                    if ($title == "Food Unit") {
+                        $worksheet->getColumnDimension('L')->setVisible(false);
+                        $worksheet->getColumnDimension('M')->setVisible(false);
+                        $worksheet->getColumnDimension('P')->setVisible(false);
+                        $worksheet->getColumnDimension('Q')->setVisible(true);
+                    }
                 }
             }
-
-
             $sheetindex++;
         }
 
