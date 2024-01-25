@@ -219,7 +219,7 @@ class Correction extends AdminController {
 
         }
 
-        if ($txn && $this->user->canUpload()){
+        if ($txn && $this->user->canUpload($txn->month, $txn->year)) {
             $action = 'edit';
         } else {
             $action = 'show';
