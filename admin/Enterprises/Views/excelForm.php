@@ -19,11 +19,11 @@
             </div>
         </td>
     </tr>
-    <?php foreach ($trans as $tran) { ?>
+    <?php foreach ($units as $tran) { ?>
         <?php $slno = 1; ?>
         <thead>
             <tr>
-                <th style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['unit_id'] ?></th>
+                <th style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['id'] ?></th>
                 <th colspan="16" style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $tran['unit_name'] ?></th>
             </tr>
 

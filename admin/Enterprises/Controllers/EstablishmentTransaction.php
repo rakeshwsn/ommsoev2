@@ -70,7 +70,7 @@ class EstablishmentTransaction extends AdminController
             $data['districts'][$district->id] = $district->name;
         }
 
-        $data['district_id'] = 0;
+        $data['district_id'] = $this->user->district_id;
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
@@ -300,29 +300,29 @@ class EstablishmentTransaction extends AdminController
             $data['heading_title'] = $heading;
 
             // fetch enterprises by district_id and unit_id
-            
+            // dd($group->units);
             foreach($group->units as &$unit){
                 $ents = $enterprisesmodel->where([
-                    'district_id'=>15,
+                    'district_id'=> $district_id,
                     'unit_id' => $unit['id']
                 ])->findAll();
                 $unit['enterprises'] = $ents;
             }
-
+// dd($unit['id']);
             $data['units'] = [];
             foreach ($units as $unit) {
-                $data['units'][$unit->id] = [
-                    'unit_name' => $unit->name,
-                    'id' => $unit->id,
-                    'enterprises' => $establishmentransaction->getAll($unit->id, $district_id)
+                $data['units'][ $unit['id']] = [
+                    'unit_name' => $unit['name'],
+                    'id' => $unit['id'],
+                    'enterprises' => $establishmentransaction->getAll($unit['id'], $district_id)
                 ];
             }
 
-            $data['columns'] = $columns[$unit->name];
-
+            $data['columns'] = $columns[$unit['name']];
+// dd($data);
             $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
             echo $htmltable;
-            continue;
+            // continue;
             exit;
             $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
