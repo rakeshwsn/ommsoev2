@@ -416,7 +416,7 @@ class User
         }
     }
 
-    public function canUpload() {
+    public function canUpload($month_id,$year_id){
         $upload_enabled = true;
 
         if(env('soe.uploadDateValidation') && $this->user_id > 1 ){
@@ -424,7 +424,8 @@ class User
             $upload_model = new AllowuploadModel();
 
             $ufilter = [
-                'user_id' => $this->user_id
+                'user_id' => $this->user_id,
+                'year' => $year_id,
             ];
 
             $upload = $upload_model->getByDate($ufilter);
@@ -434,7 +435,7 @@ class User
                 $months[] = $item['month'];
             }
 
-            $upload_enabled = in_array(getCurrentMonthId(),$months);
+            $upload_enabled = in_array($month_id,$months);
         }
         return $upload_enabled;
     }
