@@ -118,8 +118,6 @@ $validation = \Config\Services::validation();
                         <label for="managing unit name">Name Of Managing Unit<span class="text-danger">*</span></label>
                         <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('managing_unit_name'); ?></div>
-
-
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('contact_person') ? 'is-invalid' : '' ?>">
                         <label for="Contact Person">Contact Person<span class="text-danger">*</span></label>
@@ -293,7 +291,6 @@ $validation = \Config\Services::validation();
 
 <script>
     $(function() {
-
         $('#districts').on('change', function() {
 
             var d_id = $(this).val(); // Declare d_id with var
@@ -328,7 +325,7 @@ $validation = \Config\Services::validation();
                 }
             });
         });
-        // $('#districts').trigger('change');
+
         $('#blocks').on('change', function() {
             var b_id = $(this).val();
             $.ajax({
@@ -351,11 +348,8 @@ $validation = \Config\Services::validation();
                 error: function() {
                     alert('something went wrong');
                 },
-                complete: function() {
-
-                }
+                complete: function() {}
             });
-
         });
 
         // $('#gps').trigger('change');
@@ -387,6 +381,7 @@ $validation = \Config\Services::validation();
             });
 
         });
+
         //main center ajax
         $('#unit_type').on('change', function() {
             var d_id = $("#districts").val(); // Declare d_id with var
@@ -425,6 +420,7 @@ $validation = \Config\Services::validation();
                 }
             });
         });
+
         // //hide show addl budget
         if ($("#is_support_basis_infr").prop('checked') == true) {
             $('#budget_utilize').show();
@@ -499,8 +495,6 @@ $validation = \Config\Services::validation();
             }
 
         });
-
-
 
         //add new equipment row 
         var rows = <?php echo $rows; ?>;
@@ -725,13 +719,9 @@ $validation = \Config\Services::validation();
         }
     },
 });
-
-
         $("select").on("select2:close", function(e) {
             $(this).valid();
         });
-
-
     });
 </script>
 <?php js_end(); ?>

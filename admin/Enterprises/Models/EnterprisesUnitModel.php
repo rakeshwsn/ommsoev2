@@ -45,47 +45,12 @@ class EnterprisesUnitModel extends Model
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
 
-    public function getAll_bk($data = array())
-    {
-        $builder = $this->db->table("{$this->table} eu");
-        $builder->join('enterprises e', 'eu.id=e.unit_id', 'left');
-
-        $this->filter($builder, $data);
-
-        $builder->select("eu.id,
-                        eu.name,
-                        eu.sort_order,
-                        eu.group_unit,
-                        COUNT(e.unit_id) as total_ent");
-
-        // Set the sorting order
-        $sort = isset($data['sort']) && $data['sort'] ? $data['sort'] : 'eu.name';
-        $order = isset($data['order']) && $data['order'] === 'desc' ? 'desc' : 'asc';
-        $builder->orderBy($sort, $order);
-
-        // Set limit and offset if provided
-        if (isset($data['start']) || isset($data['limit'])) {
-            $start = isset($data['start']) && $data['start'] >= 0 ? (int)$data['start'] : 0;
-            $limit = isset($data['limit']) && $data['limit'] >= 1 ? (int)$data['limit'] : 15;
-            $builder->limit($limit, $start);
-        }
-
-        $builder->where("eu.{$this->deletedField} IS NULL");
-
-        $builder->groupBy('e.unit_id');
-
-        $query = $builder->getCompiledSelect(); echo $query; exit;
-
-        $res = $builder->get()->getResult();
-        return $res;
-    }
-
-    public function getAll($data = array()){
+    public function getAll($filter = array()){
         $sql = "SELECT
         `eu`.`id`,
         `eu`.`name`,
-        `eu`.`group_unit`,
-        e.total_units
+        `eu`.`unit_group_id`,
+        e.total_units,eg.name unit_group
       FROM `enterprises_units` `eu`
         LEFT JOIN (SELECT
         eu.id unit_id,
@@ -94,12 +59,15 @@ class EnterprisesUnitModel extends Model
         LEFT JOIN (SELECT
             unit_id,
             COUNT(e.id) total_units
-          FROM enterprises e
+          FROM enterprises e WHERE e.deleted_at IS NULL 
           GROUP BY unit_id) cnt
           ON cnt.unit_id = eu.id) `e`
-          ON `eu`.`id` = `e`.`unit_id`
-      WHERE `eu`.`deleted_at` IS NULL
-      ORDER BY `eu`.`name` ASC";
+          ON `eu`.`id` = `e`.`unit_id` LEFT JOIN enterprise_unit_group eg ON eu.unit_group_id = eg.id  
+      WHERE `eu`.`deleted_at` IS NULL";
+if(!empty($filter['unit_group_id'])){
+    $sql .= " AND unit_group_id=".$filter['unit_group_id'];
+}
+      $sql .= " ORDER BY `eu`.`name` ASC";
 
       return $this->db->query($sql)->getResultArray();
     }
