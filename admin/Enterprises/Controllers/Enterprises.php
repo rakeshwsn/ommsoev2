@@ -22,8 +22,6 @@ use Admin\Enterprises\Models\EnterprisesEquipmentModel;
 
 use Admin\Equipment\Models\EquipmentModel;
 
-
-
 class Enterprises extends AdminController
 {
 	public function index()
@@ -530,9 +528,6 @@ class Enterprises extends AdminController
 			'SHG' => 'SHG',
 			'FPO' => 'FPO',
 		];
-		
-	
-			
 	
 		// 
 		//district
@@ -569,9 +564,6 @@ class Enterprises extends AdminController
 				$data['villages'][$village->id] = $village->name;
 			}
 		}
-		// dd($data);
-
-
 
 		$data['gps'][] = 'Select Gp';
 
@@ -622,9 +614,6 @@ class Enterprises extends AdminController
 
 		//Add village Url
 		$data['add_village_url'] = admin_url('village/add');
-
-
-		// dd($data);
 
 		return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
 	}
