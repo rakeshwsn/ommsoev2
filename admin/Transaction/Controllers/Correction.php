@@ -176,7 +176,7 @@ class Correction extends AdminController {
                 'month' => $txn->month,
                 'year' => $txn->year,
                 'filename' => $txn->filename,
-                'status' => (int)in_array($this->user->agency_type_id,$this->settings->auto_approve_users),
+                'status' => $txn->status,
                 'date_added' => date('Y-m-d'),
                 'user_id' => $txn->user_id,
                 'transaction_type' => $txn->transaction_type,
