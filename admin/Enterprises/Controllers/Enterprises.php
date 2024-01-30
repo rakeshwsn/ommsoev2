@@ -504,14 +504,13 @@ class Enterprises extends AdminController
 				$data[$field] = '';
 			}
 		}
+
 		//
 		$id = $this->request->getGet('id');
 		$data['enterpriseequipments'] = [];
 		if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
 			$data['enterpriseequipments'] = $enterprisesmodel->equipment($id);
 		}
-
-
 
 		//units
 		$data['units'] = [];
@@ -607,8 +606,6 @@ class Enterprises extends AdminController
 		}
 		//main center dropdown
 		$data['main_center_name'][] = 'Select main center name';
-
-
 
 		$data['add_gp_url'] = admin_url('grampanchayat/add');
 
