@@ -129,7 +129,7 @@ class EstablishmentTransactionDetailsModel extends Model
     }
   }
 
-  public function txnidswisetrans($id)
+  public function idwisetrans($id)
   {
     $sql = "SELECT
     e.id ent_id,
@@ -155,9 +155,11 @@ class EstablishmentTransactionDetailsModel extends Model
     txn_dtl.service_charge,
     txn_dtl.seed_support,
     txn_dtl.seed_store,
+    txn_dtl.year_id,
     dy.name year_name,
     sm.name month_name,
-    eu.name unit_name,
+    eu_unit.unit_name,
+    eu_unit.unit_group_name,
     txn_dtl.period,
     txn_dtl.created_at
   FROM (SELECT
@@ -203,11 +205,16 @@ class EstablishmentTransactionDetailsModel extends Model
       ON dy.id = txn_dtl.year_id
     LEFT JOIN soe_months sm
       ON sm.id = txn_dtl.month_id
-    LEFT JOIN enterprises_units eu
-      ON eu.id = txn_dtl.unit_id
-  WHERE 1 = 1
-  AND  txn_id=$id ";
-      // echo $sql;exit;
+    LEFT JOIN (SELECT
+        eu.name unit_name,
+        eu.id unit_id,
+        eu.unit_group_id,
+        eug.name unit_group_name
+      FROM enterprises_units eu
+        LEFT JOIN enterprise_unit_group eug
+          ON eu.unit_group_id = eug.id) eu_unit
+      ON eu_unit.unit_id = txn_dtl.unit_id WHERE txn_id = $id ";
+    // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
 
@@ -311,7 +318,8 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
     if (!empty($filter['year_id'])) {
-      $sql .= " AND ((et.year_id BETWEEN 0 AND $last_year) OR (et.year_id = {$filter['year_id']} AND et.month_id BETWEEN 0 AND $pmonth))";
+      $sql .= " AND ((et.year_id BETWEEN 0 AND $last_year) OR (et.year_id = {$filter['year_id']} 
+      AND et.month_id BETWEEN 0 AND $pmonth))";
     }
     if (!empty($filter['district_id'])) {
       $sql .= " AND (et.district_id = {$filter['district_id']})";

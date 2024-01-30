@@ -148,12 +148,10 @@ class EstablishmentTransaction extends AdminController
             $filter['period'] = $data['period'];
         }
         $ent_trans = $establishmenttrasdtl->periodswisetrans($filter);
-        // dd($ent_trans);
         $data['trans'] = [];
 
         foreach ($ent_trans as $row) {
             $data['trans'][] = [
-                // 'created_at' => $row->created_at,
                 'units' => $row->unit_name,
                 'period' => $row->period,
                 'month' => $row->month_name,
@@ -166,34 +164,37 @@ class EstablishmentTransaction extends AdminController
                 'edit_url' => admin_url('enterprisestrans/edit?id=' . $row->est_id),
 
             ];
-            // printr($data);exit;
         }
         $data['excel_link'] = admin_url('enterprisestrans/download');
         $data['upload_url'] = admin_url('enterprisestrans/upload');
 
-        // dd($data['excel_link']);
+    
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
     public function edit()
     {
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
+
         if ($this->request->getMethod(1) == 'POST') {
             $id = $this->request->getGet('id');
+            $enterprisetransdata = [];
+            $entdata = $establishmenttrasdtl->idwisetrans($id);
 
-            $enterprisetransdata = [
-                'no_of_days_functional' => $this->request->getPost('no_of_days_functional'),
-                'produced' => $this->request->getPost('produced'),
-                'charges_per_qtl' => $this->request->getPost('charges_per_qtl'),
-                'total_expend' => $this->request->getPost('total_expend'),
-                'total_turnover' => $this->request->getPost('total_turnover'),
-                'created_at' => $this->request->getPost('created_at'),
+            if (!empty($entdata) && isset($entdata[0])) {
+                $entdata = $entdata[0];
 
+                $unit_groups = $this->columns;
 
-            ];
-            // dd($id);
-            // printr($enterprisetransdata);
-            // exit;
+                foreach ($unit_groups as $key => $columns) {
+                    if ($key == $entdata->unit_group_name) {
+
+                        foreach ($columns as $columnName => $columnValue) {
+                            $enterprisetransdata[$columnName] = $this->request->getPost($columnName);
+                        }
+                    }
+                }
+            }
 
             $establishmenttrasdtl->update($id, $enterprisetransdata);
 
@@ -207,31 +208,44 @@ class EstablishmentTransaction extends AdminController
     {
         helper('form');
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
+        $data['unit_groups'] = $this->columns;
         $id = $this->request->getGet('id');
-
         if ($id) {
-            $entdata = $establishmenttrasdtl->txnidswisetrans($id);
-            
-            $data['entranses'] = [
-                'year_id' => $entdata['year_name'],
-                'unit_id' => $entdata['unit_name'],
-                'district_id' => $entdata['district_name'],
-                'block_id' => $entdata['block_name'],
-                'month_id' => $entdata['month_name'],
-                'gp_id' => $entdata['gp_name'],
-                'village_id' => $entdata['village_name'],
-                'period' => $entdata['period'],
-                'created_at' => ymdToDmy($entdata['created_at']) ?: 0,
-                'no_of_days_functional' => $entdata['no_of_days_functional'] ?: 0,
-                'produced' => $entdata['produced'] ?: 0,
-                'charges_per_qtl' => $entdata['charges_per_qtl'] ?: 0,
-                'total_expend' => $entdata['total_expend'] ?: 0,
-                'total_turnover' => $entdata['total_turnover'] ?: 0,
-            ];
+            $entdata = $establishmenttrasdtl->idwisetrans($id);
+            if (!empty($entdata) && isset($entdata[0])) {
+                $entdata = $entdata[0];
+
+                $entranses = [
+                    'year_name' => $entdata->year_name,
+                    'unit_name' => $entdata->unit_name,
+                    'unit_group_name' => $entdata->unit_group_name,
+                    'district_name' => $entdata->district_name,
+                    'block_name' => $entdata->block_name,
+                    'month_name' => $entdata->month_name,
+                    'gp_name' => $entdata->gp_name,
+                    'village_name' => $entdata->village_name,
+                    'period' => $entdata->period,
+                    'created_at' => ymdToDmy($entdata->created_at) ?: 0,
+                    'no_of_days_functional' => $entdata->no_of_days_functional ?: 0,
+                    'produced' => $entdata->produced ?: 0,
+                    'charges_per_qtl' => $entdata->charges_per_qtl ?: 0,
+                    'total_expend' => $entdata->total_expend ?: 0,
+                    'total_turnover' => $entdata->total_turnover ?: 0,
+                    'under_maintenance' => $entdata->under_maintenance ?: 0,
+                    'event_attend' => $entdata->event_attend ?: 0,
+                    'farmer_user' => $entdata->farmer_user ?: 0,
+                    'service_charge' => $entdata->service_charge ?: 0,
+                    'seed_support' => $entdata->seed_support ?: 0,
+                    'seed_store' => $entdata->seed_store ?: 0,
+                ];
+
+                $data['entranses'] = $entranses;
+            }
+            return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
         }
 
-        return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
     }
+
 
 
     public function download()
@@ -244,31 +258,23 @@ class EstablishmentTransaction extends AdminController
         $enterpriseunitsmodel = new EnterprisesUnitModel();
         $establishmentransaction = new EstablishmentTransactionModel();
         $ugModel = new EnterpriseUnitGroup();
-
-
         $unit_groups = $ugModel->findAll();
-
         $worksheet_unit = [];
-
         foreach ($unit_groups as $group) {
             $units = $enterpriseunitsmodel->getAll(['unit_group_id' => $group->id]);
             $group->units = $units;
         }
-
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
         $district_id = $this->request->getGet('district_id');
         $period = $this->request->getGet('period');
-
         $month_name = $monthmodel->find($month_id)->name;
         $year_name = $yearmodel->find($year_id)->name;
         $filename = 'EntTxnTemplate_' . $month_name . '_' . $year_name . '_' . date('Y-m-d_His') . '.xlsx';
-
         $sheetindex = 0;
         $reader = new Html();
         $doc = new \DOMDocument();
         $spreadsheet = new Spreadsheet();
-
         $data = [
             'month_id' => $month_id,
             'year_id' => $year_id,
