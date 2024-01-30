@@ -29,25 +29,55 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class EstablishmentTransaction extends AdminController
 {
+    private $columns = [
+        'Machinary' => [
+            'no_of_days_functional' => 'No. of Days Functional',
+            'total_turnover' => 'Total turnover / sale value',
+            'produced' => 'Quintals of Produce processed',
+            'total_expend' => 'Total expenditure',
+            'under_maintenance' => 'No. of times under maintenance',
+        ],
+        'Food' => [
+            'no_of_days_functional' => 'No. of Days Functional',
+            'total_turnover' => 'Total turnover / sale value',
+            'total_expend' => 'Total expenditure',
+            'event_attend' => 'No. of event attend',
+        ],
+        'CHC' => [
+            'farmer_user' => 'NO. of farmer user',
+            'service_charge' => 'Value of service charge collected (in rupees)',
+            'total_expend' => 'Expenditure if any(rupees)',
+        ],
+        'CMSC' => [
+            'farmer_user' => 'NO. of farmer user',
+            'seed_support' => 'Quantity of seed supported (in quintals)',
+            'seed_store' => 'Quantity of seed in store (in quintals)',
+            'service_charge' => 'Value of service charges & sale of seed',
+            'total_expend' => 'Expenditure if any (in rupees)',
+        ],
+    ];
+
     public function index()
     {
         helper('form');
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
         $establishmentransaction = new EstablishmentTransactionModel();
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
-        $yearmodel = new YearModel();
+        $yearModel = new YearModel();
         $data['years'][0] = 'Select Year';
 
         $data['year_id'] = 0;
-        $years = $yearmodel->findAll();
+        $years = $yearModel->findAll();
 
         foreach ($years as $year) {
             $data['years'][$year->id] = $year->name;
         }
 
+        $data['year_id'] = $yearModel->getCurrentYear()->id;;
         if ($this->request->getGet('year_id')) {
             $data['year_id'] = $this->request->getGet('year_id');
         }
+
         $monthmodel = new MonthModel();
         $data['months'][0] = 'Select Month';
 
@@ -64,13 +94,17 @@ class EstablishmentTransaction extends AdminController
         $districtmodel = new DistrictModel();
         $data['districts'][0] = 'Select Districts';
 
-        $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+        if ($this->user->district_id) {
+            $districts = $districtmodel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+        } else {
+            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+        }
 
         foreach ($districts as $district) {
             $data['districts'][$district->id] = $district->name;
         }
 
-        $data['district_id'] = 0;
+        $data['district_id'] = $this->user->district_id;
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
@@ -134,8 +168,8 @@ class EstablishmentTransaction extends AdminController
             ];
             // printr($data);exit;
         }
-        $data['excel_link'] = admin_url('enterprises/download');
-        $data['upload_url'] = admin_url('enterprises/upload');
+        $data['excel_link'] = admin_url('enterprisestrans/download');
+        $data['upload_url'] = admin_url('enterprisestrans/upload');
 
         // dd($data['excel_link']);
 
@@ -174,36 +208,31 @@ class EstablishmentTransaction extends AdminController
         helper('form');
         $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
         $id = $this->request->getGet('id');
-        // dd($id);
+
         if ($id) {
-
-            $entdata = $establishmenttrasdtl->periodswisetrans();
-            // dd($entdata);
-            foreach ($entdata as $value) {
-
-                $data['entranses'] = [
-                    'year_id' => $value->year_name,
-                    'unit_id' => $value->unit_name,
-                    'district_id' => $value->district_name,
-                    'block_id' => $value->block_name,
-                    'month_id' => $value->month_name,
-                    'gp_id' => $value->gp_name,
-                    'village_id' => $value->village_name,
-                    'period' => $value->period,
-                    'created_at' => ymdToDmy($value->created_at) ?: 0,
-                    'no_of_days_functional' => $value->no_of_days_functional ?: 0,
-                    'produced' => $value->produced ?: 0,
-                    'charges_per_qtl' => $value->charges_per_qtl ?: 0,
-                    'total_expend' => $value->total_expend ?: 0,
-                    'total_turnover' => $value->total_turnover ?: 0,
-
-                ];
-            }
+            $entdata = $establishmenttrasdtl->txnidswisetrans($id);
+            
+            $data['entranses'] = [
+                'year_id' => $entdata['year_name'],
+                'unit_id' => $entdata['unit_name'],
+                'district_id' => $entdata['district_name'],
+                'block_id' => $entdata['block_name'],
+                'month_id' => $entdata['month_name'],
+                'gp_id' => $entdata['gp_name'],
+                'village_id' => $entdata['village_name'],
+                'period' => $entdata['period'],
+                'created_at' => ymdToDmy($entdata['created_at']) ?: 0,
+                'no_of_days_functional' => $entdata['no_of_days_functional'] ?: 0,
+                'produced' => $entdata['produced'] ?: 0,
+                'charges_per_qtl' => $entdata['charges_per_qtl'] ?: 0,
+                'total_expend' => $entdata['total_expend'] ?: 0,
+                'total_turnover' => $entdata['total_turnover'] ?: 0,
+            ];
         }
-
 
         return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
     }
+
 
     public function download()
     {
@@ -222,25 +251,9 @@ class EstablishmentTransaction extends AdminController
         $worksheet_unit = [];
 
         foreach ($unit_groups as $group) {
-            $units = $enterpriseunitsmodel->getAll(['unit_group_id'=>$group->id]);
+            $units = $enterpriseunitsmodel->getAll(['unit_group_id' => $group->id]);
             $group->units = $units;
         }
-        
-        // foreach ($unit_groups as $group) {
-
-        //     $filter = [
-        //         'id' => $unit->id,
-        //         'district_id' => $district_id
-        //     ];
-        //     $details = $enterpriseunitsmodel->getAll($filter);
-
-        //     $group = $ugModel->find($unit->unit_group_id);
-
-        //     $worksheet_unit[$key]['id'] = $unit->id;
-        //     $worksheet_unit[$key]['name'] = $unit->name;
-        //     $worksheet_unit[$key]['unit_group'] = $group->name;
-        //     $worksheet_unit[$key]['details'] = $details;
-        // }
 
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
@@ -256,162 +269,119 @@ class EstablishmentTransaction extends AdminController
         $doc = new \DOMDocument();
         $spreadsheet = new Spreadsheet();
 
-        $columns = [
-            'machinary' => [
-                'no_of_days_functional' => 'No. of Days Functional',
-                'total_turnover' => 'Total turnover / sale value',
-                'produced' => 'Quintals of Produce processed',
-                'total_expend' => 'Total expenditure',
-                'under_maintenance' => 'No. of times under maintenance',
-            ],
-            'food' => [
-                'no_of_days_functional' => 'No. of Days Functional',
-                'total_turnover' => 'Total turnover / sale value',
-                'total_expend' => 'Total expenditure',
-                'event_attend' => 'No. of event attend',
-            ],
-            'chc' => [
-                'farmer_user' => 'NO. of farmer user',
-                'service_charge' => 'Value of service charge collected (in rupees)',
-                'total_expend' => 'Expenditure if any(rupees)',
-            ],
-            'cmsc' => [
-                'farmer_user' => 'NO. of farmer user',
-                'seed_support' => 'Quantity of seed supported (in quintals)',
-                'seed_store' => 'Quantity of seed in store (in quintals)',
-                'service_charge' => 'Value of service charges & sale of seed',
-                'total_expend' => 'Expenditure if any (in rupees)',
-            ],
+        $data = [
+            'month_id' => $month_id,
+            'year_id' => $year_id,
+            'district_id' => $district_id,
+            'period' => $period
         ];
 
-
+        //loop through all unit groups
         foreach ($unit_groups as $group) {
 
-            $title = $group->name;
-            
-            $heading = "Enterprise Transaction ".ucfirst($title)." Data";
-
-            $data = [
-                'month_id' => $month_id,
-                'year_id' => $year_id,
-                'district_id' => $district_id,
-                'period' => $period
-            ];
-            $data['heading_title'] = $heading;
-
             // fetch enterprises by district_id and unit_id
-            
-            foreach($group->units as &$unit){
-                $ents = $enterprisesmodel->where([
-                    'district_id'=>15,
+            foreach ($group->units as &$unit) {
+                $enterprises = $enterprisesmodel->getBy([
+                    'district_id' => $district_id,
                     'unit_id' => $unit['id']
-                ])->findAll();
-                $unit['enterprises'] = $ents;
-            }
+                ]);
+                $unit['enterprises'] = $enterprises;
+                $group->columns = [];
 
-            $data['units'] = [];
-            foreach ($units as $unit) {
-                $data['units'][$unit->id] = [
-                    'unit_name' => $unit->name,
-                    'id' => $unit->id,
-                    'enterprises' => $establishmentransaction->getAll($unit->id, $district_id)
-                ];
-            }
+                //if enterprises are available then add columns
+                if ($enterprises) {
+                    $group->columns = $this->columns[$unit['unit_group']];
 
-            $data['columns'] = $columns[$unit->name];
+                    $data['columns'] = $this->columns[$unit['unit_group']];
 
-            $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
-            echo $htmltable;
-            continue;
-            exit;
-            $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
+                    // heading title
+                    $title = $unit['unit_group'];
+                    $data['heading_title'] = "Enterprise Transaction " . ucfirst($title) . " Data";
 
-            $worksheet = $spreadsheet->createSheet($sheetindex);
+                    $data['enterprises'] = $enterprises;
 
-            $worksheet->setTitle($title);
+                    $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
 
-            $reader->setSheetIndex($sheetindex);
-            $spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
+                    $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
-            $worksheet = $spreadsheet->getActiveSheet();
+                    $worksheet = $spreadsheet->createSheet($sheetindex);
 
-            // Load HTML content into a DOM object for formatting from class
-            $doc->loadHTML($htmltable);
+                    $worksheet->setTitle($title);
 
-            $rows = $doc->getElementsByTagName('tr');
+                    $reader->setSheetIndex($sheetindex);
+                    $spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
 
-            //formatting and designing
-            foreach ($worksheet->getRowIterator() as $row) {
-                // Find the corresponding row element in the HTML table
-                $rowIndex = $row->getRowIndex();
+                    $worksheet = $spreadsheet->getActiveSheet();
 
-                $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
+                    // Load HTML content into a DOM object for formatting from class
+                    $doc->loadHTML($htmltable);
 
-                // Get the class name of the row element
-                $className = $rowElement->getAttribute('class');
+                    $rows = $doc->getElementsByTagName('tr');
 
-                // Check if the class name matches a highlight class from the HTML table
-                if (preg_match('/highlight-(\w+)/', $className, $matches)) {
-                    $highlightClass = $matches[1];
+                    //formatting and designing
+                    foreach ($worksheet->getRowIterator() as $row) {
+                        // Find the corresponding row element in the HTML table
+                        $rowIndex = $row->getRowIndex();
 
-                    // Set the fill color based on the highlight class
-                    $fillColor = null;
-                    switch ($highlightClass) {
-                        case 'heading1':
-                            $fillColor = ExcelStyles::heading1();
-                            break;
-                        case 'heading2':
-                            $fillColor = ExcelStyles::heading2();
-                            break;
-                        case 'heading3':
-                            $fillColor = ExcelStyles::heading3();
-                            break;
-                        case 'heading4':
-                            $fillColor = ExcelStyles::fill_yellow();
-                            break;
+                        $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
+
+                        // Get the class name of the row element
+                        $className = $rowElement->getAttribute('class');
+
+                        // Check if the class name matches a highlight class from the HTML table
+                        if (preg_match('/highlight-(\w+)/', $className, $matches)) {
+                            $highlightClass = $matches[1];
+
+                            // Set the fill color based on the highlight class
+                            $fillColor = null;
+                            switch ($highlightClass) {
+                                case 'heading1':
+                                    $fillColor = ExcelStyles::heading1();
+                                    break;
+                                case 'heading2':
+                                    $fillColor = ExcelStyles::heading2();
+                                    break;
+                                case 'heading3':
+                                    $fillColor = ExcelStyles::heading3();
+                                    break;
+                                case 'heading4':
+                                    $fillColor = ExcelStyles::fill_yellow();
+                                    break;
+                            }
+
+                            if ($fillColor) {
+                                $lastColumnIndex = $worksheet->getHighestColumn();
+                                $range = 'A' . $rowIndex . ':' . $lastColumnIndex . $rowIndex;
+                                $worksheet->getStyle($range)->applyFromArray($fillColor);
+                            }
+                        }
+
+                        // Set auto-size column widths for all columns
+                        $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
+
+                        $highestRow = $worksheet->getHighestRow();
+
+                        foreach ($colsToWrap as $colToWrap) {
+                            $range = $colToWrap . '1:' . $colToWrap . $highestRow;
+
+                            $style = $worksheet->getStyle($range);
+                            $style->getAlignment()->setWrapText(true);
+                        }
+
+                        //hide the id columns
+                        if ($worksheet) {
+                            $worksheet->getColumnDimension('A')->setVisible(false);
+                            $worksheet->getColumnDimension('B')->setVisible(false);
+                            $worksheet->getColumnDimension('E')->setVisible(false);
+                            $worksheet->getColumnDimension('G')->setVisible(false);
+                            $worksheet->getColumnDimension('I')->setVisible(false);
+                            $worksheet->getRowDimension('1')->setVisible(false);
+                            $worksheet->getRowDimension('2')->setVisible(false);
+                        }
                     }
-
-                    if ($fillColor) {
-                        $lastColumnIndex = $worksheet->getHighestColumn();
-                        $range = 'A' . $rowIndex . ':' . $lastColumnIndex . $rowIndex;
-                        $worksheet->getStyle($range)->applyFromArray($fillColor);
-                    }
-                }
-
-                // Set auto-size column widths for all columns
-                $colsToWrap = ['D', 'F', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q'];
-
-                $highestRow = $worksheet->getHighestRow();
-
-                foreach ($colsToWrap as $colToWrap) {
-                    $range = $colToWrap . '1:' . $colToWrap . $highestRow;
-
-                    $style = $worksheet->getStyle($range);
-                    $style->getAlignment()->setWrapText(true);
-                }
-
-                //$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-                //$writer->save('output_file.xlsx');
-                if ($worksheet) {
-                    $worksheet->getColumnDimension('A')->setVisible(false);
-                    $worksheet->getColumnDimension('B')->setVisible(false);
-                    $worksheet->getColumnDimension('E')->setVisible(false);
-                    $worksheet->getColumnDimension('G')->setVisible(false);
-                    $worksheet->getColumnDimension('I')->setVisible(false);
-                    $worksheet->getRowDimension('1')->setVisible(false);
-                    $worksheet->getRowDimension('2')->setVisible(false);
-                    $worksheet->getColumnDimension('Q')->setVisible(false);
-
-
-                    if ($title == "Food Unit") {
-                        $worksheet->getColumnDimension('L')->setVisible(false);
-                        $worksheet->getColumnDimension('M')->setVisible(false);
-                        $worksheet->getColumnDimension('P')->setVisible(false);
-                        $worksheet->getColumnDimension('Q')->setVisible(true);
-                    }
+                    $sheetindex++;
                 }
             }
-            $sheetindex++;
         }
 
         //remove the default worksheet
@@ -473,67 +443,68 @@ class EstablishmentTransaction extends AdminController
             $url = admin_url('enterprises/transaction');
             $status = false;
             $message = '';
-            $total_sheets = $spreadsheet->getSheetCount();
 
-            $transaction_id = 0;
+            //check existing data
+            $activesheet = $spreadsheet->getSheet(0);
 
-            for ($i = 0; $i < $total_sheets; $i++) {
-                $activesheet = $spreadsheet->getSheet($i);
+            $row_data = $activesheet->toArray();
 
-                $row_data = $activesheet->toArray();
+            $year_id = $row_data[1][0];
+            $district_id = $row_data[1][1];
+            $month_id = $row_data[1][2];
+            $period = $row_data[1][3];
 
-                $year_id = $row_data[1][0];
-                $district_id = $row_data[1][1];
-                $month_id = $row_data[1][2];
-                $period = $row_data[1][3];
+            //check if exists
+            $data = [
+                'year_id' => $year_id,
+                'district_id' => $district_id,
+                'month_id' => $month_id,
+                'period' => $period,
+            ];
 
-                //skip 3 rows
-                $row_data = array_slice($row_data, 3);
+            $exists = $enterprisestransaction->isExists($data);
 
-                //check if exists
-                $data = [
-                    'year_id' => $year_id,
-                    'district_id' => $district_id,
-                    'month_id' => $month_id,
-                    'period' => $period,
-                ];
+            if ($exists) {
+                $status = false;
+                $message = 'Enterprise data for the given period already exists.';
+            } else {
+                $total_sheets = $spreadsheet->getSheetCount();
 
-                $exists = $enterprisestransaction->isExists([
-                    'year_id' => $year_id,
-                    'district_id' => $district_id,
-                    'month_id' => $month_id,
-                    'period' => $period,
-                ]);
-                if ($exists) {
-                    $status = false;
-                    $message = 'Enterprise data for the given period already exists.';
-                } else {
+                for ($i = 0; $i < $total_sheets; $i++) {
+                    $activesheet = $spreadsheet->getSheet($i);
+
+                    $row_data = $activesheet->toArray();
+
+                    //skip 3 rows
+                    $row_data = array_slice($row_data, 3);
+
                     foreach ($row_data as $key => $transaction) {
                         //only rows with gp_id
                         if (is_numeric($transaction[1])) {
                             $data = [
-                                'unit_id' => $transaction[0],
-                                'year_id' => $year_id,
-                                'district_id' => $district_id,
-                                'month_id' => $month_id,
-                                'period' => $period,
+                                'unit_id' => (int)$transaction[0],
+                                'year_id' => (int)$year_id,
+                                'district_id' => (int) $district_id,
+                                'month_id' => (int)$month_id,
+                                'period' => (int)$period,
                             ];
 
                             $transaction_id = $enterprisestransaction->insert($data);
 
                             $data = [
-                                'enterprise_id' => $transaction[1],
-                                'transaction_id' => $transaction_id,
-                                'block_id' => $transaction[4],
-                                'gp_id' => $transaction[6],
-                                'village_id' => $transaction[8],
-                                'no_of_days_functional' => $transaction[10],
-                                'produced' => $transaction[11],
-                                'charges_per_qtl' => $transaction[12],
-                                'total_expend' => $transaction[13],
-                                'total_turnover' => $transaction[14],
-
+                                'enterprise_id' => (int)$transaction[1],
+                                'transaction_id' => (int) $transaction_id,
+                                'block_id' => (int) $transaction[4],
+                                'gp_id' => (int)$transaction[6],
+                                'village_id' => (int) $transaction[8],
                             ];
+
+                            //get columns by sheet name
+                            $col = 10;
+                            $columns = $this->columns[$spreadsheet->getSheetNames()[$i]];
+                            foreach ($columns as $key => $value) {
+                                $data[$key] = (float)$transaction[$col++];
+                            }
 
                             $enterprisetransdetails->insert($data);
                             $status = true;
@@ -553,14 +524,5 @@ class EstablishmentTransaction extends AdminController
         $this->session->setFlashdata('message', $message);
 
         return $this->response->setJSON($response);
-    }
-
-    protected function _group_by($array, $key)
-    {
-        $return = array();
-        foreach ($array as $val) {
-            $return[$val[$key]][] = $val;
-        }
-        return $return;
     }
 }

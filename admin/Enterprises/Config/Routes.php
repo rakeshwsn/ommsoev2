@@ -24,11 +24,11 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
     $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::index');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
-    $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
+    $routes->get('enterprisestrans/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
     $routes->add('enterprises/delete', 'Enterprises\Controllers\EstablishmentTransaction::delete');
     
-    $routes->add('enterprises/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
+    $routes->add('enterprisestrans/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 
     $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');
     $routes->add('enterprises/center', 'Enterprises\Controllers\Enterprises::ajaxcenter');

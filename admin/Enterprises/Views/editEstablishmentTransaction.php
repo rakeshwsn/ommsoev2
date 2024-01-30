@@ -3,44 +3,44 @@
         <div class="block-header block-header-default">
             <h3 class="block-title">Edit</h3>
         </div>
-       
+
         <div class="block-content block-content-full">
             <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                 <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
                 <div class="row">
                     <div class="col-4">
                         <label class="form-label">Year</label>
-                        <input type="text" name="" class="form-control"  value="<?= $entranses['year_id']?>"readonly>          
+                        <input type="text" name="" class="form-control" value="<?= $entranses['year_id'] ?>" readonly>
                         <span id="em1" class="text-danger"></span>
 
                     </div>
                     <div class="col-4">
                         <label class="form-label">District</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['district_id']?>"readonly>                 
+                        <input type="text" name="" class="form-control" value="<?= $entranses['district_id'] ?>" readonly>
                         <span id="em2" class="text-danger"></span>
 
                     </div>
                     <div class="col-4">
                         <label class="form-label">Months</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['month_id']?>"readonly>                    
+                        <input type="text" name="" class="form-control" value="<?= $entranses['month_id'] ?>" readonly>
                         <span id="em3" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-4">
                         <label class="form-label">Block</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['block_id']?>"readonly>                        
+                        <input type="text" name="" class="form-control" value="<?= $entranses['block_id'] ?>" readonly>
                         <span id="em6" class="text-danger"></span>
                     </div>
                     <div class="col-4">
                         <label class="form-label">Gp</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['gp_id']?>"readonly>              
+                        <input type="text" name="" class="form-control" value="<?= $entranses['gp_id'] ?>" readonly>
                         <span id="em9" class="text-danger"></span>
                     </div>
 
                     <div class="col-4">
                         <label class="form-label">Village</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['village_id']?>"readonly>
+                        <input type="text" name="" class="form-control" value="<?= $entranses['village_id'] ?>" readonly>
                         <span id="em5" class="text-danger"></span>
                     </div>
                 </div>
@@ -48,13 +48,13 @@
 
                     <div class="col-4">
                         <label class="form-label">Unit Type</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['unit_id']?>"readonly>           
-                         <span id="em3" class="text-danger"></span>
+                        <input type="text" name="" class="form-control" value="<?= $entranses['unit_id'] ?>" readonly>
+                        <span id="em3" class="text-danger"></span>
 
                     </div>
                     <div class="col-4">
                         <label class="form-label">Fortnight</label>
-                        <input type="text" name="" class="form-control" value="<?= $entranses['period']?>"readonly>             
+                        <input type="text" name="" class="form-control" value="<?= $entranses['period'] ?>" readonly>
 
                         <span id="em" class="text-danger"></span>
                     </div>
@@ -67,7 +67,7 @@
 
     <div class="block">
         <div class="block-header block-header-default">
-            <h3 class="block-title"> Edit Transaction  Data</h3>
+            <h3 class="block-title"> Edit Transaction Data</h3>
         </div>
         <div class="block-content block-content-full">
             <div class="block">
@@ -83,13 +83,14 @@
                                         <th>Charges per Quintal</th>
                                         <th>Total Expenditure in the fortnight</th>
                                         <th>Total Tourn Over in the fortnight</th>
+                                        
                                     </tr>
                                 </thead>
-                              
+
                                 <tbody>
 
                                     <tr class="odd">
-                                        <td><input type="date_create" name="created_at" class="form-control" value="<?= $entranses['created_at']?>"></td>
+                                        <td><input type="date_create" name="created_at" class="form-control" value="<?= $entranses['created_at'] ?>"></td>
                                         <td><input type="text" name="no_of_days_functional" class="form-control" value="<?= $entranses['no_of_days_functional'] ?>"></td>
                                         <td><input type="text" name="produced" class="form-control" value="<?= $entranses['produced'] ?>"></td>
                                         <td><input type="text" name="charges_per_qtl" class="form-control" value="<?= $entranses['charges_per_qtl'] ?>"></td>
