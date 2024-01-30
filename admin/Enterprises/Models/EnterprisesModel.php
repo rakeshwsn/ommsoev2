@@ -102,6 +102,7 @@ class EnterprisesModel extends Model
     // exit;
     return $this->db->query($sql)->getResult();
   }
+
   public function yearWise($district_id)
   {
     $sql = "SELECT
@@ -116,6 +117,7 @@ class EnterprisesModel extends Model
     //     exit;
     return $this->db->query($sql)->getResult();
   }
+
   /**
    * This method is called from establishemntreport for districtwise report generation.
    *
@@ -123,6 +125,7 @@ class EnterprisesModel extends Model
    * 
    * @return array $result
    */
+
   public function districtwiseUnits($filter)
   {
     $sql = "SELECT
@@ -188,6 +191,7 @@ class EnterprisesModel extends Model
     // exit;
     return $this->db->query($sql)->getResult();
   }
+
   /**
    * This method is called from establishemntreport for blockwise report generation.
    *
@@ -264,6 +268,7 @@ class EnterprisesModel extends Model
     // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
+
   /**
    * This method is called from establishemntreport for gpwise report generation.
    *
@@ -339,6 +344,7 @@ class EnterprisesModel extends Model
     // dd($sql);
     return $this->db->query($sql)->getResult();
   }
+
   public function main_center($district_id, $block_id, $units)
   {
     $sql = "SELECT
@@ -357,6 +363,7 @@ class EnterprisesModel extends Model
     //  print_r($sql);exit;
     return $this->db->query($sql)->getResult();
   }
+
   public function equipment($id)
   {
     $sql = "SELECT
@@ -369,6 +376,28 @@ class EnterprisesModel extends Model
       ON e.equipment_id = eq.id  WHERE e.ent_id = $id";
     // printr($sql);
     // exit;
+    return $this->db->query($sql)->getResult();
+  }
+
+  public function getBy($filter)
+  {
+    $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
+    e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
+    eu.name unit_name FROM enterprises e 
+    LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
+    LEFT JOIN soe_blocks b ON e.block_id=b.id 
+    LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id 
+    LEFT JOIN villages v ON e.village_id=v.id 
+    WHERE e.deleted_at IS NULL";
+
+    if (!empty($filter['district_id'])) {
+      $sql .= " AND e.district_id= " . (int)$filter['district_id'];
+    }
+
+    if (!empty($filter['unit_id'])) {
+      $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
+    }
+
     return $this->db->query($sql)->getResult();
   }
 }

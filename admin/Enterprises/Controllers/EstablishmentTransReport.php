@@ -1,16 +1,12 @@
 <?php
 
 namespace Admin\Enterprises\Controllers;
-
 use Admin\Dashboard\Models\EnterpriseModel;
 use Admin\Dashboard\Models\BlockModel;
 use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\EnterprisesModel;
-// use Admin\Enterprises\Models\EnterprisesUnitModel;
-// use Admin\Enterprises\Models\GpModel;
-// use Admin\Enterprises\Models\VillagesModel;
 use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -37,7 +33,6 @@ class EstablishmentTransReport extends AdminController
 		$yearmodel = new YearModel();
 		$monthmodel = new MonthModel();
 		$request = $this->request->getGet('request');
-		// $enterprisesunitmodel = new EnterprisesUnitModel();
 		$data['districts'][0] = 'Select District';
 		$districts = $distModel->orderBy('name', 'asc')->findAll();
 		foreach ($districts as $district) {
