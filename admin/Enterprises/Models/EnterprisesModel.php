@@ -6,43 +6,43 @@ use CodeIgniter\Model;
 
 class EnterprisesModel extends Model
 {
-  protected $DBGroup              = 'default';
-  protected $table                = 'enterprises';
-  protected $primaryKey           = 'id';
-  protected $useAutoIncrement     = true;
-  protected $insertID             = 0;
-  protected $returnType           = 'object';
-  protected $useSoftDeletes        = true;
-  protected $protectFields        = false;
-  protected $allowedFields        = [];
+    protected $DBGroup = 'default';
+    protected $table = 'enterprises';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $insertID = 0;
+    protected $returnType = 'object';
+    protected $useSoftDeletes = true;
+    protected $protectFields = false;
+    protected $allowedFields = [];
 
-  // Dates
-  protected $useTimestamps        = true;
-  protected $dateFormat           = 'datetime';
-  protected $createdField         = 'created_at';
-  protected $updatedField         = 'updated_at';
-  protected $deletedField         = 'deleted_at';
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
-  // Validation
-  protected $validationRules      = [];
-  protected $validationMessages   = [];
-  protected $skipValidation       = false;
-  protected $cleanValidationRules = true;
+    // Validation
+    protected $validationRules = [];
+    protected $validationMessages = [];
+    protected $skipValidation = false;
+    protected $cleanValidationRules = true;
 
-  // Callbacks
-  protected $allowCallbacks       = true;
-  protected $beforeInsert         = [];
-  protected $afterInsert          = [];
-  protected $beforeUpdate         = [];
-  protected $afterUpdate          = [];
-  protected $beforeFind           = [];
-  protected $afterFind            = [];
-  protected $beforeDelete         = [];
-  protected $afterDelete          = [];
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
 
-  public function getAll($filter = [])
-  {
-    $sql = "SELECT
+    public function getAll($filter = [])
+    {
+        $sql = "SELECT
     e.id,
     e.unit_id,
     e.district_id,
@@ -79,33 +79,33 @@ class EnterprisesModel extends Model
     LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
    WHERE e.deleted_at IS NULL";
 
-    if (isset($filter['district_id'])) {
-      $sql .= " AND e.district_id = " . $filter['district_id'];
-    }
-    if (isset($filter['block_id'])) {
-      $sql .= " AND e.block_id = " . $filter['block_id'];
-    }
-    if (isset($filter['unit_id'])) {
-      $sql .= " AND e.unit_id = " . $filter['unit_id'];
-    }
-    if (isset($filter['doeyear'])) {
-      $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
-    }
+        if (isset($filter['district_id'])) {
+            $sql .= " AND e.district_id = " . $filter['district_id'];
+        }
+        if (isset($filter['block_id'])) {
+            $sql .= " AND e.block_id = " . $filter['block_id'];
+        }
+        if (isset($filter['unit_id'])) {
+            $sql .= " AND e.unit_id = " . $filter['unit_id'];
+        }
+        if (isset($filter['doeyear'])) {
+            $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
+        }
 
-    if (isset($filter["management_unit_type"])) {
-      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'
+        if (isset($filter["management_unit_type"])) {
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'
        
       ";
+        }
+        // $sql .=  " ORDER BY sd.name ASC";
+        // printr($sql);
+        // exit;
+        return $this->db->query($sql)->getResult();
     }
-    // $sql .=  " ORDER BY sd.name ASC";
-    // printr($sql);
-    // exit;
-    return $this->db->query($sql)->getResult();
-  }
 
-  public function yearWise($district_id)
-  {
-    $sql = "SELECT
+    public function yearWise($district_id)
+    {
+        $sql = "SELECT
     e.id,
     e.district_id,
     YEAR(e.date_estd) year
@@ -113,22 +113,22 @@ class EnterprisesModel extends Model
     WHERE e.district_id = $district_id  AND YEAR(e.date_estd) > 2000
     GROUP BY year
     ORDER BY year ";
-    //  printr($sql);
-    //     exit;
-    return $this->db->query($sql)->getResult();
-  }
+        //  printr($sql);
+        //     exit;
+        return $this->db->query($sql)->getResult();
+    }
 
-  /**
-   * This method is called from establishemntreport for districtwise report generation.
-   *
-   * @param array   $filter 
-   * 
-   * @return array $result
-   */
+    /**
+     * This method is called from establishemntreport for districtwise report generation.
+     *
+     * @param array $filter
+     *
+     * @return array $result
+     */
 
-  public function districtwiseUnits($filter)
-  {
-    $sql = "SELECT
+    public function districtwiseUnits($filter)
+    {
+        $sql = "SELECT
     disunit.unit_id,
     disunit.unit,
     disunit.district_id,
@@ -159,49 +159,49 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-    if (isset($filter['year_id']) && $filter['year_id']) {
-      $sql .= " AND dy.id = " . $filter['year_id'];
-    }
-    if (isset($filter['month']) && $filter['month']) {
-      $sql .= " AND sm.id = " . $filter['month'];
-    }
-    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-      $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
-    }
-    if (isset($filter['unit_type'])) {
-      if ($filter['unit_type'] == 'without_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'without_mou_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'only_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
-      }
-    }
-    $sql .= " GROUP BY e.unit_id, e.district_id
+        if (isset($filter['year_id']) && $filter['year_id']) {
+            $sql .= " AND dy.id = " . $filter['year_id'];
+        }
+        if (isset($filter['month']) && $filter['month']) {
+            $sql .= " AND sm.id = " . $filter['month'];
+        }
+        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+        }
+        if (isset($filter['unit_type'])) {
+            if ($filter['unit_type'] == 'without_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'without_mou_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'only_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+            }
+        }
+        $sql .= " GROUP BY e.unit_id, e.district_id
       ORDER BY e.district_id) res
       ON disunit.district_id = res.district_id
       AND disunit.unit_id = res.unit_id
 
  ";
 
-    $sql .=  " ORDER BY unit_id, district";
-    // echo $sql;
-    // exit;
-    return $this->db->query($sql)->getResult();
-  }
+        $sql .= " ORDER BY unit_id, district";
+        // echo $sql;
+        // exit;
+        return $this->db->query($sql)->getResult();
+    }
 
-  /**
-   * This method is called from establishemntreport for blockwise report generation.
-   *
-   * @param array   $filter 
-   * 
-   * @return array $result
-   */
-  public function blockwiseUnits($filter)
-  {
-    $sql = "SELECT
+    /**
+     * This method is called from establishemntreport for blockwise report generation.
+     *
+     * @param array $filter
+     *
+     * @return array $result
+     */
+    public function blockwiseUnits($filter)
+    {
+        $sql = "SELECT
     blkunit.block_id,
     blkunit.block,
     blkunit.district_id,
@@ -234,51 +234,51 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-    if (isset($filter['year_id'])) {
-      $sql .= " AND dy.id = " . $filter['year_id'];
-    }
-    if (isset($filter['month'])) {
-      $sql .= " AND sm.id = " . $filter['month'];
-    }
-    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
-    }
+        if (isset($filter['year_id'])) {
+            $sql .= " AND dy.id = " . $filter['year_id'];
+        }
+        if (isset($filter['month'])) {
+            $sql .= " AND sm.id = " . $filter['month'];
+        }
+        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+            $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+        }
 
-    if (isset($filter['unit_type'])) {
-      if ($filter['unit_type'] == 'without_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'without_mou_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'only_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
-      }
-    }
-    $sql .= " GROUP BY e.unit_id,
+        if (isset($filter['unit_type'])) {
+            if ($filter['unit_type'] == 'without_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'without_mou_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'only_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+            }
+        }
+        $sql .= " GROUP BY e.unit_id,
                e.block_id) res
       ON blkunit.block_id = res.block_id
       AND blkunit.unit_id = res.unit_id";
 
-    if (isset($filter['district_id'])) {
-      $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];
+        if (isset($filter['district_id'])) {
+            $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];
+        }
+
+        $sql .= " ORDER BY unit_id, block";
+        // echo $sql;exit;
+        return $this->db->query($sql)->getResult();
     }
 
-    $sql .=  " ORDER BY unit_id, block";
-    // echo $sql;exit;
-    return $this->db->query($sql)->getResult();
-  }
-
-  /**
-   * This method is called from establishemntreport for gpwise report generation.
-   *
-   * @param array   $filter 
-   * 
-   * @return array $result
-   */
-  public function gpwiseUnits($filter)
-  {
-    $sql = "SELECT
+    /**
+     * This method is called from establishemntreport for gpwise report generation.
+     *
+     * @param array $filter
+     *
+     * @return array $result
+     */
+    public function gpwiseUnits($filter)
+    {
+        $sql = "SELECT
     gpunits.gp_id,
     gpunits.gp,
     gpunits.block_id,
@@ -314,60 +314,61 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-    if (isset($filter['year_id'])) {
-      $sql .= " AND dy.id = " . $filter['year_id'];
-    }
-    if (isset($filter['month'])) {
-      $sql .= " AND sm.id = " . $filter['month'];
-    }
-    if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-      $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
-    }
-    if (isset($filter['unit_type'])) {
-      if ($filter['unit_type'] == 'without_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'without_mou_date') {
-        $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
-      }
-      if ($filter['unit_type'] == 'only_establishment_date') {
-        $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
-      }
-    }
-    $sql .= " GROUP BY e.unit_id,
+        if (isset($filter['year_id'])) {
+            $sql .= " AND dy.id = " . $filter['year_id'];
+        }
+        if (isset($filter['month'])) {
+            $sql .= " AND sm.id = " . $filter['month'];
+        }
+        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+            $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+        }
+        if (isset($filter['unit_type'])) {
+            if ($filter['unit_type'] == 'without_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'without_mou_date') {
+                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+            }
+            if ($filter['unit_type'] == 'only_establishment_date') {
+                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+            }
+        }
+        $sql .= " GROUP BY e.unit_id,
                e.gp_id) res
       ON res.gp_id = gpunits.gp_id
       AND res.unit_id = gpunits.unit_id";
-    if (isset($filter['block_id'])) {
-      $sql .= " WHERE gpunits.block_id = " . $filter['block_id'];
+        if (isset($filter['block_id'])) {
+            $sql .= " WHERE gpunits.block_id = " . $filter['block_id'];
+        }
+        // dd($sql);
+        return $this->db->query($sql)->getResult();
     }
-    // dd($sql);
-    return $this->db->query($sql)->getResult();
-  }
 
-  public function main_center($district_id, $block_id, $units)
-  {
-    $sql = "SELECT
-      e.id ,
+    public function getMainCenters($district_id, $block_id='', $unit_id)
+    {
+        $sql = "SELECT
+      e.id ent_id,
       e.managing_unit_name,
-      e.management_unit_type,
-      e.main_center_id
+      e.management_unit_type
       FROM enterprises e
       INNER JOIN enterprises_units eu
         ON e.unit_id = eu.id
       WHERE e.deleted_at IS NULL
-      AND eu.deleted_at IS NULL
-      AND e.district_id = $district_id
-      AND e.block_id = $block_id
-      AND eu.name LIKE '" . $units . "'
-      ";
-    //  print_r($sql);exit;
-    return $this->db->query($sql)->getResult();
-  }
+      AND eu.deleted_at IS NULL AND main_center_id IS NOT NULL AND unit_id = $unit_id";
+        if ($district_id) {
+            $sql .= " AND e.district_id = " . (int)$district_id;
+        }
+        if ($block_id) {
+            $sql .= " AND e.block_id = " . (int)$block_id;
+        }
 
-  public function equipment($id)
-  {
-    $sql = "SELECT
+        return $this->db->query($sql)->getResult();
+    }
+
+    public function equipment($id)
+    {
+        $sql = "SELECT
     e.ent_id,
     e.equipment_id,
     e.quantity,
@@ -375,14 +376,14 @@ class EnterprisesModel extends Model
   FROM enterprise_equipment e
     LEFT JOIN equipment eq
       ON e.equipment_id = eq.id  WHERE e.ent_id = $id";
-    // printr($sql);
-    // exit;
-    return $this->db->query($sql)->getResult();
-  }
+        // printr($sql);
+        // exit;
+        return $this->db->query($sql)->getResult();
+    }
 
-  public function getBy($filter)
-  {
-    $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
+    public function getBy($filter)
+    {
+        $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
     e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
     eu.name unit_name FROM enterprises e 
     LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
@@ -391,14 +392,14 @@ class EnterprisesModel extends Model
     LEFT JOIN villages v ON e.village_id=v.id 
     WHERE e.deleted_at IS NULL";
 
-    if (!empty($filter['district_id'])) {
-      $sql .= " AND e.district_id= " . (int)$filter['district_id'];
-    }
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND e.district_id= " . (int)$filter['district_id'];
+        }
 
-    if (!empty($filter['unit_id'])) {
-      $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
-    }
+        if (!empty($filter['unit_id'])) {
+            $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
+        }
 
-    return $this->db->query($sql)->getResult();
-  }
+        return $this->db->query($sql)->getResult();
+    }
 }
