@@ -27,7 +27,7 @@ $validation = \Config\Services::validation();
                     <div class="row">
                         <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                             <label for="district_id">District<span class="text-danger"></span></label>
-                            <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='filter_district' class='form-control js-select2'"); ?>
+                            <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
                         </div>
                         <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                             <label for="block_id">Block<span class="text-danger"></span></label>
@@ -564,22 +564,7 @@ $validation = \Config\Services::validation();
 
                 url += "?district_id=" + dist + "&block_id=" + block;
 
-                var popupWindow = window.open(url, "Add GP", "width=500,height=500");
-                if (popupWindow) {
-                    //Browser has allowed it to be opened
-                    popupWindow.focus();
-                } else {
-                    //Browser has blocked it
-                    alert('Please allow popups for this website');
-                }
-                var popupTimer = setInterval(function () {
-                    if (popupWindow.closed) {
-                        clearInterval(popupTimer);
-                        // console.log('Popup window closed.');
-                        // Add your event handling logic here
-                        $('#blocks').trigger('change');
-                    }
-                });
+
             });
 
             //add gp btn click new
