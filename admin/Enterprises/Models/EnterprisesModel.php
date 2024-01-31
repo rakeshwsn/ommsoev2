@@ -348,9 +348,10 @@ class EnterprisesModel extends Model
   public function main_center($district_id, $block_id, $units)
   {
     $sql = "SELECT
-      e.id ent_id,
+      e.id ,
       e.managing_unit_name,
-      e.management_unit_type
+      e.management_unit_type,
+      e.main_center_id
       FROM enterprises e
       INNER JOIN enterprises_units eu
         ON e.unit_id = eu.id

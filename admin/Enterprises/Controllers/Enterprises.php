@@ -138,8 +138,6 @@ class Enterprises extends AdminController
 		if ($this->request->getGet('doeyear') > 0) {
 			$filter['doeyear'] = $this->request->getGet('doeyear');
 		}
-
-
 		$filteredData = $enterprisesmodel->getAll($filter);
 		// dd($filteredData);
 		return $filteredData;
