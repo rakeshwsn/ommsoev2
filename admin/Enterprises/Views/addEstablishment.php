@@ -27,7 +27,7 @@ $validation = \Config\Services::validation();
                     <div class="row">
                         <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                             <label for="district_id">District<span class="text-danger"></span></label>
-                            <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='filter_district' class='form-control js-select2'"); ?>
+                            <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
                         </div>
                         <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                             <label for="block_id">Block<span class="text-danger"></span></label>
@@ -131,16 +131,12 @@ $validation = \Config\Services::validation();
                                    placeholder="Mobile" maxlength="10"
                                    value="<?= set_value('contact_mobile', $contact_mobile) ?>" required>
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_mobile'); ?></div>
-
                         </div>
                         <div class="col-6"></div>
                     </div>
-
-
                 </div>
             </div>
             <div class="dotted-border mx-4 my-4 pd-3" id="center_info">
-
                 <div class="container">
                     <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Center Info</h3>
                     <div class="row">
@@ -568,22 +564,7 @@ $validation = \Config\Services::validation();
 
                 url += "?district_id=" + dist + "&block_id=" + block;
 
-                var popupWindow = window.open(url, "Add GP", "width=500,height=500");
-                if (popupWindow) {
-                    //Browser has allowed it to be opened
-                    popupWindow.focus();
-                } else {
-                    //Browser has blocked it
-                    alert('Please allow popups for this website');
-                }
-                var popupTimer = setInterval(function () {
-                    if (popupWindow.closed) {
-                        clearInterval(popupTimer);
-                        // console.log('Popup window closed.');
-                        // Add your event handling logic here
-                        $('#blocks').trigger('change');
-                    }
-                });
+
             });
 
             //add gp btn click new
