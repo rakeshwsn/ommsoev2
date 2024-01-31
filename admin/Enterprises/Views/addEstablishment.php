@@ -27,15 +27,7 @@ $validation = \Config\Services::validation();
                     <div class="row">
                         <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                             <label for="district_id">District<span class="text-danger"></span></label>
-                            <?php
-                            $select_attributes = array(
-                                'class' => 'form-control js-select2',
-                                'id' => 'districts',
-                            );
-                            if ($district_id) {
-                                $select_attributes = array_merge($select_attributes);
-                            }
-                            echo form_dropdown('district_id', $districts, $district_id, $select_attributes); ?>
+                            <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='filter_district' class='form-control js-select2'"); ?>
                         </div>
                         <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                             <label for="block_id">Block<span class="text-danger"></span></label>
@@ -167,6 +159,7 @@ $validation = \Config\Services::validation();
                             <label for="main_center_name">Main Center name<span class="text-danger">*</span></label>
                             <?php
                             echo form_dropdown('main_center_name', $main_center_name, [], ['class' => 'form-control', 'id' => 'main_center_list']); ?>
+                            <div id="center_message" class="text-danger mt-3"></div>
                         </div>
                     </div>
                     <div class="row">
@@ -324,10 +317,8 @@ $validation = \Config\Services::validation();
                     <a href="admin/enterprises/cancel" class="btn btn-danger">Cancel</a>
                 </div>
             </div>
-
         </form>
     </div>
-
 
 <?php js_start(); ?>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
@@ -420,44 +411,48 @@ $validation = \Config\Services::validation();
                     },
                     complete: function () {}
                 });
-
             });
 
-            //main center ajax
-            $('#unit_type').on('change', function () {
+            //get main center on center_type change and sub_center is selected
+            $('[name="center_type"]').on('change', function () {
                 var d_id = $("#districts").val(); // Declare d_id with var
                 var b_id = $("#blocks").val();
-                var u_id = $(this).val();
+                var u_id = $("#unit_type").val();
+                unit_type = $('#unit_type option:selected').text();
+                selected_option = $(this).val();
+                //if selected option is sub_center and unit_type in ['CHC','CMSC']
+                if(selected_option == 'sub_center' && $.inArray(unit_type, ['CHC','CMSC']) !== -1){
+                    $.ajax({
+                        url: 'admin/enterprises/center',
+                        data: {
+                            district_id: d_id,
+                            block_id: b_id,
+                            unit_id: u_id,
+                        },
+                        type: 'GET',
+                        dataType: 'JSON',
+                        beforeSend: function () {
+                            $('#center_message').text('');
+                        },
+                        success: function (response) {
+                            if (response.main_centers && response.main_centers.length > 0) {
+                                var html = '<option value="">Select main center name</option>';
+                                $.each(response.main_centers, function (k, v) {
+                                    html += '<option value="' + v.ent_id + '">' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
+                                });
+                                $('#main_center_list').empty().html(html);
+                            } else {
+                                $('#center_message').text(response.message);
+                            }
+                        },
+                        error: function () {
+                            alert('something went wrong');
+                        },
+                        complete: function () {
 
-                $.ajax({
-                    url: 'admin/enterprises/center',
-                    data: {
-                        district_id: d_id,
-                        block_id: b_id,
-                        unit_id: u_id,
-                    },
-                    type: 'GET',
-                    dataType: 'JSON',
-                    beforeSend: function () {
-                    },
-                    success: function (response) {
-                        if (response.main_center_name) {
-                            var html = '<option value="">Select main center name</option>';
-                            $.each(response.main_center_name, function (k, v) {
-                                html += '<option value="' + v.ent_id + '">' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
-                            });
-                            $('#main_center_list').empty().html(html);
-                        } else {
-                            $('#main_center_list').empty().html('<option value="">No options available</option>');
                         }
-                    },
-                    error: function () {
-                        alert('something went wrong');
-                    },
-                    complete: function () {
-
-                    }
-                });
+                    });
+                }
             });
 
             // //hide show addl budget
@@ -589,6 +584,17 @@ $validation = \Config\Services::validation();
                         $('#blocks').trigger('change');
                     }
                 });
+            });
+
+            //add gp btn click new
+            $('#btn-add-gp').click(function (e) {
+                e.preventDefault();
+                //check if district_id and block_id is selected
+                if ($('#districts').val() == 0 || $('#blocks').val() == 0) {
+                    alert('Please select district and block first');
+                }
+                //make ajax request to get gp list
+
             });
 
             //add village btn click
