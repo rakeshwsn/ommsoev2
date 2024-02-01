@@ -73,7 +73,7 @@
         </div>
         <div class="block-content block-content-full">
             <div class="block">
-                <form action="" method="post">
+                <form action="" method="post" id="establishmentEditForm">
                     <div class="row">
                         <div class="col-sm-12">
                             <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
@@ -94,7 +94,7 @@
                                         <?php foreach ($unit_groups as $key => $columns) {
                                             if ($key == $entranses['unit_group_name']) {  ?>
                                                 <?php foreach ($columns as $key => $column) { ?>
-                                                    <td><input type="text" id="unit_group" name="<?= $key ?>" class="form-control" value="<?= $entranses[$key] ?>"></td>
+                                                    <td><input type="text" id="unit_group" name="<?= $key ?>" class="form-control" value="<?= $entranses[$key] ?>" required></td>
                                                 <?php } ?>
                                             <?php } ?>
                                         <?php } ?>
@@ -130,7 +130,42 @@
 </style>
 <?php js_start(); ?>
 <script>
-  
+    $(document).ready(function() {
+        jQuery.validator.addMethod("numbersonly", function(value, element) {
+            return this.optional(element) || /^(\d+(\.\d+)?)?$/.test(value);
+        }, "Please enter only numbers ");
+
+    });
+
+    $(document).ready(function() {
+        $("#establishmentEditForm").validate({
+            ignore: [],
+            rules: {
+                <?php foreach ($unit_groups as $key => $columns) {
+                    if ($key == $entranses['unit_group_name']) { ?>
+                        <?php foreach ($columns as $key => $column) { ?>
+                            <?= $key ?>: {
+                                required: true,
+                                numbersonly: true
+                            },
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            },
+            messages: {
+                <?php foreach ($unit_groups as $key => $columns) {
+                    if ($key == $entranses['unit_group_name']) { ?>
+                        <?php foreach ($columns as $key => $column) { ?>
+                            <?= $key ?>: {
+                                numbersonly: "Please enter only numbers"
+                            },
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            },
+        });
+    });
 </script>
+
 
 <?php js_end(); ?>

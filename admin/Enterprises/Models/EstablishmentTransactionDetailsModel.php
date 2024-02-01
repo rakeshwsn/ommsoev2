@@ -160,6 +160,7 @@ class EstablishmentTransactionDetailsModel extends Model
     sm.name month_name,
     eu_unit.unit_name,
     eu_unit.unit_group_name,
+    eu_unit.unit_group_id,
     txn_dtl.period,
     txn_dtl.created_at
   FROM (SELECT

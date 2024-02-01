@@ -19,6 +19,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/doe', 'Enterprises\Controllers\Enterprises::ajaxDoe');
     $routes->add('enterprises/exceldownld', 'Enterprises\Controllers\Enterprises::download');
     $routes->add('enterprises/excel', 'Enterprises\Controllers\Enterprises::excel');
+    $routes->post('enterprises/search', 'Localisation\Controllers\Enterprises::search', ['permission' => false]);
 
 
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
@@ -27,7 +28,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('enterprisestrans/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
     $routes->add('enterprises/delete', 'Enterprises\Controllers\EstablishmentTransaction::delete');
-    
+
     $routes->add('enterprisestrans/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 
     $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');
