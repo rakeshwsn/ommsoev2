@@ -30,10 +30,12 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
     $routes->add('areacoverage/grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
     $routes->match(['get', 'post'], 'grampanchayat/add', 'Localisation\Controllers\Grampanchayat::add');
+    $routes->post('grampanchayat/ajaxadd', 'Localisation\Controllers\Grampanchayat::ajaxAdd');
     $routes->get('grampanchayat/delete/(:segment)', 'Localisation\Controllers\Grampanchayat::delete/$1');
     $routes->post('grampanchayat/delete', 'Localisation\Controllers\Grampanchayat::delete');
     $routes->match(['get', 'post'], 'grampanchayat/edit/(:segment)', 'Localisation\Controllers\Grampanchayat::edit/$1');
     $routes->post('grampanchayat/search', 'Localisation\Controllers\Grampanchayat::search', ['permission' => false]);
+
     //saraswatee
     $routes->add('grampanchayat', 'Localisation\Controllers\Grampanchayat::index');
     $routes->add('village', 'Localisation\Controllers\Village::index');
@@ -42,6 +44,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('village/delete/(:segment)', 'Localisation\Controllers\Village::delete/$1');
     $routes->post('village/delete', 'Localisation\Controllers\Village::delete');
     $routes->match(['get', 'post'], 'village/add', 'Localisation\Controllers\Village::add');
+    $routes->post('village/ajaxadd', 'Localisation\Controllers\Village::ajaxAdd');
     $routes->match(['get', 'post'], 'village/edit/(:segment)', 'Localisation\Controllers\Village::edit/$1');
 
     $routes->get('blocks/grampanchayat/', 'Localisation\Controllers\Village::grampanchayat', ['permission' => false]);

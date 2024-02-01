@@ -244,8 +244,7 @@ class Grampanchayat extends AdminController
 	}
 	protected function validateForm()
 	{
-		//printr($_POST);
-		$validation = \Config\Services::validation();
+		$this->validation = \Config\Services::validation();
 		$id = $this->uri->getSegment(4);
 		$regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
 		$regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
@@ -256,12 +255,39 @@ class Grampanchayat extends AdminController
 		if ($this->validate($rules)) {
 			return true;
 		} else {
-			//printr($validation->getErrors());
 			$this->error['warning'] = "Warning: Please check the form carefully for errors!";
 			return false;
 		}
 		return !$this->error;
 	}
+
+    public function ajaxAdd()
+    {
+        $data['id'] = null;
+        $data['status'] = false;
+        $data['message'] = 'Failed to add Grampanchayat';
+
+        if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
+
+            $post = [
+                'block_id' => (int)$this->request->getPost('block_id'),
+                'name' => trim($this->request->getPost('name')),
+                'lgd_code' => (int)$this->request->getPost('lgd_code'),
+            ];
+            $id = $this->grampanchayatModel->insert($post);
+
+            if ($id) {
+                $data['id'] = $id;
+                $data['status'] = true;
+                $data['message'] = 'Successfully added Grampanchayat';
+            }
+        }
+        if($this->error){
+            $validation_errors = $this->validation->getErrors();
+            $data['message'] = implode("\n", $validation_errors);;
+        }
+        return $this->response->setJSON($data);
+    }
 }
 
 /* End of file hmvc.php */

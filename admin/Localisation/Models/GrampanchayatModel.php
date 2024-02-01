@@ -23,20 +23,20 @@ class GrampanchayatModel extends Model
 	protected $deletedField = 'deleted_at';
 
 	// Validation
-	// Validation
 	protected $validationRules = [
+        'id' => 'permit_empty|integer|greater_than[0]',
 		'district_id' => array(
 			'label' => 'District',
-			'rules' => 'trim|required|max_length[100]'
+			'rules' => 'trim|max_length[100]'
 		),
 		'block_id' => array(
 			'label' => 'Block',
 			'rules' => 'trim|required|max_length[100]'
-
 		),
 		'name' => array(
 			'label' => 'Name',
-			'rules' => "trim|required|max_length[255]|regex_match[/^[A-Za-z\s.]+$/]"
+			'rules' => "trim|required|max_length[255]|is_unique_gp[soe_grampanchayats.name,id,{id}]",
+            'errors' => ['is_unique_gp' => 'This Grampanchayat already exists.']
 		)
 	];
 	protected $validationMessages = [];

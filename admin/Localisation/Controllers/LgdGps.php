@@ -137,8 +137,6 @@ class LgdGps extends AdminController
 		return $this->response->setJSON($data);
 	}
 
-
-
 	protected function validateForm()
 	{
 		//printr($_POST);
@@ -159,6 +157,17 @@ class LgdGps extends AdminController
 		}
 		return !$this->error;
 	}
+
+    public function getGps() {
+        $data['blocks'] = [];
+        $gpModel = new LgdGpsModel();
+
+        $block_id = $this->request->getGet('block_id');
+
+        $data['blocks'] = $gpModel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
+
+        return $this->response->setJSON($data);
+    }
 }
 
 /* End of file hmvc.php */
