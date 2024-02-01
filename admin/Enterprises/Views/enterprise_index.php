@@ -12,7 +12,7 @@
         <div class="block-content block-content-full">
             <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
 
-            <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+            <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
 
                 <?php echo form_open('', ['method' => 'get']); ?>
                 <div class="row">
@@ -63,14 +63,14 @@
         <div class="block-header block-header-default">
             <h3 class="block-title">Enterprises List</h3>
             <div class="block-options">
-            <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
+                <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
             </div>
 
         </div>
         <div class="block-content block-content-full">
             <div class="row">
                 <div class="col-sm-12">
-                    <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
+                    <table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="datatable_info">
                         <thead>
                             <tr>
                                 <th>District</th>
@@ -131,13 +131,30 @@
         $('#districts, #blocks, #management_unit_type, #years').on('change', main);
         main();
     });
-    
+
     var download_url = "<?= $excel_link ?>";
-    
+
     $(document).ready(function() {
-        var table = $('#page_list').DataTable({
+        var table = $('#datatable').DataTable({
             "paging": true,
-            "pageLength": 10
+            "pageLength": 10,
+            "ajax": {
+                url: "<?= admin_url('enterprises') ?>",
+                type: "post", // method  , by default get
+                data: {},
+                beforeSend: function() {
+                    $('.alert-dismissible, .text-danger').remove();
+                    $("#datatable_wrapper").LoadingOverlay("show");
+                },
+                complete: function() {
+                    $("#datatable_wrapper").LoadingOverlay("hide");
+                },
+                error: function() {
+                    $("#datatable_processing").css("display", "none");
+
+                },
+                dataType: 'JSON'
+            }
         });
 
         $(function() {
@@ -200,6 +217,5 @@
 
             });
         });
-
     })
 </script>

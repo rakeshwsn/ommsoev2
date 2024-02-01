@@ -93,14 +93,82 @@ class EnterprisesModel extends Model
         }
 
         if (isset($filter["management_unit_type"])) {
-            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'
-       
-      ";
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
-        // $sql .=  " ORDER BY sd.name ASC";
-        // printr($sql);
-        // exit;
+
+        if (isset($data['sort']) && $data['sort']) {
+			$sort = $data['sort'];
+		} else {
+			$sort = "sd.name,sb.name";
+		}
+
+		if (isset($data['order']) && ($data['order'] == 'desc')) {
+			$order = "desc";
+		} else {
+			$order = "asc";
+		}
+        $sql .= " ORDER BY " . $sort . " " . $order;
+		
+		if (isset($data['start']) || isset($data['limit'])) {
+			if ($data['start'] < 0) {
+				$data['start'] = 0;
+			}
+
+			if ($data['limit'] < 1) {
+				$data['limit'] = 10;
+			}
+			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+		}
+
         return $this->db->query($sql)->getResult();
+    }
+
+    /**
+     * Get total rows
+     *
+     * @param datatype $paramname description
+     * @return Number of rows
+     */
+    public function getTotals($filter=[]){
+
+        $sql = " SELECT COUNT(e.id) total
+        FROM enterprises e
+        LEFT JOIN soe_districts sd ON sd.id = e.district_id
+        LEFT JOIN soe_blocks sb ON sb.id = e.block_id";
+        
+        if (isset($filter['district_id'])) {
+            $sql .= " AND e.district_id = " . $filter['district_id'];
+        }
+        if (isset($filter['block_id'])) {
+            $sql .= " AND e.block_id = " . $filter['block_id'];
+        }
+        if (isset($filter['unit_id'])) {
+            $sql .= " AND e.unit_id = " . $filter['unit_id'];
+        }
+        if (isset($filter['doeyear'])) {
+            $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
+        }
+
+        if (isset($filter["management_unit_type"])) {
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
+        }
+        
+        return $this->db->query($sql)->getRow()->total;
+    }
+
+	private function filter($builder,$data){
+		$builder->join('soe_districts d', 'b.district_id = d.id');
+        
+		if(!empty($data['filter_district'])){
+            $builder->where("b.district_id  = '".$data['filter_district']."'");
+        }
+
+		if (!empty($data['filter_search'])) {
+			$builder->where("
+				b.name LIKE '%{$data['filter_search']}%' OR
+				b.id = '{$data['filter_search']}'
+			");
+		}
     }
 
     public function yearWise($district_id)

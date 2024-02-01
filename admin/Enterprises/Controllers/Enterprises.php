@@ -113,8 +113,68 @@ class Enterprises extends AdminController
         }
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
-
+        $jsonData = json_encode($data);
+        
+        // dd($jsonData);
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
+    }
+
+    public function search()
+    {
+        $this->enterprisesmodel = new EnterprisesModel();
+        $requestData = $_REQUEST;
+        $totalData = $this->enterprisesmodel->getTotals();
+        $totalFiltered = $totalData;
+
+        $filter_data = array(
+            'filter_search' => $requestData['search']['value'],
+            'district_id' => $requestData['district_id'],
+            'block_id' => $requestData['block_id'],
+            'unit_id' => $requestData['unit_id'],
+            'management_unit_type' => $requestData['management_unit_type'],
+            'doeyear' => $requestData['doeyear'],
+            'order' => $requestData['order'][0]['dir'],
+            'sort' => $requestData['order'][0]['column'],
+            'start' => $requestData['start'],
+            'limit' => $requestData['length']
+        );
+        $totalFiltered = $this->enterprisesmodel->getTotals($filter_data);
+
+        $filteredData = $this->enterprisesmodel->getAll($filter_data);
+
+        $datatable = array();
+        foreach ($filteredData as $result) {
+
+            $action = '<div class="btn-group btn-group-sm pull-right">';
+            $action .= '<a class="btn btn-sm btn-primary" href="' . admin_url('block/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
+            $action .= '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('block/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
+            $action .= '</div>';
+
+            $datatable[] = array(
+                $result->districts,
+                $result->blocks,
+                $result->gps,
+                $result->villages,
+                $result->unit_name,
+                $result->management_unit_type,
+                $result->managing_unit_name,
+                $result->date_estd,
+                $result->mou_date,
+                $action,
+            );
+
+        }
+        //printr($datatable);
+        $json_data = array(
+            "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $datatable
+        );
+
+        return $this->response->setContentType('application/json')
+            ->setJSON($json_data);
+
     }
 
     private function filter()
@@ -297,7 +357,6 @@ class Enterprises extends AdminController
                     }
                     $entequipmentmodel->insertBatch($equipmentData);
                 }
-
             }
 
 
@@ -462,7 +521,7 @@ class Enterprises extends AdminController
         $data['main_centers'] = $mainCenters;
 
         $data['message'] = "";
-        if(empty($mainCenters)){
+        if (empty($mainCenters)) {
             $data['message'] = "No Main Center Found";
         }
 
