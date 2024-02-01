@@ -116,7 +116,7 @@ class Enterprises extends AdminController
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
         $jsonData = json_encode($data);
-        
+
         // dd($jsonData);
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
@@ -164,7 +164,6 @@ class Enterprises extends AdminController
                 $result->mou_date,
                 $action,
             );
-
         }
         //printr($datatable);
         $json_data = array(
@@ -176,7 +175,6 @@ class Enterprises extends AdminController
 
         return $this->response->setContentType('application/json')
             ->setJSON($json_data);
-
     }
 
     private function filter()
@@ -420,7 +418,7 @@ class Enterprises extends AdminController
                 'main_center_id' => $this->request->getPost('main_center_id'),
 
             ];
-
+            // dd($enterprisesdata);
             $data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
             $unitId = $enterprisesmodel->insertID();
             $id = $this->request->getGet('id');

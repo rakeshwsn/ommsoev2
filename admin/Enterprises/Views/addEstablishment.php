@@ -154,7 +154,7 @@ $validation = \Config\Services::validation();
                              class="col-6 form-group mt-15 <?= $validation->hasError('') ? 'is-invalid' : '' ?>">
                             <label for="main_center_name">Main Center name<span class="text-danger">*</span></label>
                             <?php
-                            echo form_dropdown('main_center_name', $main_center_name, [], ['class' => 'form-control', 'id' => 'main_center_list']); ?>
+                            echo form_dropdown('main_center_id', $main_center_name, [], ['class' => 'form-control', 'id' => 'main_center_list']); ?>
                             <div id="center_message" class="text-danger mt-3"></div>
                         </div>
                     </div>
