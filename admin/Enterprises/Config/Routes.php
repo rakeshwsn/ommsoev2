@@ -33,6 +33,8 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
     $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');
     $routes->add('enterprises/center', 'Enterprises\Controllers\Enterprises::ajaxcenter');
+    $routes->get('enterprises/getlgdgps', 'Enterprises\Controllers\Enterprises::getLgdGps');
+    $routes->get('enterprises/getlgdvillages', 'Enterprises\Controllers\Enterprises::getLgdVillages');
 
     $routes->add('enterprises/villages', 'Enterprises\Controllers\Enterprises::ajaxvillages');
 

@@ -3,6 +3,7 @@ $validation = \Config\Services::validation();
 ?>
 
 <?= form_open_multipart('', 'id="form-grampanchayat"'); ?>
+<input type="hidden" name="id" value="<?=$id?>">
 <div class="row">
     <div class="col-xl-12">
 

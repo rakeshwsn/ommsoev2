@@ -10,6 +10,8 @@ use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Enterprises\Models\EnterpriseGpModel;
 use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Localisation\Controllers\LgdGps;
+use Admin\Localisation\Models\GrampanchayatModel;
 use Admin\Localisation\Models\LgdBlocksModel;
 use Admin\Localisation\Models\LgdGpsModel;
 use Admin\Localisation\Models\LgdVillagesModel;
@@ -483,8 +485,6 @@ class Enterprises extends AdminController
     {
         $data['gps'] = [];
         $gpmodel = new EnterpriseGpModel();
-        // $lgdgpmodel = new LgdGpsModel();
-
 
         $block_id = $this->request->getGet('block_id');
 
@@ -675,5 +675,49 @@ class Enterprises extends AdminController
         $data['add_village_url'] = admin_url('village/add');
 
         return $this->template->view('Admin\Enterprises\Views\addEstablishment', $data);
+    }
+
+    public function getLgdGps()
+    {
+        $block_id = $this->request->getGet('block_id');
+        $gpModel = new LgdGpsModel();
+
+        $block = (new LgdBlocksModel())->where('block_id', $block_id)->first();
+
+        $data['gps'] = $gpModel->where('block_lgd_code', $block->lgd_code)
+            ->orderBy('name', 'asc')->asArray()->findAll();
+
+        $data['label'] = 'Select Gp';
+        $data['id'] = 'gp_id';
+        $data['gp_id'] = '';
+        $data['block_id'] = $block_id;
+
+        $data['post_url'] = admin_url('grampanchayat/ajaxadd');
+        $data['title'] = 'Add new Gram panchayat';
+        $data['html'] = view('Admin\Enterprises\Views\modal_dropdown', $data);
+
+        return $this->response->setJSON($data);
+    }
+
+    public function getLgdVillages()
+    {
+        $gp_id = $this->request->getGet('gp_id');
+        $vModel = new LgdVillagesModel();
+
+        $gp = (new GrampanchayatModel())->find($gp_id);
+
+        $data['gps'] = $vModel->where('gp_lgd_code', $gp->lgd_code)
+            ->orderBy('name', 'asc')->asArray()->findAll();
+
+        $data['label'] = 'Select Village';
+        $data['id'] = 'village_id';
+        $data['gp_id'] = $gp_id;
+        $data['block_id'] = $gp->block_id;
+
+        $data['post_url'] = admin_url('village/ajaxadd');
+        $data['title'] = 'Add new Village';
+        $data['html'] = view('Admin\Enterprises\Views\modal_dropdown', $data);
+
+        return $this->response->setJSON($data);
     }
 }
