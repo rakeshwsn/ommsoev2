@@ -316,10 +316,48 @@ $validation = \Config\Services::validation();
         </form>
     </div>
 
+    <!-- Small Modal -->
+    <div class="modal" id="modal-gps" tabindex="-1" role="dialog" aria-labelledby="modal-small" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title"></h3>
+                    </div>
+                    <div class="block-content">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Village Modal -->
+    <div class="modal" id="modal-villages" tabindex="-1" role="dialog" aria-labelledby="modal-small" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="block block-themed block-transparent mb-0">
+                    <div class="block-header bg-primary-dark">
+                        <h3 class="block-title"></h3>
+                    </div>
+                    <div class="block-content">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 <?php js_start(); ?>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
     <script>
+        var selectedGP, selectedVillage;
         $(function () {
             $('#districts').on('change', function () {
 
@@ -478,20 +516,19 @@ $validation = \Config\Services::validation();
                     $('#center_info').hide();
                 }
             });
-            //for document ready
+            //populate unit type on document ready
             $('#unit_type').trigger("change");
 
-            //Center choose
+            //Hide center dropdown if main center is selected
             if ($("#main_center").prop("checked")) {
-                // do something
                 $('#center_name').hide();
             }
 
-            // OR
+            // Show center dropdown when sub center is checked
             if ($("#sub_center").is(":checked")) {
-                // do something
                 $('#center_name').show();
             }
+
             $('#sub_center').on('change', function () {
                 $sub_center_checked = $(this).prop('checked');
                 if ($sub_center_checked) {
@@ -500,6 +537,7 @@ $validation = \Config\Services::validation();
                     $('#center_name').hide();
                 }
             });
+
             $('#main_center').on('change', function () {
                 $main_center_checked = $(this).prop('checked');
                 if ($main_center_checked) {
@@ -507,6 +545,7 @@ $validation = \Config\Services::validation();
                 }
             });
             $('#sub_center').trigger('change');
+
             //budget head will 4.1 after choosing unit type chc
             $('#unit_type,#budget_fin_yr_id').on('change', function () {
 
@@ -557,28 +596,93 @@ $validation = \Config\Services::validation();
             //add gp btn click
             $('#btn-add-gp').click(function (e) {
                 e.preventDefault();
+                //check if block_id is selected
+                if ($('#blocks').val() == 0) {
+                    alert('Please select a block');
+                    return false;
+                }
 
-                url = $(this).attr('href');
-                dist = $('#districts').val();
                 block = $('#blocks').val();
 
-                url += "?district_id=" + dist + "&block_id=" + block;
-
+                //make ajax request to get gp list
+                $.ajax({
+                    url: 'admin/enterprises/getlgdgps',
+                    data: {block_id: block},
+                    type: 'GET',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $('#modal-gps').modal('show');
+                        $('#modal-gps').LoadingOverlay('show');
+                    },
+                    success: function (data) {
+                        $('#modal-gps').find('.block-title').text(data.title);
+                        $('#modal-gps').find('.block-content').html(data.html);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(thrownError);
+                    },
+                    complete: function () {
+                        $('#modal-gps').LoadingOverlay('hide', true);
+                    }
+                });
 
             });
 
-            //add gp btn click new
-            $('#btn-add-gp').click(function (e) {
-                e.preventDefault();
-                //check if district_id and block_id is selected
-                if ($('#districts').val() == 0 || $('#blocks').val() == 0) {
-                    alert('Please select district and block first');
-                }
-                //make ajax request to get gp list
+            // update select2 on #modal-gps close
+            $('#modal-gps').on('hidden.bs.modal', function () {
+                //populate gps again
+                $('#blocks').trigger('change');
 
+                $('#gps').val(selectedGP);
+                $('#gps').trigger('change');
+                $('#modal-gps').find('.block-content').html('');
+            });
+
+            // update select2 on #modal-villages close
+            $('#modal-villages').on('hidden.bs.modal', function () {
+                //populate villages again
+                $('#gps').trigger('change');
+
+                $('#villages').val(selectedVillage);
+                $('#villages').trigger('change');
+                $('#modal-villages').find('.block-content').html('');
             });
 
             //add village btn click
+            $('#btn-add-village').click(function (e) {
+                e.preventDefault();
+                //check if block_id is selected
+                if ($('#gps').val() == 0) {
+                    alert('Please select a GP');
+                    return false;
+                }
+
+                gp_id = $('#gps').val();
+
+                //make ajax request to get gp list
+                $.ajax({
+                    url: 'admin/enterprises/getlgdvillages',
+                    data: {gp_id: gp_id},
+                    type: 'GET',
+                    dataType: 'json',
+                    beforeSend: function () {
+                        $('#modal-villages').modal('show');
+                        $('#modal-villages').LoadingOverlay('show');
+                    },
+                    success: function (data) {
+                        $('#modal-villages').find('.block-title').text(data.title);
+                        $('#modal-villages').find('.block-content').html(data.html);
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(thrownError);
+                    },
+                    complete: function () {
+                        $('#modal-villages').LoadingOverlay('hide', true);
+                    }
+                });
+
+            });
+/*
             $('#btn-add-village').click(function (e) {
                 e.preventDefault();
 
@@ -605,7 +709,7 @@ $validation = \Config\Services::validation();
                     }
                 });
             });
-
+*/
             Codebase.helpers(['select2']);
         });
 

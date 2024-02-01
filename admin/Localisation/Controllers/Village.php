@@ -264,7 +264,6 @@ class Village extends AdminController
 
 	protected function validateForm()
 	{
-		//printr($_POST);
 		$validation =  \Config\Services::validation();
 		$id = $this->uri->getSegment(4);
 		$regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
@@ -282,6 +281,34 @@ class Village extends AdminController
 		}
 		return !$this->error;
 	}
+
+    public function ajaxAdd()
+    {
+        $data['id'] = null;
+        $data['status'] = false;
+        $data['message'] = 'Failed to add Village';
+
+        if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
+
+            $post = [
+                'gp_id' => (int)$this->request->getPost('gp_id'),
+                'name' => trim($this->request->getPost('name')),
+                'lgd_code' => (int)$this->request->getPost('lgd_code'),
+            ];
+            $id = $this->villageModel->insert($post);
+
+            if ($id) {
+                $data['id'] = $id;
+                $data['status'] = true;
+                $data['message'] = 'Successfully added Village';
+            }
+        }
+        if($this->error){
+            $validation_errors = $this->validation->getErrors();
+            $data['message'] = implode("\n", $validation_errors);;
+        }
+        return $this->response->setJSON($data);
+    }
 }
 
 /* End of file hmvc.php */
