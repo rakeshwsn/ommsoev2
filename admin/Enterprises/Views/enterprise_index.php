@@ -216,6 +216,10 @@
                 });
 
             });
+
+            <?php if($district_id) { ?> 
+                $('#districts').trigger('change');
+            <?php } ?>
         });
     })
 </script>

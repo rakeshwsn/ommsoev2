@@ -38,32 +38,46 @@ class Enterprises extends AdminController
 
         $enterprisesunitmodel = new EnterprisesUnitModel();
         //populate districts
-        $data['districts'][0] = 'Select District';
-        $districts = $distModel->orderBy('name', 'asc')->findAll();
+
+        $districtmodel = new DistrictModel();
+        $data['districts'][0] = 'Select Districts';
+
+        if ($this->user->district_id) {
+            $districts = $districtmodel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+        } else {
+            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+        }
+      
         foreach ($districts as $district) {
             $data['districts'][$district->id] = $district->name;
         }
 
-        $data['district_id'] = 0;
+        $data['district_id'] = $this->user->district_id;
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $this->request->getGet('district_id');
+        }
+        
         $data['units'][0] = 'Select Unit Type';
         $units = $enterprisesunitmodel->orderBy('name', 'asc')->findAll();
-        // dd($units);
+       
         foreach ($units as $unit) {
             $data['units'][$unit->id] = $unit->name;
         }
 
         $data['unit_id'] = 0;
 
+
         //populate blocks of district selected
         $data['blocks'][0] = 'Select Block';
-        if ($this->request->getGet('district_id')) {
-            $data['district_id'] = $this->request->getGet('district_id');
+        if ($data['district_id']) {
 
             $blocks = $blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+            
             foreach ($blocks as $block) {
                 $data['blocks'][$block->id] = $block->name;
             }
         }
+
 
         //get years from district selected
         $data['years'][0] = 'Select DOE';
@@ -76,9 +90,14 @@ class Enterprises extends AdminController
             }
         }
 
-        $data['block_id'] = 0;
+        $data['block_id'] = $this->user->block_id;
         if ($this->request->getGet('block_id')) {
             $data['block_id'] = $this->request->getGet('block_id');
+        }
+
+        //for block login
+        if($this->user->block_id){
+
         }
 
         $data['management_unit_type'] = '';
@@ -181,9 +200,16 @@ class Enterprises extends AdminController
     {
         $enterprisesmodel = new EnterprisesModel();
         $filter = [];
+
+        // if $this user has district_id, then filter by district_id
+        if ($this->user->district_id) {
+            $filter['district_id'] = $this->user->district_id;
+        }
+
         if ($this->request->getGet('district_id') > 0) {
             $filter['district_id'] = $this->request->getGet('district_id');
         }
+
         if ($this->request->getGet('unit_id') > 0) {
             $filter['unit_id'] = $this->request->getGet('unit_id');
         }
@@ -191,6 +217,9 @@ class Enterprises extends AdminController
         if ($this->request->getGet('block_id') > 0) {
             $filter['block_id'] = $this->request->getGet('block_id');
         }
+
+
+
         if ($this->request->getGet('management_unit_type') != 'all') {
             $filter['management_unit_type'] = $this->request->getGet('management_unit_type');
         }
@@ -516,6 +545,7 @@ class Enterprises extends AdminController
         $unit_id = $this->request->getGet('unit_id');
 
         $mainCenters = $enterprisesmodel->getMainCenters($district_id, $block_id, $unit_id);
+
         $data['main_centers'] = $mainCenters;
 
         $data['message'] = "";
@@ -553,6 +583,7 @@ class Enterprises extends AdminController
 
             $data['enterprise_text'] = "Edit Enterprise Data";
         }
+
         // dd($enterprisesmodel->db->getFieldNames('enterprises'));
         foreach ($enterprisesmodel->db->getFieldNames('enterprises') as $field) {
             if ($this->request->getPost($field)) {
@@ -564,7 +595,7 @@ class Enterprises extends AdminController
                 $data[$field] = '';
             }
         }
-
+        // dd($data);
         //
         $id = $this->request->getGet('id');
         $data['enterpriseequipments'] = [];
@@ -588,18 +619,31 @@ class Enterprises extends AdminController
             'FPO' => 'FPO',
         ];
 
-        //
+        //saraswatee
         //district
-        $data['districts'][] = 'Select districts';
-        $district_id = 0;
-        $districts = $districtmodel->asArray()->orderBy('name', 'asc')->findAll();
+
+        $districtmodel = new DistrictModel();
+        $data['districts'][0] = 'Select Districts';
+
+        if ($this->user->district_id) {
+            $districts = $districtmodel->where('id', $this->user->district_id)->asArray()->orderBy('name', 'asc')->findAll();
+        } else {
+            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+        }
+        
+        $data['district_id'] = $this->user->district_id;
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $this->request->getGet('district_id');
+        }
+
+        //rakesh s
+        // $data['districts'][] = 'Select districts';
+        // $district_id = 0;
+        // $districts = $districtmodel->asArray()->orderBy('name', 'asc')->findAll();
         $data['districts'] = $districts;
-        /*foreach ($districts as $district) {
-            $data['districts'][$district->id] = $district->name;
-        }*/
+
 
         $data['blocks'][0] = 'Select Block';
-        // dd($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST'));
 
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
             $enterprise = $enterprisesmodel->find($id);
