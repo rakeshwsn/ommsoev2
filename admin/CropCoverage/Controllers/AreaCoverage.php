@@ -206,7 +206,7 @@ class AreaCoverage extends AdminController
 
             }
 
-            $data['blocks'][] = [
+            /*$data['blocks'][] = [
                 'week' => '',
                 'gp' => '<strong>Total</strong>',
                 'farmers_covered' => $total_farmers_covered,
@@ -233,7 +233,7 @@ class AreaCoverage extends AdminController
                 'rice_fallow_area' => $total_rice_fallow_area,
                 'status' => '',
                 'action' => ''
-            ];
+            ];*/
 
             $view = 'areacoverage_block';
         } else if ($this->user->district_id) {
