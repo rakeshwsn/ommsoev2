@@ -418,7 +418,8 @@ class EnterprisesModel extends Model
         $sql = "SELECT
       e.id ent_id,
       e.managing_unit_name,
-      e.management_unit_type
+      e.management_unit_type,
+      e.main_center_id
       FROM enterprises e
       INNER JOIN enterprises_units eu
         ON e.unit_id = eu.id
@@ -430,7 +431,6 @@ class EnterprisesModel extends Model
         if ($block_id) {
             $sql .= " AND e.block_id = " . (int)$block_id;
         }
-
         return $this->db->query($sql)->getResult();
     }
 

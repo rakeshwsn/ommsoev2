@@ -138,23 +138,23 @@
         var table = $('#datatable').DataTable({
             "paging": true,
             "pageLength": 10,
-            "ajax": {
-                url: "<?= admin_url('enterprises') ?>",
-                type: "post", // method  , by default get
-                data: {},
-                beforeSend: function() {
-                    $('.alert-dismissible, .text-danger').remove();
-                    $("#datatable_wrapper").LoadingOverlay("show");
-                },
-                complete: function() {
-                    $("#datatable_wrapper").LoadingOverlay("hide");
-                },
-                error: function() {
-                    $("#datatable_processing").css("display", "none");
+            // "ajax": {
+            //     url: "",
+            //     type: "post", // method  , by default get
+            //     data: {},
+            //     beforeSend: function() {
+            //         $('.alert-dismissible, .text-danger').remove();
+            //         $("#datatable_wrapper").LoadingOverlay("show");
+            //     },
+            //     complete: function() {
+            //         $("#datatable_wrapper").LoadingOverlay("hide");
+            //     },
+            //     error: function() {
+            //         $("#datatable_processing").css("display", "none");
 
-                },
-                dataType: 'JSON'
-            }
+            //     },
+            //     dataType: 'JSON'
+            // }
         });
 
         $(function() {
@@ -216,6 +216,10 @@
                 });
 
             });
+
+            <?php if($district_id) { ?> 
+                $('#districts').trigger('change');
+            <?php } ?>
         });
     })
 </script>
