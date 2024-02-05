@@ -10,7 +10,6 @@ use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Enterprises\Models\EnterpriseGpModel;
 use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
-use Admin\Localisation\Controllers\LgdGps;
 use Admin\Localisation\Models\GrampanchayatModel;
 use Admin\Localisation\Models\LgdBlocksModel;
 use Admin\Localisation\Models\LgdGpsModel;
@@ -21,99 +20,118 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Admin\Enterprises\Models\EnterprisesEquipmentModel;
-
 use Admin\Equipment\Models\EquipmentModel;
 
 class Enterprises extends AdminController
 {
+    private $enterprisesModel;
+    private $districtModel;
+    private $blockModel;
+    private $enterprisesunitmodel;
+    private $lgdGpModel;
+    private $entEquipmentModel;
+    private $gpModel;
+    private $villageModel;
+    private $enterprisesBudgetModel;
+    private $yearModel;
+    private $lgdVillageModel;
+    private $equipmentModel;
+
+    public function __construct()
+    {
+        $this->enterprisesModel = new EnterprisesModel();
+        $this->districtModel = new DistrictModel();
+        $this->blockModel = new BlockModel();
+        $this->enterprisesunitmodel = new EnterprisesUnitModel();
+        $this->lgdGpModel = new LgdGpsModel();
+        $this->entEquipmentModel = new EnterprisesEquipmentModel();
+        $this->gpModel = new EnterpriseGpModel();
+        $this->villageModel = new EnterpriseVillagesModel();
+        $this->enterprisesBudgetModel = new EnterprisesBudgetModel();
+        $this->yearModel = new YearModel();
+        $this->villageModel = new EnterpriseVillagesModel();
+        $this->lgdVillageModel = new LgdVillagesModel();
+        $this->equipmentModel = new EquipmentModel();
+    }
     public function index()
     {
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
         $this->template->set('header', true);
         helper('form');
-        $enterprisesmodel = new EnterprisesModel();
-        $distModel = new DistrictModel();
-        $blockmodel = new BlockModel();
-        $gpmodel = new LgdGpsModel();
 
-        $enterprisesunitmodel = new EnterprisesUnitModel();
         //populate districts
-
-        $districtmodel = new DistrictModel();
         $data['districts'][0] = 'Select Districts';
+        // If user district_id avaliable
 
         if ($this->user->district_id) {
-            $districts = $districtmodel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+            $districts =  $this->districtModel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
         } else {
-            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+            $districts =  $this->districtModel->orderBy('name', 'asc')->findAll();
         }
-      
         foreach ($districts as $district) {
             $data['districts'][$district->id] = $district->name;
         }
-
         $data['district_id'] = $this->user->district_id;
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
         }
-        
+
+        /// Units populate
+
         $data['units'][0] = 'Select Unit Type';
-        $units = $enterprisesunitmodel->orderBy('name', 'asc')->findAll();
-       
+        $units = $this->enterprisesunitmodel->orderBy('name', 'asc')->findAll();
         foreach ($units as $unit) {
             $data['units'][$unit->id] = $unit->name;
         }
-
         $data['unit_id'] = 0;
 
-
         //populate blocks of district selected
-        $data['blocks'][0] = 'Select Block';
-        if ($data['district_id']) {
 
-            $blocks = $blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
-            
+        $data['blocks'][0] = 'Select Block';
+        // if user block_id is avaliable populate blocks else populate selected district's blocks 
+        if ($this->user->block_id) {
+            $blocks =  $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->user->block_id;
+
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        } else {
+            $blocks =  $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->request->getGet('block_id');
+
             foreach ($blocks as $block) {
                 $data['blocks'][$block->id] = $block->name;
             }
         }
 
-
-        //get years from district selected
+        //get years from district selected 
         $data['years'][0] = 'Select DOE';
         if ($this->request->getGet('district_id')) {
             $district_id = $this->request->getGet('district_id');
-            $yeardata = $enterprisesmodel->yearWise($district_id);
+            $yeardata =  $this->enterprisesModel->yearWise($district_id);
 
             foreach ($yeardata as $year) {
                 $data['years'][] = $year->year;
             }
         }
-
-        $data['block_id'] = $this->user->block_id;
-        if ($this->request->getGet('block_id')) {
-            $data['block_id'] = $this->request->getGet('block_id');
-        }
-
-        //for block login
-        if($this->user->block_id){
-
-        }
-
+        //get management unit type 
         $data['management_unit_type'] = '';
         if ($this->request->getGet('management_unit_type')) {
             $data['management_unit_type'] = $this->request->getGet('management_unit_type');
         }
 
+        // get doeyear
         $data['doeyear'] = 0;
         if ($this->request->getGet('doeyear')) {
             $data['doeyear'] = $this->request->getGet('doeyear');
         }
+        // Unit_id populate
         $data['unit_id'] = 0;
         if ($this->request->getGet('unit_id')) {
             $data['unit_id'] = $this->request->getGet('unit_id');
         }
-
+        // filter 
         $filteredData = $this->filter();
 
         $data['enterprises'] = [];
@@ -134,17 +152,14 @@ class Enterprises extends AdminController
         }
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
-        $jsonData = json_encode($data);
 
-        // dd($jsonData);
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
 
     public function search()
     {
-        $this->enterprisesmodel = new EnterprisesModel();
         $requestData = $_REQUEST;
-        $totalData = $this->enterprisesmodel->getTotals();
+        $totalData = $this->enterprisesModel->getTotals();
         $totalFiltered = $totalData;
 
         $filter_data = array(
@@ -159,9 +174,9 @@ class Enterprises extends AdminController
             'start' => $requestData['start'],
             'limit' => $requestData['length']
         );
-        $totalFiltered = $this->enterprisesmodel->getTotals($filter_data);
+        $totalFiltered = $this->enterprisesModel->getTotals($filter_data);
 
-        $filteredData = $this->enterprisesmodel->getAll($filter_data);
+        $filteredData = $this->enterprisesModel->getAll($filter_data);
 
         $datatable = array();
         foreach ($filteredData as $result) {
@@ -184,7 +199,6 @@ class Enterprises extends AdminController
                 $action,
             );
         }
-        //printr($datatable);
         $json_data = array(
             "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
             "recordsTotal" => intval($totalData),
@@ -192,56 +206,45 @@ class Enterprises extends AdminController
             "data" => $datatable
         );
 
-        return $this->response->setContentType('application/json')
-            ->setJSON($json_data);
+        return $this->response->setContentType('application/json')->setJSON($json_data);
     }
 
     private function filter()
     {
-        $enterprisesmodel = new EnterprisesModel();
         $filter = [];
 
         // if $this user has district_id, then filter by district_id
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
         }
-
         if ($this->request->getGet('district_id') > 0) {
             $filter['district_id'] = $this->request->getGet('district_id');
         }
-
         if ($this->request->getGet('unit_id') > 0) {
             $filter['unit_id'] = $this->request->getGet('unit_id');
         }
-
+        if ($this->user->block_id) {
+            $filter['block_id'] = $this->user->block_id;
+        }
         if ($this->request->getGet('block_id') > 0) {
             $filter['block_id'] = $this->request->getGet('block_id');
         }
-
-
-
         if ($this->request->getGet('management_unit_type') != 'all') {
             $filter['management_unit_type'] = $this->request->getGet('management_unit_type');
         }
         if ($this->request->getGet('doeyear') > 0) {
             $filter['doeyear'] = $this->request->getGet('doeyear');
         }
-
-
-        $filteredData = $enterprisesmodel->getAll($filter);
-        // dd($filteredData);
+        $filteredData =  $this->enterprisesModel->getAll($filter);
         return $filteredData;
     }
 
     public function download()
     {
-        $enterprisesmodel = new EnterprisesModel();
 
         $filteredData = $this->filter();
-
         $worksheet_unit = [];
         $data['entdatas'] = [];
-
         foreach ($filteredData as $row) {
             $data['entdatas'][] = [
                 'unit_name' => $row->unit_name,
@@ -261,10 +264,7 @@ class Enterprises extends AdminController
                 'contact_mobile' => $row->contact_mobile,
             ];
         }
-
         $filename = 'Enterprise-Establishment' . '.xlsx';
-
-
         $sheetindex = 0;
         $reader = new Html();
         $doc = new \DOMDocument();
@@ -324,17 +324,11 @@ class Enterprises extends AdminController
         exit();
     }
 
-
     public function add()
     {
         if ($this->request->getMethod(1) == 'POST') {
 
-            $enterprisesmodel = new EnterprisesModel();
-            $entequipmentmodel = new EnterprisesEquipmentModel();
-
-            $enterprisesmodel->where('id', $this->request->getGet('id'))->delete();
-
-
+            $this->enterprisesModel->where('id', $this->request->getGet('id'))->delete();
             $enterprisesdata = [
                 'unit_id' => $this->request->getPost('unit_id'),
                 'district_id' => $this->request->getPost('district_id'),
@@ -360,52 +354,40 @@ class Enterprises extends AdminController
 
 
             ];
-
-            $enterprisesmodel->insert($enterprisesdata);
-
-            $unitId = $enterprisesmodel->insertID();
-
+            $this->enterprisesModel->insert($enterprisesdata);
+            $unitId =  $this->enterprisesModel->insertID();
             $equipmentData = [];
-
             if ($unitId) {
                 $equipments = $this->request->getPost('equipments');
                 $quantities = $this->request->getPost('quantity');
-
                 // Check if equipment details are available and they are arrays
                 if ($equipments && $quantities && is_array($equipments) && is_array($quantities)) {
                     // Loop through equipment details and quantities
                     foreach ($equipments as $index => $equipment) {
                         // Use the same index for both equipments and quantities arrays
                         $quantity = $quantities[$index] ?? 0;
-
                         $equipmentData[] = [
                             'ent_id' => $unitId,
                             'equipment_id' => $equipment,
                             'quantity' => $quantity,
                         ];
                     }
-                    $entequipmentmodel->insertBatch($equipmentData);
+                    $this->entEquipmentModel->insertBatch($equipmentData);
                 }
             }
-
-
             return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Added Successfully');
         }
-
         return $this->getForm();
     }
 
     public function edit()
     {
-        $entequipmentmodel = new EnterprisesEquipmentModel();
 
-        $enterprisesmodel = new EnterprisesModel();
         if ($this->request->getMethod(1) == 'POST') {
-
             $id = $this->request->getGet('id');
             $district_id = $this->request->getPost('district_id');
             $block_id = $this->request->getPost('block_id');
-            $enterprisesmodel->where('id', $id)->delete();
+            $this->enterprisesModel->where('id', $id)->delete();
             //if is_support_basis_infr is no set values
             if ($this->request->getPost('is_support_basis_infr') == 0) {
                 $data = [
@@ -448,11 +430,11 @@ class Enterprises extends AdminController
 
             ];
             // dd($enterprisesdata);
-            $data['enterprises'] = $enterprisesmodel->insert($enterprisesdata);
-            $unitId = $enterprisesmodel->insertID();
+            $data['enterprises'] =  $this->enterprisesModel->insert($enterprisesdata);
+            $unitId =  $this->enterprisesModel->insertID();
             $id = $this->request->getGet('id');
 
-            $entequipmentmodel->where('id', $id)->delete();
+            $this->entEquipmentModel->where('id', $id)->delete();
             $equipmentData = [];
 
             if ($unitId) {
@@ -473,10 +455,9 @@ class Enterprises extends AdminController
                             'quantity' => $quantity,
                         ];
                     }
-                    $data['enterprises'] = $entequipmentmodel->insertBatch($equipmentData);
+                    $data['enterprises'] = $this->entEquipmentModel->insertBatch($equipmentData);
                 }
             }
-
             return redirect()->to(admin_url('enterprises'))->with('message', 'Enterprise Establishment Data Updated Successfully');
         }
 
@@ -486,36 +467,31 @@ class Enterprises extends AdminController
 
     public function ajaxBlocks()
     {
-
         $data['blocks'] = [];
-        $BlocksModel = new BlockModel();
-        // $blockModel = new LgdBlocksModel();
-
-        $district_id = $this->request->getGet('district_id');
-
-        $data['blocks'] = $BlocksModel->where('district_id', $district_id)->orderBy('name', 'asc')->findAll();
-        // printr($data);exit;
+        if ($this->user->block_id) {
+            $block_id = $this->user->block_id;
+            $data['blocks'] = $this->blockModel->where('id', $block_id)->orderBy('name', 'asc')->findAll();
+        } else {
+            $data['blocks'] = $this->blockModel->where('district_id', $this->request->getGet('district_id'))->orderBy('name', 'asc')->findAll();
+        }
         return $this->response->setJSON($data);
     }
 
     public function ajaxDoe()
     {
         $data['years'] = [];
-        $enterprisesmodel = new EnterprisesModel();
         $district_id = $this->request->getGet('district_id');
-        $data['years'] = $enterprisesmodel->yearWise($district_id);
-
+        $data['years'] =  $this->enterprisesModel->yearWise($district_id);
         return $this->response->setJSON($data);
     }
 
     public function ajaxgps()
     {
         $data['gps'] = [];
-        $gpmodel = new EnterpriseGpModel();
 
         $block_id = $this->request->getGet('block_id');
 
-        $data['gps'] = $gpmodel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
+        $data['gps'] = $this->gpModel->where('block_id', $block_id)->orderBy('name', 'asc')->findAll();
 
         return $this->response->setJSON($data);
     }
@@ -523,12 +499,9 @@ class Enterprises extends AdminController
     public function ajaxvillages()
     {
         $data['villages'] = [];
-        $villagemodel = new EnterpriseVillagesModel();
-        // $lgdvillagemodel = new LgdVillagesModel();
         $gp_id = $this->request->getGet('gp_id');
 
-        $data['villages'] = $villagemodel->where('gp_id', $gp_id)
-            ->orderBy('name', 'asc')->findAll();
+        $data['villages'] = $this->villageModel->where('gp_id', $gp_id)->orderBy('name', 'asc')->findAll();
 
         return $this->response->setJSON($data);
     }
@@ -536,15 +509,13 @@ class Enterprises extends AdminController
     public function ajaxcenter()
     {
 
-        $enterprisesmodel = new EnterprisesModel();
-        $enterprisesunitmodel = new EnterprisesUnitModel();
-
+        $data['main_centers'] = [];
         $data['main_center_name'] = [];
         $district_id = $this->request->getGet('district_id');
         $block_id = $this->request->getGet('block_id');
         $unit_id = $this->request->getGet('unit_id');
 
-        $mainCenters = $enterprisesmodel->getMainCenters($district_id, $block_id, $unit_id);
+        $mainCenters =  $this->enterprisesModel->getMainCenters($district_id, $block_id, $unit_id);
 
         $data['main_centers'] = $mainCenters;
 
@@ -560,54 +531,43 @@ class Enterprises extends AdminController
     public function getForm()
     {
         $this->template->add_package(['uploader', 'jquery_loading', 'select2'], true);
-        // $this->template->add_package(array('datatable','select2'),true);
         helper('form');
-        $enterprisesmodel = new EnterprisesModel();
-        $enterprisesbudgetmodel = new EnterprisesBudgetModel();
-        $enterprisesunitmodel = new EnterprisesUnitModel();
-        $villagemodel = new EnterpriseVillagesModel();
-        $gpmodel = new EnterpriseGpModel();
-        $districtmodel = new DistrictModel();
-        $blockmodel = new BlockModel();
-
-        $equipmentmodel = new EquipmentModel();
 
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
         }
-
+        //enterprise text name change when id avaliable 
         $data['enterprise_text'] = "Add Enterprise Data";
-        // dd($this->request->getGet('id'));
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
-            $enterprise = $enterprisesmodel->find($this->request->getGet('id'));
-
+            $enterprise =  $this->enterprisesModel->find($this->request->getGet('id'));
             $data['enterprise_text'] = "Edit Enterprise Data";
         }
-
-        // dd($enterprisesmodel->db->getFieldNames('enterprises'));
-        foreach ($enterprisesmodel->db->getFieldNames('enterprises') as $field) {
+        // for view or edit
+        foreach ($this->enterprisesModel->db->getFieldNames('enterprises') as $field) {
+            //add fields for edit
             if ($this->request->getPost($field)) {
-
                 $data[$field] = $this->request->getPost($field);
             } else if (isset($enterprise->{$field}) && $enterprise->{$field}) {
+                // view or edit
                 $data[$field] = html_entity_decode($enterprise->{$field}, ENT_QUOTES, 'UTF-8');
             } else {
+                //add fields for add
                 $data[$field] = '';
             }
         }
-        // dd($data);
-        //
+
         $id = $this->request->getGet('id');
         $data['enterpriseequipments'] = [];
+        //for edit or view data 
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
-            $data['enterpriseequipments'] = $enterprisesmodel->equipment($id);
+            $data['enterpriseequipments'] =  $this->enterprisesModel->equipment($id);
         }
 
         //units
         $data['units'] = [];
         $data['units'][] = 'Select Units';
 
-        $units = $enterprisesunitmodel->findAll();
+        $units = $this->enterprisesunitmodel->findAll();
 
         foreach ($units as $unit) {
             $data['units'][$unit->id] = $unit->name;
@@ -619,98 +579,108 @@ class Enterprises extends AdminController
             'FPO' => 'FPO',
         ];
 
-        //saraswatee
-        //district
-
-        $districtmodel = new DistrictModel();
-        $data['districts'][0] = 'Select Districts';
-
+        // initialise district
+        $data['districts'] = [];
+        //district populate when user district_id avaliable else all districts populate
         if ($this->user->district_id) {
-            $districts = $districtmodel->where('id', $this->user->district_id)->asArray()->orderBy('name', 'asc')->findAll();
+            $districts = $this->districtModel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+            $data['district_id'] = $this->user->district_id;
         } else {
-            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+            $districts = $this->districtModel->orderBy('name', 'asc')->findAll();
         }
-        
-        $data['district_id'] = $this->user->district_id;
-        if ($this->request->getGet('district_id')) {
-            $data['district_id'] = $this->request->getGet('district_id');
-        }
-
-        //rakesh s
-        // $data['districts'][] = 'Select districts';
-        // $district_id = 0;
-        // $districts = $districtmodel->asArray()->orderBy('name', 'asc')->findAll();
+        // store districts in array for select
         $data['districts'] = $districts;
 
+        //initialise block
+        $data['blocks'] = [];
+        $data['gps'] = [];
 
-        $data['blocks'][0] = 'Select Block';
+        //when district id avaliable show blocks otherwise all blocks populate
+        if ($this->user->block_id) {
+            $blocks  = $$this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
 
+            $data['blocks'] = $blocks;
+
+            $data['block_id'] = $this->user->block_id;
+            //get gps of the block of fa level
+            $gps = $this->gpModel->where('block_id', $this->user->block_id)->findAll();
+            $data['gps'] = $gps;
+        } else if ($this->user->district_id) {
+            $blocks = $$this->blockModel->where('district_id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+            $data['blocks'] = $blocks;
+        }
+
+        $data['villages'] = [];
+
+        //get data for edit
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
-            $enterprise = $enterprisesmodel->find($id);
+            $enterprise =  $this->enterprisesModel->find($id);
             $district_id = $enterprise->district_id;
             $block_id = $enterprise->block_id;
             $gp_id = $enterprise->gp_id;
 
-            $blocks = $blockmodel->where('district_id', $district_id)->findAll();
+            $blocks = $this->blockModel->where('district_id', $district_id)->findAll();
 
-            foreach ($blocks as $block) {
-                $data['blocks'][$block->id] = $block->name;
-            }
-            $gps = $gpmodel->where('block_id', $data['block_id'])->findAll();
+            $data['blocks'] = $blocks;
 
-            foreach ($gps as $gp) {
-                $data['gps'][$gp->id] = $gp->name;
-            }
-            $villages = $villagemodel->where('gp_id', $data['gp_id'])->findAll();
+            $gps = $$this->gpModel->where('block_id', $block_id)->findAll();
 
-            foreach ($villages as $village) {
-                $data['villages'][$village->id] = $village->name;
-            }
+            $data['gps'] = $gps;
+
+            $villages = $$this->villagemodel->where('gp_id', $gp_id)->findAll();
+
+            $data['villages'] = $villages;
         }
 
-        $data['gps'][] = 'Select Gp';
-
-        $data['villages'][] = 'Select Village';
-
-        //equipment
+        //equipment list
 
         $data['equipments'][] = 'Select Equipment name';
 
-        $equipments = $equipmentmodel->findAll();
+        $equipments = $this->equipmentModel->findAll();
 
         foreach ($equipments as $equipment) {
             $data['equipments'][$equipment->id] = $equipment->name;
         }
-        // $equipment_id = 0;
+
         $data['equipment_id'] = 0;
         //Budget fin yrs
         $data['unit_budgets'][] = 'Select budgets';
-        // $budget_id = [];
-        $unit_budgets = $enterprisesbudgetmodel->findAll();
+        $unit_budgets = $this->enterprisesBudgetModel->findAll();
 
         foreach ($unit_budgets as $unit_budget) {
             $data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
         }
-        //Addl budget
+        //Addl budget 
         $data['addl_budgets'][] = 'Select budgets';
 
-        $addl_budgets = $enterprisesbudgetmodel->findAll();
+        $addl_budgets = $this->enterprisesBudgetModel->findAll();
 
         foreach ($addl_budgets as $addl_budget) {
             $data['addl_budgets'][$addl_budget->id] = $addl_budget->budget_code;
         }
         ////Budget final year
-        $yearmodel = new YearModel();
         $data['budget_fin_yrs'][] = 'Select Budget Year';
 
-        $budget_fin_yrs = $yearmodel->findAll();
+        $budget_fin_yrs = $this->yearModel->findAll();
 
         foreach ($budget_fin_yrs as $budget_fin_yr) {
             $data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
         }
-        //main center dropdown
-        $data['main_center_name'][] = 'Select main center name';
+        //main center dropdown when anyone select sub center 
+        $data['main_centers'] = [];
+        // main center will be shown only when sub center is selected and have district, block and unit id
+        $filter = [
+            'center_type' => 'main_center',
+            'district_id' => $data['district_id'],
+            'block_id' => $data['block_id'],
+            'unit_id' => $data['unit_id'],
+        ];
+        // main center name is concatenated with management unit type and management unit name and its id will same as enterprise id
+        $main_centers =  $this->enterprisesModel->select("id, CONCAT(managing_unit_name,' (',management_unit_type,')') as name")
+            ->where($filter)->findAll();
 
+        $data['main_centers'] = $main_centers;
+        // add gp url
         $data['add_gp_url'] = admin_url('grampanchayat/add');
 
         //Add village Url
@@ -722,18 +692,14 @@ class Enterprises extends AdminController
     public function getLgdGps()
     {
         $block_id = $this->request->getGet('block_id');
-        $gpModel = new LgdGpsModel();
-
+        // get all LGD gps of the block selected
         $block = (new LgdBlocksModel())->where('block_id', $block_id)->first();
 
-        $data['gps'] = $gpModel->where('block_lgd_code', $block->lgd_code)
-            ->orderBy('name', 'asc')->asArray()->findAll();
-
+        $data['gps'] = $this->lgdGpModel->where('block_lgd_code', $block->lgd_code)->orderBy('name', 'asc')->asArray()->findAll();
         $data['label'] = 'Select Gp';
         $data['id'] = 'gp_id';
         $data['gp_id'] = '';
         $data['block_id'] = $block_id;
-
         $data['post_url'] = admin_url('grampanchayat/ajaxadd');
         $data['title'] = 'Add new Gram panchayat';
         $data['html'] = view('Admin\Enterprises\Views\modal_dropdown', $data);
@@ -744,11 +710,10 @@ class Enterprises extends AdminController
     public function getLgdVillages()
     {
         $gp_id = $this->request->getGet('gp_id');
-        $vModel = new LgdVillagesModel();
 
         $gp = (new GrampanchayatModel())->find($gp_id);
 
-        $data['gps'] = $vModel->where('gp_lgd_code', $gp->lgd_code)
+        $data['gps'] = $this->lgdVillageModel->where('gp_lgd_code', $gp->lgd_code)
             ->orderBy('name', 'asc')->asArray()->findAll();
 
         $data['label'] = 'Select Village';

@@ -424,7 +424,7 @@ class EnterprisesModel extends Model
       INNER JOIN enterprises_units eu
         ON e.unit_id = eu.id
       WHERE e.deleted_at IS NULL
-      AND eu.deleted_at IS NULL AND main_center_id IS NOT NULL AND unit_id = $unit_id";
+      AND eu.deleted_at IS NULL AND e.center_type = 'main_center' AND main_center_id IS NOT NULL AND unit_id = $unit_id";
         if ($district_id) {
             $sql .= " AND e.district_id = " . (int)$district_id;
         }
