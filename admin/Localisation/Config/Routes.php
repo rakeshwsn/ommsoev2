@@ -44,7 +44,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('village/delete/(:segment)', 'Localisation\Controllers\Village::delete/$1');
     $routes->post('village/delete', 'Localisation\Controllers\Village::delete');
     $routes->match(['get', 'post'], 'village/add', 'Localisation\Controllers\Village::add');
-    $routes->post('village/ajaxadd', 'Localisation\Controllers\Village::ajaxAdd');
+    $routes->post('village/ajaxadd', 'Localisation\Controllers\Village::ajaxAdd'); 
     $routes->match(['get', 'post'], 'village/edit/(:segment)', 'Localisation\Controllers\Village::edit/$1');
 
     $routes->get('blocks/grampanchayat/', 'Localisation\Controllers\Village::grampanchayat', ['permission' => false]);
