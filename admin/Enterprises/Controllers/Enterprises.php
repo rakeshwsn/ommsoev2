@@ -131,21 +131,22 @@ class Enterprises extends AdminController
         if ($this->request->getGet('unit_id')) {
             $data['unit_id'] = $this->request->getGet('unit_id');
         }
-      
+
 
         $data['enterprises'] = [];
 
         $data['edit_url'] = admin_url('enterprises/edit');
-		$data['datatable_url'] = admin_url('enterprises/search');
+        $data['datatable_url'] = admin_url('enterprises/search');
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
+
 
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
 
     public function search()
     {
-     
+
         $requestData = $_REQUEST;
         $totalData = $this->enterprisesModel->getTotals();
         $totalFiltered = $totalData;
@@ -160,16 +161,16 @@ class Enterprises extends AdminController
             'start' => $requestData['start'],
             'limit' => $requestData['length'],
         );
-        
+
         $totalFiltered = $this->enterprisesModel->getTotals($filter_data);
-       
+
         $filteredData = $this->enterprisesModel->getAll($filter_data);
 
         $datatable = array();
         foreach ($filteredData as $result) {
 
             $action = '<div class="btn-group btn-group-sm pull-right">';
-            $action .= 		'<a class="btn btn-sm btn-primary" href="' . admin_url('enterprises/edit?id=' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
+            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprises/edit?id=' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
 
             $action .= '</div>';
 
@@ -183,7 +184,7 @@ class Enterprises extends AdminController
                 $result->managing_unit_name,
                 $result->date_estd,
                 $result->mou_date,
-                $result->created_at,          
+                $result->created_at,
                 $action,
             );
         }
@@ -198,7 +199,35 @@ class Enterprises extends AdminController
         return $this->response->setContentType('application/json')->setJSON($json_data);
     }
 
+    private function filter()
+    {
+        $filter = [];
 
+        // if $this user has district_id, then filter by district_id
+        if ($this->user->district_id) {
+            $filter['district_id'] = $this->user->district_id;
+        }
+        if ($this->request->getGet('district_id') > 0) {
+            $filter['district_id'] = $this->request->getGet('district_id');
+        }
+        if ($this->request->getGet('unit_id') > 0) {
+            $filter['unit_id'] = $this->request->getGet('unit_id');
+        }
+        if ($this->user->block_id) {
+            $filter['block_id'] = $this->user->block_id;
+        }
+        if ($this->request->getGet('block_id') > 0) {
+            $filter['block_id'] = $this->request->getGet('block_id');
+        }
+        if ($this->request->getGet('management_unit_type') != 'all') {
+            $filter['management_unit_type'] = $this->request->getGet('management_unit_type');
+        }
+        if ($this->request->getGet('doeyear') > 0) {
+            $filter['doeyear'] = $this->request->getGet('doeyear');
+        }
+        $filteredData =  $this->enterprisesModel->getAll($filter);
+        return $filteredData;
+    }
     public function download()
     {
 
