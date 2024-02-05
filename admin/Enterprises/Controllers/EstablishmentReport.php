@@ -41,7 +41,7 @@ class EstablishmentReport extends AdminController
 		//Block_text
 		$block_id = $this->request->getGet('block_id');
 		if ($block_id) {
-			$data['block_text'] = $this->blockmodel->find($block_id)->name;
+			$data['block_text'] = $this->blockModel->find($block_id)->name;
 		}
 		//District text
 		$district_id = $this->request->getGet('district_id');
