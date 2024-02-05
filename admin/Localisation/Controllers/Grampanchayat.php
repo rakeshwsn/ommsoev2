@@ -289,6 +289,3 @@ class Grampanchayat extends AdminController
         return $this->response->setJSON($data);
     }
 }
-
-/* End of file hmvc.php */
-/* Location: ./application/widgets/hmvc/controllers/hmvc.php */
