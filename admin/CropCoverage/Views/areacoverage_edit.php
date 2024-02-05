@@ -103,6 +103,7 @@
                     </tr>
                     </thead>
                     <tbody>
+                
                     <?php foreach ($fups as $fup) { ?>
                     <tr>
                         <td>
@@ -128,45 +129,55 @@
                     <tbody>
                         <tr>
                             <td>
-                                Farmers No
+                                Total Ragi
                             </td>
                             <td>
-                                <input type="text" name="crop_coverage[crop_diversification_farmers]" value="<?= $crop_coverage['crop_diversification_farmers'] ?>" class="form-control physical">
+                                <input type="text" name="crop_coverage[crop_div_ragi]" value="<?= $crop_coverage['crop_div_ragi'] ?>" class="form-control financial">
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                Area (In Hectare)
+                                Total Non Ragi
                             </td>
                             <td>
-                                 <input type="text" name="crop_coverage[crop_diversification_area]" value="<?= $crop_coverage['crop_diversification_area'] ?>" class="form-control physical">
+                                 <input type="text" name="crop_coverage[crop_div_non_ragi]" value="<?= $crop_coverage['crop_div_non_ragi'] ?>" class="form-control financial">
                             </td>
                         </tr>
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <td id="total-crop-diversification"><?=$total_div_crop; ?></td>
+                    </tr>
+                    </tfoot>
                 </table>
                 <?php if ($season === 'Rabi') { ?>
-                <table class="table custom-table " id="rice-fallow-table">
-                    <div class="block-header bg-dark">
-                        <h3 class="block-title text-white">Rice Fallow Details</h3>
-                    </div>
+                <table class="table custom-table " id="fuc-table">
+                    <thead>
+                    <tr>
+                        <th>Rice Fallow Crops</th>
+                        <th>Area</th>
+                    </tr>
+                    </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                Farmers No
-                            </td>
-                            <td>
-                                 <input type="text" name="crop_coverage[rice_fallow_farmers]" value="<?= $crop_coverage['rice_fallow_farmers'] ?>" class="form-control physical">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Area (In Hectare)
-                            </td>
-                            <td>
-                                 <input type="text" name="crop_coverage[rice_fallow_area]" value="<?= $crop_coverage['rice_fallow_area'] ?>" class="form-control physical">
-                            </td>
-                        </tr>
+                
+                    <?php foreach ($ricefallows as $ricefallow) { ?>
+                    <tr>
+                        <td>
+                            <?php echo $ricefallow['crop'] ?>
+                        </td>
+                        <td>
+                            <input type="text" class="form-control financial" name="ricefallow[<?=$ricefallow['crop_id']?>]" value="<?= $ricefallow['area']; ?>">
+                        </td>
+                    </tr>
+                    <?php } ?>
                     </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>Total</td>
+                        <td id="total-rfc"><?=$rfc_total?></td>
+                    </tr>
+                    </tfoot>
                 </table>
                  <?php } ?>
             </div>
@@ -181,7 +192,7 @@
             </div>
     </div>
 </section>
-<?php js_start(); ?>
+
 <script>
     $(function () {
 
@@ -275,4 +286,4 @@
     });
     <?php } ?>
 </script>
-<?php js_end(); ?>
+

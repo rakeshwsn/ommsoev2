@@ -52,13 +52,9 @@
             </h3>
             <?php if (!$approved) { ?>
                 <div class="block-options">
-
                     <a data-toggle="tooltip" title="" id="btn-action"
                         class="btn btn-square btn-success min-width-125 mb-10 btn-approve"><i class="fa fa-check"></i>
                         Approve/Reject</a>
-
-
-
                 </div>
             <?php } ?>
         </div>
@@ -99,10 +95,12 @@
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>
                         <th rowspan="3">Total Area </th>
-                        <th rowspan="3">Total Crop Diversification Farmers</th>
-                        <th rowspan="3">Total Crop Diversification Areas</th>
-                        <th rowspan="3">Total Rice Fallow Farmers</th>
-                        <th rowspan="3">Total Rice Fallow Areas</th>
+                        <th rowspan="3">Total Crop Diversification Area
+                        </th>
+                        <?php if ($season == 'Rabi') { ?>
+                            <th rowspan="3">Total Rice Fallow Area
+                            </th>
+                        <?php } ?>
                         <th rowspan="3" class="text-right no-sort">Actions</th>
                     </tr>
                     <tr>
@@ -187,17 +185,13 @@
                                     <?= $block['total_area'] ?>
                                 </td>
                                 <td>
-                                    <?= $block['crop_diversification_farmers'] ?>
+                                    <?= $block['total_crop_div'] ?>
                                 </td>
-                                <td>
-                                    <?= $block['crop_diversification_area'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['rice_fallow_farmers'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['rice_fallow_area'] ?>
-                                </td>
+                                <?php if ($season == 'Rabi') { ?>
+                                    <td>
+                                        <?= $block['total_rfc'] ?>
+                                    </td>
+                                <?php } ?>
                                 <td>
                                     <div class="btn-group btn-group-sm pull-right">
                                         <?= $block['action'] ?>

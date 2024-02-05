@@ -40,11 +40,11 @@
                         <th rowspan="3">Total Non-Ragi </th>
                         <th rowspan="3">Follow up Crops</th>
                         <th rowspan="3">Total Area </th>
-                        <th rowspan="3">Total Crop Diversification Farmers</th>
-                        <th rowspan="3">Total Crop Diversification Area</th>
-                        <?php if ($current_season === 'rabi') { ?>
-                            <th rowspan="3">Rice Fallow Farmers</th>
-                            <th rowspan="3">Rice Fallow Area</th>
+                        <th rowspan="3">Total Crop Diversification Area
+                        </th>
+                        <?php if ($current_season == 'rabi') { ?>
+                            <th rowspan="3">Total Rice Fallow Area
+                            </th>
                         <?php } ?>
                     </tr>
                     <tr>
@@ -154,17 +154,13 @@
                                 <?= $block['total_area'] ?>
                             </td>
                             <td>
-                                <?= $block['crop_diversification_farmers'] ?>
+                                <?= $block['total_crop_div'] ?>
                             </td>
-                            <td>
-                                <?= $block['crop_diversification_area'] ?>
-                            </td>
-                            <td>
-                                <?= $block['rice_fallow_farmers'] ?>
-                            </td>
-                            <td>
-                                <?= $block['rice_fallow_area'] ?>
-                            </td>
+                            <?php if ($current_season == 'rabi') { ?>
+                                <td>
+                                    <?= $block['total_rfc'] ?>
+                                </td>
+                            <?php } ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -172,7 +168,6 @@
         </div>
     </div>
 </div>
-<?php js_start(); ?>
 <script>
     $(function () {
         $('#district').on('change', function () {
@@ -198,4 +193,3 @@
         });
     });
 </script>
-<?php js_end(); ?>
