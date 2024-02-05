@@ -25,6 +25,10 @@
         <th rowspan="3">Total Non-Ragi </th>
         <th rowspan="3">Follow up Crops</th>
         <th rowspan="3">Total Area </th>
+        <th rowspan="3">Total Crop Diversification Farmers</th>
+        <th rowspan="3">Total Crop Diversification Areas</th>
+        <th rowspan="3">Total Rice Fallow Farmers</th>
+        <th rowspan="3">Total Rice Fallow Area</th>
     </tr>
     <tr class="highlight-heading2">
         <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -76,6 +80,10 @@
             <td><?=$block['total_non_ragi']?></td>
             <td><?=$block['total_fc']?></td>
             <td><?=$block['total_area']?></td>
+            <td><?=$block['crop_diversification_farmers']?></td>
+            <td><?=$block['crop_diversification_area']?></td>
+            <td><?=$block['rice_fallow_farmers']?></td>
+            <td><?=$block['rice_fallow_area']?></td>
         </tr>
     <?php endforeach; ?>
     </tbody>
