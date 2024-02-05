@@ -394,9 +394,9 @@ $validation = \Config\Services::validation();
             var u_id = $("#unit_type").val();
             unit_type = $('#unit_type option:selected').text();
             selected_option = $(this).val();
-
+           
             // If selected option is sub_center and unit_type in ['CHC','CMSC']
-            if (selected_option == 'sub_center' && $.inArray(unit_type, ['CHC', 'CMSC']) !== -1) {
+             if (selected_option == 'sub_center' && $.inArray(unit_type, ['CHC', 'CMSC']) !== -1) {
                 $.ajax({
                     url: 'admin/enterprises/center',
                     data: {
@@ -448,43 +448,46 @@ $validation = \Config\Services::validation();
 
         //hide and show center info
 
-        $('#unit_type').on('change', function() {
-            var unit_type = $(this).find('option:selected').text().toLowerCase();
+        // $('#unit_type').on('change', function() {
+        //     var unit_type = $(this).find('option:selected').text().toLowerCase();
+        //     if (unit_type == "chc" || unit_type == "cmsc") {
+        //         $('#center_info').show();
 
-            if (unit_type == "chc" || unit_type == "cmsc") {
-                $('#center_info').show();
-            } else {
-                $('#center_info').hide();
-            }
-        });
+        //     } else {
+        //         $('#center_info').hide();
+        //     }
+        // });
+
+
         //populate unit type on document ready
         $('#unit_type').trigger("change");
 
         //Hide center dropdown if main center is selected
-        if ($("#main_center").prop("checked")) {
-            $('#center_name').hide();
-        }
+        // if ($("#main_center").prop("checked")) {
+
+        //     $('#main_center_list').hide();
+        // }
 
         // Show center dropdown when sub center is checked
-        if ($("#sub_center").is(":checked")) {
-            $('#center_name').show();
-        }
+        // if ($("#sub_center").prop(":checked")) {
+        //     $('#main_center_list').show();
+        // }
 
-        $('#sub_center').on('change', function() {
-            $sub_center_checked = $(this).prop('checked');
-            if ($sub_center_checked) {
-                $('#center_name').show();
-            } else {
-                $('#center_name').hide();
-            }
-        });
+        // $('#sub_center').on('change', function() {
+        //     $sub_center_checked = $(this).prop('checked');
+        //     if ($sub_center_checked) {
+        //         $('#main_center_list').show();
+        //     } else {
+        //         $('#main_center_list').hide();
+        //     }
+        // });
 
-        $('#main_center').on('change', function() {
-            $main_center_checked = $(this).prop('checked');
-            if ($main_center_checked) {
-                $('#center_name').hide();
-            }
-        });
+        // $('#main_center').on('change', function() {
+        //     $main_center_checked = $(this).prop('checked');
+        //     if ($main_center_checked) {
+        //         $('#main_center_list').hide();
+        //     }
+        // });
 
         //budget head will 4.1 after choosing unit type chc
         $('#unit_type,#budget_fin_yr_id').on('change', function() {
