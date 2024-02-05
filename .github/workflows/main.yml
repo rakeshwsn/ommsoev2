@@ -16,7 +16,7 @@ jobs:
       uses: webfactory/ssh-agent@v0.5.1
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+        cleanup: true
     - name: Deploy files for main branch
       run: |
         cp -r * /${{ secrets.PROD_PATH }}/
