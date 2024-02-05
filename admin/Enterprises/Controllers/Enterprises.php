@@ -597,7 +597,7 @@ class Enterprises extends AdminController
 
         //when district id avaliable show blocks otherwise all blocks populate
         if ($this->user->block_id) {
-            $blocks  = $$this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            $blocks  = $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
 
             $data['blocks'] = $blocks;
 
@@ -606,7 +606,7 @@ class Enterprises extends AdminController
             $gps = $this->gpModel->where('block_id', $this->user->block_id)->findAll();
             $data['gps'] = $gps;
         } else if ($this->user->district_id) {
-            $blocks = $$this->blockModel->where('district_id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+            $blocks = $this->blockModel->where('district_id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
             $data['blocks'] = $blocks;
         }
 
@@ -623,11 +623,11 @@ class Enterprises extends AdminController
 
             $data['blocks'] = $blocks;
 
-            $gps = $$this->gpModel->where('block_id', $block_id)->findAll();
+            $gps = $this->gpModel->where('block_id', $block_id)->findAll();
 
             $data['gps'] = $gps;
 
-            $villages = $$this->villagemodel->where('gp_id', $gp_id)->findAll();
+            $villages = $this->villageModel->where('gp_id', $gp_id)->findAll();
 
             $data['villages'] = $villages;
         }
