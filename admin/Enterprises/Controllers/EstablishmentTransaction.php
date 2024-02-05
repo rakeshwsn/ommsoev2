@@ -157,7 +157,7 @@ class EstablishmentTransaction extends AdminController
         if ($data['period'] > 0) {
             $filter['period'] = $data['period'];
         }
-        $ent_trans = $$this->establishmentTxnsDtls->periodswisetrans($filter);
+        $ent_trans = $this->establishmentTxnsDtls->periodswisetrans($filter);
         $data['trans'] = [];
 
         foreach ($ent_trans as $row) {
