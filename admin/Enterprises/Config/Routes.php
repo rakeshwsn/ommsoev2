@@ -21,7 +21,6 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/excel', 'Enterprises\Controllers\Enterprises::excel');
     $routes->post('enterprises/search', 'Localisation\Controllers\Enterprises::search', ['permission' => false]);
 
-
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
     $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::index');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
