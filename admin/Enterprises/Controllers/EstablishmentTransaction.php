@@ -9,14 +9,10 @@ use Admin\Enterprises\Models\EstablishmentTransactionModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesModel;
-use Admin\Enterprises\Models\EnterprisesTransactionModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
-use Admin\Enterprises\Models\EnterpriseVillagesModel;
 use Admin\Dashboard\Models\YearModel;
 use Admin\Enterprises\Models\EnterpriseUnitGroup;
-use Admin\Localisation\Controllers\Block;
-use Admin\Localisation\Controllers\District;
 use App\Controllers\AdminController;
 use App\Libraries\Export;
 use Config\ExcelStyles;
@@ -29,6 +25,29 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class EstablishmentTransaction extends AdminController
 {
+    private $establishmenTransaction;
+    private $establishmentTxnsDtls;
+    private $yearModel;
+    private $monthModel;
+    private $districtModel;
+    private $entunitModel;
+    private $entUnitGrpModel;
+    private $enterprisesModel;
+
+
+    public function __construct()
+    {
+        $this->establishmenTransaction = new EstablishmentTransactionModel();
+        $this->establishmentTxnsDtls = new EstablishmentTransactionDetailsModel();
+        $this->yearModel = new YearModel();
+        $this->monthModel = new MonthModel();
+        $this->districtModel = new DistrictModel();
+        $this->entunitModel = new EnterprisesUnitModel();
+        $this->entUnitGrpModel = new EnterpriseUnitGroup();
+        $this->entunitModel = new EnterprisesUnitModel();
+        $this->enterprisesModel = new EnterprisesModel();
+
+    }
     private $columns = [
         'Machinary' => [
             'no_of_days_functional' => 'No. of Days Functional',
@@ -61,27 +80,20 @@ class EstablishmentTransaction extends AdminController
     {
         helper('form');
         $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
-        $establishmentransaction = new EstablishmentTransactionModel();
-        $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
-        $yearModel = new YearModel();
         $data['years'][0] = 'Select Year';
-
         $data['year_id'] = 0;
-        $years = $yearModel->findAll();
-
+        $years = $this->yearModel->findAll();
         foreach ($years as $year) {
             $data['years'][$year->id] = $year->name;
         }
 
-        $data['year_id'] = $yearModel->getCurrentYear()->id;;
+        $data['year_id'] = $this->yearModel->getCurrentYear()->id;;
         if ($this->request->getGet('year_id')) {
             $data['year_id'] = $this->request->getGet('year_id');
         }
-
-        $monthmodel = new MonthModel();
         $data['months'][0] = 'Select Month';
 
-        $months = $monthmodel->findAll();
+        $months = $this->monthModel->findAll();
 
         foreach ($months as $month) {
             $data['months'][$month->id] = $month->name;
@@ -91,13 +103,12 @@ class EstablishmentTransaction extends AdminController
         if ($this->request->getGet('month_id')) {
             $data['month_id'] = $this->request->getGet('month_id');
         }
-        $districtmodel = new DistrictModel();
         $data['districts'][0] = 'Select Districts';
 
         if ($this->user->district_id) {
-            $districts = $districtmodel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+            $districts = $this->districtModel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
         } else {
-            $districts = $districtmodel->orderBy('name', 'asc')->findAll();
+            $districts = $this->districtModel->orderBy('name', 'asc')->findAll();
         }
 
         foreach ($districts as $district) {
@@ -109,10 +120,9 @@ class EstablishmentTransaction extends AdminController
             $data['district_id'] = $this->request->getGet('district_id');
         }
         //unit
-        $entunitmodel = new EnterprisesUnitModel();
         $data['units'][0] = 'Select units';
 
-        $units = $entunitmodel->orderBy('name', 'asc')->findAll();
+        $units =  $this->entunitModel->orderBy('name', 'asc')->findAll();
 
         foreach ($units as $unit) {
             $data['units'][$unit->id] = $unit->name;
@@ -147,7 +157,7 @@ class EstablishmentTransaction extends AdminController
         if ($data['period'] > 0) {
             $filter['period'] = $data['period'];
         }
-        $ent_trans = $establishmenttrasdtl->periodswisetrans($filter);
+        $ent_trans = $$this->establishmentTxnsDtls->periodswisetrans($filter);
         $data['trans'] = [];
 
         foreach ($ent_trans as $row) {
@@ -168,18 +178,15 @@ class EstablishmentTransaction extends AdminController
         $data['excel_link'] = admin_url('enterprisestrans/download');
         $data['upload_url'] = admin_url('enterprisestrans/upload');
 
-    
-
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
     public function edit()
     {
-        $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
 
         if ($this->request->getMethod(1) == 'POST') {
             $id = $this->request->getGet('id');
             $enterprisetransdata = [];
-            $entdata = $establishmenttrasdtl->idwisetrans($id);
+            $entdata = $this->establishmentTxnsDtls->idwisetrans($id);
 
             if (!empty($entdata) && isset($entdata[0])) {
                 $entdata = $entdata[0];
@@ -196,7 +203,7 @@ class EstablishmentTransaction extends AdminController
                 }
             }
 
-            $establishmenttrasdtl->update($id, $enterprisetransdata);
+            $this->establishmentTxnsDtls->update($id, $enterprisetransdata);
 
             return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'update successful');
         }
@@ -207,11 +214,10 @@ class EstablishmentTransaction extends AdminController
     private function getForm()
     {
         helper('form');
-        $establishmenttrasdtl = new EstablishmentTransactionDetailsModel();
         $data['unit_groups'] = $this->columns;
         $id = $this->request->getGet('id');
         if ($id) {
-            $entdata = $establishmenttrasdtl->idwisetrans($id);
+            $entdata = $this->establishmentTxnsDtls->idwisetrans($id);
             if (!empty($entdata) && isset($entdata[0])) {
                 $entdata = $entdata[0];
 
@@ -243,33 +249,23 @@ class EstablishmentTransaction extends AdminController
             }
             return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
         }
-
     }
-
-
 
     public function download()
     {
 
-        $enterprisesmodel = new EnterprisesModel();
-        $enterprisestransaction = new EnterprisesTransactionModel();
-        $monthmodel = new MonthModel();
-        $yearmodel = new YearModel();
-        $enterpriseunitsmodel = new EnterprisesUnitModel();
-        $establishmentransaction = new EstablishmentTransactionModel();
-        $ugModel = new EnterpriseUnitGroup();
-        $unit_groups = $ugModel->findAll();
+        $unit_groups = $this->entUnitGrpModel->findAll();
         $worksheet_unit = [];
         foreach ($unit_groups as $group) {
-            $units = $enterpriseunitsmodel->getAll(['unit_group_id' => $group->id]);
+            $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
             $group->units = $units;
         }
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
         $district_id = $this->request->getGet('district_id');
         $period = $this->request->getGet('period');
-        $month_name = $monthmodel->find($month_id)->name;
-        $year_name = $yearmodel->find($year_id)->name;
+        $month_name = $this->monthModel->find($month_id)->name;
+        $year_name = $this->yearModel->find($year_id)->name;
         $filename = 'EntTxnTemplate_' . $month_name . '_' . $year_name . '_' . date('Y-m-d_His') . '.xlsx';
         $sheetindex = 0;
         $reader = new Html();
@@ -287,7 +283,7 @@ class EstablishmentTransaction extends AdminController
 
             // fetch enterprises by district_id and unit_id
             foreach ($group->units as &$unit) {
-                $enterprises = $enterprisesmodel->getBy([
+                $enterprises = $this->enterprisesModel->getBy([
                     'district_id' => $district_id,
                     'unit_id' => $unit['id']
                 ]);
@@ -398,7 +394,7 @@ class EstablishmentTransaction extends AdminController
         );
 
         //start protection
-        //
+    
         $spreadsheet->setActiveSheetIndex(0);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -412,10 +408,6 @@ class EstablishmentTransaction extends AdminController
 
     public function upload()
     {
-        $enterpriseunitsmodel = new EnterprisesUnitModel();
-        $enterprisestransaction = new EnterprisesTransactionModel();
-        $enterprisetransdetails = new EstablishmentTransactionDetailsModel();
-        $establishmentransaction = new EstablishmentTransactionModel();
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
@@ -468,7 +460,7 @@ class EstablishmentTransaction extends AdminController
                 'period' => $period,
             ];
 
-            $exists = $enterprisestransaction->isExists($data);
+            $exists = $this->establishmenTransaction->isExists($data);
 
             if ($exists) {
                 $status = false;
@@ -495,7 +487,7 @@ class EstablishmentTransaction extends AdminController
                                 'period' => (int)$period,
                             ];
 
-                            $transaction_id = $enterprisestransaction->insert($data);
+                            $transaction_id = $this->establishmenTransaction->insert($data);
 
                             $data = [
                                 'enterprise_id' => (int)$transaction[1],
@@ -512,7 +504,7 @@ class EstablishmentTransaction extends AdminController
                                 $data[$key] = (float)$transaction[$col++];
                             }
 
-                            $enterprisetransdetails->insert($data);
+                            $this->establishmenTransaction->insert($data);
                             $status = true;
                             $message = 'Uploaded successfully';
                         }

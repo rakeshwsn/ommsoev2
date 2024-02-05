@@ -120,6 +120,7 @@
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
     var download_url = "http://ommsoev2.local/admin/enterprises/exceldownld";
 
@@ -138,26 +139,11 @@
         var table = $('#datatable').DataTable({
             "paging": true,
             "pageLength": 10,
-            // "ajax": {
-            //     url: "",
-            //     type: "post", // method  , by default get
-            //     data: {},
-            //     beforeSend: function() {
-            //         $('.alert-dismissible, .text-danger').remove();
-            //         $("#datatable_wrapper").LoadingOverlay("show");
-            //     },
-            //     complete: function() {
-            //         $("#datatable_wrapper").LoadingOverlay("hide");
-            //     },
-            //     error: function() {
-            //         $("#datatable_processing").css("display", "none");
-
-            //     },
-            //     dataType: 'JSON'
-            // }
+           
         });
 
         $(function() {
+
             $('#districts').on('change', function() {
 
                 var d_id = $(this).val(); // Declare d_id with var
@@ -178,8 +164,11 @@
                                 html += '<option value="' + v.id + '">' + v.name + '</option>';
                             });
                             $('#blocks').html(html);
+                            
                         }
+                       
                     },
+                    
                     error: function() {
                         alert('something went wrong');
                     },
@@ -216,10 +205,7 @@
                 });
 
             });
-
-            <?php if($district_id) { ?> 
-                $('#districts').trigger('change');
-            <?php } ?>
+ 
         });
     })
 </script>

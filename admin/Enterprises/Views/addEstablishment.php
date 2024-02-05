@@ -20,24 +20,19 @@ $validation = \Config\Services::validation();
         <div class="block-header block-header-default">
             <h1 class="block-title"><b><?php echo $enterprise_text ?></b></h1>
         </div>
-        <div class="dotted-border mx-4 my-4 pd-3">
 
+        <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Local Info</h3>
                 <div class="row">
                     <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                         <label for="district_id">District<span class="text-danger"></span></label>
-                        <?= form_dropdown('district_id', option_array_values($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
+                        <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                         <label for="block_id">Block<span class="text-danger"></span></label>
                         <?php
-                        $select_attributes = array(
-                            'class' => 'form-control js-select2',
-                            'id' => 'blocks',
-                        );
-                       
-                        echo form_dropdown('block_id', $blocks, $block_id, $select_attributes); ?>
+                        echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name', array('0' => 'Select Block')), set_value('block_id', $block_id), "id='blocks' class='form-control js-select2'"); ?>
                     </div>
                 </div>
                 <div class="row">
@@ -45,12 +40,12 @@ $validation = \Config\Services::validation();
                         <label for="gp_id">GP<span class="text-danger"></span></label>
                         <div class="input-group">
                             <?php
-                            $select_attributes = array(
-                                'class' => 'form-control js-select2',
-                                'id' => 'gps',
-                            );
-                           
-                            echo form_dropdown('gp_id', $gps, $gp_id, $select_attributes); ?>
+                            echo form_dropdown(
+                                'gp_id',
+                                option_array_value($gps, 'id', 'name', array('0' => 'Select GP')),
+                                set_value('gp_id', $gp_id),
+                                "id='gps' class='form-control js-select2'"
+                            ); ?>
                             <div class="input-group-append">
                                 <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add
                                     GP</a>
@@ -62,12 +57,7 @@ $validation = \Config\Services::validation();
                         <label for="village_id">Village<span class="text-danger"></span></label>
                         <div class="input-group">
                             <?php
-                            $select_attributes = array(
-                                'class' => 'form-control js-select2',
-                                'id' => 'villages',
-                            );
-                           
-                            echo form_dropdown('village_id', $villages, $village_id, $select_attributes); ?>
+                            echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
                             <div class="input-group-append">
                                 <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
                             </div>
@@ -78,7 +68,6 @@ $validation = \Config\Services::validation();
         </div>
 
         <div class="dotted-border mx-4 my-4 pd-3">
-
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Unit Info</h3>
                 <div class="row">
@@ -89,7 +78,6 @@ $validation = \Config\Services::validation();
                             'class' => 'form-control js-select2',
                             'id' => 'unit_type',
                         );
-                      
                         echo form_dropdown('unit_id', $units, $unit_id, $select_attributes); ?>
                     </div>
                     <div class="col-6 form-group mt-15 <?= $validation->hasError('management_unit_type') ? 'is-invalid' : '' ?>">
@@ -98,7 +86,6 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
                 <div class="row">
-
                     <div class="col-6 form-group <?= $validation->hasError('managing_unit_name') ? 'is-invalid' : '' ?>">
                         <label for="managing unit name">Name Of Managing Unit<span class="text-danger">*</span></label>
                         <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>" required>
@@ -119,6 +106,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3" id="center_info">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Center Info</h3>
@@ -134,7 +122,7 @@ $validation = \Config\Services::validation();
                     <div id="center_name" class="col-6 form-group mt-15 <?= $validation->hasError('') ? 'is-invalid' : '' ?>">
                         <label for="main_center_name">Main Center name<span class="text-danger">*</span></label>
                         <?php
-                        echo form_dropdown('main_center_id', $main_center_name, [], ['class' => 'form-control', 'id' => 'main_center_list']); ?>
+                        echo form_dropdown('main_center_id', option_array_value($main_centers, 'id', 'name', ['0' => 'Select Main Center']), set_value('main_center_id', $main_center_id), ['class' => 'form-control', 'id' => 'main_center_list']); ?>
                         <div id="center_message" class="text-danger mt-3"></div>
                     </div>
                 </div>
@@ -149,7 +137,6 @@ $validation = \Config\Services::validation();
                                 </tr>
                             </thead>
                             <tbody>
-
                                 <?php if (isset($enterpriseequipments)) {
                                     $rows = 0;
                                     foreach ($enterpriseequipments as $equipment) { ?>
@@ -166,7 +153,7 @@ $validation = \Config\Services::validation();
                                             </td>
                                             <td><input type="text" class="form-control" name="quantity[<?= $rows ?>]" value="<?= $equipment->quantity ?>"></td>
                                             <td>
-                                                <button type="button" class="btn-sm btn btn-danger btn pull-right" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
+                                                <button type="button" class="btn-sm btn btn-danger btn-remove btn pull-right" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
                                             </td>
 
                                         </tr>
@@ -185,6 +172,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Date Info</h3>
@@ -200,6 +188,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Budget Info</h3>
@@ -225,6 +214,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Additional Info</h3>
@@ -269,7 +259,7 @@ $validation = \Config\Services::validation();
     </form>
 </div>
 
-<!-- Small Modal -->
+<!-- GP Modal -->
 <div class="modal" id="modal-gps" tabindex="-1" role="dialog" aria-labelledby="modal-small" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -343,9 +333,7 @@ $validation = \Config\Services::validation();
                 }
             });
         });
-        <?php if($district_id) { ?> 
-                $('#districts').trigger('change');
-            <?php } ?>
+
 
         $('#blocks').on('change', function() {
             var b_id = $(this).val();
@@ -373,7 +361,6 @@ $validation = \Config\Services::validation();
             });
         });
 
-        // $('#gps').trigger('change');
         $('#gps').on('change', function() {
             var g_id = $(this).val();
             $.ajax({
@@ -407,9 +394,9 @@ $validation = \Config\Services::validation();
             var u_id = $("#unit_type").val();
             unit_type = $('#unit_type option:selected').text();
             selected_option = $(this).val();
-
+           
             // If selected option is sub_center and unit_type in ['CHC','CMSC']
-            if (selected_option == 'sub_center' && $.inArray(unit_type, ['CHC', 'CMSC']) !== -1) {
+             if (selected_option == 'sub_center' && $.inArray(unit_type, ['CHC', 'CMSC']) !== -1) {
                 $.ajax({
                     url: 'admin/enterprises/center',
                     data: {
@@ -426,8 +413,7 @@ $validation = \Config\Services::validation();
                         if (response.main_centers && response.main_centers.length > 0) {
                             var html = '<option value="">Select main center name</option>';
                             $.each(response.main_centers, function(k, v) {
-                                var selected = (v.main_center_id == '<?= $main_center_id ?>') ? 'selected="selected"' : '';
-                                html += '<option value="' + v.main_center_id + '" ' + selected + '>' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
+                                html += '<option value="' + v.ent_id + '" >' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
                             });
                             $('#main_center_list').empty().html(html);
                         } else {
@@ -462,44 +448,46 @@ $validation = \Config\Services::validation();
 
         //hide and show center info
 
-        $('#unit_type').on('change', function() {
-            var unit_type = $(this).find('option:selected').text().toLowerCase();
+        // $('#unit_type').on('change', function() {
+        //     var unit_type = $(this).find('option:selected').text().toLowerCase();
+        //     if (unit_type == "chc" || unit_type == "cmsc") {
+        //         $('#center_info').show();
 
-            if (unit_type == "chc" || unit_type == "cmsc") {
-                $('#center_info').show();
-            } else {
-                $('#center_info').hide();
-            }
-        });
+        //     } else {
+        //         $('#center_info').hide();
+        //     }
+        // });
+
+
         //populate unit type on document ready
         $('#unit_type').trigger("change");
 
         //Hide center dropdown if main center is selected
-        if ($("#main_center").prop("checked")) {
-            $('#center_name').hide();
-        }
+        // if ($("#main_center").prop("checked")) {
+
+        //     $('#main_center_list').hide();
+        // }
 
         // Show center dropdown when sub center is checked
-        if ($("#sub_center").is(":checked")) {
-            $('#center_name').show();
-        }
+        // if ($("#sub_center").prop(":checked")) {
+        //     $('#main_center_list').show();
+        // }
 
-        $('#sub_center').on('change', function() {
-            $sub_center_checked = $(this).prop('checked');
-            if ($sub_center_checked) {
-                $('#center_name').show();
-            } else {
-                $('#center_name').hide();
-            }
-        });
+        // $('#sub_center').on('change', function() {
+        //     $sub_center_checked = $(this).prop('checked');
+        //     if ($sub_center_checked) {
+        //         $('#main_center_list').show();
+        //     } else {
+        //         $('#main_center_list').hide();
+        //     }
+        // });
 
-        $('#main_center').on('change', function() {
-            $main_center_checked = $(this).prop('checked');
-            if ($main_center_checked) {
-                $('#center_name').hide();
-            }
-        });
-        $('#sub_center').trigger('change');
+        // $('#main_center').on('change', function() {
+        //     $main_center_checked = $(this).prop('checked');
+        //     if ($main_center_checked) {
+        //         $('#main_center_list').hide();
+        //     }
+        // });
 
         //budget head will 4.1 after choosing unit type chc
         $('#unit_type,#budget_fin_yr_id').on('change', function() {
@@ -641,34 +629,7 @@ $validation = \Config\Services::validation();
             });
 
         });
-        /*
-                    $('#btn-add-village').click(function (e) {
-                        e.preventDefault();
 
-                        url = $(this).attr('href');
-                        dist = $('#districts').val();
-                        block = $('#blocks').val();
-                        gp = $('#gps').val();
-
-                        url += "?district_id=" + dist + "&block_id=" + block + "&gp_id=" + gp;
-
-                        var popupWindow = window.open(url, "Add Village", "width=500,height=500");
-                        if (popupWindow) {
-                            //Browser has allowed it to be opened
-                            popupWindow.focus();
-                        } else {
-                            //Browser has blocked it
-                            alert('Please allow popups for this website');
-                        }
-                        var popupTimer = setInterval(function () {
-                            if (popupWindow.closed) {
-                                clearInterval(popupTimer);
-                                // Add your event handling logic here
-                                $('#gps').trigger('change');
-                            }
-                        });
-                    });
-        */
         Codebase.helpers(['select2']);
     });
 
