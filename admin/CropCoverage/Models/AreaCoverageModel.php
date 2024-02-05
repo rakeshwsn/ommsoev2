@@ -280,8 +280,8 @@ FROM ac_crop_practices acp
     public function getAreaCoverage($filter = [])
     {
         if (!empty($filter['block_id'])) {
-            $sql = "SELECT cc.*,gp.name gp FROM vw_area_coverage_gpwise cc 
-                    LEFT JOIN soe_grampanchayats gp ON cc.gp_id=gp.id 
+            $sql = "SELECT cc.*,gp.name gp FROM vw_area_coverage_gpwise cc
+                    LEFT JOIN soe_grampanchayats gp ON cc.gp_id=gp.id
                     WHERE cc.block_id=" . $filter['block_id'];
             if (!empty($filter['year_id'])) {
                 $sql .= " AND cc.year_id=" . $filter['year_id'];
@@ -297,15 +297,15 @@ FROM ac_crop_practices acp
         } else if (!empty($filter['district_id'])) {
 
             $sql = "SELECT ac.*,b.id block_id,
-  b.name block,bgps.gps total_gps FROM soe_blocks b 
+  b.name block,bgps.gps total_gps FROM soe_blocks b
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
-  LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc 
+  LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc
                     WHERE cc.year_id=" . $filter['year_id'] .
                 " AND cc.season='" . $filter['season'] . "'";
             if (!empty($filter['start_date'])) {
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date'] . "')";
             }
-            $sql .= ") ac ON ac.block_id=b.id 
+            $sql .= ") ac ON ac.block_id=b.id
                 WHERE b.district_id=" . $filter['district_id'];
             $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
 
@@ -347,11 +347,11 @@ FROM soe_districts sd
             }
             $sql .= ") ac
     ON ac.district_id = sd.id";
-            $sql .= " LEFT JOIN vw_districtwise_blocks_gps dbg 
+            $sql .= " LEFT JOIN vw_districtwise_blocks_gps dbg
     ON sd.id=dbg.district_id ORDER BY sd.name";
         }
-        // echo $sql;
-        // exit;
+        //echo $sql;
+        //exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -384,9 +384,10 @@ FROM soe_districts sd
   nur.balance_smi,
   nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_div_ragi,
-  nur.crop_div_non_ragi,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
   m.fc_area,
+  m.rfc_area,
   m.ragi_smi,
   m.ragi_lt,
   m.ragi_ls,
@@ -409,6 +410,7 @@ FROM (SELECT
     SUM(crop_div_ragi) crop_div_ragi,
     SUM(crop_div_non_ragi) crop_div_non_ragi,
     SUM(fc_area) fc_area,
+    SUM(rfc_area) rfc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
     SUM(ragi_ls) ragi_ls,
@@ -434,7 +436,7 @@ FROM (SELECT
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
         }
-        $sql .= " ) vbw 
+        $sql .= " ) vbw
       ON vbw.block_id = vbg.block_id LEFT JOIN soe_districts d ON d.id=vbw.district_id";
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE vbg.district_id = " . $filter['district_id'];
@@ -452,8 +454,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_div_ragi) crop_div_ragi,
-            SUM(acc.crop_div_non_ragi) crop_div_non_ragi,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -482,10 +482,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_div_ragi,
-      n1.crop_div_non_ragi
-     
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -507,8 +504,9 @@ ORDER BY district,m.block";
   m.gp_id,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_div_ragi,
-  nur.crop_div_non_ragi,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
+  m.rice_fallow_area,
   m.fc_area,
   m.rfc_area,
   m.ragi_smi,
@@ -569,8 +567,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_div_ragi) crop_div_ragi,
-            SUM(acc.crop_div_non_ragi) crop_div_non_ragi,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -598,10 +594,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_div_ragi,
-      n1.crop_div_non_ragi
-     
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -624,8 +617,8 @@ ORDER BY m.gp";
   bgp.total_gps,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_div_ragi,
-  nur.crop_div_non_ragi,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
   m.fc_area,
   m.rfc_area,
   m.ragi_smi,
@@ -686,8 +679,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_div_ragi) crop_div_ragi,
-            SUM(acc.crop_div_non_ragi) crop_div_non_ragi,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -716,9 +707,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_div_ragi,
-      n1.crop_div_non_ragi
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -790,7 +779,7 @@ ORDER BY t1.crop_id, t1.practice_id";
   c.id crop_id,
   afc.area,
   c.crops crop
-FROM ac_crops c LEFT JOIN (SELECT * FROM ac_area_follow_up fc 
+FROM ac_crops c LEFT JOIN (SELECT * FROM ac_area_follow_up fc
 WHERE fc.crop_coverage_id=" . $crop_coverage_id . ") afc ON c.id=afc.crop_id";
 
         return $this->db->query($sql)->getResultArray();
@@ -862,7 +851,7 @@ FROM vw_districtwise_blocks_gps vdbg
 FROM
     soe_blocks sb
 LEFT JOIN
-    ac_crop_coverage acc ON acc.block_id = sb.id 
+    ac_crop_coverage acc ON acc.block_id = sb.id
         AND DATE(acc.start_date) = DATE('" . $filter['start_date'] . "')
         AND acc.deleted_at IS NULL
         AND (acc.status = 0 OR acc.status = 1 OR acc.status = 2)

@@ -206,14 +206,48 @@ class AreaCoverage extends AdminController
                 $total_rfc_area += $block->rfc_area;
                 $total_crop_div_area += $total_crop_div_area;
                 $total_total_area += $total_area;
+
             }
-        }
-        // printr($blocks);
-        // exit;
-        if ($this->user->block_id) {
-            return $this->template->view('Admin\CropCoverage\Views\areacoverage_block', $data);
-        } else {
-            echo "Please login as a FA";
+
+            $data['blocks'][] = [
+                'week' => '',
+                'gp' => '<strong>Total</strong>',
+                'farmers_covered' => $total_farmers_covered,
+                'nursery_raised' => $total_nursery_raised,
+                'balance_smi' => $total_balance_smi,
+                'balance_lt' => $total_balance_lt,
+                'ragi_smi' => $total_ragi_smi,
+                'ragi_lt' => $total_ragi_lt,
+                'ragi_ls' => $total_ragi_ls,
+                'little_millet_lt' => $total_little_millet_lt,
+                'little_millet_ls' => $total_little_millet_ls,
+                'foxtail_ls' => $total_foxtail_ls,
+                'sorghum_ls' => $total_sorghum_ls,
+                'kodo_ls' => $total_kodo_ls,
+                'barnyard_ls' => $total_barnyard_ls,
+                'pearl_ls' => $total_pearl_ls,
+                'total_ragi' => $total_total_ragi,
+                'total_non_ragi' => $total_total_non_ragi,
+                'total_fc' => $total_fc_area,
+                'total_area' => $total_total_area,
+                'crop_diversification_farmers' => $total_crop_diversification_farmers,
+                'crop_diversification_area' => $total_crop_diversification_area,
+                'rice_fallow_farmers' => $total_rice_fallow_farmers,
+                'rice_fallow_area' => $total_rice_fallow_area,
+                'status' => '',
+                'action' => ''
+            ];
+
+            $view = 'areacoverage_block';
+        } else if ($this->user->district_id) {
+            //            $filter = [
+//                'district_id' => $this->user->district_id,
+//                'year_id' => getCurrentYearId(),
+//                'season' => getCurrentSeason()
+//            ];
+
+            //            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
+            $view = 'areacoverage_district';
         }
     }
 

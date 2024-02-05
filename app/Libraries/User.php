@@ -1,7 +1,9 @@
 <?php
 namespace App\Libraries;
 
+use Admin\Common\Models\AllowuploadModel;
 use Admin\Permission\Models\PermissionModel;
+use Admin\Transaction\Models\TransactionModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 
@@ -194,19 +196,6 @@ class User
             return false;
         }else if($other_permission){
            return true;
-        }
-        return false;
-
-    }
-
-    public function hasPermission_old($data) {
-       
-        if ($this->user_group_id == 1) {
-            return true;
-        }else if(isset($this->permission[$data]) && $this->permission[$data] == 'yes') {
-            return true;
-        }else if(isset($this->permission[$data]) && $this->permission[$data] == 'no'){
-            return false;
         }
         return false;
 
@@ -425,5 +414,29 @@ class User
         }else{
             return false;
         }
+    }
+
+    public function canUpload($month_id,$year_id){
+        $upload_enabled = true;
+
+        if(env('soe.uploadDateValidation') && $this->user_id > 1 ){
+
+            $upload_model = new AllowuploadModel();
+
+            $ufilter = [
+                'user_id' => $this->user_id,
+                'year' => $year_id,
+            ];
+
+            $upload = $upload_model->getByDate($ufilter);
+
+            $months = [];
+            foreach ($upload as $item) {
+                $months[] = $item['month'];
+            }
+
+            $upload_enabled = in_array($month_id,$months);
+        }
+        return $upload_enabled;
     }
 }

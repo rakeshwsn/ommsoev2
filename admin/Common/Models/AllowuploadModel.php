@@ -98,6 +98,10 @@ class AllowuploadModel extends Model
             $sql .= " AND user_id=".$filter['user_id'];
         }
 
+        if(isset($filter['year']) && $filter['year']){
+            $sql .= " AND year=".$filter['year'];
+        }
+
         $sql .= " AND DATE('".$date."') BETWEEN DATE(from_date) AND DATE(IF(extended_date IS NOT NULL,extended_date,to_date)) ORDER BY upload_id DESC";
 //echo $sql;exit;
         $month = $this->db->query($sql)->getResultArray();

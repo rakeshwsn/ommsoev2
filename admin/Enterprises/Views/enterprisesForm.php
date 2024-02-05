@@ -5,15 +5,13 @@
     </div>
     <div class="form-group">
         <label for="unit">Group Unit:</label>
-        <select name="group_unit" id="unit" class="form-control" required>
-            <option value="">Choose Unit</option>
-            <option value="p" <?= $group_unit == "p" ? 'selected' : ''; ?>>p</option>
-            <option value="f" <?= $group_unit == "f" ? 'selected' : ''; ?>>f</option>
-        </select>
+        <?php echo form_dropdown('unit_group_id', $unit_groups, $unit_group_id, ['class' => 'form-control', 'id' => 'group_unit']); ?>
+
+     
     </div>
-   
-        <div class="form-group text-right">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-  
+
+    <div class="form-group text-right">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+
 </form>

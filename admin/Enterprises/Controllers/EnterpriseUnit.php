@@ -2,6 +2,7 @@
 
 namespace Admin\Enterprises\Controllers;
 
+use Admin\Enterprises\Models\EnterpriseUnitGroup;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use App\Controllers\AdminController;
 
@@ -9,9 +10,12 @@ use App\Controllers\AdminController;
 class EnterpriseUnit extends AdminController
 {
     private $enterprisesunitmodel;
+    private $enterpriseUnitGroup;
+
     public function __construct()
     {
         $this->enterprisesunitmodel = new EnterprisesUnitModel();
+        $this->enterpriseUnitGroup = new EnterpriseUnitGroup();
     }
 
     public function index()
@@ -34,8 +38,8 @@ class EnterpriseUnit extends AdminController
 
         if ($id && ($this->request->getMethod(true) != 'POST')) {
             $unit_info = $this->enterprisesunitmodel->find($id);
-            // printr($unit_info);
         }
+
         foreach ($this->enterprisesunitmodel->getFieldNames('enterprises_units') as $field) {
             if ($this->request->getPost($field)) {
                 $data[$field] = $this->request->getPost($field);
@@ -45,24 +49,24 @@ class EnterpriseUnit extends AdminController
                 $data[$field] = '';
             }
         }
-       
+
         $data['form'] = $this->getForm($data);
 
         $units = $this->enterprisesunitmodel->getAll();
 
         // for adding action to the result set
-        foreach($units as &$unit){
+        foreach ($units as &$unit) {
             $action  = '<div class="btn-group btn-group-sm pull-right">';
             $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterprises/unit/edit/' . $unit['id']) . '"><i class="fa fa-pencil"></i></a>';
-            
+
             $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterprises/unit/delete/' . $unit['id']) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
 
             $unit['action'] = $action;
         }
-        
+
         $data['e_units'] = $units;
-       
+
         echo $this->template->view('Admin\Enterprises\Views\enterpriseUnit', $data);
     }
 
@@ -82,26 +86,24 @@ class EnterpriseUnit extends AdminController
         $totalFiltered = $this->enterprisesunitmodel->getTotal($filter_data);
 
         $filteredData = $this->enterprisesunitmodel->getAll($filter_data);
-    //    printr($filteredData); exit;
         $datatable = array();
         $startIndex = isset($requestData['start']) ? intval($requestData['start']) : 0; // Start index of the current page
         foreach ($filteredData as $key => $result) {
 
             $action  = '<div class="btn-group btn-group-sm pull-right">';
             $action .=         '<a class="btn btn-sm btn-primary ajaxaction" href="' . admin_url('enterprises/unit/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
-            
+
             $action .=        '<a class="btn-sm btn btn-danger btn-remove" href="' . admin_url('enterprises/unit/delete/' . $result->id) . '" onclick="return confirm(\'Are you sure?\') ? true : false;"><i class="fa fa-trash-o"></i></a>';
             $action .= '</div>';
             $sequentialNumber = $startIndex + $key + 1;
             $datatable[] = array(
                 $sequentialNumber,
                 $result->name,
-                $result->group_unit,
+                $result->unit_group,
                 $result->total_ent,
                 $action
             );
         }
-        // dd($datatable);
         $json_data = array(
             "draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
             "recordsTotal"    => intval($totalData),
@@ -115,8 +117,8 @@ class EnterpriseUnit extends AdminController
     public function add()
     {
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
-
             $id = $this->enterprisesunitmodel->insert($this->request->getPost());
+
             $this->session->setFlashdata('message', 'EnterprisesUnit Saved Successfully.');
 
             return redirect()->to(admin_url('enterprises/unit'));
@@ -165,6 +167,13 @@ class EnterpriseUnit extends AdminController
 
     public function getForm($data)
     {
+        $data['unit_groups'][] = 'Select units';
+        $unit_group_id = 0;
+        $unit_groups = $this->enterpriseUnitGroup->orderBy('name', 'asc')->findAll();
+
+        foreach ($unit_groups as $unit_group) {
+            $data['unit_groups'][$unit_group->id] = $unit_group->name;
+        }
 
         return view('Admin\Enterprises\Views\enterprisesForm', $data);
     }

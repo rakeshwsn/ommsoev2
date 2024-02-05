@@ -19,23 +19,25 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/doe', 'Enterprises\Controllers\Enterprises::ajaxDoe');
     $routes->add('enterprises/exceldownld', 'Enterprises\Controllers\Enterprises::download');
     $routes->add('enterprises/excel', 'Enterprises\Controllers\Enterprises::excel');
+    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search', ['permission' => false]);
 
 
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
     $routes->get('enterprises/cancel', 'Enterprises\Controllers\Enterprises::index');
     $routes->get('enterprises/transaction', 'Enterprises\Controllers\EstablishmentTransaction::index');
-    $routes->get('enterprises/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
+    $routes->get('enterprisestrans/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
     $routes->add('enterprises/delete', 'Enterprises\Controllers\EstablishmentTransaction::delete');
-    
-    $routes->add('enterprises/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
+
+    $routes->add('enterprisestrans/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 
     $routes->add('enterprises/gps', 'Enterprises\Controllers\Enterprises::ajaxgps');
     $routes->add('enterprises/center', 'Enterprises\Controllers\Enterprises::ajaxcenter');
+    $routes->get('enterprises/getlgdgps', 'Enterprises\Controllers\Enterprises::getLgdGps');
+    $routes->get('enterprises/getlgdvillages', 'Enterprises\Controllers\Enterprises::getLgdVillages');
 
     $routes->add('enterprises/villages', 'Enterprises\Controllers\Enterprises::ajaxvillages');
 
-    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
 
     $routes->get('enterprises/report', 'Enterprises\Controllers\EstablishmentReport::index');
     $routes->add('enterprises/report/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');

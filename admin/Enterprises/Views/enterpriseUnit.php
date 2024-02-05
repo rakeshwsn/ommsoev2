@@ -1,5 +1,4 @@
 <div class="row">
-
     <div class="col-4">
         <div class="block">
             <div class="block-header block-header-default"> Enterprises</div>
@@ -28,7 +27,7 @@
                         <tr>
                             <td><?=++$key?></td>
                             <td><?=$unit['name']?></td>
-                            <td><?=$unit['group_unit']?></td>
+                            <td><?=$unit['unit_group']?></td>
                             <td><?=$unit['total_units']?></td>
                             <td><?=$unit['action']?></td>
                         </tr>
@@ -38,33 +37,11 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 <?php js_start(); ?>
 <script type="text/javascript">
     $(function() {
-
-        /*
-        $('#datatable').DataTable({
-            "processing": true,
-            "serverSide": true,
-
-            "paging": true,
-            "pageLength": 10,
-            "ajax": {
-                url: "<?= $datatable_url ?>", // json datasource
-                type: "post", // method  , by default get
-                error: function() { // error handling
-                    $(".datatable_error").html("");
-                    $("#datatable").append('<tbody class="datatable_error"><tr><th colspan="7">No data found.</th></tr></tbody>');
-                    $("#datatable_processing").css("display", "none");
-                },
-                dataType: 'json'
-            },
-        });
-        */
        $('#datatable').DataTable();
     });
 </script>

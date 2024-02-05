@@ -12,7 +12,7 @@
         <div class="block-content block-content-full">
             <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
 
-            <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+            <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
 
                 <?php echo form_open('', ['method' => 'get']); ?>
                 <div class="row">
@@ -29,7 +29,7 @@
                     <div class="col-2">
                         <label class="form-label">Managing Unit Type</label>
                         <select class="form-control" name="management_unit_type" id="management_unit_type">
-                            <option value="all">all</option>
+                            <option value="">ALL</option>
                             <option value="shg" <?= $management_unit_type == "shg" ? 'selected' : ''; ?>>SHG</option>
                             <option value="fpo" <?= $management_unit_type == "fpo" ? 'selected' : ''; ?>>FPO</option>
 
@@ -47,7 +47,7 @@
                     </div>
                     <div class="col-2">
                         <label class="form-label">Unit Type</label>
-                        <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'districts']); ?>
+                        <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'units']); ?>
 
 
                     </div>
@@ -63,14 +63,14 @@
         <div class="block-header block-header-default">
             <h3 class="block-title">Enterprises List</h3>
             <div class="block-options">
-            <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
+                <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
             </div>
 
         </div>
         <div class="block-content block-content-full">
             <div class="row">
                 <div class="col-sm-12">
-                    <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
+                    <table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="datatable_info">
                         <thead>
                             <tr>
                                 <th>District</th>
@@ -82,44 +82,19 @@
                                 <th>Mang. Unit Name</th>
                                 <th>DOE</th>
                                 <th>DOM</th>
+                                <th>Date Added</th>
 
                                 <th class="text-right no-sort sorting_disabled" aria-label="Actions">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php if ($enterprises) { ?>
-                                <?php foreach ($enterprises as $enterprise) { ?>
-                                    <tr class="odd">
-                                        <td><?= $enterprise['districts'] ?></td>
-                                        <td><?= $enterprise['blocks'] ?></td>
-                                        <td><?= $enterprise['gps'] ?></td>
-                                        <td><?= $enterprise['villages'] ?></td>
-                                        <td><?= $enterprise['unit_name'] ?></td>
-                                        <td><?= $enterprise['management_unit_type'] ?></td>
-                                        <td><?= $enterprise['managing_unit_name'] ?></td>
-                                        <td><?= $enterprise['date_estd'] ?></td>
-                                        <td><?= $enterprise['mou_date'] ?></td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm pull-right"><a class="btn btn-sm btn-primary" href="<?= $enterprise['edit_url'] ?>"><i class="fa fa-pencil"></i></a></div>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                        </tbody>
-                    <?php  } else { ?>
-                        <tbody>
-                            <tr class="odd">
-                                <td colspan="9">
-                                    <h3 class="text-center">data not avaliable</h3>
-                                </td>
-                            </tr>
-                        </tbody>
-                    <?php  } ?>
+                       
                     </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
     var download_url = "http://ommsoev2.local/admin/enterprises/exceldownld";
 
@@ -131,16 +106,46 @@
         $('#districts, #blocks, #management_unit_type, #years').on('change', main);
         main();
     });
-    
-    var download_url = "<?= $excel_link ?>";
-    
-    $(document).ready(function() {
-        var table = $('#page_list').DataTable({
-            "paging": true,
-            "pageLength": 10
-        });
 
+    var download_url = "<?= $excel_link ?>";
+
+    $(document).ready(function() {
+      
+        var table = $('#datatable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "columnDefs": [{
+                targets: 'no-sort',
+                orderable: false
+            }],
+            "ajax": {
+                url: "<?= $datatable_url ?>", // json datasource
+                type: "post", // method  , by default get
+                data: function(data) {
+                    data.district_id = $('#districts').val();
+                    data.block_id = $('#blocks').val();
+                    data.unit_id = $('#units').val();
+                    data.management_unit_type = $('#management_unit_type').val();
+                    // data.date_estd = $('#date_estd').val();
+
+                },
+                beforeSend: function() {
+                    $('.alert-dismissible, .text-danger').remove();
+                    $("#datatable_wrapper").LoadingOverlay("show");
+                },
+                complete: function() {
+                    $("#datatable_wrapper").LoadingOverlay("hide");
+                },
+                error: function() { // error handling
+                    $(".datatable_error").html("");
+                    $("#datatable_processing").css("display", "none");
+
+                },
+                dataType: 'json'
+            }
+        });
         $(function() {
+
             $('#districts').on('change', function() {
 
                 var d_id = $(this).val(); // Declare d_id with var
@@ -161,8 +166,11 @@
                                 html += '<option value="' + v.id + '">' + v.name + '</option>';
                             });
                             $('#blocks').html(html);
+
                         }
+
                     },
+
                     error: function() {
                         alert('something went wrong');
                     },
@@ -199,9 +207,7 @@
                 });
 
             });
+
         });
-
-
-
     })
 </script>

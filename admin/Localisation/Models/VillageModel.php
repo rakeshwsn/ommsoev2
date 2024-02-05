@@ -26,13 +26,15 @@ class VillageModel extends Model
 	// Validation
 	// Validation
 	protected $validationRules      = [
+        'id' => 'permit_empty|integer|greater_than[0]',
 		'gp_id' => array(
 			'label' => 'Grampanchayat',
 			'rules' => 'trim|required|max_length[100]'
 		),
 		'name' => array(
 			'label' => 'Name',
-			'rules' => "trim|required|max_length[255]"
+			'rules' => "trim|required|max_length[255]|is_unique_village[villages.name,id,{id}]",
+            'errors' => ['is_unique_gp' => 'This Grampanchayat already exists.']
 		)
 	];
 	protected $validationMessages   = [];

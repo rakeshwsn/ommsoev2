@@ -20,34 +20,19 @@ $validation = \Config\Services::validation();
         <div class="block-header block-header-default">
             <h1 class="block-title"><b><?php echo $enterprise_text ?></b></h1>
         </div>
-        <div class="dotted-border mx-4 my-4 pd-3">
 
+        <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Local Info</h3>
                 <div class="row">
                     <div class="col-6 form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                         <label for="district_id">District<span class="text-danger"></span></label>
-                        <?php
-                        $select_attributes = array(
-                            'class' => 'form-control js-select2',
-                            'id' => 'districts',
-                        );
-                        if ($district_id) {
-                            $select_attributes = array_merge($select_attributes);
-                        }
-                        echo form_dropdown('district_id', $districts,  $district_id, $select_attributes); ?>
+                        <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                         <label for="block_id">Block<span class="text-danger"></span></label>
                         <?php
-                        $select_attributes = array(
-                            'class' => 'form-control js-select2',
-                            'id' => 'blocks',
-                        );
-                        if ($block_id) {
-                            $select_attributes = array_merge($select_attributes);
-                        }
-                        echo form_dropdown('block_id', $blocks, $block_id, $select_attributes); ?>
+                        echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name', array('0' => 'Select Block')), set_value('block_id', $block_id), "id='blocks' class='form-control js-select2'"); ?>
                     </div>
                 </div>
                 <div class="row">
@@ -55,16 +40,15 @@ $validation = \Config\Services::validation();
                         <label for="gp_id">GP<span class="text-danger"></span></label>
                         <div class="input-group">
                             <?php
-                            $select_attributes = array(
-                                'class' => 'form-control js-select2',
-                                'id' => 'gps',
-                            );
-                            if ($gp_id) {
-                                $select_attributes = array_merge($select_attributes);
-                            }
-                            echo form_dropdown('gp_id', $gps,  $gp_id, $select_attributes); ?>
+                            echo form_dropdown(
+                                'gp_id',
+                                option_array_value($gps, 'id', 'name', array('0' => 'Select GP')),
+                                set_value('gp_id', $gp_id),
+                                "id='gps' class='form-control js-select2'"
+                            ); ?>
                             <div class="input-group-append">
-                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
+                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add
+                                    GP</a>
                             </div>
                         </div>
                     </div>
@@ -73,14 +57,7 @@ $validation = \Config\Services::validation();
                         <label for="village_id">Village<span class="text-danger"></span></label>
                         <div class="input-group">
                             <?php
-                            $select_attributes = array(
-                                'class' => 'form-control js-select2',
-                                'id' => 'villages',
-                            );
-                            if ($village_id) {
-                                $select_attributes = array_merge($select_attributes);
-                            }
-                            echo form_dropdown('village_id', $villages, $village_id, $select_attributes); ?>
+                            echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
                             <div class="input-group-append">
                                 <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
                             </div>
@@ -91,7 +68,6 @@ $validation = \Config\Services::validation();
         </div>
 
         <div class="dotted-border mx-4 my-4 pd-3">
-
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Unit Info</h3>
                 <div class="row">
@@ -102,9 +78,6 @@ $validation = \Config\Services::validation();
                             'class' => 'form-control js-select2',
                             'id' => 'unit_type',
                         );
-                        if ($unit_id) {
-                            $select_attributes = array_merge($select_attributes);
-                        }
                         echo form_dropdown('unit_id', $units, $unit_id, $select_attributes); ?>
                     </div>
                     <div class="col-6 form-group mt-15 <?= $validation->hasError('management_unit_type') ? 'is-invalid' : '' ?>">
@@ -113,13 +86,10 @@ $validation = \Config\Services::validation();
                     </div>
                 </div>
                 <div class="row">
-
                     <div class="col-6 form-group <?= $validation->hasError('managing_unit_name') ? 'is-invalid' : '' ?>">
                         <label for="managing unit name">Name Of Managing Unit<span class="text-danger">*</span></label>
                         <input type="text" name="managing_unit_name" class="form-control" id="managing_unit_name" placeholder="Name" value="<?= set_value('managing_unit_name', $managing_unit_name) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('managing_unit_name'); ?></div>
-
-
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('contact_person') ? 'is-invalid' : '' ?>">
                         <label for="Contact Person">Contact Person<span class="text-danger">*</span></label>
@@ -131,16 +101,13 @@ $validation = \Config\Services::validation();
                         <label for="Contact Mobile">Contact Mobile<span class="text-danger">*</span></label>
                         <input type="text" name="contact_mobile" class="form-control" id="contact_mobile" placeholder="Mobile" maxlength="10" value="<?= set_value('contact_mobile', $contact_mobile) ?>" required>
                         <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('contact_mobile'); ?></div>
-
                     </div>
                     <div class="col-6"></div>
                 </div>
-
-
             </div>
         </div>
-        <div class="dotted-border mx-4 my-4 pd-3" id="center_info">
 
+        <div class="dotted-border mx-4 my-4 pd-3" id="center_info">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Center Info</h3>
                 <div class="row">
@@ -155,7 +122,8 @@ $validation = \Config\Services::validation();
                     <div id="center_name" class="col-6 form-group mt-15 <?= $validation->hasError('') ? 'is-invalid' : '' ?>">
                         <label for="main_center_name">Main Center name<span class="text-danger">*</span></label>
                         <?php
-                        echo form_dropdown('main_center_name', $main_center_name, [], ['class' => 'form-control', 'id' => 'main_center_list']); ?>
+                        echo form_dropdown('main_center_id', option_array_value($main_centers, 'id', 'name', ['0' => 'Select Main Center']), set_value('main_center_id', $main_center_id), ['class' => 'form-control', 'id' => 'main_center_list']); ?>
+                        <div id="center_message" class="text-danger mt-3"></div>
                     </div>
                 </div>
                 <div class="row">
@@ -169,7 +137,6 @@ $validation = \Config\Services::validation();
                                 </tr>
                             </thead>
                             <tbody>
-
                                 <?php if (isset($enterpriseequipments)) {
                                     $rows = 0;
                                     foreach ($enterpriseequipments as $equipment) { ?>
@@ -185,7 +152,9 @@ $validation = \Config\Services::validation();
                                                 </select>
                                             </td>
                                             <td><input type="text" class="form-control" name="quantity[<?= $rows ?>]" value="<?= $equipment->quantity ?>"></td>
-                                            <td><button type="button" class="btn-sm btn btn-danger btn pull-right" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button></td>
+                                            <td>
+                                                <button type="button" class="btn-sm btn btn-danger btn-remove btn pull-right" onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
+                                            </td>
 
                                         </tr>
 
@@ -193,7 +162,8 @@ $validation = \Config\Services::validation();
                                     }
                                 } ?>
                                 <tr id="footer">
-                                    <td colspan="3"><button type="button" class="btn-sm btn btn-primary btn pull-right" id="equipment_row" href=""><i class="fa fa-plus"></i></button>
+                                    <td colspan="3">
+                                        <button type="button" class="btn-sm btn btn-primary btn pull-right" id="equipment_row" href=""><i class="fa fa-plus"></i></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -202,6 +172,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Date Info</h3>
@@ -217,6 +188,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Budget Info</h3>
@@ -242,6 +214,7 @@ $validation = \Config\Services::validation();
                 </div>
             </div>
         </div>
+
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Additional Info</h3>
@@ -249,7 +222,8 @@ $validation = \Config\Services::validation();
                     <div class="col-6">
                         <input type="checkbox" id="is_support_basis_infr" name="is_support_basis_infr" value="1" <?php echo ($is_support_basis_infr == 1) ? 'checked' : ''; ?>>
                         <label for="is_support_basis_infr"> Is any additional support provided from Govt. ?</label>
-                    </div><br><br>
+                    </div>
+                    <br><br>
 
                 </div>
                 <div class="block" id="budget_utilize">
@@ -282,18 +256,52 @@ $validation = \Config\Services::validation();
                 <a href="admin/enterprises/cancel" class="btn btn-danger">Cancel</a>
             </div>
         </div>
-
     </form>
 </div>
 
+<!-- GP Modal -->
+<div class="modal" id="modal-gps" tabindex="-1" role="dialog" aria-labelledby="modal-small" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title"></h3>
+                </div>
+                <div class="block-content">
 
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Village Modal -->
+<div class="modal" id="modal-villages" tabindex="-1" role="dialog" aria-labelledby="modal-small" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="block block-themed block-transparent mb-0">
+                <div class="block-header bg-primary-dark">
+                    <h3 class="block-title"></h3>
+                </div>
+                <div class="block-content">
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-alt-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <?php js_start(); ?>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 
 <script>
+    var selectedGP, selectedVillage;
     $(function() {
-
         $('#districts').on('change', function() {
 
             var d_id = $(this).val(); // Declare d_id with var
@@ -302,13 +310,10 @@ $validation = \Config\Services::validation();
                 url: 'admin/enterprises/blocks',
                 data: {
                     district_id: d_id
-
                 },
-
                 type: 'GET',
                 dataType: 'JSON',
                 beforeSend: function() {},
-
                 success: function(response) {
 
                     if (response.blocks) {
@@ -328,7 +333,8 @@ $validation = \Config\Services::validation();
                 }
             });
         });
-        // $('#districts').trigger('change');
+
+
         $('#blocks').on('change', function() {
             var b_id = $(this).val();
             $.ajax({
@@ -351,14 +357,10 @@ $validation = \Config\Services::validation();
                 error: function() {
                     alert('something went wrong');
                 },
-                complete: function() {
-
-                }
+                complete: function() {}
             });
-
         });
 
-        // $('#gps').trigger('change');
         $('#gps').on('change', function() {
             var g_id = $(this).val();
             $.ajax({
@@ -381,50 +383,53 @@ $validation = \Config\Services::validation();
                 error: function() {
                     alert('something went wrong');
                 },
-                complete: function() {
-
-                }
+                complete: function() {}
             });
-
         });
-        //main center ajax
-        $('#unit_type').on('change', function() {
-            var d_id = $("#districts").val(); // Declare d_id with var
+
+        //get main center on center_type change and sub_center is selected
+        $('[name="center_type"]').on('change', function() {
+            var d_id = $("#districts").val();
             var b_id = $("#blocks").val();
-            var u_id = $(this).val();
+            var u_id = $("#unit_type").val();
+            unit_type = $('#unit_type option:selected').text();
+            selected_option = $(this).val();
 
-            $.ajax({
-                url: 'admin/enterprises/center',
-                data: {
-                    district_id: d_id,
-                    block_id: b_id,
-                    unit_id: u_id,
+            // If selected option is sub_center and unit_type in ['CHC','CMSC']
+            if (selected_option == 'sub_center' && $.inArray(unit_type, ['CHC', 'CMSC']) !== -1) {
+                $.ajax({
+                    url: 'admin/enterprises/center',
+                    data: {
+                        district_id: d_id,
+                        block_id: b_id,
+                        unit_id: u_id,
+                    },
+                    type: 'GET',
+                    dataType: 'JSON',
+                    beforeSend: function() {
+                        $('#center_message').text('');
+                    },
+                    success: function(response) {
+                        if (response.main_centers && response.main_centers.length > 0) {
+                            var html = '<option value="">Select main center name</option>';
+                            $.each(response.main_centers, function(k, v) {
+                                html += '<option value="' + v.ent_id + '" >' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
+                            });
+                            $('#main_center_list').empty().html(html);
+                        } else {
+                            $('#center_message').text(response.message);
+                        }
+                    },
+                    error: function() {
+                        alert('something went wrong');
+                    },
+                    complete: function() {
 
-                },
-
-                type: 'GET',
-                dataType: 'JSON',
-                beforeSend: function() {},
-                success: function(response) {
-                    if (response.main_center_name) {
-                        var html = '<option value="">Select main center name</option>';
-                        $.each(response.main_center_name, function(k, v) {
-                            html += '<option value="' + v.ent_id + '">' + v.managing_unit_name + ' (' + v.management_unit_type + ')</option>';
-                        });
-                        $('#main_center_list').empty().html(html);
-                    } else {
-
-                        $('#main_center_list').empty().html('<option value="">No options available</option>');
                     }
-                },
-                error: function() {
-                    alert('something went wrong');
-                },
-                complete: function() {
-
-                }
-            });
+                });
+            }
         });
+
         // //hide show addl budget
         if ($("#is_support_basis_infr").prop('checked') == true) {
             $('#budget_utilize').show();
@@ -445,42 +450,45 @@ $validation = \Config\Services::validation();
 
         $('#unit_type').on('change', function() {
             var unit_type = $(this).find('option:selected').text().toLowerCase();
-
             if (unit_type == "chc" || unit_type == "cmsc") {
                 $('#center_info').show();
+
             } else {
                 $('#center_info').hide();
             }
         });
-        //for document ready
+   
+
+        //populate unit type on document ready
         $('#unit_type').trigger("change");
 
-        //Center choose
+        //Hide center dropdown if main center is selected
         if ($("#main_center").prop("checked")) {
-            // do something
-            $('#center_name').hide();
+
+            $('#main_center_list').hide();
         }
 
-        // OR
-        if ($("#sub_center").is(":checked")) {
-            // do something
-            $('#center_name').show();
+        // Show center dropdown when sub center is checked
+        if ($("#sub_center").prop(":checked")) {
+            $('#main_center_list').show();
         }
+
         $('#sub_center').on('change', function() {
             $sub_center_checked = $(this).prop('checked');
             if ($sub_center_checked) {
-                $('#center_name').show();
+                $('#main_center_list').show();
             } else {
-                $('#center_name').hide();
+                $('#main_center_list').hide();
             }
         });
+
         $('#main_center').on('change', function() {
             $main_center_checked = $(this).prop('checked');
             if ($main_center_checked) {
-                $('#center_name').hide();
+                $('#main_center_list').hide();
             }
         });
-        $('#sub_center').trigger('change');
+
         //budget head will 4.1 after choosing unit type chc
         $('#unit_type,#budget_fin_yr_id').on('change', function() {
 
@@ -500,9 +508,7 @@ $validation = \Config\Services::validation();
 
         });
 
-
-
-        //add new equipment row 
+        //add new equipment row
         var rows = <?php echo $rows; ?>;
         $('#equipment_row').on('click', function(e) {
             html = '<tr>';
@@ -533,62 +539,100 @@ $validation = \Config\Services::validation();
         //add gp btn click
         $('#btn-add-gp').click(function(e) {
             e.preventDefault();
+            //check if block_id is selected
+            if ($('#blocks').val() == 0) {
+                alert('Please select a block');
+                return false;
+            }
 
-            url = $(this).attr('href');
-            dist = $('#districts').val();
             block = $('#blocks').val();
 
-            url += "?district_id=" + dist + "&block_id=" + block;
-
-            var popupWindow = window.open(url, "Add GP", "width=500,height=500");
-            if (popupWindow) {
-                //Browser has allowed it to be opened
-                popupWindow.focus();
-            } else {
-                //Browser has blocked it
-                alert('Please allow popups for this website');
-            }
-            var popupTimer = setInterval(function() {
-                if (popupWindow.closed) {
-                    clearInterval(popupTimer);
-                    // console.log('Popup window closed.');
-                    // Add your event handling logic here
-                    $('#blocks').trigger('change');
+            //make ajax request to get gp list
+            $.ajax({
+                url: 'admin/enterprises/getlgdgps',
+                data: {
+                    block_id: block
+                },
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#modal-gps').modal('show');
+                    $('#modal-gps').LoadingOverlay('show');
+                },
+                success: function(data) {
+                    $('#modal-gps').find('.block-title').text(data.title);
+                    $('#modal-gps').find('.block-content').html(data.html);
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                },
+                complete: function() {
+                    $('#modal-gps').LoadingOverlay('hide', true);
                 }
             });
+
+        });
+
+        // update select2 on #modal-gps close
+        $('#modal-gps').on('hidden.bs.modal', function() {
+            //populate gps again
+            $('#blocks').trigger('change');
+
+            $('#gps').val(selectedGP);
+            $('#gps').trigger('change');
+            $('#modal-gps').find('.block-content').html('');
+        });
+
+        // update select2 on #modal-villages close
+        $('#modal-villages').on('hidden.bs.modal', function() {
+            //populate villages again
+            $('#gps').trigger('change');
+
+            $('#villages').val(selectedVillage);
+            $('#villages').trigger('change');
+            $('#modal-villages').find('.block-content').html('');
         });
 
         //add village btn click
         $('#btn-add-village').click(function(e) {
             e.preventDefault();
-
-            url = $(this).attr('href');
-            dist = $('#districts').val();
-            block = $('#blocks').val();
-            gp = $('#gps').val();
-
-            url += "?district_id=" + dist + "&block_id=" + block + "&gp_id=" + gp;
-
-            var popupWindow = window.open(url, "Add Village", "width=500,height=500");
-            if (popupWindow) {
-                //Browser has allowed it to be opened
-                popupWindow.focus();
-            } else {
-                //Browser has blocked it
-                alert('Please allow popups for this website');
+            //check if block_id is selected
+            if ($('#gps').val() == 0) {
+                alert('Please select a GP');
+                return false;
             }
-            var popupTimer = setInterval(function() {
-                if (popupWindow.closed) {
-                    clearInterval(popupTimer);
-                    // console.log('Popup window closed.');
-                    // Add your event handling logic here
-                    $('#gps').trigger('change');
+
+            gp_id = $('#gps').val();
+
+            //make ajax request to get gp list
+            $.ajax({
+                url: 'admin/enterprises/getlgdvillages',
+                data: {
+                    gp_id: gp_id
+                },
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#modal-villages').modal('show');
+                    $('#modal-villages').LoadingOverlay('show');
+                },
+                success: function(data) {
+                    $('#modal-villages').find('.block-title').text(data.title);
+                    $('#modal-villages').find('.block-content').html(data.html);
+                },
+                error: function(xhr, ajaxOptions, thrownError) {
+                    console.log(thrownError);
+                },
+                complete: function() {
+                    $('#modal-villages').LoadingOverlay('hide', true);
                 }
             });
+
         });
 
         Codebase.helpers(['select2']);
     });
+
     $(document).ready(function() {
         jQuery.validator.addMethod("lettersonly", function(value, element) {
             return this.optional(element) || /^(?!.*(?:([A-Za-z,])\1{2}))[A-Za-z, ]{3,20}$/.test(value);
@@ -613,125 +657,120 @@ $validation = \Config\Services::validation();
         }, "Please enter a valid mobile number");
     });
 
-
     $(document).ready(function() {
         $("#establishmentform").validate({
-    ignore: [],
-    rules: {
-        managing_unit_name: {
-            required: true,
-            lettersonly: true
-        },
-        unit_id: {
-            required: true,
-            ddrequired: true
-        },
-        gp_id: {
-            required: true,
-            ddrequired: true
-        },
-        district_id: {
-            required: true,
-            ddrequired: true
-        },
-        block_id: {
-            required: true,
-            ddrequired: true
-        },
-        village_id: {
-            required: true,
-            ddrequired: true
-        },
-        contact_person: {
-            required: true,
-            letters: true
-        },
-        contact_mobile: {
-            required: true,
-            mobile: true
-        },
-        unit_budget_amount: {
-            required: true,
-            rupees: true
-        },
-        own_share: {
-            required: true,
-            rupees: true
-        },
-        unit_budget: {
-            required: true,
-            decimal: true
-        },
-        budget_fin_yr_id: {
-            required: true,
-            ddrequired: true
-        },
-        date_estd: {
-            required: true,
-        },
-        mou_date: {
-            required: true,
-        },
-        purpose_infr_support: {
-            required: function(element) {
-                return $("#is_support_basis_infr").is(":checked");
+            ignore: [],
+            rules: {
+                managing_unit_name: {
+                    required: true,
+                    lettersonly: true
+                },
+                unit_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                gp_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                district_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                block_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                village_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                contact_person: {
+                    required: true,
+                    letters: true
+                },
+                contact_mobile: {
+                    required: true,
+                    mobile: true
+                },
+                unit_budget_amount: {
+                    required: true,
+                    rupees: true
+                },
+                own_share: {
+                    required: true,
+                    rupees: true
+                },
+                unit_budget: {
+                    required: true,
+                    decimal: true
+                },
+                budget_fin_yr_id: {
+                    required: true,
+                    ddrequired: true
+                },
+                date_estd: {
+                    required: true,
+                },
+                mou_date: {
+                    required: true,
+                },
+                purpose_infr_support: {
+                    required: function(element) {
+                        return $("#is_support_basis_infr").is(":checked");
+                    },
+                    lettersonly: true
+                },
+                addl_budget: {
+                    required: function(element) {
+                        return $("#is_support_basis_infr").is(":checked");
+                    },
+                    decimal: true
+                },
+                support_infr_amount: {
+                    required: function(element) {
+                        return $("#is_support_basis_infr").is(":checked");
+                    },
+                    rupees: true
+                },
             },
-            lettersonly: true
-        },
-        addl_budget: {
-            required: function(element) {
-                return $("#is_support_basis_infr").is(":checked");
+            messages: {
+                managing_unit_name: {
+                    lettersonly: "Please enter only letters and spaces."
+                },
+                contact_person: {
+                    letters: "Please enter only letters and spaces."
+                },
+                contact_mobile: {
+                    mobile: "This is not a valid mobile number "
+                },
+                unit_budget_amount: {
+                    rupees: "Please enter rupees (ex-00.00) "
+                },
+                unit_budget: {
+                    decimal: "Please enter only decimal numbers."
+                },
+                purpose_infr_support: {
+                    lettersonly: "Please enter only letters and spaces."
+                },
+                addl_budget: {
+                    decimal: "Please enter only decimal numbers."
+                },
+                support_infr_amount: {
+                    rupees: "Please enter rupees (ex-00.00) "
+                },
             },
-            decimal: true
-        },
-        support_infr_amount: {
-            required: function(element) {
-                return $("#is_support_basis_infr").is(":checked");
+            errorPlacement: function(error, element) {
+                if (element.parent('.input-group').length) {
+                    error.insertAfter(element.parent('.input-group'));
+                } else {
+                    error.insertAfter(element);
+                }
             },
-            rupees: true
-        },
-    },
-    messages: {
-        managing_unit_name: {
-            lettersonly: "Please enter only letters and spaces."
-        },
-        contact_person: {
-            letters: "Please enter only letters and spaces."
-        },
-        contact_mobile: {
-            mobile: "This is not a valid mobile number "
-        },
-        unit_budget_amount: {
-            rupees: "Please enter rupees (ex-00.00) "
-        },
-        unit_budget: {
-            decimal: "Please enter only decimal numbers."
-        },
-        purpose_infr_support: {
-            lettersonly: "Please enter only letters and spaces."
-        },
-        addl_budget: {
-            decimal: "Please enter only decimal numbers."
-        },
-        support_infr_amount: {
-            rupees: "Please enter rupees (ex-00.00) "
-        },
-    },
-    errorPlacement: function(error, element) {
-        if (element.parent('.input-group').length) {
-            error.insertAfter(element.parent('.input-group'));
-        } else {
-            error.insertAfter(element);
-        }
-    },
-});
-
-
+        });
         $("select").on("select2:close", function(e) {
             $(this).valid();
         });
-
-
     });
 </script>
 <?php js_end(); ?>

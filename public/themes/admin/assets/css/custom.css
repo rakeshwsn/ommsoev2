@@ -116,3 +116,16 @@
  select[readonly].select2-hidden-accessible+.select2-container .select2-selection__clear {
      display: none;
  }
+
+.nav-main .nav-main-heading {
+	padding: 3px 18px 2px 18px;
+	background: #0a2b55;
+	color: #fff;
+}
+.nav-main a {
+  position: relative;
+  display: block;
+  padding: 6px 18px 6px 40px;
+  font-weight: 600;
+  color: rgba(87,87,87,.9);
+}

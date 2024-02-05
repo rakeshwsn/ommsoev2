@@ -1301,9 +1301,7 @@ FROM (SELECT
         if(!empty($filter['block_id'])){
             $sql .= " AND block_id = ".$filter['block_id'];
         }
-//        if(!empty($filter['year_id']) && !empty($filter['month_id'])){
-//            $sql .= " AND month_id = ".$filter['month_id'];
-//        }
+
         $sql .= " ) bmym
   LEFT JOIN (SELECT
       st.id,

@@ -65,7 +65,7 @@ class EstablishmentTransactionDetailsModel extends Model
     sm.name month_name,
     eu.name unit_name,
     txn_dtl.period,txn_dtl.created_at
-  FROM (SELECT
+      FROM (SELECT
       etd.id est_id,
       etd.no_of_days_functional,
       etd.produced,
@@ -86,7 +86,7 @@ class EstablishmentTransactionDetailsModel extends Model
     FROM enterprises_transactiondetails etd
       INNER JOIN enterprises_transaction et
         ON etd.transaction_id = et.id
-    WHERE et.deleted_at IS NULL
+    WHERE et.deleted_at IS NULL 
     AND etd.deleted_at IS NULL) txn_dtl
     LEFT JOIN enterprises e
       ON e.id = txn_dtl.enterprise_id
@@ -103,7 +103,7 @@ class EstablishmentTransactionDetailsModel extends Model
     LEFT JOIN soe_months sm
       ON sm.id = txn_dtl.month_id
     LEFT JOIN enterprises_units eu
-      ON eu.id = txn_dtl.unit_id WHERE 1=1";
+      ON eu.id = txn_dtl.unit_id WHERE 1=1 ";
     if (isset($filter['id'])) {
       $sql .= " AND e.id = " . $filter['id'];
     }
@@ -119,7 +119,7 @@ class EstablishmentTransactionDetailsModel extends Model
     if (isset($filter['period'])) {
       $sql .= " AND txn_dtl.period = " . $filter['period'];
     }
-  
+
     // $sql .=  " GROUP BY unit.units";
     //  echo $sql;exit;
     if (isset($filter['id'])) {
@@ -127,6 +127,96 @@ class EstablishmentTransactionDetailsModel extends Model
     } else {
       return $this->db->query($sql)->getResult();
     }
+  }
+
+  public function idwisetrans($id)
+  {
+    $sql = "SELECT
+    e.id ent_id,
+    txn_dtl.txn_id,
+    txn_dtl.est_id,
+    sd.name district_name,
+    sb.name block_name,
+    v.name village_name,
+    g.name gp_name,
+    txn_dtl.no_of_days_functional,
+    txn_dtl.charges_per_qtl,
+    txn_dtl.total_expend,
+    txn_dtl.enterprise_id,
+    txn_dtl.district_id,
+    txn_dtl.block_id,
+    txn_dtl.village_id,
+    txn_dtl.gp_id,
+    txn_dtl.produced,
+    txn_dtl.total_turnover,
+    txn_dtl.under_maintenance,
+    txn_dtl.event_attend,
+    txn_dtl.farmer_user,
+    txn_dtl.service_charge,
+    txn_dtl.seed_support,
+    txn_dtl.seed_store,
+    txn_dtl.year_id,
+    dy.name year_name,
+    sm.name month_name,
+    eu_unit.unit_name,
+    eu_unit.unit_group_name,
+    eu_unit.unit_group_id,
+    txn_dtl.period,
+    txn_dtl.created_at
+  FROM (SELECT
+      etd.id est_id,
+      etd.no_of_days_functional,
+      etd.produced,
+      etd.total_turnover,
+      etd.charges_per_qtl,
+      etd.total_expend,
+      et.id txn_id,
+      etd.enterprise_id,
+      et.district_id,
+      et.period,
+      etd.block_id,
+      etd.gp_id,
+      etd.village_id,
+      et.created_at,
+      et.year_id,
+      et.month_id,
+      et.unit_id,
+      etd.under_maintenance,
+      etd.event_attend,
+      etd.farmer_user,
+      etd.service_charge,
+      etd.seed_support,
+      etd.seed_store
+    FROM enterprises_transactiondetails etd
+      INNER JOIN enterprises_transaction et
+        ON etd.transaction_id = et.id
+    WHERE et.deleted_at IS NULL
+    AND etd.deleted_at IS NULL) txn_dtl
+    LEFT JOIN enterprises e
+      ON e.id = txn_dtl.enterprise_id
+    LEFT JOIN soe_blocks sb
+      ON sb.id = txn_dtl.block_id
+    LEFT JOIN soe_districts sd
+      ON sd.id = txn_dtl.district_id
+    LEFT JOIN soe_grampanchayats g
+      ON g.id = txn_dtl.gp_id
+    LEFT JOIN villages v
+      ON v.id = txn_dtl.village_id
+    LEFT JOIN dashboard_years dy
+      ON dy.id = txn_dtl.year_id
+    LEFT JOIN soe_months sm
+      ON sm.id = txn_dtl.month_id
+    LEFT JOIN (SELECT
+        eu.name unit_name,
+        eu.id unit_id,
+        eu.unit_group_id,
+        eug.name unit_group_name
+      FROM enterprises_units eu
+        LEFT JOIN enterprise_unit_group eug
+          ON eu.unit_group_id = eug.id) eu_unit
+      ON eu_unit.unit_id = txn_dtl.unit_id WHERE txn_id = $id ";
+    // echo $sql;exit;
+    return $this->db->query($sql)->getResult();
   }
 
 
@@ -154,7 +244,7 @@ class EstablishmentTransactionDetailsModel extends Model
   COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
   COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
   COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
-FROM (SELECT
+ FROM (SELECT
     eu.id unit_id,
     eu.name unit_name
   FROM enterprises_units eu
@@ -182,7 +272,7 @@ FROM (SELECT
     if (!empty($filter['block_id'])) {
       $sql .= " AND (e.block_id = {$filter['block_id']})";
     }
-   
+
 
     $sql .= " GROUP BY e.unit_id) func_unit_upto
     ON func_unit_upto.unit_id = units.unit_id
@@ -229,7 +319,8 @@ FROM (SELECT
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
     }
     if (!empty($filter['year_id'])) {
-      $sql .= " AND ((et.year_id BETWEEN 0 AND $last_year) OR (et.year_id = {$filter['year_id']} AND et.month_id BETWEEN 0 AND $pmonth))";
+      $sql .= " AND ((et.year_id BETWEEN 0 AND $last_year) OR (et.year_id = {$filter['year_id']} 
+      AND et.month_id BETWEEN 0 AND $pmonth))";
     }
     if (!empty($filter['district_id'])) {
       $sql .= " AND (et.district_id = {$filter['district_id']})";

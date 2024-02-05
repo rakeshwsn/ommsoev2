@@ -70,6 +70,7 @@ class AreaCoverage extends AdminController
             'start_date' => $data['start_date']
         ];
 
+
         $data['district_id'] = $this->user->district_id;
 
         if ($data['block_id']) {
@@ -91,8 +92,7 @@ class AreaCoverage extends AdminController
         // exit;
 
         $blocks = $this->acModel->getAreaCoverageReport($filter);
-        // printr($blocks);
-        // exit;
+
         if ($data['block_id']) {
             $this->gps($blocks, $data);
         } else if ($data['district_id']) {
@@ -665,8 +665,8 @@ class AreaCoverage extends AdminController
 
 
         $blocks = $this->acModel->getByDistrictNew($filter);
-        print_r($blocks);
-        exit;
+        // print_r($blocks);
+        // exit;
         $this->_allblocks($blocks, $data);
 
         //
