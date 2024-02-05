@@ -43,83 +43,83 @@ class EnterprisesModel extends Model
     public function getAll($filter = [])
     {
         $sql = "SELECT
-    e.id,
-    e.unit_id,
-    e.district_id,
-    e.block_id,
-    e.gp_id,
-    e.village_id,
-    e.budget_fin_yr_id,
-    e.management_unit_type,
-    e.managing_unit_name,
-    e.contact_person,
-    e.contact_mobile,
-    e.date_estd,
-    e.mou_date,
-    e.own_share,
-    e.unit_budget,
-    e.addl_budget,
-    e.unit_budget_amount,
-    e.is_support_basis_infr,
-    e.is_support_basis_infr,
-    e.purpose_infr_support,
-    e.support_infr_amount,
-    sd.name districts,
-    sb.name blocks,
-    v.name villages,
-    sg.name gps,
-    eu.name unit_name,
-    eu.unit_group_id,
-    YEAR(e.date_estd) year
-    FROM enterprises e
-    LEFT JOIN soe_districts sd ON sd.id = e.district_id
-    LEFT JOIN soe_blocks sb ON sb.id = e.block_id
-    LEFT JOIN villages v ON v.id = e.village_id
-    LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
-    LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-   WHERE e.deleted_at IS NULL";
+        e.id,
+        e.unit_id,
+        e.district_id,
+        e.block_id,
+        e.gp_id,
+        e.village_id,
+        e.budget_fin_yr_id,
+        e.management_unit_type,
+        e.managing_unit_name,
+        e.contact_person,
+        e.contact_mobile,
+        e.date_estd,
+        e.mou_date,
+        e.own_share,
+        e.unit_budget,
+        e.addl_budget,
+        e.unit_budget_amount,
+        e.is_support_basis_infr,
+        e.is_support_basis_infr,
+        e.purpose_infr_support,
+        e.support_infr_amount,
+        date(e.created_at) created_at,
+        sd.name districts,
+        sb.name blocks,
+        v.name villages,
+        sg.name gps,
+        eu.name unit_name,
+        eu.unit_group_id,
+        YEAR(e.date_estd) year
+        FROM enterprises e
+        LEFT JOIN soe_districts sd ON sd.id = e.district_id
+        LEFT JOIN soe_blocks sb ON sb.id = e.block_id
+        LEFT JOIN villages v ON v.id = e.village_id
+        LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
+        LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
+        WHERE e.deleted_at IS NULL";
 
-        if (isset($filter['district_id'])) {
+        if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id = " . $filter['district_id'];
         }
-        if (isset($filter['block_id'])) {
+        if (!empty($filter['block_id'])) {
             $sql .= " AND e.block_id = " . $filter['block_id'];
         }
-        if (isset($filter['unit_id'])) {
+        if (!empty($filter['unit_id'])) {
             $sql .= " AND e.unit_id = " . $filter['unit_id'];
         }
-        if (isset($filter['doeyear'])) {
+        if (!empty($filter['doeyear'])) {
             $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
         }
 
-        if (isset($filter["management_unit_type"])) {
+        if (!empty($filter["management_unit_type"])) {
             $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
 
         if (isset($data['sort']) && $data['sort']) {
-			$sort = $data['sort'];
-		} else {
-			$sort = "sd.name,sb.name";
-		}
+            $sort = $data['sort'];
+        } else {
+            $sort = "sd.name,sb.name,e.created_at";
+        }
 
-		if (isset($data['order']) && ($data['order'] == 'desc')) {
-			$order = "desc";
-		} else {
-			$order = "asc";
-		}
+        if (isset($data['order']) && ($data['order'] == 'asc')) {
+            $order = "asc";
+        } else {
+            $order = "desc";
+        }
         $sql .= " ORDER BY " . $sort . " " . $order;
-		
-		if (isset($data['start']) || isset($data['limit'])) {
-			if ($data['start'] < 0) {
-				$data['start'] = 0;
-			}
 
-			if ($data['limit'] < 1) {
-				$data['limit'] = 10;
-			}
-			$sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
-		}
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
 
+            if ($data['limit'] < 1) {
+                $data['limit'] = 10;
+            }
+            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
         return $this->db->query($sql)->getResult();
     }
 
@@ -129,60 +129,62 @@ class EnterprisesModel extends Model
      * @param datatype $paramname description
      * @return Number of rows
      */
-    public function getTotals($filter=[]){
 
-        $sql = " SELECT COUNT(e.id) total
-        FROM enterprises e
-        LEFT JOIN soe_districts sd ON sd.id = e.district_id
-        LEFT JOIN soe_blocks sb ON sb.id = e.block_id";
-        
-        if (isset($filter['district_id'])) {
-            $sql .= " AND e.district_id = " . $filter['district_id'];
-        }
-        if (isset($filter['block_id'])) {
-            $sql .= " AND e.block_id = " . $filter['block_id'];
-        }
-        if (isset($filter['unit_id'])) {
-            $sql .= " AND e.unit_id = " . $filter['unit_id'];
-        }
-        if (isset($filter['doeyear'])) {
-            $sql .= " AND YEAR(e.date_estd) = " . $filter['doeyear'];
-        }
+    public function getTotals($data = array())
+    {
+        $builder = $this->db->table("{$this->table} e");
+        $this->filter($builder, $data);
 
-        if (isset($filter["management_unit_type"])) {
-            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
-        }
-        
-        return $this->db->query($sql)->getRow()->total;
+        // Add condition to check if deleted_at is not null
+        $builder->where('e.deleted_at IS  NULL');
+
+        $count = $builder->countAllResults();
+
+        return $count;
     }
+    private function filter($builder, $data)
+    {
+        $builder->join('soe_districts sd', 'e.district_id = sd.id');
+        $builder->join('soe_blocks sb', 'e.block_id = sb.id');
+        $builder->join('villages v', 'e.district_id = v.id');
+        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id');
+        $builder->join('enterprises_units eu', 'e.unit_id = eu.id');
 
-	private function filter($builder,$data){
-		$builder->join('soe_districts d', 'b.district_id = d.id');
-        
-		if(!empty($data['filter_district'])){
-            $builder->where("b.district_id  = '".$data['filter_district']."'");
+        if (!empty($data['district_id'])) {
+            $builder->where("e.district_id  = '" . $data['district_id'] . "'");
+        }
+        if (!empty($data['block_id'])) {
+            $builder->where("e.block_id  = '" . $data['block_id'] . "'");
+        }
+        if (!empty($data['unit_id'])) {
+            $builder->where("e.unit_id  = '" . $data['unit_id'] . "'");
+        }
+      
+        if (!empty($data['management_unit_type'])) {
+            $builder->where("e.management_unit_type  = '" . $data['management_unit_type'] . "'");
         }
 
-		if (!empty($data['filter_search'])) {
-			$builder->where("
-				b.name LIKE '%{$data['filter_search']}%' OR
-				b.id = '{$data['filter_search']}'
+        if (!empty($data['filter_search'])) {
+            $builder->where("
+				sb.name LIKE '%{$data['filter_search']}%' OR
+				sb.id = '{$data['filter_search']}'
 			");
-		}
+        }
+
+        // echo $this->db->getLastQuery();exit;
     }
 
     public function yearWise($district_id)
     {
         $sql = "SELECT
-    e.id,
-    e.district_id,
-    YEAR(e.date_estd) year
-    FROM enterprises e
-    WHERE e.district_id = $district_id  AND YEAR(e.date_estd) > 2000
-    GROUP BY year
-    ORDER BY year ";
-        //  printr($sql);
-        //     exit;
+        e.id,
+        e.district_id,
+        YEAR(e.date_estd) year
+        FROM enterprises e
+        WHERE e.district_id = $district_id  AND YEAR(e.date_estd) > 2000
+        GROUP BY year
+        ORDER BY year ";
+
         return $this->db->query($sql)->getResult();
     }
 
@@ -197,23 +199,23 @@ class EnterprisesModel extends Model
     public function districtwiseUnits($filter)
     {
         $sql = "SELECT
-    disunit.unit_id,
-    disunit.unit,
-    disunit.district_id,
-    disunit.district,
-    COALESCE(res.total_units, 0) total_units,
-    res.management_unit_type,
-    res.date_estd,
-    res.year_id,
-    res.month
-    FROM (SELECT
-      eu.id unit_id,
-      eu.name unit,
-      sd.id district_id,
-      sd.name district
-    FROM soe_districts sd
-      CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) disunit
-    LEFT JOIN (SELECT
+        disunit.unit_id,
+        disunit.unit,
+        disunit.district_id,
+        disunit.district,
+        COALESCE(res.total_units, 0) total_units,
+        res.management_unit_type,
+        res.date_estd,
+        res.year_id,
+        res.month
+        FROM (SELECT
+        eu.id unit_id,
+        eu.name unit,
+        sd.id district_id,
+        sd.name district
+        FROM soe_districts sd
+        CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) disunit
+        LEFT JOIN (SELECT
         unit_id,
         COUNT(e.unit_id) total_units,
         e.district_id,
@@ -250,9 +252,7 @@ class EnterprisesModel extends Model
         $sql .= " GROUP BY e.unit_id, e.district_id
       ORDER BY e.district_id) res
       ON disunit.district_id = res.district_id
-      AND disunit.unit_id = res.unit_id
-
- ";
+      AND disunit.unit_id = res.unit_id ";
 
         $sql .= " ORDER BY unit_id, district";
         // echo $sql;
@@ -270,16 +270,16 @@ class EnterprisesModel extends Model
     public function blockwiseUnits($filter)
     {
         $sql = "SELECT
-    blkunit.block_id,
-    blkunit.block,
-    blkunit.district_id,
-    blkunit.unit,
-    blkunit.unit_id,
-    COALESCE(res.total_units, 0) total_units,
-    res.management_unit_type,
-    res.date_estd,
-    res.year_id,
-    res.month
+        blkunit.block_id,
+        blkunit.block,
+        blkunit.district_id,
+        blkunit.unit,
+        blkunit.unit_id,
+        COALESCE(res.total_units, 0) total_units,
+        res.management_unit_type,
+        res.date_estd,
+        res.year_id,
+        res.month
      FROM (SELECT
         eu.id unit_id,
         eu.name unit,
@@ -347,28 +347,28 @@ class EnterprisesModel extends Model
     public function gpwiseUnits($filter)
     {
         $sql = "SELECT
-    gpunits.gp_id,
-    gpunits.gp,
-    gpunits.block_id,
-    gpunits.unit_id,
-    gpunits.unit,
-    COALESCE(res.total_units, 0) total_units,
-    res.management_unit_type,
-    res.date_estd,
-    res.year_id,
-    res.month
+        gpunits.gp_id,
+        gpunits.gp,
+        gpunits.block_id,
+        gpunits.unit_id,
+        gpunits.unit,
+        COALESCE(res.total_units, 0) total_units,
+        res.management_unit_type,
+        res.date_estd,
+        res.year_id,
+        res.month
      FROM (SELECT
       gp.id gp_id,
       gp.name gp,
       gp.block_id,
       eu.id unit_id,
       eu.name unit
-    FROM (SELECT
+     FROM (SELECT
         *
       FROM grampanchayat g
      ) gp
       CROSS JOIN enterprises_units eu) gpunits
-    LEFT JOIN (SELECT
+     LEFT JOIN (SELECT
         e.unit_id,
         COUNT(e.unit_id) total_units,
         e.gp_id,
@@ -413,7 +413,7 @@ class EnterprisesModel extends Model
         return $this->db->query($sql)->getResult();
     }
 
-    public function getMainCenters($district_id, $block_id='', $unit_id)
+    public function getMainCenters($district_id, $block_id = '', $unit_id)
     {
         $sql = "SELECT
       e.id ent_id,
@@ -437,12 +437,12 @@ class EnterprisesModel extends Model
     public function equipment($id)
     {
         $sql = "SELECT
-    e.ent_id,
-    e.equipment_id,
-    e.quantity,
-    eq.name equipment
-  FROM enterprise_equipment e
-    LEFT JOIN equipment eq
+        e.ent_id,
+        e.equipment_id,
+        e.quantity,
+        eq.name equipment
+     FROM enterprise_equipment e
+     LEFT JOIN equipment eq
       ON e.equipment_id = eq.id  WHERE e.ent_id = $id";
         // printr($sql);
         // exit;
@@ -452,13 +452,13 @@ class EnterprisesModel extends Model
     public function getBy($filter)
     {
         $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
-    e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
-    eu.name unit_name FROM enterprises e 
-    LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
-    LEFT JOIN soe_blocks b ON e.block_id=b.id 
-    LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id 
-    LEFT JOIN villages v ON e.village_id=v.id 
-    WHERE e.deleted_at IS NULL";
+        e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
+        eu.name unit_name FROM enterprises e 
+        LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
+        LEFT JOIN soe_blocks b ON e.block_id=b.id 
+        LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id 
+        LEFT JOIN villages v ON e.village_id=v.id 
+        WHERE e.deleted_at IS NULL";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id= " . (int)$filter['district_id'];
