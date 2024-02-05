@@ -19,7 +19,7 @@ jobs:
 
     - name: Deploy files for main branch
       run: |
-        cp -r * /${{ secrets.SSH_PRIVATE_KEY }}/
+        cp -r * /${{ secrets.PROD_PATH }}/
 
   deploy_test:
     runs-on: ubuntu-latest
@@ -35,4 +35,4 @@ jobs:
 
     - name: Deploy files for test branch
       run: |
-        cp -r * /${{ secrets.SSH_PRIVATE_KEY }}/
+        cp -r * /${{ secrets.TEST_PATH }}/
