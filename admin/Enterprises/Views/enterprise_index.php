@@ -108,7 +108,7 @@
                     <?php  } else { ?>
                         <tbody>
                             <tr class="odd">
-                                <td colspan="9">
+                                <td colspan="10">
                                     <h3 class="text-center">data not avaliable</h3>
                                 </td>
                             </tr>
