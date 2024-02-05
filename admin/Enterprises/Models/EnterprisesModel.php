@@ -97,28 +97,28 @@ class EnterprisesModel extends Model
             $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
 
-        if (isset($data['sort']) && $data['sort']) {
-            $sort = $data['sort'];
+        if (isset($filter['sort']) && $filter['sort']) {
+            $sort = $filter['sort'];
         } else {
             $sort = "sd.name,sb.name,e.created_at";
         }
 
-        if (isset($data['order']) && ($data['order'] == 'asc')) {
-            $order = "asc";
-        } else {
+        if (isset($filter['order']) && ($filter['order'] == 'desc')) {
             $order = "desc";
+        } else {
+            $order = "asc";
         }
         $sql .= " ORDER BY " . $sort . " " . $order;
 
-        if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
+        if (isset($filter['start']) || isset($filter['limit'])) {
+            if ($filter['start'] < 0) {
+                $filter['start'] = 0;
             }
 
-            if ($data['limit'] < 1) {
-                $data['limit'] = 10;
+            if ($filter['limit'] < 1) {
+                $filter['limit'] = 10;
             }
-            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+            $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
         return $this->db->query($sql)->getResult();
     }
