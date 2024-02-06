@@ -506,7 +506,7 @@ ORDER BY district,m.block";
   nur.farmers_covered,
   m.crop_div_ragi,
   m.crop_div_non_ragi,
-  m.rice_fallow_area,
+  m.rfc_area,
   m.fc_area,
   m.rfc_area,
   m.ragi_smi,
