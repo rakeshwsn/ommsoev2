@@ -68,6 +68,8 @@ class AreaCoverage extends AdminController
             'year_id' => $data['year_id'],
             'season' => $data['current_season'],
             'start_date' => $data['start_date']
+
+
         ];
 
 
