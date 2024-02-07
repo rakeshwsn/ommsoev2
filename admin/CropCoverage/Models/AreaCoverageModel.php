@@ -118,6 +118,17 @@ FROM ac_crop_practices acp
         $builder = $this->db->table('ac_area_follow_up');
         $builder->insertBatch($fCrop);
     }
+    public function addRiceFallowCrops($rfcrop)
+    {
+        $builder = $this->db->table('ac_area_rice_fallow');
+        $builder->insertBatch($rfcrop);
+    }
+    public function deleteRiceFallowCrops($crop_coverage_id)
+    {
+        $builder = $this->db->table('ac_area_rice_fallow');
+        $builder->where('crop_coverage_id', $crop_coverage_id)->delete();
+    }
+
 
     public function deleteNursery($crop_coverage_id)
     {
@@ -218,13 +229,17 @@ FROM ac_crop_practices acp
     {
 
         $dates = $this->getCurrentYearDates();
-
+        // print_r($dates);
+        // exit;
         $start = $dates['start_date'];
-
+        // print_r($start);
+        // exit;
         $end = $dates['end_date'];
 
         $week_start = $this->settings->start_week;
 
+        // print_r($week_start);
+        // exit;
         $week_start_index = array_search(strtolower($week_start), array('sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'));
 
         $output = [];
@@ -241,15 +256,19 @@ FROM ac_crop_practices acp
 
             $start->modify('+1 day');
         }
-
+        // printr($output);
+        // exit;
         return $output;
     }
 
     public function getWeekDate($date = 'today')
     {
         $output = $this->getWeeks();
-
+        // printr($output);
+        // exit;
         $date = strtotime($date);
+        // print_r($date);
+        // exit;
         foreach ($output as $dates) {
             if ($date >= strtotime($dates['start_date']) && $date <= strtotime($dates['end_date'])) {
                 return $dates;
@@ -276,6 +295,7 @@ FROM ac_crop_practices acp
             $sql .= " ORDER BY date(cc.start_date) DESC,gp.name ASC";
 
         } else if (!empty($filter['district_id'])) {
+
             $sql = "SELECT ac.*,b.id block_id,
   b.name block,bgps.gps total_gps FROM soe_blocks b
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
@@ -290,6 +310,7 @@ FROM ac_crop_practices acp
             $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
 
         } else {
+
             $sql = "SELECT
   sd.id district_id,
   sd.name district,
@@ -312,10 +333,9 @@ FROM ac_crop_practices acp
   ac.barnyard_ls,
   ac.pearl_ls,
   ac.fc_area,
-  ac.crop_diversification_farmers,
-  ac.crop_diversification_area,
-  ac.rice_fallow_farmers,
-  ac.rice_fallow_area,
+  ac.rfc_area,
+  ac.crop_div_ragi,
+  ac.crop_div_non_ragi, 
   ac.status
 FROM soe_districts sd
   LEFT JOIN (SELECT
@@ -337,12 +357,13 @@ FROM soe_districts sd
 
     public function getAreaCoverageReport($filter = [])
     {
-
-        if (isset($filter['block_id'])) {
+        // print_r($filter);
+        // exit;
+        if (!empty($filter['block_id'])) {
 
             return $this->getByBlockNew($filter);
 
-        } else if (isset($filter['district_id'])) {
+        } else if (!empty($filter['district_id'])) {
 
             return $this->getByDistrictNew($filter);
 
@@ -364,11 +385,10 @@ FROM soe_districts sd
   nur.balance_smi,
   nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_diversification_farmers,
-  m.crop_diversification_area,
-  nur.rice_fallow_farmers,
-  m.rice_fallow_area,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
   m.fc_area,
+  m.rfc_area,
   m.ragi_smi,
   m.ragi_lt,
   m.ragi_ls,
@@ -388,11 +408,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
-    SUM(crop_diversification_farmers) crop_diversification_farmers,
-    SUM(crop_diversification_area) crop_diversification_area,
-    SUM(rice_fallow_farmers) rice_fallow_farmers,
-    SUM(rice_fallow_area) rice_fallow_area,
+    SUM(crop_div_ragi) crop_div_ragi,
+    SUM(crop_div_non_ragi) crop_div_non_ragi,
     SUM(fc_area) fc_area,
+    SUM(rfc_area) rfc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
     SUM(ragi_ls) ragi_ls,
@@ -436,8 +455,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
-            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -466,9 +483,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_diversification_farmers,
-      n1.rice_fallow_farmers
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -490,11 +505,11 @@ ORDER BY district,m.block";
   m.gp_id,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_diversification_farmers,
-  m.crop_diversification_area,
-  nur.rice_fallow_farmers,
-  m.rice_fallow_area,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
+  m.rfc_area,
   m.fc_area,
+  m.rfc_area,
   m.ragi_smi,
   m.ragi_lt,
   m.ragi_ls,
@@ -512,11 +527,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
-    SUM(crop_diversification_farmers) crop_diversification_farmers,
-    SUM(crop_diversification_area) crop_diversification_area,
-    SUM(rice_fallow_farmers) rice_fallow_farmers,
-    SUM(rice_fallow_area) rice_fallow_area,
+    SUM(crop_div_ragi) crop_div_ragi,
+    SUM(crop_div_non_ragi) crop_div_non_ragi,
     SUM(fc_area) fc_area,
+    SUM(rfc_area) rfc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
     SUM(ragi_ls) ragi_ls,
@@ -554,8 +568,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
-            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -583,9 +595,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_diversification_farmers,
-      n1.rice_fallow_farmers
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -608,11 +618,10 @@ ORDER BY m.gp";
   bgp.total_gps,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
   nur.farmers_covered,
-  nur.crop_diversification_farmers,
-  m.crop_diversification_area,
-  nur.rice_fallow_farmers,
-  m.rice_fallow_area,
+  m.crop_div_ragi,
+  m.crop_div_non_ragi,
   m.fc_area,
+  m.rfc_area,
   m.ragi_smi,
   m.ragi_lt,
   m.ragi_ls,
@@ -629,11 +638,10 @@ FROM (SELECT
     season,
     start_date,
     SUM(farmers_covered) farmers_covered,
-    SUM(crop_diversification_farmers) crop_diversification_farmers,
-    SUM(crop_diversification_area) crop_diversification_area,
-    SUM(rice_fallow_farmers) rice_fallow_farmers,
-    SUM(rice_fallow_area) rice_fallow_area,
+    SUM(crop_div_ragi) crop_div_ragi,
+    SUM(crop_div_non_ragi) crop_div_non_ragi,
     SUM(fc_area) fc_area,
+    SUM(rfc_area) rfc_area,
     SUM(ragi_smi) ragi_smi,
     SUM(ragi_lt) ragi_lt,
     SUM(ragi_ls) ragi_ls,
@@ -672,8 +680,6 @@ FROM (SELECT
             SUM(an.balance_smi) balance_smi,
             SUM(an.balance_lt) balance_lt,
             SUM(acc.farmers_covered) farmers_covered,
-            SUM(acc.crop_diversification_farmers) crop_diversification_farmers,
-            SUM(acc.rice_fallow_farmers) rice_fallow_farmers,
             acc.start_date
           FROM ac_nursery an
             LEFT JOIN ac_crop_coverage acc
@@ -702,9 +708,7 @@ FROM (SELECT
       balance_smi,
       balance_lt,
       start_date,
-      n1.farmers_covered,
-      n1.crop_diversification_farmers,
-      n1.rice_fallow_farmers
+      n1.farmers_covered
     FROM nur n1
     WHERE DATE(start_date) = (SELECT
         MAX(DATE(n2.start_date))
@@ -778,6 +782,17 @@ ORDER BY t1.crop_id, t1.practice_id";
   c.crops crop
 FROM ac_crops c LEFT JOIN (SELECT * FROM ac_area_follow_up fc
 WHERE fc.crop_coverage_id=" . $crop_coverage_id . ") afc ON c.id=afc.crop_id";
+
+        return $this->db->query($sql)->getResultArray();
+    }
+    public function getRiceFallowCrops($crop_coverage_id = 0)
+    {
+        $sql = "SELECT
+  c.id crop_id,
+  arfc.area,
+  c.crops crop
+FROM ac_crops c LEFT JOIN (SELECT * FROM ac_area_rice_fallow rfc 
+WHERE rfc.crop_coverage_id=" . $crop_coverage_id . ") arfc ON c.id=arfc.crop_id";
 
         return $this->db->query($sql)->getResultArray();
     }

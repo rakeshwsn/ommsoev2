@@ -10,6 +10,7 @@
                         <div class="col-lg-3">
                             <div class="form-group mg-b-10-force">
                                 <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
+
                                 <?= form_dropdown('start_date', $weeks, $week_start_date, "id='filter_block' class='form-control js-select2'"); ?>
                             </div>
                         </div><!-- col-4 -->
@@ -51,10 +52,12 @@
                             <th rowspan="3">Total Non-Ragi </th>
                             <th rowspan="3">Follow up Crops</th>
                             <th rowspan="3">Total Area </th>
-                            <th rowspan="3">Total Crop Diversification Farmers</th>
-                            <th rowspan="3">Total Crop Diversification Areas</th>
-                            <th rowspan="3">Total Rice Fallow Farmers</th>
-                            <th rowspan="3">Total Rice Fallow Areas</th>
+                            <th rowspan="3">Total Crop Diversification Area
+                            </th>
+                            <?php if ($season == 'Rabi') { ?>
+                                <th rowspan="3">Total Rice Fallow Area
+                                </th>
+                            <?php } ?>
                             <th rowspan="3">Status </th>
                             <th rowspan="3" class="text-right no-sort">Actions</th>
                         </tr>
@@ -143,17 +146,13 @@
                                         <?= $district['total_area'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['crop_diversification_farmers'] ?>
+                                        <?= $district['total_crop_div'] ?>
                                     </td>
-                                    <td>
-                                        <?= $district['crop_diversification_area'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['rice_fallow_farmers'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['rice_fallow_area'] ?>
-                                    </td>
+                                    <?php if ($season == 'Rabi') { ?>
+                                        <td>
+                                            <?= $district['total_rfc'] ?>
+                                        </td>
+                                    <?php } ?>
                                     <td><label class="badge badge-<?= $district['status_color'] ?>">
                                             <?= $district['status'] ?>
                                         </label></td>

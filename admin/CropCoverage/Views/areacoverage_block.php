@@ -56,14 +56,14 @@
                     <div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
                         <div class="col-lg-3">
                             <div class="form-group mg-b-10-force">
-                                <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
-                                <?= form_dropdown('start_date', $weeks, $week_start_date, "id='filter_Start_date' class='form-control js-select2'"); ?>
+                                <label>Week</label>
+                                <?= form_dropdown('start_date', $weeks, $start_date, "id='filter_week' class='form-control js-select2'"); ?>
                             </div>
                         </div><!-- col-4 -->
                         <div class="col-lg-3 center">
                             <label class="form-control-label">&nbsp;</label>
                             <div class="form-layout-footer">
-                                <button id="btn-filter" type="submit" class="btn btn-primary">Filter</button>
+                                <button id="btn-filter" class="btn btn-primary">Filter</button>
                             </div><!-- form-layout-footer -->
                         </div>
                     </div>
@@ -91,11 +91,9 @@
                                 <th>Total Non Ragi</th>
                                 <th>Total Followup Crop</th>
                                 <th>Total Area</th>
-                                <th>Total Crop Diversification Farmers</th>
                                 <th>Total Crop Diversification Area</th>
                                 <?php if ($season === 'Rabi') { ?>
-                                    <th>Total Rice Fallow Farmers</th>
-                                    <th>Total Rice Fallow Area</th>
+                                    <th>Total Rice Fallow during Rabi (in Ha)</th>
                                 <?php } ?>
                                 <th>Status</th>
                                 <th>Action</th>
@@ -103,6 +101,8 @@
                         </thead>
                         <tbody id="table-body">
                             <?php
+                            // printr($blocks);
+                            // exit;
                             if (!empty($blocks)) {
                                 foreach ($blocks as $block) {
                                     ?>
@@ -138,19 +138,11 @@
                                             <?= $block['total_area'] ?>
                                         </td>
                                         <td>
-                                            <?= $block['crop_diversification_farmers'] ?>
+                                            <?= $block['total_crop_div_area'] ?>
                                         </td>
                                         <td>
-                                            <?= $block['crop_diversification_area'] ?>
+                                            <?= $block['total_rfc'] ?>
                                         </td>
-                                        <?php if ($season === 'Rabi') { ?>
-                                            <td>
-                                                <?= $block['rice_fallow_farmers'] ?>
-                                            </td>
-                                            <td>
-                                                <?= $block['rice_fallow_area'] ?>
-                                            </td>
-                                        <?php } ?>
                                         <td>
                                             <?= $block['status'] ?>
                                         </td>
