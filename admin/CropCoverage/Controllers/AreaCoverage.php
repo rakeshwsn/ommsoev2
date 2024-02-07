@@ -66,11 +66,7 @@ class AreaCoverage extends AdminController
 
 
 
-        // if (strtotime($dates['end_date']) < strtotime('+2 days')) {
-        //     $dates['start_date'] = $dates['start_date'];
-        // }
-        // echo $dates['start_date'];
-        // exit;
+
         $data['from_date'] = '';
         $data['to_date'] = '';
         if ($dates) {

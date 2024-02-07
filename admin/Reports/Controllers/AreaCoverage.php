@@ -68,8 +68,6 @@ class AreaCoverage extends AdminController
             'year_id' => $data['year_id'],
             'season' => $data['current_season'],
             'start_date' => $data['start_date']
-
-
         ];
 
 
@@ -94,7 +92,8 @@ class AreaCoverage extends AdminController
         // exit;
 
         $blocks = $this->acModel->getAreaCoverageReport($filter);
-
+        // printr($blocks);
+        // exit;
         if ($data['block_id']) {
             $this->gps($blocks, $data);
         } else if ($data['district_id']) {
@@ -408,12 +407,11 @@ class AreaCoverage extends AdminController
     private function _allblocks($blocks, &$data)
     {
 
-
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
             $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
             $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
             $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_area = $total_rfc_area = $total_crop_div_area = 0;
+            $total_total_area = $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_rfc_area = $total_crop_div_area = 0;
 
         $data['rows'] = [];
         $gps = 0;
@@ -461,6 +459,8 @@ class AreaCoverage extends AdminController
                 'total_ragi' => $total_ragi,
                 'total_non_ragi' => $total_non_ragi,
                 'total_fc' => $block->fc_area,
+                'total_rfc' => $block->rfc_area,
+                'total_crop_div' => $total_crop_div_area,
                 'total_area' => $total_area
             ];
 
@@ -482,6 +482,8 @@ class AreaCoverage extends AdminController
             $total_total_ragi += $total_ragi;
             $total_total_non_ragi += $total_non_ragi;
             $total_fc_area += $block->fc_area;
+            $total_rfc_area += $block->rfc_area;
+            $total_crop_div_area += $total_crop_div_area;
             $total_total_area += $total_area;
 
             $gps += $block->total_gps;
@@ -508,7 +510,9 @@ class AreaCoverage extends AdminController
             'pearl_ls' => $total_pearl_ls,
             'total_ragi' => $total_total_ragi,
             'total_non_ragi' => $total_total_non_ragi,
+            'total_rfc' => $total_rfc_area,
             'total_fc' => $total_fc_area,
+            'total_crop_div' => $total_crop_div_area,
             'total_area' => $total_total_area
         ];
     }
@@ -667,7 +671,7 @@ class AreaCoverage extends AdminController
 
 
         $blocks = $this->acModel->getByDistrictNew($filter);
-        // print_r($blocks);
+        // printr($blocks);
         // exit;
         $this->_allblocks($blocks, $data);
 

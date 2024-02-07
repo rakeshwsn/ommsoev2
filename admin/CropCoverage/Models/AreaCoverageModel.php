@@ -357,12 +357,13 @@ FROM soe_districts sd
 
     public function getAreaCoverageReport($filter = [])
     {
-
-        if (isset($filter['block_id'])) {
+        // print_r($filter);
+        // exit;
+        if (!empty($filter['block_id'])) {
 
             return $this->getByBlockNew($filter);
 
-        } else if (isset($filter['district_id'])) {
+        } else if (!empty($filter['district_id'])) {
 
             return $this->getByDistrictNew($filter);
 

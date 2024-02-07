@@ -35,11 +35,7 @@
                         <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
                         <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
                         </th>
-                        <th colspan="10">Achievement under demonstration (in Ha.)</th>
-                        <th rowspan="3">Total Ragi</th>
-                        <th rowspan="3">Total Non-Ragi </th>
-                        <th rowspan="3">Follow up Crops</th>
-                        <th rowspan="3">Total Area </th>
+                        <th colspan="14">Achievement under demonstration (in Ha.)</th>
                         <th rowspan="3">Total Crop Diversification Area
                         </th>
                         <?php if ($current_season == 'rabi') { ?>
@@ -53,6 +49,10 @@
                                 <?= $crops[$crop_id] ?>
                             </th>
                         <?php endforeach; ?>
+                        <th rowspan="2">Total Ragi</th>
+                        <th rowspan="2">Total Non-Ragi </th>
+                        <th rowspan="2">Follow up Crops</th>
+                        <th rowspan="2">Total Area </th>
                     </tr>
                     <tr>
                         <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -62,7 +62,9 @@
                                 </th>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
+
                     </tr>
+
                 </thead>
                 <tbody>
                     <?php foreach ($rows as $block): ?>
