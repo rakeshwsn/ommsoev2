@@ -294,6 +294,7 @@ class AreaCoverage extends AdminController
             'total_rfc' => $total_rfc_area,
             'total_crop_div' => $total_crop_div_area,
         ];
+
     }
 
     private function blocks($blocks, &$data)
@@ -735,6 +736,124 @@ class AreaCoverage extends AdminController
 
         $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter_allblocks', $data);
         $data['download_url'] = admin_url('reports/areacoverage/allblocks/download');
+        $data['get_blocks'] = Url::getBlocks;
+
+        return $this->template->view('Admin\Reports\Views\areacoverage', $data);
+    }
+    public function allgps($action = '')
+    {
+
+        $data = [];
+
+        $data['title'] = 'Area Coverage GPwise Report';
+
+
+        $cropsModel = new CropsModel();
+        $data['years'] = getAllYears();
+        $data['seasons'] = $this->acModel->getSeasons();
+
+        $data['current_season'] = strtolower(getCurrentSeason());
+        $data['year_id'] = getCurrentYearId();
+        if ($this->user->district_id) {
+            $data['district_id'] = $filter['district_id'] = $this->user->district_id;
+            $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
+        } else {
+            $data['districts'] = (new DistrictModel())->orderBy('name')->asArray()->find();
+        }
+        if ($this->request->getGet('year_id')) {
+            $data['year_id'] = $this->request->getGet('year_id');
+        }
+
+        if ($this->request->getGet('season')) {
+            $data['current_season'] = $this->request->getGet('season');
+        }
+
+        $data['district_id'] = '';
+        if ($this->request->getGet('district_id')) {
+            $data['district_id'] = $this->request->getGet('district_id');
+        }
+
+        $data['block_id'] = '';
+        if ($this->request->getGet('block_id')) {
+            $data['block_id'] = $this->request->getGet('block_id');
+        }
+
+
+        $filter = [
+            'year_id' => $data['year_id'],
+            'season' => $data['current_season'],
+            'district_id' => $data['district_id'],
+        ];
+
+
+        $blocks = $this->acModel->getByBlockNew($filter);
+        // printr($blocks);
+        // exit;
+        $this->gps($blocks, $data);
+
+        //
+        $data['allgps'] = true;
+
+        $data['crop_practices'] = $this->acModel->getCropPractices();
+        $crops = $cropsModel->findAll();
+
+        $data['crops'] = [];
+        foreach ($crops as $crop) {
+            $data['crops'][$crop->id] = $crop->crops;
+        }
+
+        $data['blocks'] = [];
+        if ($data['district_id']) {
+            $data['blocks'] = (new BlockModel())->where('district_id', $data['district_id'])
+                ->asArray()->findAll();
+        }
+
+        if ($action == 'download') {
+            $data['fin_year'] = (new YearModel())->find($data['year_id'])->name;
+            $data['table'] = view('Admin\Reports\Views\areacoverage_table', $data);
+            $filename = 'AreaCoverageAllGPsReport_' . $data['current_season'] . '_' . $data['fin_year'] . '_' . date('Y-m-d His') . '.xlsx';
+
+            $spreadsheet = Export::createExcelFromHTML($data['table'], $filename, true);
+            if ($spreadsheet) {
+                $worksheet = $spreadsheet->getActiveSheet();
+                $wordWrapCols = [
+                    'A1',
+                    'D1',
+                    'E1',
+                    'F1',
+                    'G1',
+                    'M2',
+                    'O2',
+                    'P2',
+                    'Q2',
+                    'R1',
+                    'S1',
+                    'T1',
+                    'U1'
+                ];
+                foreach ($wordWrapCols as $col) {
+                    $cell = $worksheet->getCell($col);
+                    $cell->getStyle()->getAlignment()->setWrapText(true);
+                }
+
+
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+                header('Cache-Control: max-age=0');
+
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+                exit();
+            }
+
+            exit;
+        }
+        $params = 'year_id=' . $data['year_id'];
+        $params .= '&season=' . $data['current_season'];
+        $params .= '&district_id=' . $data['district_id'];
+        $params .= '&block_id=' . $data['block_id'];
+        $data['filter_panel'] = view('Admin\Reports\Views\areacoverage_filter_allgps', $data);
+        $data['download_url'] = admin_url('reports/areacoverage/allgps/download?' . $params);
         $data['get_blocks'] = Url::getBlocks;
 
         return $this->template->view('Admin\Reports\Views\areacoverage', $data);

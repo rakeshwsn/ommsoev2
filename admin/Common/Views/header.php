@@ -21,7 +21,7 @@ $user = service('user');
    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito+Sans:300,400,400i,600,700&display=swap">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/codebase.min.css'); ?>">
-    <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/custom.css?v=3.1'); ?>">
+    <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/custom.css?v=3.2'); ?>">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/dflip/css/dflip.css?v=1'); ?>">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/dflip/css/themify-icons.css'); ?>">
 

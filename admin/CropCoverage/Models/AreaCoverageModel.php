@@ -350,8 +350,8 @@ FROM soe_districts sd
             $sql .= " LEFT JOIN vw_districtwise_blocks_gps dbg
     ON sd.id=dbg.district_id ORDER BY sd.name";
         }
-        //echo $sql;
-        //exit;
+        // echo $sql;
+        // exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -549,6 +549,9 @@ FROM (SELECT
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
         }
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND district_id=" . $filter['district_id'];
+        }
         if (!empty($filter['block_id'])) {
             $sql .= " AND block_id=" . $filter['block_id'];
         }
@@ -579,6 +582,9 @@ FROM (SELECT
         }
         if (!empty($filter['season'])) {
             $sql .= " AND LOWER(season) = '" . strtolower($filter['season']) . "'";
+        }
+        if (!empty($filter['district_id'])) {
+            $sql .= " AND district_id=" . $filter['district_id'];
         }
         if (!empty($filter['block_id'])) {
             $sql .= " AND block_id=" . $filter['block_id'];

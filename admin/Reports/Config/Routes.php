@@ -26,8 +26,10 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
     $routes->get('reports/areacoverage', 'Reports\Controllers\AreaCoverage::index');
     $routes->get('reports/areacoverage/allblocks', 'Reports\Controllers\AreaCoverage::allblocks');
+    $routes->get('reports/areacoverage/allgps', 'Reports\Controllers\AreaCoverage::allgps');
     $routes->get('reports/areacoverage/download', 'Reports\Controllers\AreaCoverage::index/download');
     $routes->get('reports/areacoverage/allblocks/download', 'Reports\Controllers\AreaCoverage::allblocks/download');
+    $routes->get('reports/areacoverage/allgps/download', 'Reports\Controllers\AreaCoverage::allgps/download');
     $routes->get('reports/areacoverage/getUploadStatus', 'Reports\Controllers\AreaCoverage::getUploadStatus');
     $routes->get('reports/areacoverage/blockWiseGetUploadStatus', 'Reports\Controllers\AreaCoverage::blockWiseGetUploadStatus');
     $routes->get('reports/areacoverage/blockWiseGetUploadStatus/filtered', 'Reports\Controllers\AreaCoverage::blockWiseGetUploadStatus');
