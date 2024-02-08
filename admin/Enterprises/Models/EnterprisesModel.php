@@ -71,7 +71,7 @@ class EnterprisesModel extends Model
         sg.name gps,
         eu.name unit_name,
         eu.unit_group_id,
-        YEAR(e.date_estd) year
+        YEAR(e.date_estd) doeyear
         FROM enterprises e
         LEFT JOIN soe_districts sd ON sd.id = e.district_id
         LEFT JOIN soe_blocks sb ON sb.id = e.block_id
@@ -97,20 +97,20 @@ class EnterprisesModel extends Model
             $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
 
-        if (isset($filter['sort']) && $filter['sort']) {
+        if (!empty($filter['sort']) && $filter['sort']) {
             $sort = $filter['sort'];
         } else {
             $sort = "sd.name,sb.name,e.created_at";
         }
 
-        if (isset($filter['order']) && ($filter['order'] == 'desc')) {
+        if (!empty($filter['order']) && ($filter['order'] == 'desc')) {
             $order = "desc";
         } else {
             $order = "asc";
         }
         $sql .= " ORDER BY " . $sort . " " . $order;
 
-        if (isset($filter['start']) || isset($filter['limit'])) {
+        if (!empty($filter['start']) || isset($filter['limit'])) {
             if ($filter['start'] < 0) {
                 $filter['start'] = 0;
             }
@@ -120,6 +120,7 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
+    
         return $this->db->query($sql)->getResult();
     }
 
@@ -159,7 +160,9 @@ class EnterprisesModel extends Model
         if (!empty($data['unit_id'])) {
             $builder->where("e.unit_id  = '" . $data['unit_id'] . "'");
         }
-      
+        if (!empty($data['doeyear'])) {
+            $builder->where("e.date_estd  = '" . $data['doeyear'] . "'");
+        }
         if (!empty($data['management_unit_type'])) {
             $builder->where("e.management_unit_type  = '" . $data['management_unit_type'] . "'");
         }
@@ -229,16 +232,16 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-        if (isset($filter['year_id']) && $filter['year_id']) {
+        if (!empty($filter['year_id']) && $filter['year_id']) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
-        if (isset($filter['month']) && $filter['month']) {
+        if (!empty($filter['month']) && $filter['month']) {
             $sql .= " AND sm.id = " . $filter['month'];
         }
-        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+        if (!empty($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
             $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
-        if (isset($filter['unit_type'])) {
+        if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
                 $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
             }
@@ -255,15 +258,14 @@ class EnterprisesModel extends Model
       AND disunit.unit_id = res.unit_id ";
 
         $sql .= " ORDER BY unit_id, district";
-        // echo $sql;
-        // exit;
+      
         return $this->db->query($sql)->getResult();
     }
 
     /**
      * This method is called from establishemntreport for blockwise report generation.
      *
-     * @param array $filter
+     * @param array $filter 
      *
      * @return array $result
      */
@@ -302,17 +304,17 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-        if (isset($filter['year_id'])) {
+        if (!empty($filter['year_id'])) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
-        if (isset($filter['month'])) {
+        if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];
         }
-        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-            $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+        if (!empty($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
 
-        if (isset($filter['unit_type'])) {
+        if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
                 $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
             }
@@ -328,12 +330,12 @@ class EnterprisesModel extends Model
       ON blkunit.block_id = res.block_id
       AND blkunit.unit_id = res.unit_id";
 
-        if (isset($filter['district_id'])) {
+        if (!empty($filter['district_id'])) {
             $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];
         }
 
         $sql .= " ORDER BY unit_id, block";
-        // echo $sql;exit;
+    //   echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -365,9 +367,9 @@ class EnterprisesModel extends Model
       eu.name unit
      FROM (SELECT
         *
-      FROM grampanchayat g
+      FROM grampanchayat 
      ) gp
-      CROSS JOIN enterprises_units eu) gpunits
+      CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL) gpunits
      LEFT JOIN (SELECT
         e.unit_id,
         COUNT(e.unit_id) total_units,
@@ -382,16 +384,16 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
-        if (isset($filter['year_id'])) {
+        if (!empty($filter['year_id'])) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
-        if (isset($filter['month'])) {
+        if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];
         }
-        if (isset($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
-            $sql .= " AND e.management_unit_type != '" . $filter["management_unit_type"] . "'";
+        if (!empty($filter["management_unit_type"]) && $filter["management_unit_type"] !== 'all') {
+            $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
-        if (isset($filter['unit_type'])) {
+        if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
                 $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
             }
@@ -406,10 +408,10 @@ class EnterprisesModel extends Model
                e.gp_id) res
       ON res.gp_id = gpunits.gp_id
       AND res.unit_id = gpunits.unit_id";
-        if (isset($filter['block_id'])) {
+        if (!empty($filter['block_id'])) {
             $sql .= " WHERE gpunits.block_id = " . $filter['block_id'];
         }
-        // dd($sql);
+        // echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
