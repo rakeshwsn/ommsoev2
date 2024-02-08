@@ -37,12 +37,9 @@
                     </div>
                     <div class="col-2">
                         <label class="form-label">DOE</label>
-                        <select name="doeyear" class="form-control mb-3" id="years">
-                            <?php foreach ($years as $yearvalue) : ?>
-                                <?php $selected = ($doeyear == $yearvalue) ? 'selected' : ''; ?>
-                                <option value="<?= $yearvalue ?>" <?= $selected ?>><?= $yearvalue ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                      
+                        <?php echo form_dropdown('doeyear', $years, set_value('doeyear', $doeyear), ['class' => 'form-control mb-3', 'id' => 'doeyear']); ?>
+
 
                     </div>
                     <div class="col-2">
@@ -100,10 +97,10 @@
 
     $(function() {
         function main() {
-            var href = download_url + '?district_id=' + $('#districts').val() + '&block_id=' + $('#blocks').val() + '&management_unit_type=' + $('#management_unit_type').val() + '&doeyear=' + $('#years').val();
+            var href = download_url + '?district_id=' + $('#districts').val() + '&block_id=' + $('#blocks').val() + '&management_unit_type=' + $('#management_unit_type').val() + '&doeyear=' + $('#doeyear').val();
             $('#btn-excel').attr('href', href);
         }
-        $('#districts, #blocks, #management_unit_type, #years').on('change', main);
+        $('#districts, #blocks, #management_unit_type, #doeyear').on('change', main);
         main();
     });
 
@@ -126,7 +123,7 @@
                     data.block_id = $('#blocks').val();
                     data.unit_id = $('#units').val();
                     data.management_unit_type = $('#management_unit_type').val();
-                    // data.date_estd = $('#date_estd').val();
+                    data.year = $('#doeyear').val();
 
                 },
                 beforeSend: function() {
@@ -195,7 +192,7 @@
                             $.each(response.years, function(k, v) {
                                 html += '<option value="' + v.year + '">' + v.year + '</option>';
                             });
-                            $('#years').html(html);
+                            $('#doeyear').html(html);
                         }
                     },
                     error: function() {

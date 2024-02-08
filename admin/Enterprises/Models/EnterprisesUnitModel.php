@@ -45,7 +45,8 @@ class EnterprisesUnitModel extends Model
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
 
-    public function getAll($filter = array()){
+    public function getAll($filter = array())
+    {
         $sql = "SELECT
         `eu`.`id`,
         `eu`.`name`,
@@ -64,12 +65,12 @@ class EnterprisesUnitModel extends Model
           ON cnt.unit_id = eu.id) `e`
           ON `eu`.`id` = `e`.`unit_id` LEFT JOIN enterprise_unit_group eg ON eu.unit_group_id = eg.id  
       WHERE `eu`.`deleted_at` IS NULL";
-if(!empty($filter['unit_group_id'])){
-    $sql .= " AND unit_group_id=".$filter['unit_group_id'];
-}
-      $sql .= " ORDER BY `eu`.`name` ASC";
+        if (!empty($filter['unit_group_id'])) {
+            $sql .= " AND unit_group_id=" . $filter['unit_group_id'];
+        }
+        $sql .= " ORDER BY `eu`.`name` ASC";
 
-      return $this->db->query($sql)->getResultArray();
+        return $this->db->query($sql)->getResultArray();
     }
 
     public function getTotal($data = array())

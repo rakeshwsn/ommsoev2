@@ -104,17 +104,28 @@ class Enterprises extends AdminController
                 $data['blocks'][$block->id] = $block->name;
             }
         }
-
-        //get years from district selected 
+        //if user district_id is avaliable populate years 
         $data['years'][0] = 'Select DOE';
-        if ($this->request->getGet('district_id')) {
-            $district_id = $this->request->getGet('district_id');
-            $yeardata =  $this->enterprisesModel->yearWise($district_id);
 
-            foreach ($yeardata as $year) {
-                $data['years'][] = $year->year;
+        if ($this->user->district_id) {
+            $years =  $this->enterprisesModel->yearWise($this->user->district_id);
+            $data['district_id'] = $this->user->district_id;
+
+
+            foreach ($years as $year) {
+                $data['years'][$year->year] = $year->year;
+            }
+        } elseif($this->request->getGet('district_id')) {
+            $district_id = $this->request->getGet('district_id');
+            $years =  $this->enterprisesModel->where('district_id', $district_id)->yearWise($district_id);
+            $data['district_id'] = $this->request->getGet('district_id');
+
+            foreach ($years as $year) {
+                $data['years'][$year->year] = $year->year;
             }
         }
+       
+
         //get management unit type 
         $data['management_unit_type'] = '';
         if ($this->request->getGet('management_unit_type')) {
@@ -126,6 +137,7 @@ class Enterprises extends AdminController
         if ($this->request->getGet('doeyear')) {
             $data['doeyear'] = $this->request->getGet('doeyear');
         }
+
         // Unit_id populate
         $data['unit_id'] = 0;
         if ($this->request->getGet('unit_id')) {
@@ -139,7 +151,6 @@ class Enterprises extends AdminController
         $data['datatable_url'] = admin_url('enterprises/search');
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
-
 
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
@@ -155,6 +166,7 @@ class Enterprises extends AdminController
             'district_id' => $requestData['district_id'],
             'block_id' => $requestData['block_id'],
             'unit_id' => $requestData['unit_id'],
+            'doeyear' => $requestData['year'],
             'management_unit_type' => $requestData['management_unit_type'],
             'order' => $requestData['order'][0]['dir'],
             'sort' => $requestData['order'][0]['column'],
@@ -188,7 +200,7 @@ class Enterprises extends AdminController
                 $action,
             );
         }
-        // dd($datatable);
+
         $json_data = array(
             "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
             "recordsTotal" => intval($totalData),
