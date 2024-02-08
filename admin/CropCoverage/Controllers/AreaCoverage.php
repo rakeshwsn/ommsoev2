@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Protection;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-// use Admin\CropCoverage\Models\AreaCoverageModel;
 class AreaCoverage extends AdminController
 {
     private $cropsModel;
@@ -50,21 +49,23 @@ class AreaCoverage extends AdminController
 
         $data['filtered_data_url'] = admin_url('areacoverage/filtered');
         $data['download_url'] = admin_url('areacoverage/download');
-
         $data['heading_title'] = lang('Add Area Coverage');
 
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
         }
-
-        $districtModel = new DistrictModel();
-        $data['districts'] = $districtModel->getAll();
-
+        // echo $week_start;
+        // exit;
         $data['currentDay'] = date('l');
 
         $data['isActiveDay'] = in_array($data['currentDay'], array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'));
+        $data['inActiveDay'] = !$data['isActiveDay'];
+
 
         $dates = $this->areacoveragemodel->getWeekDate();
+
+
+
 
         $data['from_date'] = '';
         $data['to_date'] = '';
@@ -74,48 +75,60 @@ class AreaCoverage extends AdminController
         }
 
         $data['upload_url'] = Url::areaCoverageUpload;
-
-        $view = 'areacoverage_block';
+        if ($this->request->getGet('start_date')) {
+            $data['start_date'] = $this->request->getGet('start_date');
+        } else {
+            $data['start_date'] = $dates['start_date'];
+        }
 
         if ($this->user->block_id) {
             $filter = [
                 'block_id' => $this->user->block_id,
                 'year_id' => getCurrentYearId(),
                 'season' => getCurrentSeason(),
-                'start_date' => $this->request->getGet('start_date'),
+                'start_date' => $data['start_date'],
             ];
+
 
             $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
             // printr($blocks);
             // exit;
-            $data['start_date'] = '';
             $weekDate = $this->areacoveragemodel->getWeekDate();
+            $data['start_date'] = '';
             if ($weekDate) {
                 $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
             }
             $data['filtered_data_url'] = admin_url('areacoverage/filtered');
             $weeks = $this->areacoveragemodel->getWeeks();
-            $data['weeks'] = [];
-            $week_start_date = '';
+            // printr($weeks);
+            // exit;
+            $data['weeks'][0] = 'All Weeks';
+            $week_text = '';
+
             foreach ($weeks as $week) {
                 //dropdown weeks
                 if (strtotime($week['start_date']) <= strtotime('today')) {
                     $data['weeks'][$week['start_date']] = $week_start_date = $week['start_date'];
                 }
                 //show week text
-//                if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
-//                    $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
-//                }
+                if (strtotime($week['start_date']) <= strtotime($data['start_date'])) {
+                    $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
+                }
             }
+            // printr($data['weeks']);
+            // exit;
+
             $data['week_start_date'] = $data['start_date'];
+
+            $data['week_text'] = $week_text;
             $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
                 $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
                 $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
                 $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-                $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_diversification_farmers = $total_crop_diversification_area = $total_rice_fallow_farmers = $total_rice_fallow_area = 0;
+                $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_rfc_area = $total_total_area = $total_crop_div_area = 0;
 
             $data['blocks'] = [];
-            //            dd($blocks);
+
             foreach ($blocks as $block) {
                 $status = $block->status;
                 if (!isset($status)) {
@@ -144,10 +157,9 @@ class AreaCoverage extends AdminController
                 $total_ragi = $block->ragi_smi +
                     $block->ragi_lt +
                     $block->ragi_ls;
-                //echo 'total_area:'.$total_area.' total_ragi:'.$total_ragi.' fc_area:'.$block->fc_area.'<br>';
+                $total_crop_div_area = $block->crop_div_ragi +
+                    $block->crop_div_non_ragi;
 
-                //                $total_non_ragi = $total_area - $total_ragi - $block->fc_area;
-                //subtraction issue for float values
                 $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
                 $data['blocks'][] = [
@@ -171,20 +183,16 @@ class AreaCoverage extends AdminController
                     'total_non_ragi' => $total_non_ragi,
                     'total_fc' => $block->fc_area,
                     'total_area' => $total_area,
-                    'crop_diversification_farmers' => $block->crop_diversification_farmers,
-                    'crop_diversification_area' => $block->crop_diversification_area,
-                    'rice_fallow_farmers' => $block->rice_fallow_farmers,
-                    'rice_fallow_area' => $block->rice_fallow_area,
-                    // 'status' => $this->statuses[$status],
+                    'total_crop_div_area' => $total_crop_div_area,
+                    'total_rfc' => $block->rfc_area,
                     'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
                     'action' => $action,
                 ];
 
-                //calc total
-                $total_farmers_covered += $block->farmers_covered;
-                $total_nursery_raised += $block->nursery_raised;
-                $total_balance_smi += $block->balance_smi;
-                $total_balance_lt += $block->balance_lt;
+                $total_farmers_covered = $block->farmers_covered;
+                $total_nursery_raised = $block->nursery_raised;
+                $total_balance_smi = $block->balance_smi;
+                $total_balance_lt = $block->balance_lt;
                 $total_ragi_smi += $block->ragi_smi;
                 $total_ragi_lt += $block->ragi_lt;
                 $total_ragi_ls += $block->ragi_ls;
@@ -198,56 +206,18 @@ class AreaCoverage extends AdminController
                 $total_total_ragi += $total_ragi;
                 $total_total_non_ragi += $total_non_ragi;
                 $total_fc_area += $block->fc_area;
-                $total_crop_diversification_farmers += $block->crop_diversification_farmers;
-                $total_crop_diversification_area += $block->crop_diversification_area;
-                $total_rice_fallow_farmers += $block->rice_fallow_farmers;
-                $total_rice_fallow_area += $block->rice_fallow_area;
+                $total_rfc_area += $block->rfc_area;
+                $total_crop_div_area += $total_crop_div_area;
                 $total_total_area += $total_area;
-
             }
-
-            /*$data['blocks'][] = [
-                'week' => '',
-                'gp' => '<strong>Total</strong>',
-                'farmers_covered' => $total_farmers_covered,
-                'nursery_raised' => $total_nursery_raised,
-                'balance_smi' => $total_balance_smi,
-                'balance_lt' => $total_balance_lt,
-                'ragi_smi' => $total_ragi_smi,
-                'ragi_lt' => $total_ragi_lt,
-                'ragi_ls' => $total_ragi_ls,
-                'little_millet_lt' => $total_little_millet_lt,
-                'little_millet_ls' => $total_little_millet_ls,
-                'foxtail_ls' => $total_foxtail_ls,
-                'sorghum_ls' => $total_sorghum_ls,
-                'kodo_ls' => $total_kodo_ls,
-                'barnyard_ls' => $total_barnyard_ls,
-                'pearl_ls' => $total_pearl_ls,
-                'total_ragi' => $total_total_ragi,
-                'total_non_ragi' => $total_total_non_ragi,
-                'total_fc' => $total_fc_area,
-                'total_area' => $total_total_area,
-                'crop_diversification_farmers' => $total_crop_diversification_farmers,
-                'crop_diversification_area' => $total_crop_diversification_area,
-                'rice_fallow_farmers' => $total_rice_fallow_farmers,
-                'rice_fallow_area' => $total_rice_fallow_area,
-                'status' => '',
-                'action' => ''
-            ];*/
-
-            $view = 'areacoverage_block';
-        } else if ($this->user->district_id) {
-            //            $filter = [
-//                'district_id' => $this->user->district_id,
-//                'year_id' => getCurrentYearId(),
-//                'season' => getCurrentSeason()
-//            ];
-
-            //            $districts = $this->areacoveragemodel->getAreaCoverage($filter);
-            $view = 'areacoverage_district';
         }
-
-        return $this->template->view('Admin\CropCoverage\Views\\' . $view, $data);
+        // printr($blocks);
+        // exit;
+        if ($this->user->block_id) {
+            return $this->template->view('Admin\CropCoverage\Views\areacoverage_block', $data);
+        } else {
+            echo "Please login as a FA";
+        }
     }
 
     public function download()
@@ -302,12 +272,11 @@ class AreaCoverage extends AdminController
                 $sheet->setCellValue("C$row", ($key + 1));
                 $sheet->setCellValue("D$row", $gp->block);
                 $sheet->setCellValue("E$row", $gp->gp);
-
                 $sheet->setCellValue("T$row", "=J$row+K$row+L$row");
                 $sheet->setCellValue("U$row", "=SUM(M$row:S$row)");
-                $sheet->setCellValue("AE$row", "=SUM(V$row:AB$row)");
-                $sheet->setCellValue("AF$row", "=SUM(T$row:AB$row)");
-
+                $sheet->setCellValue("AC$row", "=SUM(V$row:AB$row)");
+                $sheet->setCellValue("AD$row", "=SUM(T$row:AB$row)");
+                $sheet->setCellValue("AG$row", "= AE$row+AF$row");
             }
         } else {
             foreach ($gps as $key => $gp) {
@@ -317,12 +286,12 @@ class AreaCoverage extends AdminController
                 $sheet->setCellValue("C$row", ($key + 1));
                 $sheet->setCellValue("D$row", $gp->block);
                 $sheet->setCellValue("E$row", $gp->gp);
-
                 $sheet->setCellValue("T$row", "=J$row+K$row+L$row");
                 $sheet->setCellValue("U$row", "=SUM(M$row:S$row)");
-                $sheet->setCellValue("AG$row", "=SUM(V$row:AB$row)");
-                $sheet->setCellValue("AH$row", "=SUM(T$row:AB$row,AD$row)");
-
+                $sheet->setCellValue("AC$row", "=SUM(V$row:AB$row)");
+                $sheet->setCellValue("AD$row", "=SUM(T$row:AB$row)");
+                $sheet->setCellValue("AL$row", "=SUM(AE$row:AK$row)");
+                $sheet->setCellValue("AO$row", "=SUM(AM$row+AN$row)");
             }
         }
         // Set read-only mode to prevent adding new rows when reading
@@ -347,7 +316,7 @@ class AreaCoverage extends AdminController
         $validation->setPrompt('Only numbers greater than or equal to 0 are allowed.');
         $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
         $validation->setFormula1("=0");
-        $validation->setSqref("F5:AF$row");
+        $validation->setSqref("F5:AO$row");
 
         if ($current_season === 'Kharif') {
             $cells = "F5:S$row";
@@ -359,6 +328,11 @@ class AreaCoverage extends AdminController
             $sheet->getStyle($cells)
                 ->getProtection()
                 ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+            $cells = "AE5:AF$row";
+            $sheet->getStyle($cells)
+                ->getProtection()
+                ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
 
         } else {
             $cells = "F5:S$row";
@@ -366,7 +340,15 @@ class AreaCoverage extends AdminController
                 ->getProtection()
                 ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
-            $cells = "V5:AF$row";
+            $cells = "V5:AB$row";
+            $sheet->getStyle($cells)
+                ->getProtection()
+                ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+            $cells = "AE5:AK$row";
+            $sheet->getStyle($cells)
+                ->getProtection()
+                ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+            $cells = "AM5:AN$row";
             $sheet->getStyle($cells)
                 ->getProtection()
                 ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
@@ -484,13 +466,12 @@ class AreaCoverage extends AdminController
                             'block_id' => $gp[0],
                             'gp_id' => $gp[1],
                             'farmers_covered' => $gp[5],
-                            'crop_diversification_farmers' => $gp[30],
-                            'crop_diversification_area' => $gp[31],
-                            'rice_fallow_farmers' => $gp[28],
-                            'rice_fallow_area' => $gp[29],
+                            'crop_div_ragi' => $gp[38],
+                            'crop_div_non_ragi' => $gp[39],
+
                         ];
 
-                        //                        $ac_crop_coverage_id = 0;
+                        $ac_crop_coverage_id = 0;
                         $ac_crop_coverage_id = $acModel->insert($master);
 
                         $col = 5;
@@ -525,14 +506,31 @@ class AreaCoverage extends AdminController
                         $col += 2;
                         $fCrop = [];
                         foreach ($crops as $crop) {
+
                             $fCrop[] = [
                                 'crop_coverage_id' => $ac_crop_coverage_id,
                                 'crop_id' => $crop->id,
                                 'area' => $gp[++$col],
+
                             ];
                         }
                         $acModel->addFupCrops($fCrop);
+                        //Rice fallow crops
+                        if ($current['season'] == "Rabi") {
+                            $col += 2;
+                            $rfcrop = [];
+                            foreach ($crops as $crop) {
 
+                                $rfcrop[] = [
+                                    'crop_coverage_id' => $ac_crop_coverage_id,
+                                    'crop_id' => $crop->id,
+                                    'area' => $gp[++$col],
+
+                                ];
+                            }
+
+                            $acModel->addRiceFallowCrops($rfcrop);
+                        }
                     }
                 }
             }
@@ -561,10 +559,8 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
-                'crop_diversification_farmers' => $this->request->getPost('crop_coverage')['crop_diversification_farmers'],
-                'crop_diversification_area' => $this->request->getPost('crop_coverage')['crop_diversification_area'],
-                'rice_fallow_farmers' => $this->request->getPost('crop_coverage')['rice_fallow_farmers'],
-                'rice_fallow_area' => $this->request->getPost('crop_coverage')['rice_fallow_area'],
+                'crop_div_ragi' => $this->request->getPost('crop_coverage')['crop_div_ragi'],
+                'crop_div_non_ragi' => $this->request->getPost('crop_coverage')['crop_div_non_ragi'],
                 'status' => 0,
                 'remarks' => ''
             ];
@@ -610,8 +606,21 @@ class AreaCoverage extends AdminController
                     'area' => $this->request->getPost('fup')[$crop->id],
                 ];
             }
+
             $this->areacoveragemodel->deleteFupCrops($cc_id);
             $this->areacoveragemodel->addFupCrops($fCrop);
+
+            $rfCrop = [];
+            foreach ($crops as $crop) {
+                $rfCrop[] = [
+                    'crop_coverage_id' => $cc_id,
+                    'crop_id' => $crop->id,
+                    'area' => $this->request->getPost('ricefallow')[$crop->id],
+                ];
+            }
+
+            $this->areacoveragemodel->deleteRiceFallowCrops($cc_id);
+            $this->areacoveragemodel->addRiceFallowCrops($rfCrop);
 
             return redirect()->to(admin_url('areacoverage'))->with('message', 'Area coverage data updated.');
         }
@@ -651,11 +660,10 @@ class AreaCoverage extends AdminController
 
         $data['crop_coverage'] = [
             'farmers_covered' => $cc_info->farmers_covered,
-            'crop_diversification_farmers' => $cc_info->crop_diversification_farmers,
-            'crop_diversification_area' => $cc_info->crop_diversification_area,
-            'rice_fallow_farmers' => $cc_info->rice_fallow_farmers,
-            'rice_fallow_area' => $cc_info->rice_fallow_area
+            'crop_div_ragi' => $cc_info->crop_div_ragi,
+            'crop_div_non_ragi' => $cc_info->crop_div_non_ragi,
         ];
+        $data['total_div_crop'] = $cc_info->crop_div_ragi + $cc_info->crop_div_non_ragi;
 
         $data['nursery_info'] = $this->areacoveragemodel->getNursery($cc_id);
 
@@ -704,16 +712,23 @@ class AreaCoverage extends AdminController
 
         //fup
         $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
+        $data['ricefallows'] = $this->areacoveragemodel->getRiceFallowCrops($cc_id);
         // printr($data['fups']);
         // exit;
         $area = 0;
         foreach ($data['fups'] as $fup) {
             $area += $fup['area'];
         }
-
         $data['fups_total'] = $area;
         $data['practices'] = $_practices;
+        $rfarea = 0;
+        foreach ($data['ricefallows'] as $ricefallow) {
+            $rfarea += $ricefallow['area'];
+        }
+        $data['rfc_total'] = $rfarea;
 
+        // printr($data['practices']);
+        // exit;
         if ($return_data) {
             return $data;
         }

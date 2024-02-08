@@ -10,7 +10,11 @@
                         <label>Year</label>
                         <select class="form-control" id="year_id" name="year_id" required>
                             <?php foreach ($years as $year) { ?>
-                                <option value="<?=$year['id']?>" <?php if($year['id']==$year_id){echo 'selected';} ?>><?=$year['name']?></option>
+                                <option value="<?= $year['id'] ?>" <?php if ($year['id'] == $year_id) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $year['name'] ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
@@ -19,7 +23,11 @@
                         <select class="form-control" id="season" name="season">
                             <option value="">Select Season</option>
                             <?php foreach ($seasons as $value => $season) { ?>
-                                <option value="<?=$value?>" <?php if($value==$current_season){echo 'selected';} ?>><?=$season?></option>
+                                <option value="<?= $value ?>" <?php if ($value == $current_season) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $season ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
@@ -28,7 +36,11 @@
                         <select class="form-control" id="district" name="district_id">
                             <option value="">All Districts</option>
                             <?php foreach ($districts as $district) { ?>
-                                <option value="<?=$district['id']?>" <?php if($district['id']==$district_id){echo 'selected';} ?>><?=$district['name']?></option>
+                                <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $district['name'] ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
@@ -37,7 +49,11 @@
                         <select class="form-control" id="block" name="block_id">
                             <option value="">All Blocks</option>
                             <?php foreach ($blocks as $block) { ?>
-                                <option value="<?=$block['id']?>" <?php if($block['id']==$block_id){echo 'selected';} ?>><?=$block['name']?></option>
+                                <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $block['name']; ?>
+                                </option>
                             <?php } ?>
                         </select>
                     </div>
