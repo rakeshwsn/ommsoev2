@@ -783,6 +783,7 @@ class AreaCoverage extends AdminController
             'year_id' => $data['year_id'],
             'season' => $data['current_season'],
             'district_id' => $data['district_id'],
+            'block_id' => $data['block_id'],
         ];
 
 
@@ -807,11 +808,28 @@ class AreaCoverage extends AdminController
             $data['blocks'] = (new BlockModel())->where('district_id', $data['district_id'])
                 ->asArray()->findAll();
         }
-
+        $districts = (new DistrictModel())->where('id', $this->request->getGet('district_id'))->first();
+        $blocks = (new BlockModel())->where('district_id', $data['district_id'])
+            ->asArray()->first();
+        // printr($blocks);
+        // exit;
         if ($action == 'download') {
             $data['fin_year'] = (new YearModel())->find($data['year_id'])->name;
-            $data['table'] = view('Admin\Reports\Views\areacoverage_table', $data);
-            $filename = 'AreaCoverageAllGPsReport_' . $data['current_season'] . '_' . $data['fin_year'] . '_' . date('Y-m-d His') . '.xlsx';
+            $data['table'] = view('Admin\Reports\Views\areacoverage_table_allgps', $data);
+            $filename = 'AreaCoverageAllGPsReport__' . $data['fin_year'] . $data['current_season'];
+
+            // Check if $districts->name exists before appending it to the filename
+            if ($districts && isset($districts->name)) {
+                $filename .= '_districts_' . $districts->name;
+            }
+
+            // Check if $blocks exists and if $blocks->name is set before appending it to the filename
+            if ($blocks && isset($blocks['name'])) {
+                $filename .= '_blocks_' . $blocks['name'];
+            }
+
+            $filename .= '_' . date('Y-m-d His') . '.xlsx';
+
 
             $spreadsheet = Export::createExcelFromHTML($data['table'], $filename, true);
             if ($spreadsheet) {
@@ -856,7 +874,7 @@ class AreaCoverage extends AdminController
         $data['download_url'] = admin_url('reports/areacoverage/allgps/download?' . $params);
         $data['get_blocks'] = Url::getBlocks;
 
-        return $this->template->view('Admin\Reports\Views\areacoverage', $data);
+        return $this->template->view('Admin\Reports\Views\areacoverage_gpwise', $data);
     }
 
     public function getUploadStatus()

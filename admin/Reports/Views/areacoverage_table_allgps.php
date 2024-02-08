@@ -16,10 +16,6 @@
                         <th rowspan="3">GPs</th>
             <?php } ?>
             <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
-            <th rowspan="3">Nursery Raised (in Ha.)</th>
-            <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
-            <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
-            </th>
             <th colspan="14">Achievement under demonstration (in Ha.)</th>
             <th rowspan="3">Total Crop Diversification Areas</th>
             <?php if ($current_season == 'rabi') { ?>
@@ -85,15 +81,7 @@
                 <td>
                     <?= $block['farmers_covered'] ?>
                 </td>
-                <td>
-                    <?= $block['nursery_raised'] ?>
-                </td>
-                <td>
-                    <?= $block['balance_smi'] ?>
-                </td>
-                <td>
-                    <?= $block['balance_lt'] ?>
-                </td>
+
                 <td>
                     <?= $block['ragi_smi'] ?>
                 </td>
