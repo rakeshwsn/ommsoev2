@@ -16,7 +16,7 @@
             <table class="table custom-table " id="txn-table">
                 <thead>
                     <tr>
-                        <?php if ($block_id) { ?>
+                        <?php if ($block_id || isset($allgps)) { ?>
                             <th rowspan="3">GP</th>
                         <?php } else if ($district_id) { ?>
                                 <th rowspan="3">Block</th>
@@ -69,7 +69,7 @@
                 <tbody>
                     <?php foreach ($rows as $block): ?>
                         <tr>
-                            <?php if ($block_id) { ?>
+                            <?php if ($block_id || isset($allgps)) { ?>
                                 <td>
                                     <?= $block['gp'] ?>
                                 </td>
