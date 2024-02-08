@@ -44,6 +44,19 @@
                             <?php } ?>
                         </select>
                     </div>
+                    <div class="col-md-2">
+                        <label>Block</label>
+                        <select class="form-control" id="block" name="block_id">
+                            <option value="">All Blocks</option>
+                            <?php foreach ($blocks as $block) { ?>
+                                <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
+                                      echo 'selected';
+                                  } ?>>
+                                    <?= $block['name']; ?>
+                                </option>
+                            <?php } ?>
+                        </select>
+                    </div>
                     <div class="col-md-2" style="margin-top: 25px;">
 
                         <button id="btn-filter" class="btn btn-outline btn-primary">
