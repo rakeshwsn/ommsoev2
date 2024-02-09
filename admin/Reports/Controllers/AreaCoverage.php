@@ -224,6 +224,8 @@ class AreaCoverage extends AdminController
             $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
             $total_crop_div = $block->crop_div_ragi + $block->crop_div_non_ragi;
             $data['rows'][] = [
+                'district_name' => $block->district_name,
+                'block_name' => $block->block_name,
                 'gp' => $block->gp,
                 'farmers_covered' => $block->farmers_covered,
                 'nursery_raised' => $block->nursery_raised,
@@ -273,6 +275,8 @@ class AreaCoverage extends AdminController
 
         $data['rows'][] = [
             'gp' => '<strong>Total</strong>',
+            'district_name' => '',
+            'block_name' => '',
             'farmers_covered' => $total_farmers_covered,
             'nursery_raised' => $total_nursery_raised,
             'balance_smi' => $total_balance_smi,
@@ -824,9 +828,7 @@ class AreaCoverage extends AdminController
             }
 
             // Check if $blocks exists and if $blocks->name is set before appending it to the filename
-            if ($blocks && isset($blocks['name'])) {
-                $filename .= '_blocks_' . $blocks['name'];
-            }
+
 
             $filename .= '_' . date('Y-m-d His') . '.xlsx';
 

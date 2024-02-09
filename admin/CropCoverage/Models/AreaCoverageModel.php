@@ -501,6 +501,8 @@ ORDER BY district,m.block";
     {
 
         $sql = "SELECT
+        sd.name AS district_name,
+  sb.name AS block_name,
   gp,
   m.gp_id,
   nur.nursery_raised,nur.balance_smi,nur.balance_lt,
@@ -521,6 +523,8 @@ ORDER BY district,m.block";
   m.barnyard_ls,
   m.pearl_ls
 FROM (SELECT
+ block_id,
+    district_id,
     gp_id,
     gp,
     year_id,
@@ -558,7 +562,7 @@ FROM (SELECT
         if (!empty($filter['start_date'])) {
             $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
         }
-        $sql .= " GROUP BY gp_id) m
+        $sql .= " GROUP BY gp_id) m LEFT JOIN soe_districts sd ON m.district_id = sd.id LEFT JOIN soe_blocks sb ON m.block_id=sb.id
   LEFT JOIN (WITH nur
       AS
       (SELECT
@@ -608,7 +612,7 @@ FROM (SELECT
       FROM nur n2
       WHERE n2.gp_id = n1.gp_id)) nur
     ON nur.gp_id = m.gp_id
-ORDER BY m.gp";
+ORDER BY sd.name ASC,sb.name ASC, m.gp ASC";
         // echo $sql;
         // exit;
 
