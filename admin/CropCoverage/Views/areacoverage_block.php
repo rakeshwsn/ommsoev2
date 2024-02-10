@@ -36,8 +36,11 @@
                         </div>
                         <div class="status"></div>
                     </form>
+
                 </div>
+                <p style="color:red;font-size: 15px;padding-top:2px;">Please Download and Upload data Monday-Friday</p>
             </div>
+
         </div>
 
         <form action="">
