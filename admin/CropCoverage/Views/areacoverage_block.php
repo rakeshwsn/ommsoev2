@@ -1,9 +1,3 @@
-<style>
-    .down-btn,
-    .up-btn {
-        padding-top: 24px;
-    }
-</style>
 <div class="row">
     <div class="col-xl-12">
         <div class="block">
@@ -42,35 +36,38 @@
                         </div>
                         <div class="status"></div>
                     </form>
+
+                </div>
+                <p style="color:red;font-size: 15px;padding-top:2px;">Please Download and Upload data Monday-Friday</p>
+            </div>
+
+        </div>
+
+        <form action="">
+            <div class="block">
+                <div class="block-header block-header-default bg-warning">
+                    <h3 class="block-title">
+                        Area Coverage WeekWise
+                    </h3>
+                </div>
+                <div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
+                    <div class="col-lg-3">
+                        <div class="form-group mg-b-10-force">
+                            <label>Week</label>
+                            <?= form_dropdown('start_date', $weeks, $start_date, "id='filter_week' class='form-control js-select2'"); ?>
+                        </div>
+                    </div><!-- col-4 -->
+                    <div class="col-lg-3 center">
+                        <label class="form-control-label">&nbsp;</label>
+                        <div class="form-layout-footer">
+                            <button id="btn-filter" class="btn btn-primary">Filter</button>
+                        </div><!-- form-layout-footer -->
+                    </div>
                 </div>
             </div>
-        </div>
-        <?php if (!empty($blocks)) { ?>
-            <form action="">
-                <div class="block">
-                    <div class="block-header block-header-default bg-warning">
-                        <h3 class="block-title">
-                            Area Coverage WeekWise
-                        </h3>
-                    </div>
-                    <div class="block-header-content" style="display:flex;padding:20px 0 20px 0">
-                        <div class="col-lg-3">
-                            <div class="form-group mg-b-10-force">
-                                <label>Week</label>
-                                <?= form_dropdown('start_date', $weeks, $start_date, "id='filter_week' class='form-control js-select2'"); ?>
-                            </div>
-                        </div><!-- col-4 -->
-                        <div class="col-lg-3 center">
-                            <label class="form-control-label">&nbsp;</label>
-                            <div class="form-layout-footer">
-                                <button id="btn-filter" class="btn btn-primary">Filter</button>
-                            </div><!-- form-layout-footer -->
-                        </div>
-                    </div>
-                </div>
-            </form>
+        </form>
 
-        <?php } ?>
+
         <div class="block">
             <div class="block-header block-header-default  bg-primary">
                 <h3 class="block-title"> Area Coverage History</h3>

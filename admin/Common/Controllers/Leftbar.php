@@ -458,7 +458,7 @@ class Leftbar extends AdminController
 
         $enterprises = [];
 
-      
+
         if ($this->user->hasPermission("enterprises")) {
             $enterprises[] = [
                 "name" => 'Enterprises Units',
@@ -569,6 +569,14 @@ class Leftbar extends AdminController
             $areacoverage[] = [
                 "name" => "Area Coverage Blockwise Report",
                 "href" => admin_url("reports/areacoverage/allblocks"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        }
+        if ($this->user->hasPermission("reports/areacoverage/allgps")) {
+            $areacoverage[] = [
+                "name" => "Area Coverage GPWise Report",
+                "href" => admin_url("reports/areacoverage/allgps"),
                 "heading" => 0,
                 "children" => [],
             ];

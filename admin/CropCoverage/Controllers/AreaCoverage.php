@@ -19,7 +19,12 @@ class AreaCoverage extends AdminController
 {
     private $cropsModel;
     private $districtModel;
-    private $areacoveragemodel;
+    private $acModel;
+    private $blockModel;
+    private $grampanchayatModel;
+    private $yearModel;
+
+
     public $colors_ac = [
         'warning',
         'success',
@@ -32,7 +37,12 @@ class AreaCoverage extends AdminController
     {
         $this->cropsModel = new CropsModel();
         $this->districtModel = new DistrictModel();
-        $this->areacoveragemodel = new AreaCoverageModel();
+        $this->acModel = new AreaCoverageModel();
+        $this->blockModel = new BlockModel();
+        $this->grampanchayatModel = new GrampanchayatModel();
+        $this->yearModel = new YearModel();
+
+
     }
     public function index()
     {
@@ -54,19 +64,12 @@ class AreaCoverage extends AdminController
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
         }
-        // echo $week_start;
-        // exit;
+
         $data['currentDay'] = date('l');
 
         $data['isActiveDay'] = in_array($data['currentDay'], array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'));
         $data['inActiveDay'] = !$data['isActiveDay'];
-
-
-        $dates = $this->areacoveragemodel->getWeekDate();
-
-
-
-
+        $dates = $this->acModel->getWeekDate();
         $data['from_date'] = '';
         $data['to_date'] = '';
         if ($dates) {
@@ -90,18 +93,17 @@ class AreaCoverage extends AdminController
             ];
 
 
-            $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+            $blocks = $this->acModel->getAreaCoverage($filter);
             // printr($blocks);
             // exit;
-            $weekDate = $this->areacoveragemodel->getWeekDate();
+            $weekDate = $this->acModel->getWeekDate();
             $data['start_date'] = '';
             if ($weekDate) {
-                $data['start_date'] = $this->areacoveragemodel->getWeekDate()['start_date'];
+                $data['start_date'] = $this->acModel->getWeekDate()['start_date'];
             }
             $data['filtered_data_url'] = admin_url('areacoverage/filtered');
-            $weeks = $this->areacoveragemodel->getWeeks();
-            // printr($weeks);
-            // exit;
+            $weeks = $this->acModel->getWeeks();
+
             $data['weeks'][0] = 'All Weeks';
             $week_text = '';
 
@@ -117,7 +119,6 @@ class AreaCoverage extends AdminController
             }
             // printr($data['weeks']);
             // exit;
-
             $data['week_start_date'] = $data['start_date'];
 
             $data['week_text'] = $week_text;
@@ -223,7 +224,7 @@ class AreaCoverage extends AdminController
     public function download()
     {
 
-        $dates = $this->areacoveragemodel->getWeekDate();
+        $dates = $this->acModel->getWeekDate();
 
         if (!$dates) {
             return redirect()->to(admin_url('areacoverage'))
@@ -234,14 +235,13 @@ class AreaCoverage extends AdminController
         $data['to_date'] = $dates['end_date'];
 
         $reader = IOFactory::createReader('Xlsx');
-        $current_season = $this->areacoveragemodel->getCurrentYearDates()['season'];
+        $current_season = $this->acModel->getCurrentYearDates()['season'];
 
         if ($current_season === 'Kharif') {
             $template_file = DIR_TEMPLATE . 'area_coverage_kharif.xlsx';
         } elseif ($current_season === 'Rabi') {
             $template_file = DIR_TEMPLATE . 'area_coverage_rabi.xlsx';
         }
-
 
         $spreadsheet = $reader->load($template_file);
 
@@ -252,11 +252,9 @@ class AreaCoverage extends AdminController
         $year_text = getCurrentYear();
         $sheet->setCellValue('F1', 'District wise weekly Crop Progress under OMM during ' . $year_text);
 
-
-
         $fin_year = getCurrentYear();
 
-        $gps = (new GrampanchayatModel())->getGPsByBlock($this->user->block_id);
+        $gps = $this->grampanchayatModel->getGPsByBlock($this->user->block_id);
 
         if (!$gps) {
             return redirect()->to(admin_url('areacoverage'))
@@ -382,7 +380,7 @@ class AreaCoverage extends AdminController
                 'errors' => $this->validator->getErrors()
             ]);
         } else {
-            $acModel = new AreaCoverageModel();
+
             $file = $this->request->getFile('file');
 
             try {
@@ -396,20 +394,16 @@ class AreaCoverage extends AdminController
             }
 
             $activesheet = $spreadsheet->getSheet(0);
-
             $row_data = $activesheet->toArray();
-            // printr($row_data);
-            // exit;
+            $dates = $this->acModel->getWeekDate();
 
-            $dates = $this->areacoveragemodel->getWeekDate();
-
-            $current = $this->areacoveragemodel->getCurrentYearDates();
+            $current = $this->acModel->getCurrentYearDates();
 
             $from_date = $dates['start_date'];
             $to_date = $dates['end_date'];
             $excel_from_date = isset($row_data[0][22]) ? $row_data[0][22] : 0;
 
-            $exists = $acModel
+            $exists = $this->acModel
                 ->where('start_date', $from_date)
                 ->where('block_id', $this->user->block_id)
                 ->where('season', $current['season'])
@@ -424,7 +418,7 @@ class AreaCoverage extends AdminController
             $gp_belongs = false;
 
             if ($gp_cell) {
-                $gp = (new GrampanchayatModel())->find($gp_cell);
+                $gp = $this->grampanchayatModel->find($gp_cell);
             }
             if ($gp) {
                 $gp_belongs = $gp->block_id == $this->user->block_id;
@@ -452,7 +446,7 @@ class AreaCoverage extends AdminController
                     'message' => 'The GP dont belong to your block. Please download the file and try again.'
                 ]);
             } else {
-                $crops = (new CropsModel())->findAll();
+                $crops = $this->cropsModel->findAll();
 
                 foreach ($row_data as $gp) {
                     //only rows with gp_id
@@ -472,7 +466,7 @@ class AreaCoverage extends AdminController
                         ];
 
                         $ac_crop_coverage_id = 0;
-                        $ac_crop_coverage_id = $acModel->insert($master);
+                        $ac_crop_coverage_id = $this->acModel->insert($master);
 
                         $col = 5;
                         $nursery = [
@@ -482,9 +476,9 @@ class AreaCoverage extends AdminController
                             'balance_lt' => $gp[++$col],
                         ];
 
-                        $acModel->addNursery($nursery);
+                        $this->acModel->addNursery($nursery);
 
-                        $cropPractices = $acModel->getCropPractices();
+                        $cropPractices = $this->acModel->getCropPractices();
 
                         $areas = [];
 
@@ -499,7 +493,7 @@ class AreaCoverage extends AdminController
                             $areas[] = $_areas;
                         }
 
-                        $acModel->addArea($areas);
+                        $this->acModel->addArea($areas);
 
                         //follow up crops
 
@@ -514,7 +508,7 @@ class AreaCoverage extends AdminController
 
                             ];
                         }
-                        $acModel->addFupCrops($fCrop);
+                        $this->acModel->addFupCrops($fCrop);
                         //Rice fallow crops
                         if ($current['season'] == "Rabi") {
                             $col += 2;
@@ -529,7 +523,7 @@ class AreaCoverage extends AdminController
                                 ];
                             }
 
-                            $acModel->addRiceFallowCrops($rfcrop);
+                            $this->acModel->addRiceFallowCrops($rfcrop);
                         }
                     }
                 }
@@ -547,7 +541,7 @@ class AreaCoverage extends AdminController
     {
         $cc_id = $this->request->getGet('id');
 
-        $dates = $this->areacoveragemodel->getWeekDate();
+        $dates = $this->acModel->getWeekDate();
 
         $to_date = $dates['end_date'];
 
@@ -564,7 +558,7 @@ class AreaCoverage extends AdminController
                 'status' => 0,
                 'remarks' => ''
             ];
-            $this->areacoveragemodel->update($cc_id, $master);
+            $this->acModel->update($cc_id, $master);
 
             $nursery = [
                 'crop_coverage_id' => $cc_id,
@@ -573,10 +567,10 @@ class AreaCoverage extends AdminController
                 'balance_lt' => $this->request->getPost('nursery')['balance_lt'],
             ];
 
-            $this->areacoveragemodel->deleteNursery($cc_id);
-            $this->areacoveragemodel->addNursery($nursery);
+            $this->acModel->deleteNursery($cc_id);
+            $this->acModel->addNursery($nursery);
 
-            $cropPractices = $this->areacoveragemodel->getCropPractices();
+            $cropPractices = $this->acModel->getCropPractices();
 
             $areas = [];
 
@@ -592,8 +586,8 @@ class AreaCoverage extends AdminController
 
             }
 
-            $this->areacoveragemodel->deleteArea($cc_id);
-            $this->areacoveragemodel->addArea($areas);
+            $this->acModel->deleteArea($cc_id);
+            $this->acModel->addArea($areas);
 
             //follow up crops
 
@@ -607,8 +601,8 @@ class AreaCoverage extends AdminController
                 ];
             }
 
-            $this->areacoveragemodel->deleteFupCrops($cc_id);
-            $this->areacoveragemodel->addFupCrops($fCrop);
+            $this->acModel->deleteFupCrops($cc_id);
+            $this->acModel->addFupCrops($fCrop);
 
             $rfCrop = [];
             foreach ($crops as $crop) {
@@ -619,8 +613,8 @@ class AreaCoverage extends AdminController
                 ];
             }
 
-            $this->areacoveragemodel->deleteRiceFallowCrops($cc_id);
-            $this->areacoveragemodel->addRiceFallowCrops($rfCrop);
+            $this->acModel->deleteRiceFallowCrops($cc_id);
+            $this->acModel->addRiceFallowCrops($rfCrop);
 
             return redirect()->to(admin_url('areacoverage'))->with('message', 'Area coverage data updated.');
         }
@@ -633,9 +627,8 @@ class AreaCoverage extends AdminController
         $cc_id = $this->request->getGet('id');
 
 
-        $cc_info = $this->areacoveragemodel->find($cc_id);
-        // printr($cc_info);
-        // exit;
+        $cc_info = $this->acModel->find($cc_id);
+
         if (!$cc_info) {
             return redirect()->to(admin_url('areacoverage'))->with('message', 'Could not find the data requested');
         }
@@ -647,16 +640,16 @@ class AreaCoverage extends AdminController
             $data['show_form'] = true;
         }
 
-        $data['district'] = (new DistrictModel())->find($cc_info->district_id)->name;
-        $data['block'] = (new BlockModel())->find($cc_info->block_id)->name;
-        $data['gp'] = (new GrampanchayatModel())->find($cc_info->gp_id)->name;
-        $data['year'] = (new YearModel())->find($cc_info->year_id)->name;
+        $data['district'] = $this->districtModel->find($cc_info->district_id)->name;
+        $data['block'] = $this->blockModel->find($cc_info->block_id)->name;
+        $data['gp'] = $this->grampanchayatModel->find($cc_info->gp_id)->name;
+        $data['year'] = $this->yearModel->find($cc_info->year_id)->name;
         $data['season'] = $cc_info->season;
         $data['date_added'] = ymdToDmy($cc_info->created_at);
         $data['start_date'] = ymdToDmy($cc_info->start_date);
         $data['end_date'] = ymdToDmy($cc_info->end_date);
 
-        $cropPrtcArea = $this->areacoveragemodel->getPracticeArea($cc_id);
+        $cropPrtcArea = $this->acModel->getPracticeArea($cc_id);
 
         $data['crop_coverage'] = [
             'farmers_covered' => $cc_info->farmers_covered,
@@ -665,7 +658,7 @@ class AreaCoverage extends AdminController
         ];
         $data['total_div_crop'] = $cc_info->crop_div_ragi + $cc_info->crop_div_non_ragi;
 
-        $data['nursery_info'] = $this->areacoveragemodel->getNursery($cc_id);
+        $data['nursery_info'] = $this->acModel->getNursery($cc_id);
 
         $data['crops'] = [];
         $smi = $lt = $ls = 0;
@@ -711,8 +704,8 @@ class AreaCoverage extends AdminController
         ];
 
         //fup
-        $data['fups'] = $this->areacoveragemodel->getFupCrops($cc_id);
-        $data['ricefallows'] = $this->areacoveragemodel->getRiceFallowCrops($cc_id);
+        $data['fups'] = $this->acModel->getFupCrops($cc_id);
+        $data['ricefallows'] = $this->acModel->getRiceFallowCrops($cc_id);
         // printr($data['fups']);
         // exit;
         $area = 0;
@@ -750,12 +743,6 @@ class AreaCoverage extends AdminController
 
         $data['heading_title'] = 'Area Coverage Delete';
 
-        $data['text_list'] = lang('Approve.text_list');
-        $data['text_no_results'] = lang('Approve.text_no_results');
-        $data['text_confirm'] = lang('Approve.text_confirm');
-
-        $data['button_add'] = lang('Add Target');
-        $data['button_edit'] = lang('Edit Target');
         $data['button_delete'] = lang('Approve.button_delete');
 
         if (isset($this->error['warning'])) {
@@ -768,7 +755,7 @@ class AreaCoverage extends AdminController
             $data['district_id'] = $district_id = 0;
         }
 
-        $week_dates = $this->areacoveragemodel->getWeekDate();
+        $week_dates = $this->acModel->getWeekDate();
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
@@ -778,7 +765,7 @@ class AreaCoverage extends AdminController
             $data['start_date'] = $start_date = '';
         }
 
-        $acModel = new AreaCoverageModel();
+
 
         $filter = [
             'district_id' => $district_id,
@@ -791,7 +778,7 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
             //delete
             $filter['block_id'] = $this->request->getPost('blocks');
-            $this->areacoveragemodel->deleteAll($filter);
+            $this->acModel->deleteAll($filter);
 
             return redirect()->to(admin_url('areacoverage/delete?district_id=' . $district_id . '&start_date=' . $start_date))
                 ->with('message', 'The records have been deleted.');
@@ -799,7 +786,7 @@ class AreaCoverage extends AdminController
 
         $blocks = [];
         if ($district_id) {
-            $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+            $blocks = $this->acModel->getAreaCoverage($filter);
         }
 
         $data['blocks'] = [];
@@ -848,7 +835,7 @@ class AreaCoverage extends AdminController
             }
         }
 
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = '';
@@ -868,14 +855,14 @@ class AreaCoverage extends AdminController
         $data['week_text'] = $week_text;
 
         $data['districts'] = [];
-        $districts = (new DistrictModel())->orderBy('name')->findAll();
+        $districts = $this->districtModel->orderBy('name')->findAll();
 
         $data['districts'][0] = 'Select District';
         foreach ($districts as $district) {
             $data['districts'][$district->id] = $district->name;
         }
 
-        $district_status = $acModel->where('district_id', $district_id)
+        $district_status = $this->acModel->where('district_id', $district_id)
             ->where('start_date', $start_date)->first();
 
         $data['status'] = '';

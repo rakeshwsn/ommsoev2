@@ -3,6 +3,11 @@
      background-color: black;
  }
 
+ .down-btn,
+ .up-btn {
+     padding-top: 24px;
+ }
+
  #loading-overlay {
      background: rgb(255 255 255 / 80%);
      display: flex;
@@ -117,15 +122,16 @@
      display: none;
  }
 
-.nav-main .nav-main-heading {
-	padding: 3px 18px 2px 18px;
-	background: #0a2b55;
-	color: #fff;
-}
-.nav-main a {
-  position: relative;
-  display: block;
-  padding: 6px 18px 6px 40px;
-  font-weight: 600;
-  color: rgba(87,87,87,.9);
-}
+ .nav-main .nav-main-heading {
+     padding: 3px 18px 2px 18px;
+     background: #0a2b55;
+     color: #fff;
+ }
+
+ .nav-main a {
+     position: relative;
+     display: block;
+     padding: 6px 18px 6px 40px;
+     font-weight: 600;
+     color: rgba(87, 87, 87, .9);
+ }
