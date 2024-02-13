@@ -62,8 +62,6 @@ $validation = \Config\Services::validation();
                                     <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
                                 </div>
                             </div>
-
-
                         </div>
                         <br>
                         <div class="village">
@@ -76,16 +74,14 @@ $validation = \Config\Services::validation();
                                     <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                     <div class="col-6" id="dis_adrs">
-                        <div class="address_type">
+                        <!-- <div class="address_type">
                             <input type="checkbox" id="gp_vlg_not_available" name="address_type" value="1">
                             <label for="gp_vlg_not_available">If GP and Village is not avaliable</label>
                         </div>
-                        <br>
+                        <br> -->
                         <div class="address">
                             <label for="address">Address<span class="text-danger"></span></label>
                             <div class="input-group">
@@ -477,23 +473,24 @@ $validation = \Config\Services::validation();
                 $('#budget_utilize').hide();
             }
         });
-       
-        // if village and gp is avaliable then disable address block
+        // initial state
+        $('#gp_vlg_available').prop('checked', true);
+        $('#address').prop('disabled', true);
+
+        // Trigger change event to handle initial state
+        $('#gp_vlg_available').trigger('change');
+        // Enable or disable "If GP and Village is available" checkbox
         $('#gp_vlg_available').on('change', function() {
-            $gp_vlg_checked = $(this).prop('checked');
-            if ($gp_vlg_checked) {
-                $('#dis_adrs').hide();
+            var isChecked = $(this).prop('checked');
+            if (isChecked) {
+                $('#address').prop('disabled', true);
+                $('#gps').prop('disabled', false);
+                $('#villages').prop('disabled', false);
             } else {
-                $('#dis_adrs').show();
-            }
-        });
-        //if village and gp not avaliable then enable address block and disable gp and village block
-        $('#gp_vlg_not_available').on('change', function() {
-            $address_check = $(this).prop('checked');
-            if ($address_check) {
-                $('#gp_vlg').hide();
-            } else {
-                $('#gp_vlg').show();
+                $('#gps').prop('disabled', true);
+                $('#villages').prop('disabled', true);
+                $('#address').prop('disabled', false);
+
             }
         });
 
