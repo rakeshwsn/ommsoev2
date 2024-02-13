@@ -1,24 +1,32 @@
+<style>
+    th {
+        text-align: center;
+        font-weight: bold;
+        background-color: #EFEF05;
+    }
+</style>
+
 <table class="table table-bordered">
     <tr>
         <td colspan="16" style="text-align: center; font-weight: bold; background-color:#EFA105">Enterprise Data</td>
     </tr>
     <tr>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Slno </th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Unit Type</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">District</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Block</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">GP</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Village</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Established Unit Budget Head </th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Addl. Support Provided for basic infra. creation</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Type/Purpose of Addl. Infra. Support </th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Budget Head utilised for Addl. Infra Support</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Type of Management Unit </th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Name of Managing Unit</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Date of Establishment</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Date of MoU</th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Name of Contact Person </th>
-        <th style="text-align: center; font-weight: bold; background-color:#EFEF05">Mobile Number</th>
+        <th>Slno </th>
+        <th>Unit Type</th>
+        <th>District</th>
+        <th>Block</th>
+        <th>GP</th>
+        <th>Village</th>
+        <th>Established Unit Budget Head </th>
+        <th>Addl. Support Provided for basic infra. creation</th>
+        <th>Type/Purpose of Addl. Infra. Support </th>
+        <th>Budget Head utilised for Addl. Infra Support</th>
+        <th>Type of Management Unit </th>
+        <th>Name of Managing Unit</th>
+        <th>Date of Establishment</th>
+        <th>Date of MoU</th>
+        <th>Name of Contact Person </th>
+        <th>Mobile Number</th>
 
 
     </tr>

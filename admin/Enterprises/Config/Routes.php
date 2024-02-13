@@ -28,6 +28,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->get('enterprisestrans/download', 'Enterprises\Controllers\EstablishmentTransaction::download');
     $routes->add('enterprisestrans/edit', 'Enterprises\Controllers\EstablishmentTransaction::edit');
     $routes->add('enterprises/delete', 'Enterprises\Controllers\EstablishmentTransaction::delete');
+    $routes->post('enterprisestrans/search', 'Enterprises\Controllers\EstablishmentTransaction::search', ['permission' => false]);
 
     $routes->add('enterprisestrans/upload', 'Enterprises\Controllers\EstablishmentTransaction::upload');
 

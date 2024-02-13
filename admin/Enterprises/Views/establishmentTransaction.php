@@ -4,7 +4,7 @@
             <h3 class="block-title">Filter</h3>
         </div>
         <div class="block-content block-content-full">
-            <div id="page_list_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+            <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
                 <?php echo form_open('', ['method' => 'get']); ?>
                 <!-- DataTables functionality is initialized with .js-dataTable-full class in js/pages/be_tables_datatables.min.js which was auto compiled from _es6/pages/be_tables_datatables.js -->
                 <div class="row">
@@ -35,7 +35,7 @@
                     <div class="col-2">
                         <label class="form-label">Fortnight</label>
                         <select class="form-control" name="period" id="period">
-                            <option value="all">all</option>
+                            <option value="">all</option>
                             <option value="1" <?= $period == "1" ? 'selected' : ''; ?>>1st fortnight</option>
                             <option value="2" <?= $period == "2" ? 'selected' : ''; ?>>2nd fortnight</option>
 
@@ -78,7 +78,7 @@
             <div class="row">
 
                 <div class="col-sm-12">
-                    <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
+                    <table id="datatable" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="datatable_info">
                         <thead>
                             <tr>
                                 <th>Date Upload</th>
@@ -93,24 +93,7 @@
                                 <th class="text-right no-sort sorting_disabled" aria-label="Actions">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($trans as $tran) { ?>
-                                <tr class="odd">
-                                    <td><?= $tran['created_at'] ?></td>
-                                    <td><?= $tran['units'] ?></td>
-                                    <td><?= $tran['districts'] ?></td>
-                                    <td><?= $tran['blocks'] ?></td>
-                                    <td><?= $tran['gp'] ?></td>
-                                    <td><?= $tran['villages'] ?></td>
-                                    <td><?= $tran['month'] ?></td>
-                                    <td><?= $tran['years'] ?></td>
-                                    <td><?= $tran['period'] ?></td>
-                                    <td>
-                                        <div class="btn-group btn-group pull-right"><a class="btn btn-sm btn-primary" href="<?= $tran['edit_url'] ?>"><i class="fa fa-pencil"></i></a></div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
+                       
                     </table>
                 </div>
             </div>
@@ -141,28 +124,7 @@
 
 <script type="text/javascript">
     var download_url = "http://ommsoev2.local/admin/enterprises/download";
-    // $(function() {
-    //     var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
-
-    //     $('#districts').on('change', function() {
-    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
-    //         $('#btn-excel').attr('href', href);
-    //     })
-
-    //     $('#month').on('change', function() {
-    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
-    //         $('#btn-excel').attr('href', href);
-    //     })
-    //     $('#year').on('change', function() {
-    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
-    //         $('#btn-excel').attr('href', href);
-    //     })
-    //     $('#period').on('change', function() {
-    //         var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
-    //         $('#btn-excel').attr('href', href);
-    //     })
-    //     $('#btn-excel').attr('href', href);
-    // });
+    
     $(function() {
         function main() {
             var href = download_url + '?district_id=' + $('#districts').val() + '&month_id=' + $('#month').val() + '&year_id=' + $('#year').val() + '&period=' + $('#period').val();
@@ -176,10 +138,7 @@
     var download_url = "<?= $excel_link ?>";
 
     $(document).ready(function() {
-        var table = $('#page_list').DataTable({
-            "paging": true,
-            "pageLength": 10
-        });
+       
         $("#btn-excel").click(function() {
             if ($("#year").val() === "0") {
                 $("#em1").html("This field could not be empty!");
@@ -226,6 +185,39 @@
             $("#em").hide();
             $("#period").css("border-color", "green");
         })
+        var table = $('#datatable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "columnDefs": [{
+                targets: 'no-sort',
+                orderable: false
+            }],
+            "ajax": {
+                url: "<?= $datatable_url ?>", // json datasource
+                type: "post", // method  , by default get
+                data: function(data) {
+                    data.district_id = $('#districts').val();
+                    data.month_id = $('#month').val();
+                    data.unit_id = $('#unit').val();
+                    data.period = $('#period').val();
+                    data.year_id = $('#year').val();
+
+                },
+                beforeSend: function() {
+                    $('.alert-dismissible, .text-danger').remove();
+                    $("#datatable_wrapper").LoadingOverlay("show");
+                },
+                complete: function() {
+                    $("#datatable_wrapper").LoadingOverlay("hide");
+                },
+                error: function() { // error handling
+                    $(".datatable_error").html("");
+                    $("#datatable_processing").css("display", "none");
+
+                },
+                dataType: 'json'
+            }
+        });
     })
 
 
