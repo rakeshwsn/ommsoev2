@@ -128,19 +128,19 @@
                                 <tbody>
 
                                     <?php if ($block_id) { ?>
-                                        <?php foreach ($gpunits as $gpunit) : ?>
+                                        <?php foreach ($gpUnits as $gpUnit) : ?>
                                             <tr>
-                                                <td><?= $gpunit['gp'] ?></td>
-                                                <?php foreach ($gpunit['g_units'] as $gunit) : ?>
+                                                <td><?= $gpUnit['gp'] ?></td>
+                                                <?php foreach ($gpUnit['g_units'] as $gunit) : ?>
                                                     <td><?= $gunit ?></td>
                                                 <?php endforeach; ?>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php } else if ($district_id) { ?>
-                                        <?php foreach ($blockunits as $blockunit) : ?>
+                                        <?php foreach ($blockUnits as $blockUnit) : ?>
                                             <tr>
-                                                <td><?= $blockunit['block'] ?></td>
-                                                <?php foreach ($blockunit['b_units'] as $bunit) : ?>
+                                                <td><?= $blockUnit['block'] ?></td>
+                                                <?php foreach ($blockUnit['b_units'] as $bunit) : ?>
                                                     <td><?= $bunit ?></td>
                                                 <?php endforeach; ?>
                                             </tr>
@@ -175,7 +175,7 @@
             var d_id = $(this).val(); // Declare d_id with var
 
             $.ajax({
-                url: 'admin/enterprisesreport/blocks',
+                url: 'admin/enterprises/report/blocks',
                 data: {
                     district_id: d_id
                 },

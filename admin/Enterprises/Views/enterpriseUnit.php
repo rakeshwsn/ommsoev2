@@ -1,5 +1,4 @@
 <div class="row">
-
     <div class="col-4">
         <div class="block">
             <div class="block-header block-header-default"> Enterprises</div>
@@ -38,14 +37,11 @@
             </div>
         </div>
     </div>
-
-
 </div>
 
 <?php js_start(); ?>
 <script type="text/javascript">
     $(function() {
-
        $('#datatable').DataTable();
     });
 </script>

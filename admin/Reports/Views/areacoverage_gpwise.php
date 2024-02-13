@@ -16,25 +16,10 @@
             <table class="table custom-table " id="txn-table">
                 <thead>
                     <tr>
-                        <?php if ($block_id || isset($allgps)) { ?>
-                            <th rowspan="3">GP</th>
-                        <?php } else if ($district_id) { ?>
-                                <th rowspan="3">Block</th>
-                                <th rowspan="3">GPs</th>
-                        <?php } else if (isset($allblocks)) { ?>
-                                    <th rowspan="3">District</th>
-                                    <th rowspan="3">Block</th>
-                                    <th rowspan="3">GPs</th>
-                        <?php } else { ?>
-                                    <th rowspan="3">District</th>
-                                    <th rowspan="3">Blocks</th>
-                                    <th rowspan="3">GPs</th>
-                        <?php } ?>
+                        <th rowspan="3">District</th>
+                        <th rowspan="3">Block</th>
+                        <th rowspan="3">GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
-                        <th rowspan="3">Nursery Raised (in Ha.)</th>
-                        <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
-                        <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
-                        </th>
                         <th colspan="14">Achievement under demonstration (in Ha.)</th>
                         <th rowspan="3">Total Crop Diversification Area
                         </th>
@@ -67,100 +52,71 @@
 
                 </thead>
                 <tbody>
-                    <?php foreach ($rows as $block): ?>
+                    <?php foreach ($rows as $gp):
+
+                        ?>
                         <tr>
-                            <?php if ($block_id || isset($allgps)) { ?>
-                                <td>
-                                    <?= $block['gp'] ?>
-                                </td>
-                            <?php } else if ($district_id) { ?>
-                                    <td>
-                                    <?= $block['block'] ?>
-                                    </td>
-                                    <td>
-                                    <?= $block['gps'] ?>
-                                    </td>
-                            <?php } else if (isset($allblocks)) { ?>
-                                        <td>
-                                    <?= $block['district'] ?>
-                                        </td>
-                                        <td>
-                                    <?= $block['block'] ?>
-                                        </td>
-                                        <td>
-                                    <?= $block['gps'] ?>
-                                        </td>
-                            <?php } else { ?>
-                                        <td>
-                                    <?= $block['district'] ?>
-                                        </td>
-                                        <td>
-                                    <?= $block['blocks'] ?>
-                                        </td>
-                                        <td>
-                                    <?= $block['gps'] ?>
-                                        </td>
-                            <?php } ?>
                             <td>
-                                <?= $block['farmers_covered'] ?>
+                                <?= $gp['district_name'] ?>
                             </td>
                             <td>
-                                <?= $block['nursery_raised'] ?>
+                                <?= $gp['block_name'] ?>
                             </td>
                             <td>
-                                <?= $block['balance_smi'] ?>
+                                <?= $gp['gp'] ?>
+                            </td>
+
+                            <td>
+                                <?= $gp['farmers_covered'] ?>
                             </td>
                             <td>
-                                <?= $block['balance_lt'] ?>
+                                <?= $gp['ragi_smi'] ?>
                             </td>
                             <td>
-                                <?= $block['ragi_smi'] ?>
+                                <?= $gp['ragi_lt'] ?>
                             </td>
                             <td>
-                                <?= $block['ragi_lt'] ?>
+                                <?= $gp['ragi_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['ragi_ls'] ?>
+                                <?= $gp['little_millet_lt'] ?>
                             </td>
                             <td>
-                                <?= $block['little_millet_lt'] ?>
+                                <?= $gp['little_millet_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['little_millet_ls'] ?>
+                                <?= $gp['foxtail_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['foxtail_ls'] ?>
+                                <?= $gp['sorghum_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['sorghum_ls'] ?>
+                                <?= $gp['kodo_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['kodo_ls'] ?>
+                                <?= $gp['barnyard_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['barnyard_ls'] ?>
+                                <?= $gp['pearl_ls'] ?>
                             </td>
                             <td>
-                                <?= $block['pearl_ls'] ?>
+                                <?= $gp['total_ragi'] ?>
                             </td>
                             <td>
-                                <?= $block['total_ragi'] ?>
+                                <?= $gp['total_non_ragi'] ?>
                             </td>
                             <td>
-                                <?= $block['total_non_ragi'] ?>
+                                <?= $gp['total_fc'] ?>
                             </td>
                             <td>
-                                <?= $block['total_fc'] ?>
+                                <?= $gp['total_area'] ?>
                             </td>
                             <td>
-                                <?= $block['total_area'] ?>
-                            </td>
-                            <td>
-                                <?= $block['total_crop_div'] ?>
+                                <?= $gp['total_crop_div'] ?>
                             </td>
                             <?php if ($current_season == 'rabi') { ?>
                                 <td>
-                                    <?= $block['total_rfc'] ?>
+                                    <?= $gp['total_rfc'] ?>
                                 </td>
                             <?php } ?>
                         </tr>

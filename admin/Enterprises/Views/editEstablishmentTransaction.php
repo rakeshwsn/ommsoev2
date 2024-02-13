@@ -133,39 +133,39 @@
     $(document).ready(function() {
         jQuery.validator.addMethod("numbersonly", function(value, element) {
             return this.optional(element) || /^(\d+(\.\d+)?)?$/.test(value);
-        }, "Please enter only numbers ");
-
-    });
-
-    $(document).ready(function() {
+        }, "Please enter only numbers");
+      
         $("#establishmentEditForm").validate({
             ignore: [],
             rules: {
                 <?php foreach ($unit_groups as $key => $columns) {
-                    if ($key == $entranses['unit_group_name']) { ?>
-                        <?php foreach ($columns as $key => $column) { ?>
+                    if ($key == $entranses['unit_group_name'])  { ?>
+                        <?php foreach ($columns as $key => $column)  { ?>
+                        
                             <?= $key ?>: {
                                 required: true,
                                 numbersonly: true
                             },
                         <?php } ?>
                     <?php } ?>
-                <?php } ?>
-            },
+                <?php }?>
+             },
             messages: {
                 <?php foreach ($unit_groups as $key => $columns) {
                     if ($key == $entranses['unit_group_name']) { ?>
                         <?php foreach ($columns as $key => $column) { ?>
+                           
                             <?= $key ?>: {
                                 numbersonly: "Please enter only numbers"
                             },
                         <?php } ?>
                     <?php } ?>
                 <?php } ?>
-            },
+            }
         });
     });
 </script>
+
 
 
 <?php js_end(); ?>

@@ -19,7 +19,7 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/doe', 'Enterprises\Controllers\Enterprises::ajaxDoe');
     $routes->add('enterprises/exceldownld', 'Enterprises\Controllers\Enterprises::download');
     $routes->add('enterprises/excel', 'Enterprises\Controllers\Enterprises::excel');
-    $routes->post('enterprises/search', 'Localisation\Controllers\Enterprises::search', ['permission' => false]);
+    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search', ['permission' => false]);
 
 
     $routes->add('enterprises/edit', 'Enterprises\Controllers\Enterprises::edit');
@@ -38,7 +38,6 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
 
     $routes->add('enterprises/villages', 'Enterprises\Controllers\Enterprises::ajaxvillages');
 
-    $routes->post('enterprises/search', 'Enterprises\Controllers\Enterprises::search',['permission'=>false]);
 
     $routes->get('enterprises/report', 'Enterprises\Controllers\EstablishmentReport::index');
     $routes->add('enterprises/report/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');

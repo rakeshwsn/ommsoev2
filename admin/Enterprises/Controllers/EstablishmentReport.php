@@ -5,11 +5,8 @@ namespace Admin\Enterprises\Controllers;
 use Admin\Dashboard\Models\BlockModel;
 use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\MonthModel;
-
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
-// use Admin\Enterprises\Models\GpModel;
-// use Admin\Enterprises\Models\VillagesModel;
 use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
 use Dompdf\Dompdf;
@@ -21,43 +18,44 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class EstablishmentReport extends AdminController
 {
+	private $districtModel;
+	private $blockModel;
+	private $yearModel;
+	private $enterprisesModel;
+	private $monthModel;
+
+	public function __construct()
+	{
+		$this->districtModel = new DistrictModel();
+		$this->blockModel = new BlockModel();
+		$this->yearModel = new YearModel();
+		$this->enterprisesModel = new EnterprisesModel();
+		$this->monthModel = new MonthModel();
+	}
 	public function index()
 	{
-		$distmodel = new DistrictModel();
-		$blockmodel = new BlockModel();
-		$yearmodel = new YearModel();
-		$monthmodel = new MonthModel();
-		$enterprisesmodel = new EnterprisesModel();
-
-		// $this->template->add_package(array('datatable', 'select2', 'uploader', 'jquery_loading'), true);
 		$this->template->set('header', true);
-
-		$enterprisesmodel = new EnterprisesModel();
-
 		$request = $this->request->getGet('request');
-
 		$data = [];
-
 		$data = $this->filterOptions($data);
-		//Block_text
-		$block_id = $this->request->getGet('block_id');
-		if ($block_id) {
-			$data['block_text'] = $blockmodel->find($block_id)->name;
+		//district text
+		if ($data['district_id']) {
+			$data['district_text'] = $this->districtModel->find($data['district_id'])->name;
 		}
-		//District text
-		$district_id = $this->request->getGet('district_id');
-		if ($district_id) {
-			$data['district_text'] = $distmodel->find($district_id)->name;
+		//block text
+		if ($data['block_id']) {
+			$data['block_text'] = $this->blockModel->find($data['block_id'])->name;
 		}
+
 		//year text
 
 		$year_id = $this->request->getGet('year_id');
 		if ($year_id) {
-			$data['year_text'] = $yearmodel->find($year_id)->name;
+			$data['year_text'] = $this->yearModel->find($year_id)->name;
 		}
 		//unit text
 		$management_unit_type = $this->request->getGet('management_unit_type');
-// dd($management_unit_type);
+		// dd($management_unit_type);
 		if ($management_unit_type === "FPO") {
 			$data['unit_text'] = "FPO";
 		} elseif ($management_unit_type === "SHG") {
@@ -66,16 +64,15 @@ class EstablishmentReport extends AdminController
 			$data['unit_text'] = "FPO & SHG";
 		}
 
-
 		//month text
 		$month_id = $this->request->getGet('month_id');
 		if ($month_id) {
-			$data['month_text'] = $monthmodel->find($month_id)->name;
+			$data['month_text'] = $this->monthModel->find($month_id)->name;
 		}
-		// dd($data['management_unit_type']);
+
 		$filter = [
-			'district_id' => $this->request->getGet('district_id'),
-			'block_id' => $this->request->getGet('block_id'),
+			'district_id' => $data['district_id'],
+			'block_id' => $data['block_id'],
 			'management_unit_type' => $this->request->getGet('management_unit_type'),
 			'year_id' => $this->request->getGet('year_id'),
 			'month' => $this->request->getGet('month_id'),
@@ -83,13 +80,13 @@ class EstablishmentReport extends AdminController
 		];
 
 		//Retrive data for gps if block_id present
-		if ($this->request->getGet('block_id')) {
-			$gpunits = $enterprisesmodel->gpwiseUnits($filter);
+		if ($data['block_id']) {
+			$gpUnits = $this->enterprisesModel->gpwiseUnits($filter);
 
-			$data['gpunits'] = [];
-			foreach ($gpunits as $gpunit) {
+			$data['gpUnits'] = [];
+			foreach ($gpUnits as $gpunit) {
 				$_gp_units = [];
-				foreach ($gpunits as $_gp_unit) {
+				foreach ($gpUnits as $_gp_unit) {
 					if ($gpunit->gp_id == $_gp_unit->gp_id) {
 						$_gp_units[$_gp_unit->unit_id] = $_gp_unit->total_units;
 					}
@@ -102,7 +99,7 @@ class EstablishmentReport extends AdminController
 				}
 				$_gp_units['total'] = $total;
 
-				$data['gpunits'][$gpunit->gp_id] = [
+				$data['gpUnits'][$gpunit->gp_id] = [
 
 					'gp' => $gpunit->gp,
 					'g_units' => $_gp_units
@@ -111,7 +108,7 @@ class EstablishmentReport extends AdminController
 			//unitwise total for all district --add new row as total
 			$total_units = $_gp_units = [];
 			$total = 0;
-			foreach ($gpunits as $_g_unit) {
+			foreach ($gpUnits as $_g_unit) {
 				$total_units[$_g_unit->unit_id][] = $_g_unit->total_units;
 				$total += $_g_unit->total_units;
 			}
@@ -122,7 +119,7 @@ class EstablishmentReport extends AdminController
 				$_gp_units[$unit_id] = array_sum($utotal);
 			}
 
-			$data['gpunits']['total'] = [
+			$data['gpUnits']['total'] = [
 				'gp' => 'Total',
 				'g_units' => $_gp_units
 			];
@@ -130,12 +127,12 @@ class EstablishmentReport extends AdminController
 		}
 
 		//Retrive data for blocks if district_id is present
-		else if ($this->request->getGet('district_id')) {
-			$blockunits = $enterprisesmodel->blockwiseUnits($filter);
-			$data['blockunits'] = [];
-			foreach ($blockunits as $blockunit) {
+		else if ($data['district_id']) {
+			$blockUnits = $this->enterprisesModel->blockwiseUnits($filter);
+			$data['blockUnits'] = [];
+			foreach ($blockUnits as $blockunit) {
 				$_block_units = [];
-				foreach ($blockunits as $_block_unit) {
+				foreach ($blockUnits as $_block_unit) {
 					if ($blockunit->block_id == $_block_unit->block_id) {
 						$_block_units[$_block_unit->unit_id] = $_block_unit->total_units;
 					}
@@ -147,7 +144,7 @@ class EstablishmentReport extends AdminController
 				}
 				$_block_units['total'] = $total;
 
-				$data['blockunits'][$blockunit->block_id] = [
+				$data['blockUnits'][$blockunit->block_id] = [
 					'block' => $blockunit->block,
 					'b_units' => $_block_units
 				];
@@ -156,7 +153,7 @@ class EstablishmentReport extends AdminController
 			//unitwise total for all district --add new row as total
 			$total_units = $_block_units = [];
 			$total = 0;
-			foreach ($blockunits as $_b_unit) {
+			foreach ($blockUnits as $_b_unit) {
 				$total_units[$_b_unit->unit_id][] = $_b_unit->total_units;
 				$total += $_b_unit->total_units;
 			}
@@ -167,19 +164,15 @@ class EstablishmentReport extends AdminController
 				$_block_units[$unit_id] = array_sum($utotal);
 			}
 
-			$data['blockunits']['total'] = [
+			$data['blockUnits']['total'] = [
 				'block' => 'Total',
 				'b_units' => $_block_units
 			];
-
 		} else {
 
-			$units = $enterprisesmodel->districtwiseUnits($filter);
-			// dd($units);
-			// printr($units);exit;
+			$units = $this->enterprisesModel->districtwiseUnits($filter);
 			$data['units'] = [];
 			foreach ($units as $unit) {
-
 				//for all units of each district
 				$_units = [];
 				foreach ($units as $_unit) {
@@ -208,7 +201,6 @@ class EstablishmentReport extends AdminController
 				$total_units[$_unit->unit_id][] = $_unit->total_units;
 				$total += $_unit->total_units;
 			}
-
 			$total_units['total'][] = $total;
 
 			foreach ($total_units as $unit_id => $utotal) {
@@ -227,8 +219,6 @@ class EstablishmentReport extends AdminController
 
 		$data['download_excel_url'] = admin_url('enterprises/report?request=download_excel') . '&' . http_build_query($filter);
 		$data['download_pdf_url'] = admin_url('enterprises/report?request=download_pdf') . '&' . http_build_query($filter);
-
-		// dd($data);
 		//for excel download
 		if ($request) {
 			$reader = new Html();
@@ -238,11 +228,8 @@ class EstablishmentReport extends AdminController
 
 			$filename = 'Enterprise Establishment Report.xlsx';
 
-			// dd($data);
 			$htmltable = view('Admin\Enterprises\Views\excelFormEntRpt', $data);
-			// echo $htmltable;exit;
 			$htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
-			// dd($htmltable);
 			$worksheet = $spreadsheet->createSheet($sheetindex);
 
 			$worksheet->setTitle('Enterprise Establishment Report');
@@ -256,7 +243,6 @@ class EstablishmentReport extends AdminController
 
 			$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 
-			//
 			$spreadsheet->setActiveSheetIndex(0);
 
 			if ($request == 'download_excel') {
@@ -285,98 +271,97 @@ class EstablishmentReport extends AdminController
 				exit();
 			}
 		}
-
-		// dd($data);
-
 		return $this->template->view('Admin\Enterprises\Views\establishmentReport', $data);
 	}
 
 	private function filterOptions($data)
 	{
-		$distmodel = new DistrictModel();
-		$blockmodel = new BlockModel();
-		$yearmodel = new YearModel();
-		$monthmodel = new MonthModel();
 
 		$data['districts'][0] = 'Select District';
-		$data['district_id'] = 0;
-		$districts = $distmodel->orderBy('name', 'asc')->findAll();
+
+		if ($this->user->district_id) {
+			$districts =  $this->districtModel->where('id', $this->user->district_id)->orderBy('name', 'asc')->findAll();
+		} else {
+			$districts =  $this->districtModel->orderBy('name', 'asc')->findAll();
+		}
 		foreach ($districts as $district) {
 			$data['districts'][$district->id] = $district->name;
 		}
-
-		//month
-		$data['months'][0] = 'Select Month';
-		$months = $monthmodel->findAll();
-		foreach ($months as $month) {
-			$data['months'][$month->id] = $month->name;
+		$data['district_id'] = $this->user->district_id;
+		if ($this->request->getGet('district_id')) {
+			$data['district_id'] = $this->request->getGet('district_id');
 		}
 
-		//year
+		//month
+		// if user block_id avaliable populate block
+		$data['blocks'][0] = 'Select Block';
+
+		if ($this->user->block_id) {
+            $blocks =  $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->user->block_id;
+
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        } else {
+            $blocks =  $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->request->getGet('block_id');
+
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        }
+		//year populate
 		$data['years'][0] = 'Select year';
 
-		$years = $yearmodel->orderBy('name', 'asc')->findAll();
+		$years = $this->yearModel->orderBy('name', 'asc')->findAll();
 		foreach ($years as $year) {
 			$data['years'][$year->id] = $year->name;
 		}
-
-		//block
-		$data['blocks'][0] = 'Select Block';
-		if ($this->request->getGet('district_id')) {
-			$data['district_id'] = $this->request->getGet('district_id');
-
-			$blocks = $blockmodel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
-			foreach ($blocks as $block) {
-				$data['blocks'][$block->id] = $block->name;
-			}
+		 // month
+		$data['months'][0] = 'Select Month';
+		$data['month_id'] = 0;
+		$months = $this->monthModel->orderBy('name', 'asc')->findAll();
+		foreach ($months as $month) {
+			$data['months'][$month->id] = $month->name;
 		}
-
 		if ($this->request->getGet('month_id')) {
 			$data['month_id'] = $this->request->getGet('month_id');
-		} else {
-			$data['month_id'] = 0;
 		}
-
+		$data['year_id'] = 0;
 		if ($this->request->getGet('year_id')) {
 			$data['year_id'] = $this->request->getGet('year_id');
-		} else {
-			$data['year_id'] = 0;
 		}
+		$data['block_id'] = 0;
 
 		if ($this->request->getGet('block_id')) {
 			$data['block_id'] = $this->request->getGet('block_id');
-		} else {
-			$data['block_id'] = 0;
 		}
+		if ($this->user->block_id) {
+            $data['block_id'] = $this->user->block_id;
+        }
+		$data['management_unit_type'] = '';
 
 		if ($this->request->getGet('management_unit_type')) {
 			$data['management_unit_type'] = $this->request->getGet('management_unit_type');
-		} else {
-			$data['management_unit_type'] = '';
 		}
+		$data['unit_type'] = '';
 
 		if ($this->request->getGet('unit_type')) {
 			$data['unit_type'] = $this->request->getGet('unit_type');
-		} else {
-			$data['unit_type'] = '';
 		}
-
-
-		// dd($data);
 		return $data;
 	}
-
 	public function ajaxBlocks()
 	{
 
 		$data['blocks'] = [];
-		$BlocksModel = new BlockModel();
-
-		$district_id = $this->request->getGet('district_id');
-		$data['blocks'] = $BlocksModel->where('district_id', $district_id)->orderBy('name', 'asc')->findAll();
-		// printr($data);
+		$data['district_id'] = $this->request->getGet('district_id');
+		if ($this->user->block_id) {
+			$data['blocks'] = $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+		} else {
+			$data['blocks'] = $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+		}
 		return $this->response->setJSON($data);
 	}
-
-	
 }

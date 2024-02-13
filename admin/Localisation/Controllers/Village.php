@@ -154,7 +154,6 @@ class Village extends AdminController
 				$action
 			);
 		}
-		// dd($datatable);
 		$json_data = array(
 			"draw"            => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
 			"recordsTotal"    => intval($totalData),
