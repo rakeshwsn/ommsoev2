@@ -35,37 +35,69 @@ $validation = \Config\Services::validation();
                         echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name', array('0' => 'Select Block')), set_value('block_id', $block_id), "id='blocks' class='form-control js-select2'"); ?>
                     </div>
                 </div>
+
+            </div>
+        </div>
+        <div class="dotted-border mx-4 my-4 p-3">
+            <div class="container">
+                <h3 class="text-left text-dark my-3" style="font-weight: bold;">Local Info</h3>
                 <div class="row">
-                    <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
-                        <label for="gp_id">GP<span class="text-danger"></span></label>
-                        <div class="input-group">
-                            <?php
-                            echo form_dropdown(
-                                'gp_id',
-                                option_array_value($gps, 'id', 'name', array('0' => 'Select GP')),
-                                set_value('gp_id', $gp_id),
-                                "id='gps' class='form-control js-select2'"
-                            ); ?>
-                            <div class="input-group-append">
-                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add
-                                    GP</a>
+                    <div class="col-6" id="gp_vlg">
+                        <div class="">
+                            <input type="checkbox" id="gp_vlg_available" name="address_type" value="1">
+                            <label for="gp_vlg_available">If GP and Village is avaliable</label>
+                        </div>
+                        <br>
+                        <div class="gp">
+                            <label for="gp_id">GP<span class="text-danger"></span></label>
+                            <div class="input-group">
+                                <?php
+                                echo form_dropdown(
+                                    'gp_id',
+                                    option_array_value($gps, 'id', 'name', array('0' => 'Select GP')),
+                                    set_value('gp_id', $gp_id),
+                                    "id='gps' class='form-control js-select2'"
+                                ); ?>
+                                <div class="input-group-append">
+                                    <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
+                                </div>
                             </div>
+
+
+                        </div>
+                        <br>
+                        <div class="village">
+
+                            <label for="village_id">Village<span class="text-danger"></span></label>
+                            <div class="input-group">
+                                <?php
+                                echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
+                                <div class="input-group-append">
+                                    <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
-
-                    <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
-                        <label for="village_id">Village<span class="text-danger"></span></label>
-                        <div class="input-group">
-                            <?php
-                            echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
-                            <div class="input-group-append">
-                                <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
+                    <div class="col-6" id="dis_adrs">
+                        <div class="address_type">
+                            <input type="checkbox" id="gp_vlg_not_available" name="address_type" value="1">
+                            <label for="gp_vlg_not_available">If GP and Village is not avaliable</label>
+                        </div>
+                        <br>
+                        <div class="address">
+                            <label for="address">Address<span class="text-danger"></span></label>
+                            <div class="input-group">
+                                <textarea name="address" id="address" cols="30" rows="3" class="form-control"></textarea>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
@@ -445,6 +477,25 @@ $validation = \Config\Services::validation();
                 $('#budget_utilize').hide();
             }
         });
+       
+        // if village and gp is avaliable then disable address block
+        $('#gp_vlg_available').on('change', function() {
+            $gp_vlg_checked = $(this).prop('checked');
+            if ($gp_vlg_checked) {
+                $('#dis_adrs').hide();
+            } else {
+                $('#dis_adrs').show();
+            }
+        });
+        //if village and gp not avaliable then enable address block and disable gp and village block
+        $('#gp_vlg_not_available').on('change', function() {
+            $address_check = $(this).prop('checked');
+            if ($address_check) {
+                $('#gp_vlg').hide();
+            } else {
+                $('#gp_vlg').show();
+            }
+        });
 
         //hide and show center info
 
@@ -457,7 +508,7 @@ $validation = \Config\Services::validation();
                 $('#center_info').hide();
             }
         });
-   
+
 
         //populate unit type on document ready
         $('#unit_type').trigger("change");
@@ -669,10 +720,7 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
-                gp_id: {
-                    required: true,
-                    ddrequired: true
-                },
+
                 district_id: {
                     required: true,
                     ddrequired: true
@@ -681,8 +729,22 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
+                gp_id: {
+                    required: function(element) {
+                        return $("#gp_vlg_available").is(":selected");
+                    },
+                    ddrequired: true
+                },
                 village_id: {
-                    required: true,
+                    required: function(element) {
+                        return $("#gp_vlg_available").is(":selected");
+                    },
+                    ddrequired: true
+                },
+                address: {
+                    required: function(element) {
+                        return $("#gp_vlg_not_available").is(":selected");
+                    },
                     ddrequired: true
                 },
                 contact_person: {

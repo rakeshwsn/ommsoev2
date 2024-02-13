@@ -61,10 +61,12 @@ class EstablishmentTransactionDetailsModel extends Model
     txn_dtl.gp_id,
     txn_dtl.produced,
     txn_dtl.total_turnover,
+    txn_dtl.month_id,
     dy.name year_name,
     sm.name month_name,
     eu.name unit_name,
-    txn_dtl.period,txn_dtl.created_at
+    DATE(txn_dtl.created_at) created_at,
+    txn_dtl.period
       FROM (SELECT
       etd.id est_id,
       etd.no_of_days_functional,
@@ -87,7 +89,12 @@ class EstablishmentTransactionDetailsModel extends Model
       INNER JOIN enterprises_transaction et
         ON etd.transaction_id = et.id
     WHERE et.deleted_at IS NULL 
-    AND etd.deleted_at IS NULL) txn_dtl
+    AND etd.deleted_at IS NULL ";
+    if (!empty($filter['year_id']) && $filter['year_id']) {
+      $sql .= " AND et.year_id = " . $filter['year_id'];
+    }
+
+    $sql .= " ) txn_dtl
     LEFT JOIN enterprises e
       ON e.id = txn_dtl.enterprise_id
     LEFT JOIN soe_blocks sb
@@ -104,29 +111,95 @@ class EstablishmentTransactionDetailsModel extends Model
       ON sm.id = txn_dtl.month_id
     LEFT JOIN enterprises_units eu
       ON eu.id = txn_dtl.unit_id WHERE 1=1 ";
-    if (isset($filter['id'])) {
-      $sql .= " AND e.id = " . $filter['id'];
-    }
-    if (isset($filter['year_id']) && $filter['year_id']) {
-      $sql .= " AND txn_dtl.year_id = " . $filter['year_id'];
-    }
-    if (isset($filter['district_id'])) {
-      $sql .= " AND txn_dtl.district_id = " . $filter['district_id'];
-    }
-    if (isset($filter['month_id'])) {
-      $sql .= " AND txn_dtl.month_id = " . $filter['month_id'];
-    }
-    if (isset($filter['period'])) {
-      $sql .= " AND txn_dtl.period = " . $filter['period'];
+    if (!empty($filter['unit_id'])) {
+      $sql .= " AND txn_dtl.unit_id = " . $filter['unit_id'];
     }
 
+    if (!empty($filter['district_id'])) {
+      $sql .= " AND txn_dtl.district_id = " . $filter['district_id'];
+    }
+    if (!empty($filter['month_id'])) {
+      $sql .= " AND txn_dtl.month_id = " . $filter['month_id'];
+    }
+    if (!empty($filter['period'])) {
+      $sql .= " AND txn_dtl.period = " . $filter['period'];
+    }
+    
+    if (!empty($filter['sort']) && $filter['sort']) {
+      $sort = $filter['sort'];
+    } else {
+      $sort = "sd.name,txn_dtl.created_at";
+    }
+    if (!empty($filter['order']) && ($filter['order'] == 'desc')) {
+      $order = "desc";
+    } else {
+      $order = "asc";
+    }
+    $sql .= " ORDER BY " . $sort . " " . $order;
+
+    if (!empty($filter['start']) || isset($filter['limit'])) {
+      if ($filter['start'] < 0) {
+        $filter['start'] = 0;
+      }
+
+      if ($filter['limit'] < 1) {
+        $filter['limit'] = 10;
+      }
+      $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
+    }
     // $sql .=  " GROUP BY unit.units";
-    //  echo $sql;exit;
+  
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {
       return $this->db->query($sql)->getResult();
     }
+  }
+  public function getTotals($data = array())
+  {
+    $builder = $this->db->table("{$this->table} etd");
+    $builder->join('enterprises_transaction et', 'etd.transaction_id = et.id');
+
+    $this->filter($builder, $data);
+
+    // Add condition to check if deleted_at is not null
+    $builder->where('etd.deleted_at IS  NULL');
+
+    $count = $builder->countAllResults();
+
+    return $count;
+  }
+  private function filter($builder, $data)
+  {
+    $builder->join('dashboard_years dy', 'et.year_id = dy.id');
+    $builder->join('soe_months sm', 'et.month_id = sm.id');
+    $builder->join('soe_districts sd', 'et.district_id = sd.id');
+    $builder->join('soe_blocks sb', 'etd.block_id = sb.id');
+    $builder->join('villages v', 'etd.village_id = v.id');
+    $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id');
+    $builder->join('enterprises_units eu', 'et.unit_id = eu.id');
+
+    if (!empty($data['district_id'])) {
+      $builder->where("et.district_id  = '" . $data['district_id'] . "'");
+    }
+    if (!empty($data['month_id'])) {
+      $builder->where("et.month_id  = '" . $data['month_id'] . "'");
+    }
+    if (!empty($data['period'])) {
+      $builder->where("et.period  = '" . $data['period'] . "'");
+    }
+    if (!empty($data['year_id'])) {
+      $builder->where("et.year_id  = '" . $data['year_id'] . "'");
+    }
+
+
+    if (!empty($data['filter_search'])) {
+      $builder->where("
+      sd.name LIKE '%{$data['filter_search']}%' OR
+      sd.id = '{$data['filter_search']}'");
+    }
+
+    // echo $this->db->getLastQuery();exit;
   }
 
   public function idwisetrans($id)
@@ -163,7 +236,7 @@ class EstablishmentTransactionDetailsModel extends Model
     eu_unit.unit_group_id,
     txn_dtl.period,
     txn_dtl.created_at
-  FROM (SELECT
+      FROM (SELECT
       etd.id est_id,
       etd.no_of_days_functional,
       etd.produced,
@@ -231,34 +304,34 @@ class EstablishmentTransactionDetailsModel extends Model
       $pmonth = $filter['month_id'] - 1;
     }
     $sql = "SELECT
-  units.unit_id,
-  units.unit_name,
-  COALESCE(func_unit_upto.total_units, 0) total_units_upto,
-  COALESCE(func_unit_mon.total_units, 0) total_units_mon,
-  COALESCE(func_unit_upto.total_units, 0) + COALESCE(func_unit_mon.total_units, 0) total_units_cumm,
-  COALESCE(trxn_upto.turn_over, 0) turnover_upto,
-  COALESCE(txn_mon.turn_over, 0) turnover_mon,
-  COALESCE(trxn_upto.turn_over, 0) + COALESCE(txn_mon.turn_over, 0) turnover_cumm,
-  COALESCE(trxn_upto.expense, 0) expn_upto,
-  COALESCE(txn_mon.expense, 0) expn_mon,
-  COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
-  COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
-  COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
- FROM (SELECT
+      units.unit_id,
+      units.unit_name,
+      COALESCE(func_unit_upto.total_units, 0) total_units_upto,
+      COALESCE(func_unit_mon.total_units, 0) total_units_mon,
+      COALESCE(func_unit_upto.total_units, 0) + COALESCE(func_unit_mon.total_units, 0) total_units_cumm,
+      COALESCE(trxn_upto.turn_over, 0) turnover_upto,
+      COALESCE(txn_mon.turn_over, 0) turnover_mon,
+      COALESCE(trxn_upto.turn_over, 0) + COALESCE(txn_mon.turn_over, 0) turnover_cumm,
+      COALESCE(trxn_upto.expense, 0) expn_upto,
+      COALESCE(txn_mon.expense, 0) expn_mon,
+      COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
+      COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
+      COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
+    FROM (SELECT
     eu.id unit_id,
     eu.name unit_name
-  FROM enterprises_units eu
-  ORDER BY eu.name) units
-  LEFT JOIN (SELECT
-      e.unit_id,
-      COUNT(e.id) total_units
-    FROM enterprises e
-      LEFT JOIN dashboard_years dy
-        ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
-      LEFT JOIN soe_months sm
-        ON MONTH(e.mou_date) = sm.number
-    WHERE e.deleted_at IS NULL
-    AND e.unit_id > 0
+    FROM enterprises_units eu
+    ORDER BY eu.name) units
+    LEFT JOIN (SELECT
+        e.unit_id,
+        COUNT(e.id) total_units
+      FROM enterprises e
+        LEFT JOIN dashboard_years dy
+          ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
+        LEFT JOIN soe_months sm
+          ON MONTH(e.mou_date) = sm.number
+      WHERE e.deleted_at IS NULL
+      AND e.unit_id > 0
     AND YEAR(e.mou_date) > 2000";
     if (!empty($filter['management_unit_type'])) {
       $sql .= " AND (e.management_unit_type = '" . $filter['management_unit_type'] . "')";
@@ -276,7 +349,7 @@ class EstablishmentTransactionDetailsModel extends Model
 
     $sql .= " GROUP BY e.unit_id) func_unit_upto
     ON func_unit_upto.unit_id = units.unit_id
-  LEFT JOIN (SELECT
+     LEFT JOIN (SELECT
       e.unit_id,
       COUNT(e.id) total_units
     FROM enterprises e
@@ -302,7 +375,7 @@ class EstablishmentTransactionDetailsModel extends Model
 
     $sql .= " GROUP BY e.unit_id) func_unit_mon
     ON func_unit_mon.unit_id = units.unit_id
-  LEFT JOIN (SELECT
+      LEFT JOIN (SELECT
       et.unit_id,
       SUM(etd.total_turnover) turn_over,
       SUM(etd.total_expend) expense,
@@ -331,7 +404,7 @@ class EstablishmentTransactionDetailsModel extends Model
 
     $sql .= " GROUP BY et.unit_id) trxn_upto
     ON trxn_upto.unit_id = units.unit_id
-  LEFT JOIN (SELECT
+      LEFT JOIN (SELECT
       et.unit_id,
       et.district_id,
       SUM(etd.total_turnover) turn_over,

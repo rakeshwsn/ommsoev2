@@ -49,7 +49,6 @@ class Enterprises extends AdminController
         $this->villageModel = new EnterpriseVillagesModel();
         $this->enterprisesBudgetModel = new EnterprisesBudgetModel();
         $this->yearModel = new YearModel();
-        $this->villageModel = new EnterpriseVillagesModel();
         $this->lgdVillageModel = new LgdVillagesModel();
         $this->equipmentModel = new EquipmentModel();
     }
@@ -237,7 +236,7 @@ class Enterprises extends AdminController
         if ($this->request->getGet('doeyear') > 0) {
             $filter['doeyear'] = $this->request->getGet('doeyear');
         }
-        $filteredData =  $this->enterprisesModel->getAll($filter);
+        $filteredData =  $this->enterprisesModel->getTotals($filter);
         return $filteredData;
     }
     public function download()

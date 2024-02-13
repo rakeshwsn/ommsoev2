@@ -19,6 +19,7 @@
             </div>
         </td>
     </tr>
+    <?php printr($enterprises);exit; ?>
     <?php foreach ($enterprises as $enterprise) { ?>
         <?php $slno = 1; ?>
         <thead>

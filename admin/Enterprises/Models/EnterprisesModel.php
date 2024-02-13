@@ -469,7 +469,7 @@ class EnterprisesModel extends Model
         if (!empty($filter['unit_id'])) {
             $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
         }
-
+// echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 }
