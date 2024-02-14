@@ -80,6 +80,8 @@ class EnterprisesModel extends Model
         LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
         WHERE e.deleted_at IS NULL";
 
+
+
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id = " . $filter['district_id'];
         }
@@ -120,7 +122,7 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
-    
+        //echo $sql;
         return $this->db->query($sql)->getResult();
     }
 
@@ -140,16 +142,17 @@ class EnterprisesModel extends Model
         $builder->where('e.deleted_at IS  NULL');
 
         $count = $builder->countAllResults();
+        //echo $this->db->getLastQuery();exit;
 
         return $count;
     }
     private function filter($builder, $data)
     {
-        $builder->join('soe_districts sd', 'e.district_id = sd.id');
-        $builder->join('soe_blocks sb', 'e.block_id = sb.id');
-        $builder->join('villages v', 'e.district_id = v.id');
-        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id');
-        $builder->join('enterprises_units eu', 'e.unit_id = eu.id');
+        $builder->join('soe_districts sd', 'e.district_id = sd.id','left');
+        $builder->join('soe_blocks sb', 'e.block_id = sb.id','left');
+        $builder->join('villages v', 'e.district_id = v.id','left');
+        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id','left');
+        $builder->join('enterprises_units eu', 'e.unit_id = eu.id','left');
 
         if (!empty($data['district_id'])) {
             $builder->where("e.district_id  = '" . $data['district_id'] . "'");
@@ -174,7 +177,7 @@ class EnterprisesModel extends Model
 			");
         }
 
-        // echo $this->db->getLastQuery();exit;
+        //echo $this->db->getLastQuery();exit;
     }
 
     public function yearWise($district_id)
@@ -258,14 +261,14 @@ class EnterprisesModel extends Model
       AND disunit.unit_id = res.unit_id ";
 
         $sql .= " ORDER BY unit_id, district";
-      
+
         return $this->db->query($sql)->getResult();
     }
 
     /**
      * This method is called from establishemntreport for blockwise report generation.
      *
-     * @param array $filter 
+     * @param array $filter
      *
      * @return array $result
      */
@@ -367,7 +370,7 @@ class EnterprisesModel extends Model
       eu.name unit
      FROM (SELECT
         *
-      FROM grampanchayat 
+      FROM grampanchayat
      ) gp
       CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL) gpunits
      LEFT JOIN (SELECT
@@ -455,11 +458,11 @@ class EnterprisesModel extends Model
     {
         $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
         e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
-        eu.name unit_name FROM enterprises e 
-        LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
-        LEFT JOIN soe_blocks b ON e.block_id=b.id 
-        LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id 
-        LEFT JOIN villages v ON e.village_id=v.id 
+        eu.name unit_name FROM enterprises e
+        LEFT JOIN enterprises_units eu ON e.unit_id=eu.id
+        LEFT JOIN soe_blocks b ON e.block_id=b.id
+        LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id
+        LEFT JOIN villages v ON e.village_id=v.id
         WHERE e.deleted_at IS NULL";
 
         if (!empty($filter['district_id'])) {
