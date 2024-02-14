@@ -225,7 +225,8 @@ class Correction extends AdminController {
             $action = 'show';
         }
 
-        $data['show_form'] = false;
+        // for button
+        $data['show_form'] = true;
 
         $data['block'] = $txn->block;
         $data['district'] = $txn->district;

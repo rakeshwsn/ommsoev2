@@ -69,7 +69,7 @@ class EnterprisesUnitModel extends Model
             $sql .= " AND unit_group_id=" . $filter['unit_group_id'];
         }
         $sql .= " ORDER BY `eu`.`name` ASC";
-
+// echo $sql;exit;
         return $this->db->query($sql)->getResultArray();
     }
 

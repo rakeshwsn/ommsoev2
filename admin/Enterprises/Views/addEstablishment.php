@@ -47,12 +47,10 @@ $validation = \Config\Services::validation();
                                 "id='gps' class='form-control js-select2'"
                             ); ?>
                             <div class="input-group-append">
-                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add
-                                    GP</a>
+                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                         <label for="village_id">Village<span class="text-danger"></span></label>
                         <div class="input-group">
@@ -63,9 +61,18 @@ $validation = \Config\Services::validation();
                             </div>
                         </div>
                     </div>
+                    <div class="col-6 form-group">
+                        <label for="address">Address<span class="text-danger"></span></label>
+                        <div class="input-group">
+                            <textarea name="address" id="address" cols="30" rows="3" class="form-control"><?php echo isset($address) ? htmlspecialchars($address) : ''; ?></textarea>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
+
+
 
         <div class="dotted-border mx-4 my-4 pd-3">
             <div class="container">
@@ -445,6 +452,8 @@ $validation = \Config\Services::validation();
                 $('#budget_utilize').hide();
             }
         });
+        // initial state
+
 
         //hide and show center info
 
@@ -457,7 +466,7 @@ $validation = \Config\Services::validation();
                 $('#center_info').hide();
             }
         });
-   
+
 
         //populate unit type on document ready
         $('#unit_type').trigger("change");
@@ -669,21 +678,17 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
-                gp_id: {
-                    required: true,
-                    ddrequired: true
-                },
+
                 district_id: {
                     required: true,
                     ddrequired: true
                 },
-                block_id: {
-                    required: true,
-                    ddrequired: true
-                },
-                village_id: {
-                    required: true,
-                    ddrequired: true
+
+                address: {
+                    required: function(element) {
+                        return $("#blocks").is("not :selected");
+                    },
+
                 },
                 contact_person: {
                     required: true,

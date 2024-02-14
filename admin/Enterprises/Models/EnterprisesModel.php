@@ -64,7 +64,8 @@ class EnterprisesModel extends Model
         e.is_support_basis_infr,
         e.purpose_infr_support,
         e.support_infr_amount,
-        date(e.created_at) created_at,
+        e.address,
+     date(e.created_at) created_at,
         sd.name districts,
         sb.name blocks,
         v.name villages,
@@ -78,7 +79,7 @@ class EnterprisesModel extends Model
         LEFT JOIN villages v ON v.id = e.village_id
         LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
         LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-        WHERE e.deleted_at IS NULL";
+        WHERE e.deleted_at IS NULL ";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -120,7 +121,7 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
-    
+        // echo $sql;
         return $this->db->query($sql)->getResult();
     }
 
@@ -140,16 +141,17 @@ class EnterprisesModel extends Model
         $builder->where('e.deleted_at IS  NULL');
 
         $count = $builder->countAllResults();
+        //echo $this->db->getLastQuery();exit;
 
         return $count;
     }
     private function filter($builder, $data)
     {
-        $builder->join('soe_districts sd', 'e.district_id = sd.id');
-        $builder->join('soe_blocks sb', 'e.block_id = sb.id');
-        $builder->join('villages v', 'e.district_id = v.id');
-        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id');
-        $builder->join('enterprises_units eu', 'e.unit_id = eu.id');
+        $builder->join('soe_districts sd', 'e.district_id = sd.id','left');
+        $builder->join('soe_blocks sb', 'e.block_id = sb.id','left');
+        $builder->join('villages v', 'e.district_id = v.id','left');
+        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id','left');
+        $builder->join('enterprises_units eu', 'e.unit_id = eu.id','left');
 
         if (!empty($data['district_id'])) {
             $builder->where("e.district_id  = '" . $data['district_id'] . "'");
@@ -168,13 +170,13 @@ class EnterprisesModel extends Model
         }
 
         if (!empty($data['filter_search'])) {
-            $builder->where("
+            $builder->where("sb.is_program=1 AND
 				sb.name LIKE '%{$data['filter_search']}%' OR
 				sb.id = '{$data['filter_search']}'
 			");
         }
 
-        // echo $this->db->getLastQuery();exit;
+        //echo $this->db->getLastQuery();exit;
     }
 
     public function yearWise($district_id)
@@ -243,13 +245,13 @@ class EnterprisesModel extends Model
         }
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id, e.district_id
@@ -258,14 +260,14 @@ class EnterprisesModel extends Model
       AND disunit.unit_id = res.unit_id ";
 
         $sql .= " ORDER BY unit_id, district";
-      
+
         return $this->db->query($sql)->getResult();
     }
 
     /**
      * This method is called from establishemntreport for blockwise report generation.
      *
-     * @param array $filter 
+     * @param array $filter
      *
      * @return array $result
      */
@@ -287,7 +289,8 @@ class EnterprisesModel extends Model
         eu.name unit,
         sb.id block_id,
         sb.name block,
-        sb.district_id
+        sb.district_id,
+        sb.is_program
       FROM soe_blocks sb
         CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) blkunit
         LEFT JOIN (SELECT
@@ -316,19 +319,20 @@ class EnterprisesModel extends Model
 
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id,
                e.block_id) res
       ON blkunit.block_id = res.block_id
-      AND blkunit.unit_id = res.unit_id";
+      AND blkunit.unit_id = res.unit_id
+      and blkunit.is_program = 1";
 
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];
@@ -367,7 +371,7 @@ class EnterprisesModel extends Model
       eu.name unit
      FROM (SELECT
         *
-      FROM grampanchayat 
+      FROM soe_grampanchayats
      ) gp
       CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL) gpunits
      LEFT JOIN (SELECT
@@ -395,13 +399,13 @@ class EnterprisesModel extends Model
         }
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id,
@@ -455,12 +459,12 @@ class EnterprisesModel extends Model
     {
         $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
         e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
-        eu.name unit_name FROM enterprises e 
-        LEFT JOIN enterprises_units eu ON e.unit_id=eu.id 
-        LEFT JOIN soe_blocks b ON e.block_id=b.id 
-        LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id 
-        LEFT JOIN villages v ON e.village_id=v.id 
-        WHERE e.deleted_at IS NULL";
+        eu.name unit_name FROM enterprises e
+        LEFT JOIN enterprises_units eu ON e.unit_id=eu.id
+        LEFT JOIN soe_blocks b ON e.block_id=b.id
+        LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id
+        LEFT JOIN villages v ON e.village_id=v.id
+        WHERE e.deleted_at IS NULL AND b.is_program=1";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id= " . (int)$filter['district_id'];
@@ -469,7 +473,7 @@ class EnterprisesModel extends Model
         if (!empty($filter['unit_id'])) {
             $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
         }
-
+// echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 }

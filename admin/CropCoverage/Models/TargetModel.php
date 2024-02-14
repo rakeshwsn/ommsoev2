@@ -126,7 +126,7 @@ FROM (
             $sql .= " sb.district_id = " . $filter['district_id'];
         }
 
-        $sql .= "
+        $sql .= " AND sb.is_program=1
 ) AS block
 LEFT JOIN (
   SELECT
@@ -215,7 +215,7 @@ FROM
             sd.name,
             COUNT(sb.id) no_of_block
         FROM soe_districts sd
-        LEFT JOIN soe_blocks sb ON sd.id = sb.district_id
+        LEFT JOIN soe_blocks sb ON sd.id = sb.district_id WHERE sb.is_program=1
         GROUP BY sb.district_id
     ) sd
 LEFT JOIN
@@ -531,7 +531,7 @@ LEFT JOIN (
     COALESCE(tar.area_ + tar.fup, 0) AS target_area,
     COALESCE((ach.smi + ach.lt + ach.ls + ach.fup_area), 0) AS ach_area
 FROM
-    soe_blocks sb
+    (SELECT * FROM soe_blocks WHERE is_program=1) sb
 LEFT JOIN (
     SELECT
         atm.block_id,

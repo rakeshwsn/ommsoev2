@@ -39,8 +39,5 @@ class BlockModel extends Model
 	protected $afterDelete          = [];
 	protected $bulider;
 	
-
-	
-
 	
 }

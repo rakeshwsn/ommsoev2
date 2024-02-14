@@ -198,7 +198,7 @@ FROM (
             $sql .= " sb.district_id =" . $filter['district_id'];
 
         }
-        $sql .= " AND sg.deleted_at IS NULL
+        $sql .= " AND sg.deleted_at IS NULL AND sb.is_program=1
   GROUP BY sb.id, sb.name
 ) AS t1
 LEFT JOIN (
@@ -316,7 +316,7 @@ FROM soe_districts sd
   LEFT JOIN (SELECT
       district_id,
       COUNT(id) AS block_count
-    FROM soe_blocks
+    FROM soe_blocks WHERE is_program=1
     GROUP BY district_id) AS block_data
     ON sd.id = block_data.district_id
   LEFT JOIN (SELECT

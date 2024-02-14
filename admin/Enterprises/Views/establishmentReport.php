@@ -103,10 +103,10 @@
 
                                     <tr>
                                         <th rowspan="2">
-                                            <?php if ($district_id) {
-                                                echo "Blocks";
-                                            } elseif ($block_id) {
+                                            <?php if ($block_id) {
                                                 echo "Grampanchayat";
+                                            } elseif ($district_id) {
+                                                echo "Blocks";
                                             } else {
                                                 echo "Districts";
                                             }

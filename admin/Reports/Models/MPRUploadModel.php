@@ -84,7 +84,7 @@ class MPRUploadModel extends Model {
             FROM soe_districts sd
                 LEFT JOIN soe_blocks sb
                 ON sd.id = sb.district_id
-            WHERE sb.fund_agency_id = '".$filter['fund_agency_id']."'
+            WHERE sb.is_program=1 AND sb.fund_agency_id = '".$filter['fund_agency_id']."'
             GROUP BY sb.district_id) sd
             LEFT JOIN (SELECT
                 *

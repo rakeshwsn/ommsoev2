@@ -137,7 +137,9 @@ class ClosingbalanceModel extends Model
             ->join('user_group ut','ut.id=t.agency_type_id','LEFT')
             ->join('soe_years y','y.id=t.year','LEFT')
             ->join('users u','u.id=t.user_id','LEFT')
-            ->where('t.id',$id)->get()->getRow();
+            ->where('t.id',$id)
+            ->where('c.is_program',1)
+			->get()->getRow();
 
         return $result;
     }

@@ -72,7 +72,7 @@ class AreaCoverageModel extends Model
 		LEFT JOIN soe_grampanchayats sg
 		  ON a.gp_id = sg.id
 	  WHERE a.deleted_at IS NULL AND sg.deleted_at IS NULL
-	  AND y.deleted_at IS NULL";
+	  AND y.deleted_at IS NULL AND sb.is_program=1";
 		if (isset($filter['year_id'])) {
 			$sql .= " AND a.year_id = " . $filter['year_id'];
 		}
@@ -115,7 +115,7 @@ class AreaCoverageModel extends Model
 		LEFT JOIN soe_grampanchayats sg
 		  ON a.gp_id = sg.id
 	  WHERE a.deleted_at IS NULL
-	  AND y.deleted_at IS NULL";
+	  AND y.deleted_at IS NULL AND sb.is_program=1";
 		if (isset($filter['year_id'])) {
 			$sql .= " AND a.year_id = " . $filter['year_id'];
 		}

@@ -64,7 +64,7 @@ class EstablishmentTransactionModel extends Model
     LEFT JOIN villages v
       ON e.village_id = v.id
     LEFT JOIN enterprises_units eu
-      ON e.unit_id = eu.id where e.unit_id = $unit_id and e.district_id= $district_id ";
+      ON e.unit_id = eu.id where sb.is_program=1 AND e.unit_id = $unit_id and e.district_id= $district_id ";
 
     return $this->db->query($sql)->getResult();
   }
