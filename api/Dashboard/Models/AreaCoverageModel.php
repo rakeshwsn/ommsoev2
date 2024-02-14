@@ -255,9 +255,8 @@ FROM ac_crop_practices acp
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date'] . "')";
             }
             $sql .= ") ac ON ac.block_id=b.id
-                WHERE b.district_id=" . $filter['district_id'];
+                WHERE AND b.is_program=1 AND b.district_id=" . $filter['district_id'];
             $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
-
         } else {
             $sql = "SELECT
   sd.id district_id,
@@ -772,7 +771,7 @@ LEFT JOIN
 LEFT JOIN
     soe_districts sd ON sb.district_id = sd.id
 WHERE
-    1 = 1";
+    1 = 1 AND sb.is_program=1";
 
         if (isset($filter['district_id'])) {
             $sql .= " AND sd.id = " . $filter['district_id'];

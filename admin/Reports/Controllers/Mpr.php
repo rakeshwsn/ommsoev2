@@ -198,398 +198,27 @@ class Mpr extends AdminController
 
     }
 
-    public function index1($action='') {
-
-        $data = [];
+    public function indexNew($action=''){
+        $this->block_model = new BlockModel();
+        $data=[];
 
         $data['year_id'] = getCurrentYearId();
         if($this->request->getGet('year')){
             $data['year_id'] = $this->request->getGet('year');
         }
 
-        $data['month_id'] = getCurrentMonthId();
+        $data['month_id'] = getMonthIdByMonth(date('m'));
         if($this->request->getGet('month')){
             $data['month_id'] = $this->request->getGet('month');
         }
-
-        $data['agency_type_id'] = '';
-        if($this->request->getGet('agency_type_id')){
-            $data['agency_type_id'] = $this->request->getGet('agency_type_id');
-        }
-
-        $data['fund_agency_id'] = 1;
-        if($this->user->fund_agency_id){
-            $data['fund_agency_id'] = $this->user->fund_agency_id;
-        }
-        if($this->request->getGet('fund_agency_id')){
-            $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
-        }
-
-        $data['district_id'] = '';
-        if($this->request->getGet('district_id')){
-            $data['district_id'] = $this->request->getGet('district_id');
-        }
-
-        if($this->user->agency_type_id==$this->settings->district_user){
-            $data['district_id'] = $this->user->district_id;
-        }
-
-        $data['block_id'] = '';
-        if($this->request->getGet('block_id')){
-            $data['block_id'] = $this->request->getGet('block_id');
-        }
-
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $data['block_id'] = $this->user->block_id;
-        }
-
-    
-        if($data['block_id']){
-            $where = ['block_id'=>$data['block_id'],'user_group_id'=>$this->settings->block_user];
-            $user = (new UserModel())->where($where)->first();
-            $data['block_user_id'] = $user->id;
-        }
-
-        if($data['district_id']){
-            $where = ['district_id'=>$data['district_id'],'user_group_id'=>$this->settings->district_user];
-            $user = (new UserModel())->where($where)->first();
-            $data['district_user_id'] = $user->id;
-        }
-
 
         $data['districts'] = [];
 
-        $this->block_model = new BlockModel();
-
-        $data['blocks'] = [];
-        $data['fund_agencies'] = [];
-
-        $reportModel = new ReportsModel();
-        $data['components'] = [];
-        $filter = [
-            'month_id' => $data['month_id'],
-            'year_id' => $data['year_id'],
-            'user_id' => $this->user->id,
-        ];
-
-
-        $filter['component_agency_type_id'] = $this->user->agency_type_id;
-        
-        if($this->user->agency_type_id==11){ //spmu
-            $filter['component_agency_type_id'] = NULL;
-        }
-        if($data['agency_type_id']){
-            $filter['agency_type_id'] = $data['agency_type_id'];
-        }
-        if($data['district_id']){
-            $filter['district_id'] = $data['district_id'];
-            $filter['agency_type_id'] = [5,6,7]; //fa/cbo/atma --to be added to settings
-
-            //in case of dmf angul/keunjhar (district id 7) all agency_type
-            if($data['district_id']==7 || $data['district_id']==15){
-                $filter['agency_type_id'] = [5,6,7,8,9]; //only expense
-                $filter['district_id'] = null;
-            }
-            $filter['component_agency_type_id'] = 7;
-        }
-        if($data['block_id']){
-            $filter['block_id'] = $data['block_id'];
-            $filter['block_user_id'] = $data['block_user_id'];
-            $filter['agency_type_id'] = [5,6,7]; //fa/cbo --to be added to settings
-            $filter['category'] = 'program'; //only program components when block is selected
-            $filter['component_agency_type_id'] = 5;
-        }
-
-        if($data['fund_agency_id']){
-            $filter['fund_agency_id'] = $data['fund_agency_id'];
-            $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
-
-            //if fund_ag == dmf cati = 7
-            if($data['fund_agency_id']!=1)
-                $filter['component_agency_type_id'] = 7;
-                if($data['block_id'])
-                    $filter['component_agency_type_id'] = 5;
-        }
-
-        $filter['block_users'] = [5,6];
-        $filter['block_user'] = false;
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $filter['block_user'] = true;
-        }
-        if($this->user->agency_type_id==$this->settings->district_user){
-            $filter['district_user_id'] = $data['district_user_id'];
-            $filter['agency_type_id'] = $data['agency_type_id'];
-        }
-
-        $components = $reportModel->getMpr($filter);
-
-        $components = $this->buildTree($components, 'parent', 'scomponent_id');
-
-        if($action=='download') {
-            $data['components'] = $this->getTable($components, 'download');
-        } else {
-            $data['components'] = $this->getTable($components, 'view');
-        }
-
-        //mpr table html for excel and view --rakesh --092/06/23
-        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
-
-        if($data['district_id']) {
-            $data['district'] = (new DistrictModel())->find($data['district_id'])->name;
-            $data['blocks'] = $this->block_model->where(
-                [
-                    'district_id' => $data['district_id'],
-                    'fund_agency_id' => $data['fund_agency_id'],
-                ]
-            )->asArray()->findAll();
-
-        }
-
-        if($data['block_id']) {
-            $block = $this->block_model->find($data['block_id']);
-            $data['block'] = $block->name;
-
-            $data['fund_agency'] = $block->fund_agency_id ? (new CommonModel())->getFundAgency($block->fund_agency_id)['name']:'-';
-        }
-        $data['month_name'] = getMonthById($data['month_id'])['name'];
-        $data['fin_year'] = getYear($data['year_id']);
-
-        $this->filterPanel($data);
-
-        if($action=='download'){
-            $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
-
-            $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
-            if($spreadsheet){
-                $worksheet = $spreadsheet->getActiveSheet();
-                $columnIndex = 'B'; // Change this to the desired column index
-                $wordWrapCols=[
-                    'G2','O2','Q1'
-                ];
-                foreach($wordWrapCols as $col){
-                    $cell = $worksheet->getCell($col);
-                    $cell->getStyle()->getAlignment()->setWrapText(true);
-                }
-                
-                // Get the highest row index in the column
-                $highestRow = $worksheet->getHighestRow();
-
-                // Apply word wrap to each cell in column B
-                for ($row = 1; $row <= $highestRow; $row++) {
-                    $cell = $worksheet->getCell($columnIndex . $row);
-                    $cell->getStyle()->getAlignment()->setWrapText(true);
-                }
-                
-                $worksheet->getColumnDimension($columnIndex)->setWidth(20);
-
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment;filename="'. $filename .'"');
-                header('Cache-Control: max-age=0');
-
-                $writer = new Xlsx($spreadsheet);
-                $writer->save('php://output');
-                exit();
-            }
-            exit;
-        }
-
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
-
-        return $this->template->view('Admin\Reports\Views\mpr_block', $data);
-    }
-
-    public function mprtest($action=''){
-        $this->block_model = new BlockModel();
-        $data=[];
-
-        $data['year_id'] = getCurrentYearId();
-        if($this->request->getGet('year')){
-            $data['year_id'] = $this->request->getGet('year');
-        }
-
-        $data['month_id'] = getCurrentMonthId();
-        if($this->request->getGet('month')){
-            $data['month_id'] = $this->request->getGet('month');
-        }
-        
         $data['fund_agency_id'] = $this->user->fund_agency_id?:1;
         if($this->request->getGet('fund_agency_id')){
             $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+            $data['districts'] = [];
         }
-
-        
-        $data['agency_type_id'] = $this->user->agency_type_id;
-        
-        $data['agency']='';
-        $data['fund_receipt_not']=true;
-
-        if($data['fund_agency_id'] != 1){
-            $data['agency_type_id']=7;
-            $data['agency']=''; 
-        }
-
-        if($this->request->getGet('agency_type_id')){
-            $data['agency']=$data['agency_type_id'] = $this->request->getGet('agency_type_id');
-            $data['get_agency']=true;
-        }
-
-        $data['district_id'] = $this->user->district_id;
-        if($this->request->getGet('district_id')){
-            $data['district_id'] = $this->request->getGet('district_id');
-            $data['agency_type_id']=7;
-            $data['agency']='';
-            
-        }
-
-        $data['block_id'] = $this->user->block_id;
-        if($this->request->getGet('block_id')){
-            $data['block_id'] = $this->request->getGet('block_id');
-            $data['agency']='';
-            
-        }
-
-        if($this->request->getGet('agency_type_id')){
-            $data['fagency_type_id']=(array)$this->request->getGet('agency_type_id');
-            $data['agency']=$this->request->getGet('agency_type_id');
-        }else if(!empty($data['block_id'])){
-            $data['fagency_type_id']=[5,6];
-        }else if(!empty($data['agency_type_id']) && ($data['agency_type_id'] && $data['agency_type_id']!=11)){
-            $afilter=[
-                'fund_agency_id'=>$data['fund_agency_id'],
-                'agency_type_id'=>(array)$data['agency_type_id']
-            ];
-            $agency_types =  array_column((new UserGroupModel())->getAgencyTypeByFundAgecny($afilter),'user_group_id');
-            
-            $data['fagency_type_id']=$agency_types;
-        }else{
-            $data['fagency_type_id']=[];
-        }
-
-        if(count($data['fagency_type_id'])>1){
-            $data['fund_receipt_not']=true;
-        }
-
-
-        if(($data['agency'] || !empty($data['block_id'])) || $data['fund_agency_id']!=1){
-            $data['fund_receipt_not']=false;
-        }
-        $data['agency_type_id']=$data['agency'];
-        $filter = [
-            'month_id' => $data['month_id'],
-            'year_id' => $data['year_id'],
-            'user_id' => $this->user->id,
-            'fagency_type_id'=>$data['fagency_type_id']?array_filter($data['fagency_type_id']):[],
-            'agency_type_id'=>$data['agency_type_id'],
-            'agency_id'=>$data['agency'],
-            'district_id'=>$data['district_id'],
-            'block_id'=>$data['block_id'],
-            'fund_agency_id'=>$data['fund_agency_id'],
-            'fund_receipt_not'=>$data['fund_receipt_not']
-        ];
-
-       // printr($filter);
-        
-        $reportModel = new ReportsModel();
-        $data['components'] = [];
-
-        $components = $reportModel->getMprTestNew($filter);
-
-        $components = $this->buildTree($components, 'parent', 'scomponent_id');
-
-        if($action=='download') {
-            $data['components'] = $this->getTable($components, 'download');
-        } else {
-            $data['components'] = $this->getTable($components, 'view');
-        }
-
-        //mpr table html for excel and view --rakesh --092/06/23
-        $data['mpr_table'] = view('Admin\Reports\Views\mpr_table', $data);
-        
-        $this->filterPanel($data);
-        
-        if($data['district_id']) {
-            $data['district'] = (new DistrictModel())->find($data['district_id'])->name;
-            $data['blocks'] = $this->block_model->where(
-                [
-                    'district_id' => $data['district_id'],
-                    'fund_agency_id' => $data['fund_agency_id'],
-                ]
-            )->asArray()->findAll();
-
-        }
-
-        if($data['block_id']) {
-            $block = $this->block_model->find($data['block_id']);
-            $data['block'] = $block->name;
-
-            $data['fund_agency'] = $block->fund_agency_id ? (new CommonModel())->getFundAgency($block->fund_agency_id)['name']:'-';
-        }
-        $data['month_name'] = getMonthById($data['month_id'])['name'];
-        $data['fin_year'] = getYear($data['year_id']);
-
-        if($action=='download'){
-            $filename = 'MPR_' . $data['month_name'].$data['fin_year']. '_' . date('Y-m-d His') . '.xlsx';
-
-            $spreadsheet=Export::createExcelFromHTML($data['mpr_table'],$filename,true);
-            if($spreadsheet){
-                $worksheet = $spreadsheet->getActiveSheet();
-                $columnIndex = 'B'; // Change this to the desired column index
-                $wordWrapCols=[
-                    'G2','O2','Q1'
-                ];
-                foreach($wordWrapCols as $col){
-                    $cell = $worksheet->getCell($col);
-                    $cell->getStyle()->getAlignment()->setWrapText(true);
-                }
-                
-                // Get the highest row index in the column
-                $highestRow = $worksheet->getHighestRow();
-
-                // Apply word wrap to each cell in column B
-                for ($row = 1; $row <= $highestRow; $row++) {
-                    $cell = $worksheet->getCell($columnIndex . $row);
-                    $cell->getStyle()->getAlignment()->setWrapText(true);
-                }
-                
-                $worksheet->getColumnDimension($columnIndex)->setWidth(20);
-
-                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment;filename="'. $filename .'"');
-                header('Cache-Control: max-age=0');
-
-                $writer = new Xlsx($spreadsheet);
-                $writer->save('php://output');
-                exit();
-            }
-            exit;
-        }
-
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
-
-      
-        return $this->template->view('Admin\Reports\Views\mpr_block', $data);
-
-    }
-
-    public function mprtestfinal($action=''){
-        $this->block_model = new BlockModel();
-        $data=[];
-
-        $data['year_id'] = getCurrentYearId();
-        if($this->request->getGet('year')){
-            $data['year_id'] = $this->request->getGet('year');
-        }
-
-        $data['month_id'] = getCurrentMonthId();
-        if($this->request->getGet('month')){
-            $data['month_id'] = $this->request->getGet('month');
-        }
-
-        $data['fund_agency_id'] = $this->user->fund_agency_id?:1;
-        if($this->request->getGet('fund_agency_id')){
-            $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
-        }
-
 
         $data['agency_type_id'] = $this->user->agency?$this->user->agency_type_id:0;
         if($this->user->agency_type_id==$this->settings->district_user){
@@ -600,7 +229,6 @@ class Mpr extends AdminController
         }
 
         $data['user_group_id'] = $this->user->agency_type_id;
-
 
         $data['district_id'] = $this->user->district_id;
         if($this->request->getGet('district_id')){
@@ -614,7 +242,6 @@ class Mpr extends AdminController
             $data['block_id'] = $this->request->getGet('block_id');
             $data['user_group_id']=[6,5];
         }
-
 
         if($this->request->getGet('agency_type_id')){
             $data['agency_type_id'] = $data['user_group_id']=$this->request->getGet('agency_type_id');
@@ -635,8 +262,14 @@ class Mpr extends AdminController
             $fund_receipt_agency=$data['user_group_id'];
         }
 
+        //hard code for block user
+        if($this->user->agency_type_id==$this->settings->block_user
+            && $this->request->getGet('agency_type_id')==''){
+            $component_agency = [5,6]; //block user --fa and cbo
+            $fund_receipt_agency = [5,6]; //block user --fa and cbo
+        }
 
-      // printr( $data['component_agency']);
+        // printr( $data['component_agency']);
 
         $filter = [
             'month_id' => $data['month_id'],
@@ -651,14 +284,14 @@ class Mpr extends AdminController
             'fundreceipt_agency'=>(array)$fund_receipt_agency
         ];
 
-       // printr($filter);
+        // printr($filter);
 
         $reportModel = new ReportsModel();
 
         $data['components'] = [];
         $this->filterPanel($data);
 
-        $components = $reportModel->getMprFinal($filter);
+        $components = $reportModel->getMpr($filter);
 
         $components = $this->buildTree($components, 'parent', 'scomponent_id');
 
@@ -730,8 +363,10 @@ class Mpr extends AdminController
             exit;
         }
 
-        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].'&month='.$data['month_id'].'&district_id='.$data['district_id'].'&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
-
+        $data['download_url'] = Url::mprDownload.'?year='.$data['year_id'].
+            '&month='.$data['month_id'].'&district_id='.$data['district_id'].
+            '&agency_type_id='.$data['agency_type_id'].
+            '&block_id='.$data['block_id'].'&fund_agency_id='.$data['fund_agency_id'];
 
         return $this->template->view('Admin\Reports\Views\mpr_block', $data);
 

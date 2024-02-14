@@ -110,7 +110,7 @@ class EstablishmentTransactionDetailsModel extends Model
     LEFT JOIN soe_months sm
       ON sm.id = txn_dtl.month_id
     LEFT JOIN enterprises_units eu
-      ON eu.id = txn_dtl.unit_id WHERE 1=1 ";
+      ON eu.id = txn_dtl.unit_id WHERE 1=1 AND sb.is_program=1";
     if (!empty($filter['unit_id'])) {
       $sql .= " AND txn_dtl.unit_id = " . $filter['unit_id'];
     }
@@ -192,9 +192,8 @@ class EstablishmentTransactionDetailsModel extends Model
       $builder->where("et.year_id  = '" . $data['year_id'] . "'");
     }
 
-
     if (!empty($data['filter_search'])) {
-      $builder->where("
+      $builder->where("sb.is_program=1 AND 
       sd.name LIKE '%{$data['filter_search']}%' OR
       sd.id = '{$data['filter_search']}'");
     }
@@ -287,7 +286,7 @@ class EstablishmentTransactionDetailsModel extends Model
       FROM enterprises_units eu
         LEFT JOIN enterprise_unit_group eug
           ON eu.unit_group_id = eug.id) eu_unit
-      ON eu_unit.unit_id = txn_dtl.unit_id WHERE txn_id = $id ";
+      ON eu_unit.unit_id = txn_dtl.unit_id WHERE sb.is_program=1 AND txn_id = $id ";
     // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }

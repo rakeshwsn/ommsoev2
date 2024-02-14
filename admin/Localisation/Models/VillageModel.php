@@ -106,7 +106,8 @@ class VillageModel extends Model
 		$builder->join('soe_grampanchayats g', 'v.gp_id = g.id', 'left');
 		$builder->join('soe_blocks b', 'g.block_id = b.id', 'left');
 		$builder->join('soe_districts d', 'b.district_id = d.id', 'left');
-
+		
+		$builder->where("b.is_program=1");
 
 		if (!empty($data['filter_district'])) {
 			$builder->where("b.district_id  = '" . $data['filter_district'] . "'");
@@ -125,8 +126,7 @@ class VillageModel extends Model
 		}
 		if (!empty($data['filter_search'])) {
 			$builder->where(
-				"
-				v.name LIKE '%{$data['filter_search']}%'"
+				"v.name LIKE '%{$data['filter_search']}%'"
 			);
 		}
 		// echo $this->db->getLastQuery();exit;
@@ -168,7 +168,7 @@ class VillageModel extends Model
 		  ON sg.block_id = sb.id
 		LEFT JOIN soe_districts sd
 		  ON sg.district_id = sd.id
-	where v.id = $id
+	where sb.is_program=1 AND v.id = $id
 	  GROUP BY districts";
 		return $this->db->query($sql)->getRow();
 	}

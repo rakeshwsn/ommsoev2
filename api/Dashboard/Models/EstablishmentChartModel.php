@@ -56,7 +56,7 @@ class EstablishmentChartModel extends Model
 		  COUNT(b.id) blocks
 		FROM soe_districts d
 		  LEFT JOIN soe_blocks b
-			ON b.district_id = d.id
+			ON b.district_id = d.id WHERE b.is_program=1
 		GROUP BY d.id) dist
 		LEFT JOIN dashboard_establishment chc
 		  ON chc.district_id = dist.district_id LEFT JOIN dashboard_establishment cmsc ON dist.district_id = cmsc.district_id

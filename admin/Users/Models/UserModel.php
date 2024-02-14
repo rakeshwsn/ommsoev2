@@ -74,7 +74,7 @@ FROM user u
     ON b.id = u.block_id
   LEFT JOIN user_group ug
     ON ug.id = u.user_group_id
-WHERE  u.deleted_at IS NULL";
+WHERE  u.deleted_at IS NULL AND b.is_program=1";
 
         if (!empty($filter['filter_search'])) {
             $sql .= " AND (concat_ws(' ', u.firstname, u.lastname) LIKE '%{$filter['filter_search']}%'
@@ -126,7 +126,7 @@ WHERE  u.deleted_at IS NULL";
                 ON b.id = u.block_id
               LEFT JOIN user_group ug
                 ON ug.id = u.user_group_id
-            WHERE user_group_id != 1 AND u.deleted_at IS NULL";
+            WHERE user_group_id != 1 AND u.deleted_at IS NULL AND b.is_program=1";
 
         if (!empty($filter['filter_search'])) {
             $sql .= " AND (concat_ws(' ', u.firstname, u.lastname) LIKE '%{$filter['filter_search']}%'
@@ -254,7 +254,7 @@ FROM soe_allow_uploads sau
         ON u.block_id = sb.id
       LEFT JOIN soe_districts sd
         ON u.district_id = sd.id
-    WHERE u.deleted_at IS NULL";
+    WHERE u.deleted_at IS NULL AND sb.is_program=1";
         if (!empty($filter['agency_type_id'])) {
             $sql .= " AND u.user_group_id = " . $filter['agency_type_id'];
         } else {

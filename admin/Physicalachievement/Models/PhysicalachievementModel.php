@@ -192,7 +192,7 @@ class PhysicalachievementModel extends Model
       FROM vw_district_fund_agency sd
         LEFT JOIN soe_blocks sb
           ON sb.district_id = sd.district_id
-      WHERE sb.fund_agency_id = sd.fund_agency_id";
+      WHERE sb.is_program=1 AND sb.fund_agency_id = sd.fund_agency_id";
     if (!empty($data['district_id'])) {
       $sql .= " and sb.district_id = " . $data['district_id'];
     }
