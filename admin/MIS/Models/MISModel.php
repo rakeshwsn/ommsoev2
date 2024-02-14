@@ -47,7 +47,7 @@ FROM mis_submissions ms
     ON m.id = ms.month
   LEFT JOIN user_group ug
     ON ug.id = ms.agency_type_id
-WHERE 1=1";
+WHERE 1=1 AND b.is_program=1";
         
         $sql .= " AND ms.deleted_at IS NULL";
 
@@ -105,9 +105,7 @@ FROM mis_submissions ms
     ON b.id = ms.block_id
   LEFT JOIN soe_districts d
     ON d.id = ms.district_id
-WHERE ms.deleted_at IS NULL";
-
-  
+WHERE ms.deleted_at IS NULL AND b.is_program=1";
         
         if (!empty($filter['user_id'])) {
             $sql .= " AND ms.user_id=".$filter['user_id'];
@@ -148,7 +146,7 @@ WHERE ms.deleted_at IS NULL";
 FROM (SELECT
     *
   FROM soe_blocks
-  WHERE district_id = $district_id) sb
+  WHERE is_program=1 AND district_id = $district_id) sb
   LEFT JOIN (SELECT
       *
     FROM mis_submissions msb

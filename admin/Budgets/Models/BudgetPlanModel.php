@@ -132,6 +132,7 @@ class BudgetPlanModel extends Model
         $builder->join("soe_years y","sbp.year=y.id","left");
         $builder->select("sbp.*,d.name as district,b.name as block,y.name as yname, sfa.name as fund_agency");
         $builder->where("sbp.id",$budget_plan_id);
+        $builder->where("b.is_program",1);
         $res = $builder->get()->getRow();
         return $res;
 
@@ -162,6 +163,7 @@ class BudgetPlanModel extends Model
         }
        
         $builder->where("sbp.deleted_at IS NULL");
+        $builder->where("sb.is_program=1");
 
 
     }

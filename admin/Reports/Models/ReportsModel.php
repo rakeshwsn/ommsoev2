@@ -2552,7 +2552,7 @@ FROM (SELECT
     FROM soe_blocks sb
       LEFT JOIN user u
         ON u.block_id = sb.id
-    WHERE sb.district_id = $district_id
+    WHERE sb.is_program=1 AND sb.district_id = $district_id
       AND u.fund_agency_id = $fund_agency_id 
       AND u.user_group_id = 5) bl
     LEFT JOIN (SELECT
@@ -2671,7 +2671,7 @@ FROM (SELECT
     FROM user u
     WHERE u.id=" . $filter['user_id'] . ") agency
     LEFT JOIN soe_blocks b
-      ON b.id = agency.block_id
+      ON b.id = agency.block_id AND b.is_program=1
     LEFT JOIN user_group ug
       ON agency.agency_type_id = ug.id
     LEFT JOIN (SELECT
@@ -2845,7 +2845,7 @@ AS
         ON bl.id = res.block_id
       LEFT JOIN soe_districts sd
         ON res.district_id = sd.id
-    WHERE usr.district_id = " . $filter['district_id'] . "
+    WHERE bl.is_program=1 AND usr.district_id = " . $filter['district_id'] . "
     AND usr.fund_agency_id = " . $filter['fund_agency_id'] . "),
 refund
 AS
@@ -2975,7 +2975,7 @@ FROM (SELECT
       (SELECT
             sb.id block_id,
             agency.id agency_type_id
-          FROM soe_blocks sb
+          FROM (SELECT * FROM soe_blocks WHERE is_program=1) sb
             CROSS JOIN (SELECT
                 *
               FROM user_group
@@ -3003,7 +3003,7 @@ FROM (SELECT
           FROM (SELECT
               *
             FROM soe_blocks sb
-            WHERE 1 = 1";
+            WHERE 1 = 1 AND sb.is_program=1";
         if (!empty($filter['fund_agency_id'])) {
             $sql .= " AND sb.fund_agency_id = '" . $filter['fund_agency_id'] . "'";
         }
@@ -3415,7 +3415,7 @@ FROM (SELECT
   sb.fund_agency_id,
   sb.phase,
   agtp.id agency_type_id
-FROM soe_blocks sb
+FROM (SELECT * FROM soe_blocks WHERE is_program=1) sb
   CROSS JOIN (SELECT
       *
     FROM user_group ug
@@ -3816,7 +3816,7 @@ FROM fr_upto
 LEFT JOIN ex_upto ON ex_upto.block_id = fr_upto.block_id
 LEFT JOIN soe_blocks sb ON fr_upto.block_id = sb.id
 LEFT JOIN expn ON expn.block_id = fr_upto.block_id
-WHERE fr_upto.district_id = $district_id";
+WHERE sb.is_program=1 AND fr_upto.district_id = $district_id";
 
         return $this->db->query($sql)->getResult();
     }

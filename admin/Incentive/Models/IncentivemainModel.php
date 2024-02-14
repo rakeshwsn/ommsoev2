@@ -57,9 +57,6 @@ class IncentivemainModel extends Model
         $builder->join("soe_blocks sb", "im.block_id=sb.id", "left");
         $this->filter($builder, $data);
 
-
-
-
         if (isset($data['start']) || isset($data['limit'])) {
             if ($data['start'] < 0) {
                 $data['start'] = 0;
@@ -171,7 +168,7 @@ class IncentivemainModel extends Model
           blo.name block_name
         FROM soe_districts sd
           LEFT JOIN soe_blocks blo
-            ON blo.district_id = sd.id) main_tbl
+            ON blo.district_id = sd.id WHERE blo.is_program=1) main_tbl
         LEFT JOIN (SELECT * FROM incetive_main_details d WHERE d.year=".$filter['year']." OR d.district_id=".$filter['district_id'].") imd
           ON main_tbl.district_id = imd.district_id
           AND main_tbl.block_id = imd.block_id
@@ -182,7 +179,7 @@ class IncentivemainModel extends Model
 
     private function filter($builder, $data)
     {
-
+		$builder->where('sb.is_program=1');
         if (!empty($data['filter_district'])) {
             $builder->where(
                 "im.district_id = '{$data['filter_district']}'"

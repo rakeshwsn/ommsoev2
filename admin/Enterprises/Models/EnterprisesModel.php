@@ -78,7 +78,7 @@ class EnterprisesModel extends Model
         LEFT JOIN villages v ON v.id = e.village_id
         LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
         LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-        WHERE e.deleted_at IS NULL";
+        WHERE e.deleted_at IS NULL AND sb.is_program=1";
 
 
 
@@ -171,7 +171,7 @@ class EnterprisesModel extends Model
         }
 
         if (!empty($data['filter_search'])) {
-            $builder->where("
+            $builder->where("sb.is_program=1 AND
 				sb.name LIKE '%{$data['filter_search']}%' OR
 				sb.id = '{$data['filter_search']}'
 			");
@@ -306,7 +306,7 @@ class EnterprisesModel extends Model
           ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
-      WHERE e.deleted_at IS NULL";
+      WHERE e.deleted_at IS NULL AND sb.is_program=1";
         if (!empty($filter['year_id'])) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
@@ -463,7 +463,7 @@ class EnterprisesModel extends Model
         LEFT JOIN soe_blocks b ON e.block_id=b.id
         LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id
         LEFT JOIN villages v ON e.village_id=v.id
-        WHERE e.deleted_at IS NULL";
+        WHERE e.deleted_at IS NULL AND b.is_program=1";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id= " . (int)$filter['district_id'];

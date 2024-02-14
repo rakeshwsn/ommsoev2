@@ -152,7 +152,7 @@ class LgdBlocksModel extends Model
 			ON sb.district_id = sd.id
 		LEFT JOIN soe_fund_agency sfa
 			ON sb.fund_agency_id = sfa.id
-		WHERE 1=1";
+		WHERE 1=1 AND sb.is_program=1";
         if(!empty($filter['district_id'])){
             $sql .= " AND sd.id = ".$filter['district_id'];
         }
@@ -172,7 +172,7 @@ class LgdBlocksModel extends Model
   sb.phase phase_no,
   CONCAT('Phase ', sb.phase, CONCAT(' (', COUNT(sb.id), ' block)')) name
 FROM soe_blocks sb
-WHERE 1 = 1";
+WHERE 1 = 1 AND sb.is_program=1";
         if(!empty($agency_id)){
             $sql .= " AND sb.fund_agency_id = ".$agency_id;
         }

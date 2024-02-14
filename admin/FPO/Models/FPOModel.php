@@ -57,7 +57,7 @@ FROM (SELECT
     COUNT(sb.id) total_block
   FROM soe_districts sd
     LEFT JOIN soe_blocks sb
-      ON sd.id = sb.district_id
+      ON sd.id = sb.district_id WHERE sb.is_program=1
   GROUP BY sb.district_id) d
 
   LEFT JOIN (SELECT
@@ -102,7 +102,7 @@ FROM (SELECT
     sb.id,
     sb.name
   FROM soe_blocks sb
-  WHERE sb.district_id = $district_id) b
+  WHERE sb.district_id = $district_id AND sb.is_program=1) b
   LEFT JOIN fpo f
     ON b.id = f.block_id";
         return $this->db->query($sql)->getResultArray();

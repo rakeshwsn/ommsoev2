@@ -81,7 +81,7 @@ FROM soe_transactions t
     ON m.id = t.month
   LEFT JOIN user_group ug
     ON ug.id = t.agency_type_id
-WHERE 1=1";
+WHERE 1=1 AND b.is_program=1";
         if($transaction_type) {
             $sql .= " AND transaction_type = '$transaction_type'";
         } else {
@@ -144,7 +144,7 @@ FROM soe_transactions t
     ON b.id = t.block_id
   LEFT JOIN soe_districts d
     ON d.id = t.district_id
-WHERE t.deleted_at IS NULL";
+WHERE t.deleted_at IS NULL AND b.is_program=1";
 
         if (!empty($filter['transaction_type'])) {
             $sql .= " AND t.transaction_type = '".$filter['transaction_type']."'";
@@ -1116,7 +1116,7 @@ FROM (SELECT
       FROM soe_closing_balances scb
         LEFT JOIN soe_blocks sb
           ON scb.block_id = sb.id
-      WHERE scb.deleted_at IS NULL
+      WHERE scb.deleted_at IS NULL AND sb.is_program=1
       AND scb.year > 0
       AND scb.month > 0)
     UNION
@@ -1135,7 +1135,7 @@ FROM (SELECT
 FROM mis_submissions ms
   LEFT JOIN soe_blocks sb
     ON ms.block_id = sb.id
-WHERE ms.deleted_at IS NULL
+WHERE ms.deleted_at IS NULL AND sb.is_program=1
 AND ms.year > 0
 AND ms.month > 0)
       ) sts
@@ -1348,7 +1348,7 @@ FROM (SELECT
       FROM soe_closing_balances scb
         LEFT JOIN soe_blocks sb
           ON scb.block_id = sb.id
-      WHERE scb.deleted_at IS NULL
+      WHERE scb.deleted_at IS NULL AND sb.is_program=1
       AND scb.year > 0
       AND scb.month > 0)
     UNION

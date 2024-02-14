@@ -309,7 +309,7 @@ class BudgetModel extends Model
         AND bp.fund_agency_id = ".$filter['fund_agency_id']."
         AND bp.district_id = ".$filter['district_id']."
         AND b.deleted_at IS NULL
-        AND bp.deleted_at IS NULL
+        AND bp.deleted_at IS NULL AND sb.is_program=1
         GROUP BY bp.block_id
         ORDER BY bp.block_id";
        //echo $sql;

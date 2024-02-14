@@ -96,5 +96,7 @@ class MprUpload extends AdminController
         return $this->response->setJSON($data);
     }
 
-   
+    public function status() {
+
+    }
 }

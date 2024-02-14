@@ -300,7 +300,7 @@ FROM ac_crop_practices acp
   b.name block,bgps.gps total_gps FROM soe_blocks b
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc
-                    WHERE cc.year_id=" . $filter['year_id'] .
+                    WHERE b.is_program=1 AND cc.year_id=" . $filter['year_id'] .
                 " AND cc.season='" . $filter['season'] . "'";
             if (!empty($filter['start_date'])) {
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date'] . "')";
@@ -562,7 +562,7 @@ FROM (SELECT
         if (!empty($filter['start_date'])) {
             $sql .= " AND DATE(start_date)=DATE('" . $filter['start_date'] . "')";
         }
-        $sql .= " GROUP BY gp_id) m LEFT JOIN soe_districts sd ON m.district_id = sd.id LEFT JOIN soe_blocks sb ON m.block_id=sb.id
+        $sql .= " GROUP BY gp_id) m LEFT JOIN soe_districts sd ON m.district_id = sd.id LEFT JOIN soe_blocks sb ON m.block_id=sb.id AND sb.is_program=1
   LEFT JOIN (WITH nur
       AS
       (SELECT

@@ -109,9 +109,9 @@ class DistrictModel extends Model
   sd.name
 FROM soe_blocks sb
   LEFT JOIN soe_districts sd
-    ON sb.district_id = sd.id";
+    ON sb.district_id = sd.id WHERE 1=1 AND sb.is_program=1";
         if($fund_agency_id){
-            $sql .= " WHERE sb.fund_agency_id = ".$fund_agency_id;
+            $sql .= " AND sb.fund_agency_id = ".$fund_agency_id;
         }
 $sql .= " GROUP BY sd.id";
 

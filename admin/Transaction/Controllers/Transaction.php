@@ -23,7 +23,6 @@ class Transaction extends AdminController
 {
 
     use TreeTrait;
-
     private $cells = [
         'month' => 'A1',
         'year' => 'B1',
@@ -42,7 +41,6 @@ class Transaction extends AdminController
 
     public function index()
     {
-
         $this->template->add_package(['datatable', 'uploader', 'jquery_loading'], true);
         $data = [];
         $data['months'] = getMonths();
@@ -489,7 +487,6 @@ class Transaction extends AdminController
 
     public function downloadTemplate()
     {
-
         $month_id = $this->request->getGet('month');
 
         $year = $this->request->getGet('year');
@@ -552,7 +549,6 @@ class Transaction extends AdminController
 
     protected function fillExcel(&$activesheet, $data)
     {
-
         $year = $data['year'];
         $month = $data['month'];
         $month_year = $data['month_year'];
@@ -666,7 +662,6 @@ class Transaction extends AdminController
 
     protected function fillComponents($components, &$row, &$activesheet)
     {
-
         $this->ob_phy = $this->ob_fin = $this->upto_phy = $this->upto_fin = 0;
 
         //row start
@@ -748,7 +743,6 @@ class Transaction extends AdminController
 
     public function add()
     {
-
         $txnModel = new TransactionModel();
         $txnCompModel = new TransactionComponentModel();
 
@@ -765,7 +759,8 @@ class Transaction extends AdminController
             $district_id = $this->user->district_id;
         }
 
-        $fund_agency_id = $this->user->fund_agency_id;
+        //add a default fund agency id
+        $fund_agency_id = $this->user->fund_agency_id ?: 0;
         if ($this->request->getGet('fund_agency_id')) {
             $fund_agency_id = $this->request->getGet('fund_agency_id');
         }
