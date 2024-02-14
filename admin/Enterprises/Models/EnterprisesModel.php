@@ -65,7 +65,7 @@ class EnterprisesModel extends Model
         e.purpose_infr_support,
         e.support_infr_amount,
         e.address,
-     date(e.created_at) created_at,
+        date(e.created_at) created_at,
         sd.name districts,
         sb.name blocks,
         v.name villages,
