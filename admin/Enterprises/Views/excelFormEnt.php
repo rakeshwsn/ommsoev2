@@ -1,36 +1,31 @@
-<style>
-    th {
-        text-align: center;
-        font-weight: bold;
-        background-color: #EFEF05;
-    }
-</style>
+
 
 <table class="table table-bordered">
-    <tr>
-        <td colspan="16" style="text-align: center; font-weight: bold; background-color:#EFA105">Enterprise Data</td>
-    </tr>
-    <tr>
-        <th>Slno </th>
-        <th>Unit Type</th>
-        <th>District</th>
-        <th>Block</th>
-        <th>GP</th>
-        <th>Village</th>
-        <th>Established Unit Budget Head </th>
-        <th>Addl. Support Provided for basic infra. creation</th>
-        <th>Type/Purpose of Addl. Infra. Support </th>
-        <th>Budget Head utilised for Addl. Infra Support</th>
-        <th>Type of Management Unit </th>
-        <th>Name of Managing Unit</th>
-        <th>Date of Establishment</th>
-        <th>Date of MoU</th>
-        <th>Name of Contact Person </th>
-        <th>Mobile Number</th>
+    <thead>
+        <tr>
+            <th colspan="16" style="text-align: center; font-weight: bold; background-color:#EFA105">Enterprise Data</th>
+        </tr>
+        <tr>
+            <th style=" font-weight: bold ;">Slno </th>
+            <th style=" font-weight: bold ;">Unit Type</th>
+            <th style=" font-weight: bold ;">District</th>
+            <th style=" font-weight: bold ;">Block</th>
+            <th style=" font-weight: bold ;">GP</th>
+            <th style=" font-weight: bold ;">Village</th>
+            <th style=" font-weight: bold ;">Established Unit Budget Head </th>
+            <th style=" font-weight: bold ;">Addl. Support Provided for basic infra. creation</th>
+            <th style=" font-weight: bold ;">Type/Purpose of Addl. Infra. Support </th>
+            <th style=" font-weight: bold ;">Budget Head utilised for Addl. Infra Support</th>
+            <th style=" font-weight: bold ;">Type of Management Unit </th>
+            <th style=" font-weight: bold ;">Name of Managing Unit</th>
+            <th style=" font-weight: bold ;">Date of Establishment</th>
+            <th style=" font-weight: bold ;">Date of MoU</th>
+            <th style=" font-weight: bold ;">Name of Contact Person </th>
+            <th style=" font-weight: bold ;">Mobile Number</th>
 
 
-    </tr>
-
+        </tr>
+    </thead>
     <tbody>
 
         <?php $slno = 0;
@@ -38,7 +33,7 @@
             $slno++ ?>
             <tr>
                 <td><?= $slno ?></td>
-                <td><?= $entdata['unit_name']?></td>
+                <td><?= $entdata['unit_name'] ?></td>
                 <td><?= $entdata['districts'] ?></td>
                 <td><?= $entdata['blocks'] ?></td>
                 <td><?= $entdata['gps'] ?></td>

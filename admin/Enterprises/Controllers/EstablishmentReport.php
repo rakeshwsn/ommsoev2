@@ -82,7 +82,7 @@ class EstablishmentReport extends AdminController
 		//Retrive data for gps if block_id present
 		if ($data['block_id']) {
 			$gpUnits = $this->enterprisesModel->gpwiseUnits($filter);
-
+			
 			$data['gpUnits'] = [];
 			foreach ($gpUnits as $gpunit) {
 				$_gp_units = [];
@@ -105,6 +105,7 @@ class EstablishmentReport extends AdminController
 					'g_units' => $_gp_units
 				];
 			}
+			
 			//unitwise total for all district --add new row as total
 			$total_units = $_gp_units = [];
 			$total = 0;

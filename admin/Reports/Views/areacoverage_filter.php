@@ -36,12 +36,13 @@
                         <select class="form-control" id="district" name="district_id">
                             <option value="">All Districts</option>
                             <?php foreach ($districts as $district) { ?>
-                                <option value="<?= $district['id'] ?>" <?php if ($district['id'] == $district_id) {
+                                <option value="<?= $district->id ?>" <?php if ($district->id == $district_id) {
                                       echo 'selected';
                                   } ?>>
-                                    <?= $district['name'] ?>
+                                    <?= $district->name ?>
                                 </option>
                             <?php } ?>
+
                         </select>
                     </div>
                     <div class="col-md-2">
@@ -49,10 +50,10 @@
                         <select class="form-control" id="block" name="block_id">
                             <option value="">All Blocks</option>
                             <?php foreach ($blocks as $block) { ?>
-                                <option value="<?= $block['id'] ?>" <?php if ($block['id'] == $block_id) {
+                                <option value="<?= $block->id ?>" <?php if ($block->id == $block_id) {
                                       echo 'selected';
                                   } ?>>
-                                    <?= $block['name']; ?>
+                                    <?= $block->name; ?>
                                 </option>
                             <?php } ?>
                         </select>
