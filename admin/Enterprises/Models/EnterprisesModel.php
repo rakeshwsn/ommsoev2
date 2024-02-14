@@ -79,7 +79,7 @@ class EnterprisesModel extends Model
         LEFT JOIN villages v ON v.id = e.village_id
         LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
         LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
-        WHERE e.deleted_at IS NULL AND sb.is_program=1";
+        WHERE e.deleted_at IS NULL ";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -121,7 +121,7 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
-        //echo $sql;
+        // echo $sql;
         return $this->db->query($sql)->getResult();
     }
 

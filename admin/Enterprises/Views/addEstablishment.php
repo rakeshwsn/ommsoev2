@@ -38,11 +38,28 @@ $validation = \Config\Services::validation();
                 <div class="row">
                     <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
                         <label for="gp_id">GP<span class="text-danger"></span></label>
-                        <?php echo form_dropdown('gp_id', option_array_value($gps, 'id', 'name', array('0' => 'Select GP')), set_value('gp_id', $gp_id), "id='gps' class='form-control js-select2'"); ?>
+                        <div class="input-group">
+                            <?php
+                            echo form_dropdown(
+                                'gp_id',
+                                option_array_value($gps, 'id', 'name', array('0' => 'Select GP')),
+                                set_value('gp_id', $gp_id),
+                                "id='gps' class='form-control js-select2'"
+                            ); ?>
+                            <div class="input-group-append">
+                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                         <label for="village_id">Village<span class="text-danger"></span></label>
-                        <?php echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
+                        <div class="input-group">
+                            <?php
+                            echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
+                            <div class="input-group-append">
+                                <a href="<?= $add_village_url ?>" class="btn btn-sm btn-secondary" id="btn-add-village">Add Village</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-6 form-group">
                         <label for="address">Address<span class="text-danger"></span></label>
@@ -54,7 +71,7 @@ $validation = \Config\Services::validation();
 
             </div>
         </div>
-       
+
 
 
         <div class="dotted-border mx-4 my-4 pd-3">
@@ -436,7 +453,7 @@ $validation = \Config\Services::validation();
             }
         });
         // initial state
-     
+
 
         //hide and show center info
 
@@ -666,12 +683,12 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
-              
+
                 address: {
                     required: function(element) {
                         return $("#blocks").is("not :selected");
                     },
-                   
+
                 },
                 contact_person: {
                     required: true,
