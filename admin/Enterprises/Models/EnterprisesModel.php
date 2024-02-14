@@ -64,7 +64,8 @@ class EnterprisesModel extends Model
         e.is_support_basis_infr,
         e.purpose_infr_support,
         e.support_infr_amount,
-        date(e.created_at) created_at,
+        e.address,
+     date(e.created_at) created_at,
         sd.name districts,
         sb.name blocks,
         v.name villages,
@@ -79,8 +80,6 @@ class EnterprisesModel extends Model
         LEFT JOIN soe_grampanchayats sg  ON sg.id = e.gp_id
         LEFT JOIN enterprises_units eu ON eu.id = e.unit_id
         WHERE e.deleted_at IS NULL AND sb.is_program=1";
-
-
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id = " . $filter['district_id'];
@@ -290,7 +289,8 @@ class EnterprisesModel extends Model
         eu.name unit,
         sb.id block_id,
         sb.name block,
-        sb.district_id
+        sb.district_id,
+        sb.is_program
       FROM soe_blocks sb
         CROSS JOIN (SELECT * FROM enterprises_units WHERE deleted_at IS NULL) eu) blkunit
         LEFT JOIN (SELECT
@@ -306,7 +306,7 @@ class EnterprisesModel extends Model
           ON DATE(e.date_estd) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
-      WHERE e.deleted_at IS NULL AND sb.is_program=1";
+      WHERE e.deleted_at IS NULL";
         if (!empty($filter['year_id'])) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
@@ -331,14 +331,15 @@ class EnterprisesModel extends Model
         $sql .= " GROUP BY e.unit_id,
                e.block_id) res
       ON blkunit.block_id = res.block_id
-      AND blkunit.unit_id = res.unit_id";
+      AND blkunit.unit_id = res.unit_id
+      and blkunit.is_program = 1";
 
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];
         }
 
         $sql .= " ORDER BY unit_id, block";
-    //   echo $sql;exit;
+      //echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -370,7 +371,7 @@ class EnterprisesModel extends Model
       eu.name unit
      FROM (SELECT
         *
-      FROM grampanchayat
+      FROM soe_grampanchayats
      ) gp
       CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL) gpunits
      LEFT JOIN (SELECT
