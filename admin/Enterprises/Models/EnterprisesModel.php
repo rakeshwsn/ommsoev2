@@ -245,13 +245,13 @@ class EnterprisesModel extends Model
         }
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id, e.district_id
@@ -319,13 +319,13 @@ class EnterprisesModel extends Model
 
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id,
@@ -339,7 +339,7 @@ class EnterprisesModel extends Model
         }
 
         $sql .= " ORDER BY unit_id, block";
-      //echo $sql;exit;
+    //   echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -399,13 +399,13 @@ class EnterprisesModel extends Model
         }
         if (!empty($filter['unit_type'])) {
             if ($filter['unit_type'] == 'without_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.date_estd IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NULL) ";
             }
             if ($filter['unit_type'] == 'without_mou_date') {
-                $sql .= " AND (YEAR(e.date_estd) < 2000 OR e.mou_date IS NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.mou_date IS NULL) ";
             }
             if ($filter['unit_type'] == 'only_establishment_date') {
-                $sql .= " AND (YEAR(e.date_estd) > 2000 OR e.date_estd IS NOT NULL) ";
+                $sql .= " AND (YEAR(e.date_estd) = 1 OR e.date_estd IS NOT NULL) ";
             }
         }
         $sql .= " GROUP BY e.unit_id,
