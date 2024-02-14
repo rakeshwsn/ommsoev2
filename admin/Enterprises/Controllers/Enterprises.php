@@ -150,7 +150,7 @@ class Enterprises extends AdminController
         $data['datatable_url'] = admin_url('enterprises/search');
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
-
+// dd($data);
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
 
@@ -237,6 +237,7 @@ class Enterprises extends AdminController
             $filter['doeyear'] = $this->request->getGet('doeyear');
         }
         $filteredData =  $this->enterprisesModel->getTotals($filter);
+    
         return $filteredData;
     }
     public function download()
@@ -351,6 +352,7 @@ class Enterprises extends AdminController
                 'own_share' => $this->request->getPost('own_share'),
                 'center_type' => $this->request->getPost('center_type'),
                 'main_center_id' => $this->request->getPost('main_center_id'),
+                'address' => $this->request->getPost('address'),
 
 
             ];
@@ -427,6 +429,7 @@ class Enterprises extends AdminController
                 'own_share' => $this->request->getPost('own_share'),
                 'center_type' => $this->request->getPost('center_type'),
                 'main_center_id' => $this->request->getPost('main_center_id'),
+                'address' => $this->request->getPost('address'),
 
             ];
             // dd($enterprisesdata);
