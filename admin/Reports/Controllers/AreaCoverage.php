@@ -16,6 +16,8 @@ class AreaCoverage extends AdminController
     private $districtModel;
     private $acModel;
     private $cropsModel;
+    private $blockModel;
+    private $yearModel;
     public $statuses = ['Uploaded', 'Approved', 'Rejected', 'Not Uploaded', 'Not Required'];
     public $colors_ac = [
         'warning',
@@ -29,68 +31,78 @@ class AreaCoverage extends AdminController
         $this->districtModel = new DistrictModel();
         $this->acModel = new AreaCoverageModel();
         $this->cropsModel = new CropsModel();
+        $this->blockModel = new BlockModel();
+        $this->yearModel = new YearModel();
     }
 
     public function index($action = '')
     {
-
         $data = [];
         $data['title'] = 'Area Coverage Report';
         $data['years'] = getAllYears();
         $data['seasons'] = $this->acModel->getSeasons();
-        $data['current_season'] = strtolower(getCurrentSeason());
-        $data['year_id'] = getCurrentYearId();
+        $dates = $this->acModel->getWeekDate();
+        $data['districts'] = $this->districtModel->getAll();
 
         if ($this->request->getGet('year_id')) {
             $data['year_id'] = $this->request->getGet('year_id');
+        } else {
+            $data['year_id'] = getCurrentYearId();
         }
         if ($this->request->getGet('season')) {
-            $data['current_season'] = $this->request->getGet('season');
+            $data['current_season'] = $season = $this->request->getGet('season');
+        } else {
+            $data['current_season'] = strtolower(getCurrentSeason());
         }
         $data['district_id'] = '';
         if ($this->request->getGet('district_id')) {
             $data['district_id'] = $this->request->getGet('district_id');
+        } else {
+            $data['district_id'] = $this->user->district_id;
         }
-
+        $data['blocks'] = [];
+        if ($data['district_id']) {
+            $data['blocks'] = $this->blockModel->getAll(['district_id' => $data['district_id']]);
+        }
         $data['block_id'] = '';
         if ($this->request->getGet('block_id')) {
             $data['block_id'] = $this->request->getGet('block_id');
+        } else {
+            $data['block_id'] = $this->user->block_id;
         }
-
-        $dates = $this->acModel->getWeekDate();
-
         $data['start_date'] = '';
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $this->request->getGet('start_date');
         }
 
+        // $data['district_id'] = $this->user->district_id;
+
+        // if ($data['block_id']) {
+        //     $filter['block_id'] = $data['block_id'];
+        // } else if ($data['district_id']) {
+        //     $filter['district_id'] = $data['district_id'];
+        // }
+
+        // printr($data['districts']);
+        // exit;
+        // if ($this->user->block_id) {
+        //     $data['block_id'] =  $this->user->block_id;
+        //     $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
+        // } else if ($this->user->district_id) {
+        //     $data['district_id'] = $filter['district_id'] = $this->user->district_id;
+        //     $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
+        // } else {
+        //     $data['districts'] = (new DistrictModel())->orderBy('name')->asArray()->find();
+        // }
+        // echo $data['district_id'];
+        // exit;
         $filter = [
             'year_id' => $data['year_id'],
             'season' => $data['current_season'],
-            'start_date' => $data['start_date']
+            'start_date' => $data['start_date'],
+            'district_id' => $data['district_id'],
+            'block_id' => $data['block_id'],
         ];
-
-
-        $data['district_id'] = $this->user->district_id;
-
-        if ($data['block_id']) {
-            $filter['block_id'] = $data['block_id'];
-        } else if ($data['district_id']) {
-            $filter['district_id'] = $data['district_id'];
-        }
-
-        if ($this->user->block_id) {
-            $data['block_id'] = $filter['block_id'] = $this->user->block_id;
-            $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
-        } else if ($this->user->district_id) {
-            $data['district_id'] = $filter['district_id'] = $this->user->district_id;
-            $data['districts'] = (new DistrictModel())->where('id', $this->user->district_id)->asArray()->find();
-        } else {
-            $data['districts'] = (new DistrictModel())->orderBy('name')->asArray()->find();
-        }
-        // echo $data['district_id'];
-        // exit;
-
         $blocks = $this->acModel->getAreaCoverageReport($filter);
         // printr($blocks);
         // exit;
@@ -110,14 +122,10 @@ class AreaCoverage extends AdminController
             $data['crops'][$crop->id] = $crop->crops;
         }
 
-        $data['blocks'] = [];
-        if ($data['district_id']) {
-            $data['blocks'] = (new BlockModel())->where('district_id', $data['district_id'])
-                ->orderBy('name')->asArray()->findAll();
-        }
+
 
         if ($action == 'download') {
-            $data['fin_year'] = (new YearModel())->find($data['year_id'])->name;
+            $data['fin_year'] = $this->yearModel->find($data['year_id'])->name;
             $data['table'] = view('Admin\Reports\Views\areacoverage_table', $data);
             $filename = 'AreaCoverageReport_' . $data['current_season'] . '_' . $data['fin_year'] . '_' . date('Y-m-d His') . '.xlsx';
 
@@ -155,10 +163,10 @@ class AreaCoverage extends AdminController
 
             exit;
         }
-
-        $weeks = $this->acModel->getWeeks();
-        // printr($weeks);
+        // echo $season;
         // exit;
+        $weeks = $this->acModel->getWeeks();
+
         $data['weeks'][0] = 'All Weeks';
         $week_text = '';
         foreach ($weeks as $week) {
@@ -171,6 +179,8 @@ class AreaCoverage extends AdminController
                 $week_text = date('d F', strtotime($week['start_date'])) . '-' . date('d F', strtotime($week['end_date']));
             }
         }
+        // printr($weeks);
+        // exit;
 
         $data['week_start_date'] = $data['start_date'];
 
