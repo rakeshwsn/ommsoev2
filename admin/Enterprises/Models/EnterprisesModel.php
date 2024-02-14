@@ -419,7 +419,7 @@ class EnterprisesModel extends Model
         return $this->db->query($sql)->getResult();
     }
 
-    public function getMainCenters($district_id, $block_id = '', $unit_id)
+    public function getMainCenters($district_id, $unit_id,$block_id = '',)
     {
         $sql = "SELECT
       e.id ent_id,
