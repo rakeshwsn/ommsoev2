@@ -70,11 +70,11 @@ class UserModel extends Model
 FROM user u
   LEFT JOIN soe_districts d
     ON d.id = u.district_id
-  LEFT JOIN soe_blocks b
+  LEFT JOIN (SELECT * FROM soe_blocks WHERE is_program=1) b
     ON b.id = u.block_id
   LEFT JOIN user_group ug
     ON ug.id = u.user_group_id
-WHERE  u.deleted_at IS NULL AND b.is_program=1";
+WHERE  u.deleted_at IS NULL";
 
         if (!empty($filter['filter_search'])) {
             $sql .= " AND (concat_ws(' ', u.firstname, u.lastname) LIKE '%{$filter['filter_search']}%'
@@ -122,11 +122,11 @@ WHERE  u.deleted_at IS NULL AND b.is_program=1";
             FROM user u
               LEFT JOIN soe_districts d
                 ON d.id = u.district_id
-              LEFT JOIN soe_blocks b
+              LEFT JOIN (SELECT * FROM soe_blocks WHERE is_program=1) b
                 ON b.id = u.block_id
               LEFT JOIN user_group ug
                 ON ug.id = u.user_group_id
-            WHERE user_group_id != 1 AND u.deleted_at IS NULL AND b.is_program=1";
+            WHERE user_group_id != 1 AND u.deleted_at IS NULL";
 
         if (!empty($filter['filter_search'])) {
             $sql .= " AND (concat_ws(' ', u.firstname, u.lastname) LIKE '%{$filter['filter_search']}%'

@@ -6,50 +6,51 @@ use CodeIgniter\Model;
 
 class DistrictModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'soe_districts';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
-	protected $useSoftDeletes       = false;
-	protected $protectFields        = false;
-	protected $allowedFields        = [];
+    protected $DBGroup = 'default';
+    protected $table = 'soe_districts';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $insertID = 0;
+    protected $returnType = 'object';
+    protected $useSoftDeletes = false;
+    protected $protectFields = false;
+    protected $allowedFields = [];
 
-	// Dates
-	protected $useTimestamps        = false;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+    // Dates
+    protected $useTimestamps = false;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
-	// Validation
-	// Validation
-	protected $validationRules      = [
-		
-		'name' => array(
-			'label' => 'Name', 
-			'rules' => "trim|required|max_length[255]"
-		)
-	];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
-	protected $cleanValidationRules = true;
+    // Validation
+    // Validation
+    protected $validationRules = [
 
-	// Callbacks
-	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = [];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = [];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+        'name' => array(
+            'label' => 'Name',
+            'rules' => "trim|required|max_length[255]"
+        )
+    ];
+    protected $validationMessages = [];
+    protected $skipValidation = false;
+    protected $cleanValidationRules = true;
 
-    public function getAll($data = array()){
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
+
+    public function getAll($data = array())
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
 
         $builder->select("*");
 
@@ -74,7 +75,7 @@ class DistrictModel extends Model
             if ($data['limit'] < 1) {
                 $data['limit'] = 10;
             }
-            $builder->limit((int)$data['limit'],(int)$data['start']);
+            $builder->limit((int) $data['limit'], (int) $data['start']);
         }
         //$builder->where($this->deletedField, null);
 
@@ -83,42 +84,47 @@ class DistrictModel extends Model
         return $res;
     }
 
-    public function getTotals($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getTotals($data = array())
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
         $count = $builder->countAllResults();
         return $count;
     }
 
-    private function filter($builder,$data){
+    private function filter($builder, $data)
+    {
 
         if (!empty($data['filter_search'])) {
-            $builder->where("
+            $builder->where(
+                "
 				name LIKE '%{$data['filter_search']}%'"
             );
         }
         if (!empty($data['filter_district'])) {
-            $builder->where("id",$data['filter_district']);
+            $builder->where("id", $data['filter_district']);
         }
 
     }
 
-    public function getDistrictsByFundAgency($fund_agency_id=null) {
+    public function getDistrictsByFundAgency($fund_agency_id = null)
+    {
         $sql = "SELECT
   sd.id,
   sd.name
 FROM soe_blocks sb
   LEFT JOIN soe_districts sd
     ON sb.district_id = sd.id WHERE 1=1 AND sb.is_program=1";
-        if($fund_agency_id){
-            $sql .= " AND sb.fund_agency_id = ".$fund_agency_id;
+        if ($fund_agency_id) {
+            $sql .= " AND sb.fund_agency_id = " . $fund_agency_id;
         }
-$sql .= " GROUP BY sd.id";
+        $sql .= " GROUP BY sd.id";
 
         return $this->db->query($sql)->getResultArray();
     }
 
-    public function getNewDistricts() {
+    public function getNewDistricts()
+    {
         return $this->db->query('SELECT
   sb.district_id,
   phase

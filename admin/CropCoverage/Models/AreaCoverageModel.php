@@ -232,8 +232,7 @@ FROM ac_crop_practices acp
         // print_r($dates);
         // exit;
         $start = $dates['start_date'];
-        // print_r($start);
-        // exit;
+
         $end = $dates['end_date'];
 
         $week_start = $this->settings->start_week;
@@ -253,7 +252,6 @@ FROM ac_crop_practices acp
                     'end_date' => min($start->modify('+6 days'), $end)->format('Y-m-d')
                 ];
             }
-
             $start->modify('+1 day');
         }
         // printr($output);
@@ -621,6 +619,8 @@ ORDER BY sd.name ASC,sb.name ASC, m.gp ASC";
 
     public function getAllDistrictsNew($filter = [])
     {
+        // print_r($filter);
+        // exit;
         $sql = "SELECT
   bgp.district_id,
   bgp.district,

@@ -114,7 +114,7 @@ class Enterprises extends AdminController
             foreach ($years as $year) {
                 $data['years'][$year->year] = $year->year;
             }
-        } elseif($this->request->getGet('district_id')) {
+        } elseif ($this->request->getGet('district_id')) {
             $district_id = $this->request->getGet('district_id');
             $years =  $this->enterprisesModel->where('district_id', $district_id)->yearWise($district_id);
             $data['district_id'] = $this->request->getGet('district_id');
@@ -150,7 +150,7 @@ class Enterprises extends AdminController
         $data['datatable_url'] = admin_url('enterprises/search');
 
         $data['excel_link'] = admin_url('enterprises/exceldownld');
-// dd($data);
+        // dd($data);
         return $this->template->view('Admin\Enterprises\Views\enterprise_index', $data);
     }
 
@@ -244,6 +244,7 @@ class Enterprises extends AdminController
     {
 
         $filteredData = $this->filter();
+
         $worksheet_unit = [];
         $data['entdatas'] = [];
         foreach ($filteredData as $row) {
@@ -265,6 +266,7 @@ class Enterprises extends AdminController
                 'contact_mobile' => $row->contact_mobile,
             ];
         }
+
         $filename = 'Enterprise-Establishment' . '.xlsx';
         $sheetindex = 0;
         $reader = new Html();
@@ -272,7 +274,7 @@ class Enterprises extends AdminController
         $spreadsheet = new Spreadsheet();
 
         $htmltable = view('Admin\Enterprises\Views\excelFormEnt', $data);
-
+// echo $htmltable;exit;
         $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
         $worksheet = $spreadsheet->createSheet($sheetindex);
@@ -306,8 +308,13 @@ class Enterprises extends AdminController
 
         // Iterate through each column and set auto-size
         for ($col = 'A'; $col <= $highestColumn; $col++) {
-            $worksheet->getColumnDimension($col)->setAutoSize(true);
+            // $worksheet->getColumnDimension($col)->setAutoSize(true);
+
+                $worksheet->getStyle('A1:' . $highestColumn . $worksheet->getHighestRow())
+          ->getAlignment()->setWrapText(true);
+
         }
+
 
         //remove the default worksheet
         $spreadsheet->removeSheetByIndex(
