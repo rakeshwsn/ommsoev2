@@ -36,6 +36,7 @@
                     <div class="col-lg-3">
                         <div class="form-group mg-b-10-force">
                             <label class="form-control-label">Districts: <span class="tx-danger">*</span></label>
+
                             <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $id ?? ''), "id='filter_district' class='form-control js-select2'"); ?>
 
 

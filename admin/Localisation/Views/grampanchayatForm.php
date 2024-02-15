@@ -3,7 +3,7 @@ $validation = \Config\Services::validation();
 ?>
 
 <?= form_open_multipart('', 'id="form-grampanchayat"'); ?>
-<input type="hidden" name="id" value="<?=$id?>">
+<input type="hidden" name="id" value="<?= $id ?>">
 <div class="row">
     <div class="col-xl-12">
 
@@ -21,7 +21,7 @@ $validation = \Config\Services::validation();
             <div class="block-content">
                 <div class="form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                     <label for="code">District</label>
-                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), "id='district_id' class='form-control js-select2'"); ?>
+                    <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), "id='district_id' class='form-control js-select2'" . ($district_id ? " disabled" : "")); ?>
                     <div class="invalid-feedback animated fadeInDown">
                         <?= $validation->getError('district'); ?>
                     </div>
@@ -29,7 +29,7 @@ $validation = \Config\Services::validation();
                 </div>
                 <div class="form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                     <label for="code">Block</label>
-                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), "id='block_id' class='form-control js-select2'"); ?>
+                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), "id='block_id' class='form-control js-select2'" . ($block_id ? " disabled" : "")); ?>
                     <div class="invalid-feedback animated fadeInDown">
                         <?= $validation->getError('block_id'); ?>
                     </div>
@@ -47,7 +47,6 @@ $validation = \Config\Services::validation();
     </div>
 </div>
 <?= form_close(); ?>
-<?php js_start(); ?>
 <script type="text/javascript">
 
     $(document).ready(function () {
@@ -87,8 +86,4 @@ $validation = \Config\Services::validation();
             });
         });
     });
-
-
-
 </script>
-<?php js_end(); ?>
