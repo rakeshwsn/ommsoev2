@@ -418,7 +418,7 @@ class EnterprisesModel extends Model
         }
         $sql .= " ORDER BY unit_id, gp";
 
-        // echo $sql;exit;
+         echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 

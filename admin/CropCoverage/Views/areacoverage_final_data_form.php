@@ -69,7 +69,10 @@
                          <span><a href="<?= base_url('uploads/finaldatadoc/' . $filename); ?>"><?php echo  $filename; ?></a></span>
                     <div class="status"></div>
                 </form>
+                
             </div>
+                    <p class='text-danger'style='font-size:15px'>Please Upload First The Document Of This Block </p>
+
         <?php  }else{     ?>
             <div class="col-md-2" style="display: none;">
                 <form class="dm-uploader" id="uploader">
@@ -88,6 +91,7 @@
             </div>
         </div>
     </div>
+  <?php if($block_id){ ?>   
     <div class="tableFixHead">
             <table class="table custom-table " id="final-table">
                 <thead>
@@ -177,7 +181,7 @@
                             <td>
                                 <p id="total_non_ragi_<?= $gpdata['gp_id'] ?>" class="sum-input-total-non-ragi"></p>
                             </td>
-                             <td>
+                            <td>
                                 <input type="number" name="area[<?= $gpdata['gp_id'] ?>][farmers_covered_under_followup]"
                                     id="farmers_followup_<?= $gpdata['gp_id'] ?>"
                                     value="<?= $gpdata['farmers_covered_under_followup']; ?>"
@@ -267,6 +271,7 @@
         </div>
     </div>
 </div>
+ <?php }else{ echo "<p class='text-danger'style='font-size:20px'>Please Select Block First And Then Click On Filter Button</p>";} ?>
 <script>
     function validatePositiveInteger(input, maxLength) {
         // Remove non-numeric characters (except ".") from the input

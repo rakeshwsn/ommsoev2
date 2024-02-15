@@ -231,8 +231,9 @@ class District extends AdminController
 		}
 
 		$blocks = $blockModel->where($filter)->findAll();
+
 		// printr($blocks);
-		// exit;
+//		 exit;
 		return $this->respond($blocks);
 	}
 

@@ -46,11 +46,28 @@ class BlockModel extends Model
 	protected $afterInsert = [];
 	protected $beforeUpdate = [];
 	protected $afterUpdate = [];
-	protected $beforeFind = [];
+	protected $beforeFind = ['setIsProgram'];
 	protected $afterFind = [];
 	protected $beforeDelete = [];
 	protected $afterDelete = [];
 
+    protected $isProgram = 1;
+    //Filter is_program=1 by default
+    protected function setIsProgram($data){
+        if($this->isProgram !== null){
+            $this->where('is_program', $this->isProgram);
+        }
+    }
+
+    public function nonProgramOnly(){
+        $this->isProgram = 0;
+        return $this;
+    }
+
+    public function withNonProgram(){
+        $this->isProgram = null;
+        return $this;
+    }
 
 	public function getAll($data = array())
 	{
@@ -118,7 +135,6 @@ class BlockModel extends Model
 
 	protected function getBlockCode(array $data)
 	{
-
 		$builder = $this->db->table("{$this->table} b");
 		$builder->select("b.code");
 		$builder->where("b.district_id  = '" . $data['data']['district_id'] . "'");
