@@ -298,13 +298,13 @@ FROM ac_crop_practices acp
   b.name block,bgps.gps total_gps FROM soe_blocks b
   LEFT JOIN (SELECT * FROM vw_blockwise_gps) bgps ON bgps.block_id=b.id
   LEFT JOIN (SELECT * FROM vw_area_coverage_blockwise cc
-                    WHERE b.is_program=1 AND cc.year_id=" . $filter['year_id'] .
+                    WHERE cc.year_id=" . $filter['year_id'] .
                 " AND cc.season='" . $filter['season'] . "'";
             if (!empty($filter['start_date'])) {
                 $sql .= " AND DATE(cc.start_date)=date('" . $filter['start_date'] . "')";
             }
             $sql .= ") ac ON ac.block_id=b.id
-                WHERE b.district_id=" . $filter['district_id'];
+                WHERE b.is_program=1 AND b.district_id=" . $filter['district_id'];
             $sql .= " ORDER BY date(ac.start_date) DESC,b.name ASC";
 
         } else {

@@ -891,6 +891,7 @@ class AreaCoverage extends AdminController
 
     public function getUploadStatus()
     {
+
         $data = [];
 
 
@@ -963,7 +964,8 @@ class AreaCoverage extends AdminController
 
         $data = [];
         $data['districts'] = $this->districtModel->getAll();
-
+        // printr($data['districts']);
+        // exit;
         $this->template->add_package(array('datatable', 'select2'), true);
 
 
