@@ -243,10 +243,8 @@ class Enterprises extends AdminController
     }
     public function download()
     {
-
         $filteredData = $this->filter();
 
-        $worksheet_unit = [];
         $data['entdatas'] = [];
         foreach ($filteredData as $row) {
             $data['entdatas'][] = [
