@@ -65,6 +65,7 @@ class EnterprisesModel extends Model
         e.purpose_infr_support,
         e.support_infr_amount,
         e.address,
+        e.pincode,
         date(e.created_at) created_at,
         sd.name districts,
         sb.name blocks,
@@ -121,7 +122,6 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
-        // echo $sql;
         return $this->db->query($sql)->getResult();
     }
 
@@ -141,7 +141,7 @@ class EnterprisesModel extends Model
         $builder->where('e.deleted_at IS  NULL');
 
         $count = $builder->countAllResults();
-        //echo $this->db->getLastQuery();exit;
+      
 
         return $count;
     }
@@ -163,20 +163,21 @@ class EnterprisesModel extends Model
             $builder->where("e.unit_id  = '" . $data['unit_id'] . "'");
         }
         if (!empty($data['doeyear'])) {
-            $builder->where("e.date_estd  = '" . $data['doeyear'] . "'");
+            $builder->where("YEAR(e.date_estd) = '" . $data['doeyear'] . "'");
         }
         if (!empty($data['management_unit_type'])) {
             $builder->where("e.management_unit_type  = '" . $data['management_unit_type'] . "'");
         }
+        //add to filter
+        // $builder->where("sb.is_program  = 1");
 
         if (!empty($data['filter_search'])) {
-            $builder->where("sb.is_program=1 AND
+            $builder->where("
 				sb.name LIKE '%{$data['filter_search']}%' OR
 				sb.id = '{$data['filter_search']}'
 			");
         }
 
-        //echo $this->db->getLastQuery();exit;
     }
 
     public function yearWise($district_id)

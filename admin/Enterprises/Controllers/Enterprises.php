@@ -159,6 +159,7 @@ class Enterprises extends AdminController
 
         $requestData = $_REQUEST;
         $totalData = $this->enterprisesModel->getTotals();
+       
         $totalFiltered = $totalData;
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
@@ -174,7 +175,7 @@ class Enterprises extends AdminController
         );
 
         $totalFiltered = $this->enterprisesModel->getTotals($filter_data);
-
+        // printr($totalFiltered);exit;
         $filteredData = $this->enterprisesModel->getAll($filter_data);
 
         $datatable = array();
@@ -189,7 +190,7 @@ class Enterprises extends AdminController
                 $result->districts,
                 $result->blocks,
                 $result->gps,
-                $result->villages,
+                // $result->villages,
                 $result->unit_name,
                 $result->management_unit_type,
                 $result->managing_unit_name,
@@ -274,7 +275,7 @@ class Enterprises extends AdminController
         $spreadsheet = new Spreadsheet();
 
         $htmltable = view('Admin\Enterprises\Views\excelFormEnt', $data);
-// echo $htmltable;exit;
+
         $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
         $worksheet = $spreadsheet->createSheet($sheetindex);
@@ -360,6 +361,7 @@ class Enterprises extends AdminController
                 'center_type' => $this->request->getPost('center_type'),
                 'main_center_id' => $this->request->getPost('main_center_id'),
                 'address' => $this->request->getPost('address'),
+                'pincode' => $this->request->getPost('pincode'),
 
 
             ];
@@ -437,6 +439,7 @@ class Enterprises extends AdminController
                 'center_type' => $this->request->getPost('center_type'),
                 'main_center_id' => $this->request->getPost('main_center_id'),
                 'address' => $this->request->getPost('address'),
+                'pincode' => $this->request->getPost('pincode'),
 
             ];
             // dd($enterprisesdata);
