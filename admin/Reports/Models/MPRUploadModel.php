@@ -93,6 +93,7 @@ class MPRUploadModel extends Model {
                 AND month = '".$filter['month_id']."'
                 AND deleted_at IS NULL) smu
                 ON sd.id = smu.district_id";
+//        echo $sql;exit;
         return $this->db->query($sql)->getResult();  
     }
 }
