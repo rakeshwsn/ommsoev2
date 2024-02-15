@@ -69,7 +69,10 @@
                          <span><a href="<?= base_url('uploads/finaldatadoc/' . $filename); ?>"><?php echo  $filename; ?></a></span>
                     <div class="status"></div>
                 </form>
+                
             </div>
+                    <p class='text-danger'style='font-size:15px'>Please Upload First The Document Of This Block </p>
+
         <?php  }else{     ?>
             <div class="col-md-2" style="display: none;">
                 <form class="dm-uploader" id="uploader">
