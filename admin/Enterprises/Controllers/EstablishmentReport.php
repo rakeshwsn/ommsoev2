@@ -9,6 +9,7 @@ use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Dashboard\Models\YearModel;
 use App\Controllers\AdminController;
+use Config\ExcelStyles;
 use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
@@ -214,8 +215,6 @@ class EstablishmentReport extends AdminController
 			];
 		}
 
-
-
 		$data['unit_names'] = (new EnterprisesUnitModel)->orderBy('id')->findAll();
 
 		$data['download_excel_url'] = admin_url('enterprises/report?request=download_excel') . '&' . http_build_query($filter);
@@ -258,6 +257,8 @@ class EstablishmentReport extends AdminController
 			} elseif ($request == 'download_pdf') {
 
 				$filename = 'Enterprise Establishment Report.pdf';
+
+				// $spreadsheet->getStyle('A1:D4')->applyFromArray(ExcelStyles::border());
 
 				// Provide the download link for the generated PDF file
 				header('Content-Type: application/pdf');

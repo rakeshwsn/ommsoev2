@@ -64,27 +64,27 @@
         <?php if ($block_id) { ?>
             <?php foreach ($gpUnits as $gpUnit) : ?>
                 <tr>
-                    <td><?= $gpUnit['gp'] ?></td>
+                    <td style="border: 1px solid black;"><?= $gpUnit['gp'] ?></td>
                     <?php foreach ($gpUnit['g_units'] as $gunit) : ?>
-                        <td><?= $gunit ?></td>
+                        <td style="border: 1px solid black;"><?= $gunit ?></td>
                     <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
         <?php } else if ($district_id) { ?>
             <?php foreach ($blockUnits as $blockUnit) : ?>
                 <tr>
-                    <td><?= $blockUnit['block'] ?></td>
+                    <td style="border: 1px solid black;"><?= $blockUnit['block'] ?></td>
                     <?php foreach ($blockUnit['b_units'] as $bunit) : ?>
-                        <td><?= $bunit ?></td>
+                        <td style="border: 1px solid black;"><?= $bunit ?></td>
                     <?php endforeach; ?>
                 </tr>
             <?php endforeach; ?>
         <?php } else { ?>
             <?php foreach ($units as $unit) : ?>
                 <tr>
-                    <td><?= $unit['district'] ?></td>
+                    <td style="border: 1px solid black;"><?= $unit['district'] ?></td>
                     <?php foreach ($unit['units'] as $eunit) : ?>
-                        <td><?= $eunit ?></td>
+                        <td style="border: 1px solid black;"><?= $eunit ?></td>
                     <?php endforeach; ?>
 
                 </tr>
