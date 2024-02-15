@@ -791,7 +791,7 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
-        //LGD 
+        //LGD
         if ($this->user->hasPermission("LGD Block")) {
             $localisation[] = [
                 "name" => lang("LGD Block"),
@@ -913,6 +913,8 @@ class Leftbar extends AdminController
                 "children" => $system,
             ];
         }
+
+        $data['current_uri'] = base_url(uri_string());
 
         return view("Admin\Common\Views\leftbar", $data);
     }

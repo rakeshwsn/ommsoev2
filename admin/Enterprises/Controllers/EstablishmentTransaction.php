@@ -46,7 +46,6 @@ class EstablishmentTransaction extends AdminController
         $this->entUnitGrpModel = new EnterpriseUnitGroup();
         $this->entunitModel = new EnterprisesUnitModel();
         $this->enterprisesModel = new EnterprisesModel();
-
     }
     private $columns = [
         'Machinary' => [
@@ -138,47 +137,97 @@ class EstablishmentTransaction extends AdminController
         if ($this->request->getGet('period')) {
             $data['period'] = $this->request->getGet('period');
         }
-        $filter = [];
 
-        if ($data['year_id'] > 0) {
-            $filter['year_id'] = $data['year_id'];
-        }
 
-        if ($data['district_id'] > 0) {
-            $filter['district_id'] = $data['district_id'];
-        }
 
-        if ($data['month_id'] > 0) {
-            $filter['month_id'] = $data['month_id'];
-        }
-        if ($data['unit_id'] > 0) {
-            $filter['unit_id'] = $data['unit_id'];
-        }
-        if ($data['period'] > 0) {
-            $filter['period'] = $data['period'];
-        }
-        $ent_trans = $this->establishmentTxnsDtls->periodswisetrans($filter);
         $data['trans'] = [];
 
-        foreach ($ent_trans as $row) {
-            $data['trans'][] = [
-                'units' => $row->unit_name,
-                'period' => $row->period,
-                'month' => $row->month_name,
-                'districts' => $row->district_name,
-                'blocks' => $row->block_name,
-                'gp' => $row->gp_name,
-                'villages' => $row->village_name,
-                'years' => $row->year_name,
-                'created_at' => ymdToDmy($row->created_at),
-                'edit_url' => admin_url('enterprisestrans/edit?id=' . $row->est_id),
 
-            ];
-        }
+        $data['datatable_url'] = admin_url('enterprisestrans/search');
+
         $data['excel_link'] = admin_url('enterprisestrans/download');
         $data['upload_url'] = admin_url('enterprisestrans/upload');
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
+    }
+    public function search()
+    {
+
+        $requestData = $_REQUEST;
+        $totalData = $this->establishmentTxnsDtls->getTotals();
+        $totalFiltered = $totalData;
+        // This array use for filter data 
+        $filter_data = array(
+            'filter_search' => $requestData['search']['value'],
+            'district_id' => $requestData['district_id'],
+            'month_id' => $requestData['month_id'],
+            'unit_id' => $requestData['unit_id'],
+            'year_id' => $requestData['year_id'],
+            'period' => $requestData['period'],
+            'order' => $requestData['order'][0]['dir'],
+            'sort' => $requestData['order'][0]['column'],
+            'start' => $requestData['start'],
+            'limit' => $requestData['length'],
+        );
+
+        $totalFiltered = $this->establishmentTxnsDtls->getTotals($filter_data);
+
+        $filteredData = $this->establishmentTxnsDtls->periodswisetrans($filter_data);
+        $datatable = array();
+        foreach ($filteredData as $result) {
+
+            $action = '<div class="btn-group btn-group-sm pull-right">';
+            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprisestrans/edit?id=' . $result->txn_id) . '"><i class="fa fa-pencil"></i></a>';
+
+            $action .= '</div>';
+            // result holds the database column name
+            $datatable[] = array(
+                $result->created_at,
+                $result->unit_name,
+                $result->district_name,
+                $result->block_name,
+                $result->gp_name,
+                $result->village_name,
+                $result->month_name,
+                $result->year_name,
+                $result->period,            
+                $action,
+            );
+        }
+
+        $json_data = array(
+            "draw" => isset($requestData['draw']) ? intval($requestData['draw']) : 1,
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $datatable
+        );
+
+        return $this->response->setContentType('application/json')->setJSON($json_data);
+    }
+    private function filter()
+    {
+        $filter = [];
+
+        // if $this user has district_id, then filter by district_id
+
+        if ($this->request->getGet('district_id') > 0) {
+            $filter['district_id'] = $this->request->getGet('district_id');
+        }
+        if ($this->request->getGet('year_id') > 0) {
+            $filter['year_id'] = $this->request->getGet('year_id');
+        }
+        if ($this->request->getGet('month_id') > 0) {
+            $filter['month_id'] = $this->request->getGet('month_id');
+        }
+        if ($this->request->getGet('unit_id') > 0) {
+            $filter['unit_id'] = $this->request->getGet('unit_id');
+        }
+        if ($this->request->getGet('period') != 'all') {
+            $filter['period'] = $this->request->getGet('period');
+        }
+
+        $filteredData =  $this->establishmentTxnsDtls->periodswisetrans($filter);
+        return $filteredData;
     }
     public function edit()
     {
@@ -260,6 +309,7 @@ class EstablishmentTransaction extends AdminController
             $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
             $group->units = $units;
         }
+      
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
         $district_id = $this->request->getGet('district_id');
@@ -394,7 +444,7 @@ class EstablishmentTransaction extends AdminController
         );
 
         //start protection
-    
+
         $spreadsheet->setActiveSheetIndex(0);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

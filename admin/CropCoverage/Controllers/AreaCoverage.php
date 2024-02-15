@@ -70,6 +70,8 @@ class AreaCoverage extends AdminController
         $data['isActiveDay'] = in_array($data['currentDay'], array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'));
         $data['inActiveDay'] = !$data['isActiveDay'];
         $dates = $this->acModel->getWeekDate();
+        // printr($dates);
+        // exit;
         $data['from_date'] = '';
         $data['to_date'] = '';
         if ($dates) {
@@ -79,17 +81,24 @@ class AreaCoverage extends AdminController
 
         $data['upload_url'] = Url::areaCoverageUpload;
         if ($this->request->getGet('start_date')) {
-            $data['start_date'] = $this->request->getGet('start_date');
+            $data['get_date'] = $this->request->getGet('start_date');
         } else {
-            $data['start_date'] = $dates['start_date'];
+            $data['get_date'] = $dates['start_date'];
         }
+        // if ($data['get_date']) {
+        //     $data['start_date'] = $dates['get_date'];
+        // } else {
+        //     $data['start_date'] = $dates['start_date'];
+        // }
+        // var_dump($this->request->getGet('start_date'));
+        // var_dump($dates['start_date']);
 
         if ($this->user->block_id) {
             $filter = [
                 'block_id' => $this->user->block_id,
                 'year_id' => getCurrentYearId(),
                 'season' => getCurrentSeason(),
-                'start_date' => $data['start_date'],
+                'start_date' => $data['get_date']
             ];
 
 

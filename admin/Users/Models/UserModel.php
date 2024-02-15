@@ -70,7 +70,7 @@ class UserModel extends Model
 FROM user u
   LEFT JOIN soe_districts d
     ON d.id = u.district_id
-  LEFT JOIN soe_blocks b
+  LEFT JOIN (SELECT * FROM soe_blocks WHERE is_program=1) b
     ON b.id = u.block_id
   LEFT JOIN user_group ug
     ON ug.id = u.user_group_id
@@ -122,7 +122,7 @@ WHERE  u.deleted_at IS NULL";
             FROM user u
               LEFT JOIN soe_districts d
                 ON d.id = u.district_id
-              LEFT JOIN soe_blocks b
+              LEFT JOIN (SELECT * FROM soe_blocks WHERE is_program=1) b
                 ON b.id = u.block_id
               LEFT JOIN user_group ug
                 ON ug.id = u.user_group_id
@@ -254,7 +254,7 @@ FROM soe_allow_uploads sau
         ON u.block_id = sb.id
       LEFT JOIN soe_districts sd
         ON u.district_id = sd.id
-    WHERE u.deleted_at IS NULL";
+    WHERE u.deleted_at IS NULL AND sb.is_program=1";
         if (!empty($filter['agency_type_id'])) {
             $sql .= " AND u.user_group_id = " . $filter['agency_type_id'];
         } else {

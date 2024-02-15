@@ -54,7 +54,7 @@
                     <div class="col-lg-3">
                         <div class="form-group mg-b-10-force">
                             <label>Week</label>
-                            <?= form_dropdown('start_date', $weeks, $start_date, "id='filter_week' class='form-control js-select2'"); ?>
+                            <?= form_dropdown('start_date', $weeks, $get_date, "id='filter_week' class='form-control js-select2'"); ?>
                         </div>
                     </div><!-- col-4 -->
                     <div class="col-lg-3 center">

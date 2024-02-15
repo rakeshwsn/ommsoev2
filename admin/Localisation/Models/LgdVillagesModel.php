@@ -168,7 +168,7 @@ class LgdVillagesModel extends Model
 		  ON sg.block_id = sb.id
 		LEFT JOIN soe_districts sd
 		  ON sg.district_id = sd.id
-	where v.id = $id
+	where sb.is_program=1 AND v.id = $id
 	  GROUP BY districts";
 		return $this->db->query($sql)->getRow();
 	}

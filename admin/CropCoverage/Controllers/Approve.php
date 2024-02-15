@@ -566,6 +566,8 @@ class Approve extends AdminController
             'season' => $data['season'],
             'start_date' => $data['start_date']
         ];
+        // printr($filter);
+        // exit;
 
         $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
         // printr($blocks);

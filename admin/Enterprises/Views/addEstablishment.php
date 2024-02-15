@@ -47,12 +47,10 @@ $validation = \Config\Services::validation();
                                 "id='gps' class='form-control js-select2'"
                             ); ?>
                             <div class="input-group-append">
-                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add
-                                    GP</a>
+                                <a href="<?= $add_gp_url ?>" class="btn btn-sm btn-secondary" id="btn-add-gp">Add GP</a>
                             </div>
                         </div>
                     </div>
-
                     <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
                         <label for="village_id">Village<span class="text-danger"></span></label>
                         <div class="input-group">
@@ -64,6 +62,21 @@ $validation = \Config\Services::validation();
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-6 form-group">
+                        <label for="address">Address<span class="text-danger"></span></label>
+                        <div class="input-group">
+                            <textarea name="address" id="address" cols="30" rows="3" class="form-control"><?php echo isset($address) ? htmlspecialchars($address) : ''; ?></textarea>
+                        </div>
+                    </div>
+                    <div class="col-6 form-group">
+                        <label for="pincode">Pin code<span class="text-danger"></span></label>
+                        <div class="input-group">
+                            <input type="text" name="pincode" class="form-control" id="pincode" placeholder="Enter Pincode" value="<?= set_value('pincode', $pincode) ?>">
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -445,6 +458,8 @@ $validation = \Config\Services::validation();
                 $('#budget_utilize').hide();
             }
         });
+        // initial state
+
 
         //hide and show center info
 
@@ -457,7 +472,7 @@ $validation = \Config\Services::validation();
                 $('#center_info').hide();
             }
         });
-   
+
 
         //populate unit type on document ready
         $('#unit_type').trigger("change");
@@ -655,6 +670,10 @@ $validation = \Config\Services::validation();
         jQuery.validator.addMethod("mobile", function(value, element) {
             return this.optional(element) || /([0-9]{11}$)|(^[5-9][0-9]{9}$)/.test(value);
         }, "Please enter a valid mobile number");
+        jQuery.validator.addMethod("digitsOnly", function(value, element) {
+            return this.optional(element) || /^[1-9]\d{0,8}$/.test(value);
+        }, "Please enter a valid pin code");
+
     });
 
     $(document).ready(function() {
@@ -669,21 +688,17 @@ $validation = \Config\Services::validation();
                     required: true,
                     ddrequired: true
                 },
-                gp_id: {
-                    required: true,
-                    ddrequired: true
-                },
+
                 district_id: {
                     required: true,
                     ddrequired: true
                 },
-                block_id: {
-                    required: true,
-                    ddrequired: true
-                },
-                village_id: {
-                    required: true,
-                    ddrequired: true
+
+                address: {
+                    required: function(element) {
+                        return $("#blocks").val() == 0;
+                    },
+                    letters: true
                 },
                 contact_person: {
                     required: true,
@@ -733,6 +748,13 @@ $validation = \Config\Services::validation();
                     },
                     rupees: true
                 },
+
+                pincode: {
+                    digitsOnly: true,
+                    required: function(element) {
+                        return $("#blocks").val() == 0;
+                    },
+                }
             },
             messages: {
                 managing_unit_name: {
@@ -759,6 +781,12 @@ $validation = \Config\Services::validation();
                 support_infr_amount: {
                     rupees: "Please enter rupees (ex-00.00) "
                 },
+                pincode: {
+                    digitsOnly: "Please enter exactly 6 digits."
+                },
+                address: {
+                    letters: "Please enter address"
+                }
             },
             errorPlacement: function(error, element) {
                 if (element.parent('.input-group').length) {

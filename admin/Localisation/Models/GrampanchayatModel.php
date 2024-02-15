@@ -126,6 +126,7 @@ class GrampanchayatModel extends Model
 			);
 		}
 		$builder->where("sg.deleted_at", null);
+		$builder->where("sb.is_program", 1);
 	}
 
 	public function getGPsByBlock($block_id)
@@ -141,7 +142,7 @@ SELECT
 FROM soe_grampanchayats sg
 LEFT JOIN soe_blocks sb
   ON sg.block_id = sb.id
-WHERE sg.deleted_at IS NULL";
+WHERE sg.deleted_at IS NULL AND sb.is_program=1";
 
 		if ($block_id) {
 			$sql .= " AND sg.block_id = " . $block_id;

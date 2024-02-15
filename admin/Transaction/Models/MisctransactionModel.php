@@ -175,7 +175,9 @@ FROM (SELECT
             ->join('user_group ut','ut.id=t.agency_type_id','LEFT')
             ->join('soe_years y','y.id=t.year','LEFT')
             ->join('users u','u.id=t.user_id','LEFT')
-            ->where('t.id',$transaction_id)->get()->getRow();
+            ->where('b.is_program',1)
+            ->where('t.id',$transaction_id)
+			->get()->getRow();
 
         return $result;
     }

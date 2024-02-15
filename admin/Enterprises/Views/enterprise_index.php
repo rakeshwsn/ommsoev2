@@ -73,7 +73,6 @@
                                 <th>District</th>
                                 <th>Block</th>
                                 <th>GP</th>
-                                <th>Village</th>
                                 <th>Unit Type</th>
                                 <th>Mang. Unit Type</th>
                                 <th>Mang. Unit Name</th>
