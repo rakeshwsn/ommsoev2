@@ -159,7 +159,7 @@
                 var d_id = $(this).val(); // Declare d_id with var
 
                 $.ajax({
-                    url: 'admin/enterprisesreport/blocks',
+                    url: 'admin/enterprises/report/blocks',
                     data: {
                         district_id: d_id
                     },

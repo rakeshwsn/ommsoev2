@@ -119,7 +119,7 @@ class Enterprise extends AdminController
 		if ($year_id) {
 			$data['year_name'] = $yearmodel->find($year_id)->name;
 		}
-		
+		// dd($data);
 
 		return $this->template->view('Admin\Dashboard\Views\enterpriseForm', $data);
 	}
