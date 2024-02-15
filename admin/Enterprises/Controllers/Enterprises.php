@@ -87,7 +87,7 @@ class Enterprises extends AdminController
         //populate blocks of district selected
 
         $data['blocks'][0] = 'Select Block';
-        // if user block_id is avaliable populate blocks else populate selected district's blocks 
+        // if user block_id is avaliable populate blocks else populate selected district's blocks
         if ($this->user->block_id) {
             $blocks =  $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
             $data['block_id'] = $this->user->block_id;
@@ -103,7 +103,7 @@ class Enterprises extends AdminController
                 $data['blocks'][$block->id] = $block->name;
             }
         }
-        //if user district_id is avaliable populate years 
+        //if user district_id is avaliable populate years
         $data['years'][0] = 'Select DOE';
 
         if ($this->user->district_id) {
@@ -125,7 +125,7 @@ class Enterprises extends AdminController
         }
 
 
-        //get management unit type 
+        //get management unit type
         $data['management_unit_type'] = '';
         if ($this->request->getGet('management_unit_type')) {
             $data['management_unit_type'] = $this->request->getGet('management_unit_type');
@@ -237,7 +237,7 @@ class Enterprises extends AdminController
         if ($this->request->getGet('doeyear') > 0) {
             $filter['doeyear'] = $this->request->getGet('doeyear');
         }
-        $filteredData =  $this->enterprisesModel->getAll($filter);
+        $filteredData =  $this->enterprisesModel->getTotals($filter);
 
         return $filteredData;
     }
@@ -310,7 +310,7 @@ class Enterprises extends AdminController
         // Iterate through each column and set auto-size
         for ($col = 'A'; $col <= $highestColumn; $col++) {
             // $worksheet->getColumnDimension($col)->setAutoSize(true);
-          
+
                 $worksheet->getStyle('A1:' . $highestColumn . $worksheet->getHighestRow())
           ->getAlignment()->setWrapText(true);
 
@@ -528,7 +528,7 @@ class Enterprises extends AdminController
         $block_id = $this->request->getGet('block_id');
         $unit_id = $this->request->getGet('unit_id');
 
-        $mainCenters =  $this->enterprisesModel->getMainCenters($district_id, $block_id, $unit_id);
+        $mainCenters =  $this->enterprisesModel->getMainCenters($district_id, $unit_id, $block_id);
 
         $data['main_centers'] = $mainCenters;
 
@@ -549,7 +549,7 @@ class Enterprises extends AdminController
         if (isset($this->error['warning'])) {
             $data['error'] = $this->error['warning'];
         }
-        //enterprise text name change when id avaliable 
+        //enterprise text name change when id avaliable
         $data['enterprise_text'] = "Add Enterprise Data";
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
             $enterprise =  $this->enterprisesModel->find($this->request->getGet('id'));
@@ -571,7 +571,7 @@ class Enterprises extends AdminController
 
         $id = $this->request->getGet('id');
         $data['enterpriseequipments'] = [];
-        //for edit or view data 
+        //for edit or view data
         if ($this->request->getGet('id') && ($this->request->getMethod(true) != 'POST')) {
             $data['enterpriseequipments'] =  $this->enterprisesModel->equipment($id);
         }
@@ -663,7 +663,7 @@ class Enterprises extends AdminController
         foreach ($unit_budgets as $unit_budget) {
             $data['unit_budgets'][$unit_budget->id] = $unit_budget->budget_code;
         }
-        //Addl budget 
+        //Addl budget
         $data['addl_budgets'][] = 'Select budgets';
 
         $addl_budgets = $this->enterprisesBudgetModel->findAll();
@@ -679,7 +679,7 @@ class Enterprises extends AdminController
         foreach ($budget_fin_yrs as $budget_fin_yr) {
             $data['budget_fin_yrs'][$budget_fin_yr->id] = $budget_fin_yr->name;
         }
-        //main center dropdown when anyone select sub center 
+        //main center dropdown when anyone select sub center
         $data['main_centers'] = [];
         // main center will be shown only when sub center is selected and have district, block and unit id
         $filter = [

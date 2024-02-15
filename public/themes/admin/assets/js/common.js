@@ -30,12 +30,12 @@ $(function(){
 				Vvveb.Gui.init();
 
 				$('#modal-popup').modal('show');
-				
+
 			}
 		});
-		
-		
-		
+
+
+
 	});
 });
 
@@ -97,3 +97,7 @@ function cleanupInput() {
         });
     });
 }
+
+$(function(){
+    $(".nav-main a.active").parents('li').eq(1).addClass('open')
+})

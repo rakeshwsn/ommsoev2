@@ -4,17 +4,21 @@
         <?php if(isset($menu['heading']) && $menu['heading']){?>
             <?php echo $menu['name']; ?>
         <?}else{?>
-            <?php if ($menu['href']) { ?>
-                <a href="<?php echo $menu['href']; ?>"><i class="<?php echo $menu['icon']; ?> "></i> <span class="sidebar-mini-hide"><?php echo $menu['name']; ?></span></a>
+            <?php if ($menu['href']) {
+                $is_active1 = ($menu['href'] && $menu['href'] == $current_uri) ? 'active' : '';
+            ?>
+            <a href="<?php echo $menu['href']; ?>" class="<?php echo $is_active1; ?>"><i class="<?php echo $menu['icon']; ?> "></i> <span class="sidebar-mini-hide"><?php echo $menu['name']; ?></span></a>
             <?php } else { ?>
                 <a class="<?php echo $menu['children']?'nav-submenu':'';?>" data-toggle="<?php echo $menu['children']?'nav-submenu':'';?>" href="#"><i class="<?php echo $menu['icon']; ?> "></i> <span class="sidebar-mini-hide"><?php echo $menu['name']; ?></span></a>
             <?php } ?>
             <?php if ($menu['children']) { ?>
             <ul class="list-unstyled">
-                <?php foreach ($menu['children'] as $children_1) { ?>
+                <?php foreach ($menu['children'] as $children_1) {
+                    $is_active = ($children_1['href'] && $children_1['href'] == $current_uri) ? 'active' : '';
+                ?>
                 <li>
                     <?php if ($children_1['href']) { ?>
-                    <a href="<?php echo $children_1['href']; ?>"><?php echo $children_1['name']; ?></a>
+                    <a href="<?php echo $children_1['href']; ?>" class="<?php echo $is_active; ?>""><?php echo $children_1['name']; ?></a>
                     <?php } else { ?>
                     <a class="parent waves-effect"><?php echo $children_1['name']; ?></a>
                     <?php } ?>
@@ -45,5 +49,4 @@
         <?php } ?>
 	</li>
 	<?php } ?>
-</ul>		
-			 
+</ul>
