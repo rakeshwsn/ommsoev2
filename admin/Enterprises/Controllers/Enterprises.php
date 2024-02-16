@@ -159,7 +159,6 @@ class Enterprises extends AdminController
 
         $requestData = $_REQUEST;
         $totalData = $this->enterprisesModel->getTotals();
-
         $totalFiltered = $totalData;
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
@@ -176,8 +175,9 @@ class Enterprises extends AdminController
 
         $totalFiltered = $this->enterprisesModel->getTotals($filter_data);
         // printr($totalFiltered);exit;
+       
         $filteredData = $this->enterprisesModel->getAll($filter_data);
-
+       
         $datatable = array();
         foreach ($filteredData as $result) {
 
