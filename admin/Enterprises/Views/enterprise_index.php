@@ -60,7 +60,7 @@
         <div class="block-header block-header-default">
             <h3 class="block-title">Enterprises List</h3>
             <div class="block-options">
-                <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Download Form</a>
+                <a href="<?= $excel_link ?>" id="btn-excel" class="btn btn-outline-danger"><i class="fa fa-file-excel-o"></i> Export</a>
             </div>
 
         </div>
@@ -80,7 +80,7 @@
                                 <th>DOM</th>
                                 <th>Date Added</th>
 
-                                <th class="text-right no-sort sorting_disabled" aria-label="Actions">Actions</th>
+                                <th class="text-right no-sort" aria-label="Actions">Actions</th>
                             </tr>
                         </thead>
                        
@@ -96,10 +96,10 @@
 
     $(function() {
         function main() {
-            var href = download_url + '?district_id=' + $('#districts').val() + '&block_id=' + $('#blocks').val() + '&management_unit_type=' + $('#management_unit_type').val() + '&doeyear=' + $('#doeyear').val();
+            var href = download_url + '?district_id=' + $('#districts').val() + '&block_id=' + $('#blocks').val() + '&management_unit_type=' + $('#management_unit_type').val() + '&doeyear=' + $('#doeyear').val()+ '&unit_id=' + $('#units').val();
             $('#btn-excel').attr('href', href);
         }
-        $('#districts, #blocks, #management_unit_type, #doeyear').on('change', main);
+        $('#districts, #blocks, #management_unit_type, #doeyear ,#units').on('change', main);
         main();
     });
 
@@ -140,6 +140,7 @@
                 dataType: 'json'
             }
         });
+        
         $(function() {
 
             $('#districts').on('change', function() {

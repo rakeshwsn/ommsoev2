@@ -38,20 +38,20 @@
                 <tr>
                     <th>District</th>
                     <th>Status</th>
-                    <th>Date</th>
+                    <th>Date Uploaded</th>
                     <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                     <?php foreach($mpruploadstatus as $mprs){
                         if($mprs->file){
-                            $action="<a class='btn btn-primary' href='".admin_url($mprs->file)."'>Download</a>";
+                            $action="<a class='btn btn-primary' href='".site_url($mprs->file)."'>Download</a>";
                         }else{
                             $action="";
                         }
                         ?>
                     <tr>
-                        <td><?=$mprs->name?></td>
+                        <td><?=$mprs->district?></td>
                         <td><?=$mprs->file?'<label class="badge badge-primary">Uploaded</label>':'<label class="badge badge-danger">Not Uploaded</label>'?></td>
                         <td><?=$mprs->created_at?ymdToDmy($mprs->created_at):''?></td>
                         <td><?=$action?></td>
