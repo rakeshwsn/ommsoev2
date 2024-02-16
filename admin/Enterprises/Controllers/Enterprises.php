@@ -175,9 +175,9 @@ class Enterprises extends AdminController
 
         $totalFiltered = $this->enterprisesModel->getTotals($filter_data);
         // printr($totalFiltered);exit;
-       
+
         $filteredData = $this->enterprisesModel->getAll($filter_data);
-       
+
         $datatable = array();
         foreach ($filteredData as $result) {
 
@@ -244,7 +244,7 @@ class Enterprises extends AdminController
     public function download()
     {
         $filteredData = $this->filter();
-      
+
         $data['entdatas'] = [];
         foreach ($filteredData as $row) {
             $data['entdatas'][] = [
@@ -395,7 +395,7 @@ class Enterprises extends AdminController
             $id = $this->request->getGet('id');
             $district_id = $this->request->getPost('district_id');
             $block_id = $this->request->getPost('block_id');
-            
+
             //if is_support_basis_infr is no set values
             if ($this->request->getPost('is_support_basis_infr') == 0) {
                 $data = [
@@ -440,7 +440,7 @@ class Enterprises extends AdminController
 
             ];
             // dd($enterprisesdata);
-            $this->enterprisesModel->update($id,$enterprisesdata);
+            $this->enterprisesModel->update($id, $enterprisesdata);
 
             $this->entEquipmentModel->where('ent_id', $id)->delete();
             $equipmentData = [];
@@ -626,8 +626,13 @@ class Enterprises extends AdminController
             $district_id = $enterprise->district_id;
             $block_id = $enterprise->block_id;
             $gp_id = $enterprise->gp_id;
+            if ($this->user->block_id) {
+                $blocks  = $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            }
+            else{
+                $blocks = $this->blockModel->where('district_id', $district_id)->findAll();
 
-            $blocks = $this->blockModel->where('district_id', $district_id)->findAll();
+            }
 
             $data['blocks'] = $blocks;
 
