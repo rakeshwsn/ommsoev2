@@ -251,7 +251,7 @@ class EnterpriseModel extends Model
 		  ON sd.id = de.district_id
 	  WHERE de.year_id = $year_id
 	  AND de.unit_id = $unit_id  AND de.deleted_at IS NULL order by district";
-	//   echo $sql;exit;
+	  echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
 }
