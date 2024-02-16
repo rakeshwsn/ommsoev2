@@ -30,14 +30,14 @@ $validation = \Config\Services::validation();
                         <?= form_dropdown('district_id', option_array_value($districts, 'id', 'name', array('0' => 'Select Districts')), set_value('district_id', $district_id), "id='districts' class='form-control js-select2'"); ?>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
-                        <label for="block_id">Block<span class="text-danger"></span></label>
+                        <label for="block_id">Block</label>
                         <?php
                         echo form_dropdown('block_id', option_array_value($blocks, 'id', 'name', array('0' => 'Select Block')), set_value('block_id', $block_id), "id='blocks' class='form-control js-select2'"); ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-6 form-group <?= $validation->hasError('gp_id') ? 'is-invalid' : '' ?>">
-                        <label for="gp_id">GP<span class="text-danger"></span></label>
+                        <label for="gp_id">GP</label>
                         <div class="input-group">
                             <?php
                             echo form_dropdown(
@@ -52,7 +52,7 @@ $validation = \Config\Services::validation();
                         </div>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('village_id') ? 'is-invalid' : '' ?>">
-                        <label for="village_id">Village<span class="text-danger"></span></label>
+                        <label for="village_id">Village</label>
                         <div class="input-group">
                             <?php
                             echo form_dropdown('village_id', option_array_value($villages, 'id', 'name', array('0' => 'Select Village')), set_value('village_id', $village_id), "id='villages' class='form-control js-select2'"); ?>
@@ -70,7 +70,7 @@ $validation = \Config\Services::validation();
                         </div>
                     </div>
                     <div class="col-6 form-group">
-                        <label for="pincode">Pin code<span class="text-danger"></span></label>
+                        <label for="pincode">Pin code<span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" name="pincode" class="form-control" id="pincode" placeholder="Enter Pincode" value="<?= set_value('pincode', $pincode) ?>">
                         </div>
@@ -85,7 +85,7 @@ $validation = \Config\Services::validation();
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Unit Info</h3>
                 <div class="row">
                     <div class="col-6 form-group mt-15 <?= $validation->hasError('unit_id') ? 'is-invalid' : '' ?> ">
-                        <label for="units">Name/Type of Unit <span class="text-danger"></span></label>
+                        <label for="units">Name/Type of Unit <span class="text-danger">*</span></label>
                         <?php
                         $select_attributes = array(
                             'class' => 'form-control js-select2',
@@ -211,7 +211,7 @@ $validation = \Config\Services::validation();
                         <?php echo form_dropdown('budget_fin_yr_id', $budget_fin_yrs, set_value('budget_fin_yr_id', $budget_fin_yr_id), ['class' => 'form-control', 'id' => 'budget_fin_yr_id']); ?>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('unit_budget') ? 'is-invalid' : '' ?>">
-                        <label for="Established Unit Budget Head">Established Unit Budget Head<span class="text-danger">*</span></label>
+                        <label for="Established Unit Budget Head">Established Unit Budget Head</span></label>
                         <input type="text" name="unit_budget" class="form-control" id="unit_budget" placeholder="Enter Budget " value="<?= set_value('unit_budget', $unit_budget) ?>">
                     </div>
                 </div>
@@ -246,8 +246,8 @@ $validation = \Config\Services::validation();
                             <input type="text" name="purpose_infr_support" class="form-control" id="purpose_infr_support" placeholder="Type/ Purposeof Addl. infa structure " value="<?= set_value('purpose_infr_support', $purpose_infr_support) ?>">
                         </div>
                         <div class="  col-6 form-group <?= $validation->hasError('addl_budget') ? 'is-invalid' : '' ?>">
-                            <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support<span class="text-danger">*</span></label>
-                            <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Enter Budget " value="<?= set_value('addl_budget', $addl_budget) ?>">
+                            <label for="exampleInputEmail1">Budget Head Utilised for Addl. infra support</span></label>
+                            <input type="text" name="addl_budget" class="form-control" id="addl_budget" placeholder="Example:1.4 " value="<?= set_value('addl_budget', $addl_budget) ?>">
                         </div>
                     </div>
 
@@ -649,11 +649,8 @@ $validation = \Config\Services::validation();
     });
 
     $(document).ready(function() {
-        jQuery.validator.addMethod("lettersonly", function(value, element) {
-            return this.optional(element) || /^(?!.*(?:([A-Za-z,])\1{2}))[A-Za-z, ]{3,20}$/.test(value);
-        }, "Please enter only letters and spaces.");
         jQuery.validator.addMethod("letters", function(value, element) {
-            return this.optional(element) || /^(?!.*(?:([A-Za-z])\1{2}))[A-Za-z ]{3,20}$/.test(value);
+            return this.optional(element) || /^(?!.*(?:([A-Za-z,])\1{2,}))[A-Za-z ]+$/.test(value);
         }, "Please enter only letters and spaces.");
         jQuery.validator.addMethod("digitsOnly", function(value, element) {
             return this.optional(element) || /^(?:\+?91|0)?[6789]\d{9}$/.test(value);
@@ -682,7 +679,7 @@ $validation = \Config\Services::validation();
             rules: {
                 managing_unit_name: {
                     required: true,
-                    lettersonly: true
+                    letters: true
                 },
                 unit_id: {
                     required: true,
@@ -716,10 +713,6 @@ $validation = \Config\Services::validation();
                     required: true,
                     rupees: true
                 },
-                unit_budget: {
-                    required: true,
-                    decimal: true
-                },
                 budget_fin_yr_id: {
                     required: true,
                     ddrequired: true
@@ -734,7 +727,7 @@ $validation = \Config\Services::validation();
                     required: function(element) {
                         return $("#is_support_basis_infr").is(":checked");
                     },
-                    lettersonly: true
+                    letters: true
                 },
                 addl_budget: {
                     required: function(element) {
@@ -751,14 +744,13 @@ $validation = \Config\Services::validation();
 
                 pincode: {
                     digitsOnly: true,
-                    required: function(element) {
-                        return $("#blocks").val() == 0;
-                    },
+                    // required: true
+
                 }
             },
             messages: {
                 managing_unit_name: {
-                    lettersonly: "Please enter only letters and spaces."
+                    letters: "Please enter only letters and spaces."
                 },
                 contact_person: {
                     letters: "Please enter only letters and spaces."
@@ -773,7 +765,7 @@ $validation = \Config\Services::validation();
                     decimal: "Please enter only decimal numbers."
                 },
                 purpose_infr_support: {
-                    lettersonly: "Please enter only letters and spaces."
+                    letters: "Please enter only letters and spaces."
                 },
                 addl_budget: {
                     decimal: "Please enter only decimal numbers."
