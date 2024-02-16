@@ -140,6 +140,7 @@
                 dataType: 'json'
             }
         });
+        
         $(function() {
 
             $('#districts').on('change', function() {
