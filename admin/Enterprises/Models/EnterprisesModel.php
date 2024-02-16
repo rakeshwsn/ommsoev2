@@ -371,14 +371,29 @@ class EnterprisesModel extends Model
       eu.id unit_id,
       eu.name unit
      FROM (SELECT
-        *
-      FROM soe_grampanchayats
-     ) gp
-      CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL) gpunits
+      id,
+      name,
+      block_id,
+      lgd_code
+    FROM soe_grampanchayats
+    UNION
+    SELECT
+      NULL id,
+      'Other' name,
+      block_id,
+      NULL lgd_code
+    FROM (SELECT DISTINCT
+        block_id
+      FROM soe_grampanchayats) AS blocks) gp
+      CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL";
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND block_id = " . $filter['block_id'];
+        }
+        $sql .= ") gpunits
      LEFT JOIN (SELECT
         e.unit_id,
         COUNT(e.unit_id) total_units,
-        e.gp_id,
+        e.gp_id, e.block_id,
         e.management_unit_type,
         e.date_estd,
         dy.id year_id,
@@ -389,6 +404,9 @@ class EnterprisesModel extends Model
           LEFT JOIN soe_months sm
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND e.block_id = " . $filter['block_id'];
+        }
         if (!empty($filter['year_id'])) {
             $sql .= " AND dy.id = " . $filter['year_id'];
         }
@@ -411,14 +429,11 @@ class EnterprisesModel extends Model
         }
         $sql .= " GROUP BY e.unit_id,
                e.gp_id) res
-      ON res.gp_id = gpunits.gp_id
-      AND res.unit_id = gpunits.unit_id";
-        if (!empty($filter['block_id'])) {
-            $sql .= " WHERE gpunits.block_id = " . $filter['block_id'];
-        }
-        $sql .= " ORDER BY unit_id, gp";
+      ON  coalesce(res.gp_id,0) = coalesce(gpunits.gp_id,0)
+      AND gpunits.block_id=res.block_id AND gpunits.unit_id=res.unit_id
+      ORDER BY unit_id, gp";
 
-         echo $sql;exit;
+//         echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
