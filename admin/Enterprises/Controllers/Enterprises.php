@@ -159,7 +159,7 @@ class Enterprises extends AdminController
 
         $requestData = $_REQUEST;
         $totalData = $this->enterprisesModel->getTotals();
-       
+
         $totalFiltered = $totalData;
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
@@ -237,14 +237,14 @@ class Enterprises extends AdminController
         if ($this->request->getGet('doeyear') > 0) {
             $filter['doeyear'] = $this->request->getGet('doeyear');
         }
-        $filteredData =  $this->enterprisesModel->getTotals($filter);
+        $filteredData =  $this->enterprisesModel->getAll($filter);
 
         return $filteredData;
     }
     public function download()
     {
         $filteredData = $this->filter();
-
+      
         $data['entdatas'] = [];
         foreach ($filteredData as $row) {
             $data['entdatas'][] = [
@@ -309,9 +309,8 @@ class Enterprises extends AdminController
         for ($col = 'A'; $col <= $highestColumn; $col++) {
             // $worksheet->getColumnDimension($col)->setAutoSize(true);
 
-                $worksheet->getStyle('A1:' . $highestColumn . $worksheet->getHighestRow())
-          ->getAlignment()->setWrapText(true);
-
+            $worksheet->getStyle('A1:' . $highestColumn . $worksheet->getHighestRow())
+                ->getAlignment()->setWrapText(true);
         }
 
 
@@ -396,7 +395,7 @@ class Enterprises extends AdminController
             $id = $this->request->getGet('id');
             $district_id = $this->request->getPost('district_id');
             $block_id = $this->request->getPost('block_id');
-            $this->enterprisesModel->where('id', $id)->delete();
+            
             //if is_support_basis_infr is no set values
             if ($this->request->getPost('is_support_basis_infr') == 0) {
                 $data = [
@@ -441,14 +440,12 @@ class Enterprises extends AdminController
 
             ];
             // dd($enterprisesdata);
-            $data['enterprises'] =  $this->enterprisesModel->insert($enterprisesdata);
-            $unitId =  $this->enterprisesModel->insertID();
-            $id = $this->request->getGet('id');
+            $this->enterprisesModel->update($id,$enterprisesdata);
 
-            $this->entEquipmentModel->where('id', $id)->delete();
+            $this->entEquipmentModel->where('ent_id', $id)->delete();
             $equipmentData = [];
 
-            if ($unitId) {
+            if ($id) {
 
                 $equipments = $this->request->getPost('equipments');
                 $quantities = $this->request->getPost('quantity');
@@ -461,7 +458,7 @@ class Enterprises extends AdminController
                         $quantity = $quantities[$index] ?? 0;
 
                         $equipmentData[] = [
-                            'ent_id' => $unitId,
+                            'ent_id' => $id,
                             'equipment_id' => $equipment,
                             'quantity' => $quantity,
                         ];

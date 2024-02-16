@@ -200,7 +200,7 @@ class EnterpriseModel extends Model
 		$sql = "SELECT
 		eu.id unit_id,
 		eu.name unit_name,
-		eu.group_unit,
+		eu.unit_group_id,
 		COALESCE(ent.total_units,0) total_units
 	  FROM enterprises_units eu
 		LEFT JOIN (SELECT
@@ -250,8 +250,8 @@ class EnterpriseModel extends Model
 		LEFT JOIN soe_districts sd
 		  ON sd.id = de.district_id
 	  WHERE de.year_id = $year_id
-	  AND de.unit_id = $unit_id  AND de.deleted_at IS NULL";
-	//   echo $sql;exit;
+	  AND de.unit_id = $unit_id  AND de.deleted_at IS NULL order by district";
+	  echo $sql;exit;
 		return $this->db->query($sql)->getResult();
 	}
 }
