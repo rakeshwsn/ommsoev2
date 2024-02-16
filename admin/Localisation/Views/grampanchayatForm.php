@@ -22,13 +22,17 @@ $validation = \Config\Services::validation();
                 <div class="form-group <?= $validation->hasError('district_id') ? 'is-invalid' : '' ?>">
                     <label for="code">District</label>
                     <?php echo form_dropdown('district_id', $districts, set_value('district_id', $district_id), "id='district_id' class='form-control js-select2'" . ($district_id ? " disabled" : "")); ?>
-
+                    <div class="invalid-feedback animated fadeInDown">
+                        <?= $validation->getError('district'); ?>
+                    </div>
 
                 </div>
                 <div class="form-group <?= $validation->hasError('block_id') ? 'is-invalid' : '' ?>">
                     <label for="code">Block</label>
-                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), "id='block_id' class='form-control js-select2'" . ($block_id ? " disabled" : "")); ?>
-
+                    <?php echo form_dropdown('block_id', $blocks, set_value('block_id', $block_id), "id='block_id' class='form-control js-select2'"); ?>
+                    <div class="invalid-feedback animated fadeInDown">
+                        <?= $validation->getError('block_id'); ?>
+                    </div>
                 </div>
 
                 <div class="form-group <?= $validation->hasError('name') ? 'is-invalid' : '' ?>">
