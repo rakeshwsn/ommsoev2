@@ -213,21 +213,37 @@ class Grampanchayat extends AdminController
 			}
 		}
 
-		$data['districts'][0] = 'Select districts';
 		if ($this->request->getGet('district_id')) {
 			$data['district_id'] = $this->request->getGet('district_id');
 		} else {
 			$data['district_id'] = $this->user->district_id;
 		}
 
-		foreach ($this->districtModel->orderBy('name', 'asc')->getAll() as $dist) {
+        //Get userwise districts
+        if($this->user->district_id){
+            $districts = $this->districtModel
+                ->where('id',$this->user->district_id)
+                ->orderBy('name', 'asc')
+                ->findAll();
+        } else {
+            $districts = $this->districtModel
+                ->orderBy('name', 'asc')
+                ->findAll();
+        }
+
+//        $data['districts'][0] = 'Select districts';
+		foreach ($districts as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
-		//distrcit end
-		//Blocks start
-		$data['blocks'][0] = 'Select block';
-		$blocks = $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
 
+		//Blocks start
+        $bfilter = ['district_id' => $data['district_id']];
+        if($this->user->block_id){
+            $bfilter['id'] = $this->user->block_id;
+        }
+		$blocks = $this->blockModel->where($bfilter)->orderBy('name', 'asc')->findAll();
+
+//        $data['blocks'][0] = 'Select block';
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
@@ -239,12 +255,12 @@ class Grampanchayat extends AdminController
 		}
 
 		if ($this->request->isAJAX()) {
-
 			echo $this->template->view('Admin\Localisation\Views\grampanchayatform', $data, true);
 		} else {
 			echo $this->template->view('Admin\Localisation\Views\grampanchayatform', $data);
 		}
 	}
+
 	protected function validateForm()
 	{
 		$this->validation = \Config\Services::validation();
