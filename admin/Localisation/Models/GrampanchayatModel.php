@@ -86,8 +86,7 @@ class GrampanchayatModel extends Model
 			}
 			$builder->limit((int) $data['limit'], (int) $data['start']);
 		}
-		//$builder->where($this->deletedField, null);
-		//$builder->where('g.tcode', null);
+
 		$res = $builder->get()->getResult();
 		//		echo $this->db->getLastQuery();
 		return $res;
@@ -107,7 +106,7 @@ class GrampanchayatModel extends Model
 		$builder->join('soe_districts sd', 'sb.district_id = sd.id', 'left');
 
 		if (!empty($data['filter_district'])) {
-			$builder->where("sg.district_id  = '" . $data['filter_district'] . "'");
+//			$builder->where("sg.district_id  = '" . $data['filter_district'] . "'");
 		}
 
 		if (!empty($data['filter_block'])) {
