@@ -80,7 +80,7 @@
                                 <th>DOM</th>
                                 <th>Date Added</th>
 
-                                <th class="text-right no-sort sorting_disabled" aria-label="Actions">Actions</th>
+                                <th class="text-right no-sort" aria-label="Actions">Actions</th>
                             </tr>
                         </thead>
                        
@@ -140,6 +140,7 @@
                 dataType: 'json'
             }
         });
+        
         $(function() {
 
             $('#districts').on('change', function() {
