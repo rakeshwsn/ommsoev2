@@ -240,9 +240,9 @@ class Grampanchayat extends AdminController
 
 		if ($this->request->isAJAX()) {
 
-			echo $this->template->view('Admin\Localisation\Views\grampanchayatform', $data, true);
+			echo $this->template->view('Admin\Localisation\Views\grampanchayatForm', $data, true);
 		} else {
-			echo $this->template->view('Admin\Localisation\Views\grampanchayatform', $data);
+			echo $this->template->view('Admin\Localisation\Views\grampanchayatForm', $data);
 		}
 	}
 	protected function validateForm()
