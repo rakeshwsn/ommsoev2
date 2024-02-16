@@ -25,53 +25,48 @@ use App\Libraries\OdkCentral;
  */
 class Services extends BaseService
 {
-	// public static function example($getShared = true)
-	// {
-	//     if ($getShared)
-	//     {
-	//         return static::getSharedInstance('example');
-	//     }
-	//
-	//     return new \CodeIgniter\Example();
-	// }
+    // public static function example($getShared = true)
+    // {
+    //     if ($getShared)
+    //     {
+    //         return static::getSharedInstance('example');
+    //     }
+    //
+    //     return new \CodeIgniter\Example();
+    // }
 
     public static function template($getShared = true)
     {
-        if ($getShared)
-        {
+        if ($getShared) {
             return static::getSharedInstance('template');
         }
         $tconfig = new \Config\Template();
-        if (empty($config) || ! (is_array($config) || $config instanceof TemplateConfig))
-        {
+        if (empty($config) || !(is_array($config) || $config instanceof TemplateConfig)) {
             $config = config('Template');
         }
         return new Template($config);
     }
     public static function user($getShared = true)
     {
-        if ($getShared)
-        {
+        if ($getShared) {
             return static::getSharedInstance('user');
         }
 
         return new User();
     }
-	
-	public static function odkcentral($getShared = true)
-	 {
-	     if ($getShared)
-	     {
-	         return static::getSharedInstance('odkcentral');
-	     }
 
-	     return new OdkCentral();
-	 }
+    public static function odkcentral($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('odkcentral');
+        }
+
+        return new OdkCentral();
+    }
 
     public static function shortcode($getShared = true)
     {
-        if ($getShared)
-        {
+        if ($getShared) {
             return static::getSharedInstance('shortcode');
         }
 
@@ -80,8 +75,7 @@ class Services extends BaseService
 
     public static function export($getShared = true)
     {
-        if ($getShared)
-        {
+        if ($getShared) {
             return static::getSharedInstance('export');
         }
 
