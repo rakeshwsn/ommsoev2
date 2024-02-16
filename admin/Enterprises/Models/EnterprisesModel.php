@@ -98,7 +98,17 @@ class EnterprisesModel extends Model
         if (!empty($filter["management_unit_type"])) {
             $sql .= " AND e.management_unit_type = '" . $filter["management_unit_type"] . "'";
         }
-
+        if (!empty($filter['filter_search'])) {
+            $search = $filter['filter_search'];
+            $sql .= "AND
+                (sd.name LIKE '%$search%' OR
+                sb.name LIKE '%$search%' OR
+                v.name LIKE '%$search%' OR
+                eu.name LIKE '%$search%' OR
+                e.managing_unit_name LIKE '%$search%')
+            ";
+        }
+      
         if (!empty($filter['sort']) && $filter['sort']) {
             $sort = $filter['sort'];
         } else {
@@ -122,6 +132,9 @@ class EnterprisesModel extends Model
             }
             $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
         }
+       
+        
+     
         return $this->db->query($sql)->getResult();
     }
 
@@ -141,17 +154,17 @@ class EnterprisesModel extends Model
         $builder->where('e.deleted_at IS  NULL');
 
         $count = $builder->countAllResults();
-      
+
 
         return $count;
     }
     private function filter($builder, $data)
     {
-        $builder->join('soe_districts sd', 'e.district_id = sd.id','left');
-        $builder->join('soe_blocks sb', 'e.block_id = sb.id','left');
-        $builder->join('villages v', 'e.district_id = v.id','left');
-        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id','left');
-        $builder->join('enterprises_units eu', 'e.unit_id = eu.id','left');
+        $builder->join('soe_districts sd', 'e.district_id = sd.id', 'left');
+        $builder->join('soe_blocks sb', 'e.block_id = sb.id', 'left');
+        $builder->join('villages v', 'e.district_id = v.id', 'left');
+        $builder->join('soe_grampanchayats sg', 'e.gp_id = sg.id', 'left');
+        $builder->join('enterprises_units eu', 'e.unit_id = eu.id', 'left');
 
         if (!empty($data['district_id'])) {
             $builder->where("e.district_id  = '" . $data['district_id'] . "'");
@@ -173,11 +186,14 @@ class EnterprisesModel extends Model
 
         if (!empty($data['filter_search'])) {
             $builder->where("
-				sb.name LIKE '%{$data['filter_search']}%' OR
-				sb.id = '{$data['filter_search']}'
+				sd.name LIKE '%{$data['filter_search']}%' OR
+                sb.name LIKE '%{$data['filter_search']}%' OR
+                v.name LIKE '%{$data['filter_search']}%' OR
+               eu.name LIKE '%{$data['filter_search']}%' OR
+                eu.name LIKE '%{$data['filter_search']}%' OR
+                e.managing_unit_name LIKE '%{$data['filter_search']}%'
 			");
         }
-
     }
 
     public function yearWise($district_id)
@@ -261,7 +277,7 @@ class EnterprisesModel extends Model
       AND disunit.unit_id = res.unit_id ";
 
         $sql .= " ORDER BY unit_id, district";
-// echo $sql;exit;
+        // echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -340,7 +356,7 @@ class EnterprisesModel extends Model
         }
 
         $sql .= " ORDER BY unit_id, block";
-    //   echo $sql;exit;
+        //   echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -418,11 +434,12 @@ class EnterprisesModel extends Model
         }
         $sql .= " ORDER BY unit_id, gp";
 
-         echo $sql;exit;
+        echo $sql;
+        exit;
         return $this->db->query($sql)->getResult();
     }
 
-    public function getMainCenters($district_id, $unit_id,$block_id = '')
+    public function getMainCenters($district_id, $unit_id, $block_id = '')
     {
         $sql = "SELECT
       e.id ent_id,
@@ -476,7 +493,7 @@ class EnterprisesModel extends Model
         if (!empty($filter['unit_id'])) {
             $sql .= " AND e.unit_id= " . (int)$filter['unit_id'];
         }
-// echo $sql;exit;
+        // echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 }
