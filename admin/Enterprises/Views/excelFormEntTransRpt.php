@@ -40,6 +40,7 @@
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">Up to Previous Month </th>
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">During the Month </th>
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">Cumulative </th>
+
             </tr>
             <tr class="subhead">
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black ">Total Turnover (in Rs)</th>

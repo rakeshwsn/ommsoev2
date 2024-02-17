@@ -124,7 +124,17 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($filter['period'])) {
       $sql .= " AND txn_dtl.period = " . $filter['period'];
     }
-    
+    if (!empty($filter['filter_search'])) {
+      $search = $filter['filter_search'];
+      $sql .= " AND
+          (dy.name LIKE '%$search%' OR
+          sd.name LIKE '%$search%' OR
+          sm.name LIKE '%$search%' OR
+          eu.name LIKE '%$search%' OR
+          txn_dtl.period LIKE '%$search%')
+      ";
+    }
+
     if (!empty($filter['sort']) && $filter['sort']) {
       $sort = $filter['sort'];
     } else {
@@ -148,7 +158,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
     }
     // $sql .=  " GROUP BY unit.units";
-  
+
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {
@@ -164,20 +174,19 @@ class EstablishmentTransactionDetailsModel extends Model
 
     // Add condition to check if deleted_at is not null
     $builder->where('etd.deleted_at IS  NULL');
-
     $count = $builder->countAllResults();
 
     return $count;
   }
   private function filter($builder, $data)
   {
-    $builder->join('dashboard_years dy', 'et.year_id = dy.id');
-    $builder->join('soe_months sm', 'et.month_id = sm.id');
-    $builder->join('soe_districts sd', 'et.district_id = sd.id');
-    $builder->join('soe_blocks sb', 'etd.block_id = sb.id');
-    $builder->join('villages v', 'etd.village_id = v.id');
-    $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id');
-    $builder->join('enterprises_units eu', 'et.unit_id = eu.id');
+    $builder->join('dashboard_years dy', 'et.year_id = dy.id', 'left');
+    $builder->join('soe_months sm', 'et.month_id = sm.id', 'left');
+    $builder->join('soe_districts sd', 'et.district_id = sd.id', 'left');
+    $builder->join('soe_blocks sb', 'etd.block_id = sb.id', 'left');
+    $builder->join('villages v', 'etd.village_id = v.id', 'left');
+    $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id', 'left');
+    $builder->join('enterprises_units eu', 'et.unit_id = eu.id', 'left');
 
     if (!empty($data['district_id'])) {
       $builder->where("et.district_id  = '" . $data['district_id'] . "'");
@@ -191,12 +200,22 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($data['year_id'])) {
       $builder->where("et.year_id  = '" . $data['year_id'] . "'");
     }
+    if (!empty($data['unit_id'])) {
+      $builder->where("et.unit_id  = '" . $data['unit_id'] . "'");
+    }
 
     if (!empty($data['filter_search'])) {
-      $builder->where("sb.is_program=1 AND 
-      sd.name LIKE '%{$data['filter_search']}%' OR
-      sd.id = '{$data['filter_search']}'");
+      $search = $data['filter_search'];
+
+      $builder->where(" 
+      dy.name LIKE '%$search%' OR
+          sd.name LIKE '%$search%' OR
+          sm.name LIKE '%$search%' OR
+          eu.name LIKE '%$search%' OR
+          txn_dtl.period LIKE '%$search%'");
     }
+   
+
 
     // echo $this->db->getLastQuery();exit;
   }

@@ -391,14 +391,14 @@ class EnterprisesModel extends Model
       name,
       block_id,
       lgd_code
-    FROM soe_grampanchayats
-    UNION
-    SELECT
-      NULL id,
+        FROM soe_grampanchayats
+        UNION
+        SELECT
+        NULL id,
       'Other' name,
       block_id,
       NULL lgd_code
-    FROM (SELECT DISTINCT
+        FROM (SELECT DISTINCT
         block_id
       FROM soe_grampanchayats) AS blocks) gp
       CROSS JOIN enterprises_units eu WHERE eu.deleted_at IS NULL";
@@ -449,7 +449,6 @@ class EnterprisesModel extends Model
       AND gpunits.block_id=res.block_id AND gpunits.unit_id=res.unit_id
       ORDER BY unit_id, gp";
 
-//         echo $sql;exit;
         return $this->db->query($sql)->getResult();
     }
 
@@ -509,5 +508,63 @@ class EnterprisesModel extends Model
         }
         // echo $sql;exit;
         return $this->db->query($sql)->getResult();
+    }
+      /**
+   * Get all the data for a specific unit and district.
+   *
+   * @param datatype $unit_id description
+   * @param datatype $district_id description
+   * @throws Some_Exception_Class description of exception
+   * @return Some_Return_Value
+   */
+    public function distUnitwiseData($unit_id, $district_id)
+    {
+      $sql = "SELECT
+      e.id,
+      e.unit_id,
+      e.block_id,
+      e.district_id,
+      e.gp_id,
+      e.village_id,
+      e.managing_unit_name shg_name,
+      eu.name unit_name,
+      sb.name block,
+      g.name grampanchayat,
+      v.name villages,
+      e.district_id
+    FROM enterprises e
+      LEFT JOIN soe_blocks sb
+        ON e.block_id = sb.id
+      LEFT JOIN soe_grampanchayats g
+        ON e.gp_id = g.id
+      LEFT JOIN villages v
+        ON e.village_id = v.id
+      LEFT JOIN enterprises_units eu
+        ON e.unit_id = eu.id where sb.is_program=1 AND e.unit_id = $unit_id and e.district_id= $district_id ";
+  
+      return $this->db->query($sql)->getResult();
+    }
+    public function getCheckEnterpriseTransaction($data = [])
+    {
+      $this->db->select("*");
+      $this->db->from("enterprises e");
+  
+      if (!empty($data['district_id'])) {
+        $this->db->where("e.district_id", $data['district_id']);
+      }
+      if (!empty($data['year_id'])) {
+        $this->db->where("e.year_id", $data['year_id']);
+      }
+      if (!empty($data['month_id'])) {
+        $this->db->where("e.month_id", $data['month_id']);
+      }
+      if (!empty($data['period'])) {
+        $this->db->where("e.period", $data['period']);
+      }
+  
+  
+      $res = $this->db->get()->row_array();
+  
+      return $res;
     }
 }
