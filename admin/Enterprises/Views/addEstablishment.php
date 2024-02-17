@@ -670,7 +670,9 @@ $validation = \Config\Services::validation();
         jQuery.validator.addMethod("digitsOnly", function(value, element) {
             return this.optional(element) || /^[1-9]\d{0,8}$/.test(value);
         }, "Please enter a valid pin code");
-
+        jQuery.validator.addMethod("address", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9,\-\s]+$/.test(value);
+        }, "Please enter a valid address");
     });
 
     $(document).ready(function() {
@@ -695,7 +697,7 @@ $validation = \Config\Services::validation();
                     required: function(element) {
                         return $("#blocks").val() == 0;
                     },
-                    letters: true
+                    address: true
                 },
                 contact_person: {
                     required: true,
@@ -761,15 +763,11 @@ $validation = \Config\Services::validation();
                 unit_budget_amount: {
                     rupees: "Please enter rupees (ex-00.00) "
                 },
-                unit_budget: {
-                    decimal: "Please enter only decimal numbers."
-                },
+              
                 purpose_infr_support: {
                     letters: "Please enter only letters and spaces."
                 },
-                addl_budget: {
-                    decimal: "Please enter only decimal numbers."
-                },
+              
                 support_infr_amount: {
                     rupees: "Please enter rupees (ex-00.00) "
                 },
@@ -777,7 +775,7 @@ $validation = \Config\Services::validation();
                     digitsOnly: "Please enter exactly 6 digits."
                 },
                 address: {
-                    letters: "Please enter address"
+                    address: "Please enter address"
                 }
             },
             errorPlacement: function(error, element) {
