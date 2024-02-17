@@ -104,7 +104,7 @@
                                     <tr>
                                         <th class=" tg-8d8j" rowspan="3">Type of Unit </th>
                                         <th class="tg-nrix text-center" colspan="3">No. of Functional Unit </th>
-                                        <th class="tg-nrix text-center" colspan="6">Transaction Data </th>
+                                        <th class="tg-nrix text-center" colspan="7">Transaction Data </th>
                                     </tr>
                                     <tr>
                                         <th class="tg-nrix" rowspan="2">Up to Previous Month </th>
@@ -113,6 +113,7 @@
                                         <th class="tg-nrix" colspan="2">Up to Previous Month </th>
                                         <th class="tg-nrix" colspan="2">During the Month </th>
                                         <th class="tg-nrix" colspan="2">Cumulative </th>
+                                        <th class="tg-nrix" rowspan="2">Average </th>
                                     </tr>
                                     <tr>
                                         <th class="tg-nrix">Total Turnover (in Rs)</th>
@@ -137,6 +138,7 @@
                                             <td><?= $distwisetxn['expn_mon'] ?></td>
                                             <td><?= $distwisetxn['turnover_cumm'] ?></td>
                                             <td><?= $distwisetxn['expn_cumm'] ?></td>
+                                            <td></td>
                                         </tr>
                                     <?php  } ?>
                                 </tbody>
