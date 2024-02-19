@@ -138,7 +138,7 @@
                                             <td><?= $distwisetxn['expn_mon'] ?></td>
                                             <td><?= $distwisetxn['turnover_cumm'] ?></td>
                                             <td><?= $distwisetxn['expn_cumm'] ?></td>
-                                            <td></td>
+                                            <td><?= $distwisetxn['avg_turnover'] ?></td>
                                         </tr>
                                     <?php  } ?>
                                 </tbody>

@@ -321,7 +321,27 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($filter['month_id'])) {
       $pmonth = $filter['month_id'] - 1;
     }
+    $avgMonth = 0;
+    if (!empty($filter['month_id'])) {
+      $avgMonth = $filter['month_id'] ;
+    }
+    // echo $avgMonth;
     $sql = "SELECT
+    t1.unit_id,
+    t1.unit_name,
+    t1.total_units_upto,
+    t1.total_units_mon,
+    t1.total_units_cumm,
+    t1.turnover_upto,
+    t1.turnover_mon,
+    t1.turnover_cumm,
+    t1.expn_upto,
+    t1.expn_mon,
+    t1.expn_cumm,
+    t1.incm_upto,
+    t1.incm_mon,
+    COALESCE(t1.turnover_cumm /$avgMonth, 0) avg_turnover
+     FROM (SELECT
       units.unit_id,
       units.unit_name,
       COALESCE(func_unit_upto.total_units, 0) total_units_upto,
@@ -334,7 +354,8 @@ class EstablishmentTransactionDetailsModel extends Model
       COALESCE(txn_mon.expense, 0) expn_mon,
       COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
       COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
-      COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
+      COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon,
+      func_unit_upto.month_id
     FROM (SELECT
     eu.id unit_id,
     eu.name unit_name
@@ -342,7 +363,8 @@ class EstablishmentTransactionDetailsModel extends Model
     ORDER BY eu.name) units
     LEFT JOIN (SELECT
         e.unit_id,
-        COUNT(e.id) total_units
+        COUNT(e.id) total_units,
+        sm.id month_id
       FROM enterprises e
         LEFT JOIN dashboard_years dy
           ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
@@ -449,7 +471,7 @@ class EstablishmentTransactionDetailsModel extends Model
     }
 
     $sql .= " GROUP BY et.unit_id) txn_mon
-    ON txn_mon.unit_id = units.unit_id";
+    ON txn_mon.unit_id = units.unit_id)t1";
     // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
