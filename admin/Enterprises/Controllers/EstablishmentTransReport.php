@@ -114,16 +114,16 @@ class EstablishmentTransReport extends AdminController
 
 		$data['district_id'] = $filter['district_id'] = $this->request->getGet('district_id') ?? 0;
 		$data['year_id'] = $filter['year_id'] = $this->request->getGet('year_id') ?? ((new YearModel())->getCurrentYear())->id;
-		$data['month_id'] = $this->request->getGet('month_id') ?? ((new MonthModel())->getCurrentMonth())->id;
+		$data['month_id'] = $filter['month_id']=$this->request->getGet('month_id') ?? ((new MonthModel())->getCurrentMonth())->id;
 		$data['block_id'] = $filter['block_id'] = $this->request->getGet('block_id') ?? 0;
 		$data['management_unit_type'] = $filter['management_unit_type'] = $this->request->getGet('management_unit_type') ?? '';
 		//print_r($filter);
-		if(!$this->request->getGet('month_id')){
-			$filter['month_id'] = getCurrentMonthId();
-		} else {
-			$filter['month_id'] = $this->request->getGet('month_id');
-		}
-
+		// if(!$this->request->getGet('month_id')){
+		// 	$filter['month_id'] = getCurrentMonth()->id;
+		// } else {
+		// 	$filter['month_id'] = $this->request->getGet('month_id');
+		// }
+// dd($filter);
 		$distwisetxnreports = $enetrprisetrxnreprt->unitwisereport($filter);
 		// dd($distwisetxnreports);
 		foreach ($distwisetxnreports as $distwisetxnreport) {
@@ -140,10 +140,11 @@ class EstablishmentTransReport extends AdminController
 				'expn_cumm' => $distwisetxnreport->expn_cumm,
 				'incm_upto' => $distwisetxnreport->incm_upto,
 				'incm_mon' => $distwisetxnreport->incm_mon,
+				'avg_turnover' => round($distwisetxnreport->avg_turnover,2)
 			];
 		}
 		// dd($data);
-		$data['download_txn_excel_url'] = admin_url('enttxnreport?request=download_txn_excel') . '&' . http_build_query($filter);
+		$data['download_txn_excel_url'] = admin_url('enterprises/enttxnreport?request=download_txn_excel') . '&' . http_build_query($filter);
 		if ($request) {
 			$reader = new Html();
 			$doc = new \DOMDocument();
@@ -172,7 +173,15 @@ class EstablishmentTransReport extends AdminController
 
 			//
 			$spreadsheet->setActiveSheetIndex(0);
+			$highestColumn = $worksheet->getHighestColumn();
 
+			// Iterate through each column and set auto-size
+			for ($col = 'A'; $col <= $highestColumn; $col++) {
+				// $worksheet->getColumnDimension($col)->setAutoSize(true);
+	
+				$worksheet->getStyle('A1:' . $highestColumn . $worksheet->getHighestRow())
+					->getAlignment()->setWrapText(true);
+			}
 			if ($request == 'download_txn_excel') {
 
 				header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
