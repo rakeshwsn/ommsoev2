@@ -43,6 +43,7 @@ class MonthModel extends Model
 	public function getCurrentMonth() {
         $month = date('m');
         $sql = "SELECT * FROM ".$this->table." WHERE number =".$month;
+		// echo $sql; exit;
         return $this->db->query($sql)->getFirstRow();
 	}
 }
