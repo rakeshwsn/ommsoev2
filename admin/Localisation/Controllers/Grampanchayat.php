@@ -231,7 +231,7 @@ class Grampanchayat extends AdminController
                 ->findAll();
         }
 
-//        $data['districts'][0] = 'Select districts';
+        $data['districts'][0] = 'Select districts';
 		foreach ($districts as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
@@ -243,7 +243,7 @@ class Grampanchayat extends AdminController
         }
 		$blocks = $this->blockModel->where($bfilter)->orderBy('name', 'asc')->findAll();
 
-//        $data['blocks'][0] = 'Select block';
+        $data['blocks'][0] = 'Select block';
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
@@ -267,7 +267,7 @@ class Grampanchayat extends AdminController
 		$id = $this->uri->getSegment(4);
 		$regex = "(\/?([a-zA-Z0-9+\$_-]\.?)+)*\/?"; // Path
 		$regex .= "(\?[a-zA-Z+&\$_.-][a-zA-Z0-9;:@&%=+\/\$_.-]*)?"; // GET Query
-		$regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor 
+		$regex .= "(#[a-zA-Z_.-][a-zA-Z0-9+\$_.-]*)?"; // Anchor
 
 		$rules = $this->grampanchayatModel->validationRules;
 

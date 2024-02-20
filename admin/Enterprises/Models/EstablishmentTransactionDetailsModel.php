@@ -124,7 +124,17 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($filter['period'])) {
       $sql .= " AND txn_dtl.period = " . $filter['period'];
     }
-    
+    if (!empty($filter['filter_search'])) {
+      $search = $filter['filter_search'];
+      $sql .= " AND
+          (dy.name LIKE '%$search%' OR
+          sd.name LIKE '%$search%' OR
+          sm.name LIKE '%$search%' OR
+          eu.name LIKE '%$search%' OR
+          txn_dtl.period LIKE '%$search%')
+      ";
+    }
+
     if (!empty($filter['sort']) && $filter['sort']) {
       $sort = $filter['sort'];
     } else {
@@ -148,7 +158,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
     }
     // $sql .=  " GROUP BY unit.units";
-  
+
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {
@@ -164,20 +174,19 @@ class EstablishmentTransactionDetailsModel extends Model
 
     // Add condition to check if deleted_at is not null
     $builder->where('etd.deleted_at IS  NULL');
-
     $count = $builder->countAllResults();
 
     return $count;
   }
   private function filter($builder, $data)
   {
-    $builder->join('dashboard_years dy', 'et.year_id = dy.id');
-    $builder->join('soe_months sm', 'et.month_id = sm.id');
-    $builder->join('soe_districts sd', 'et.district_id = sd.id');
-    $builder->join('soe_blocks sb', 'etd.block_id = sb.id');
-    $builder->join('villages v', 'etd.village_id = v.id');
-    $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id');
-    $builder->join('enterprises_units eu', 'et.unit_id = eu.id');
+    $builder->join('dashboard_years dy', 'et.year_id = dy.id', 'left');
+    $builder->join('soe_months sm', 'et.month_id = sm.id', 'left');
+    $builder->join('soe_districts sd', 'et.district_id = sd.id', 'left');
+    $builder->join('soe_blocks sb', 'etd.block_id = sb.id', 'left');
+    $builder->join('villages v', 'etd.village_id = v.id', 'left');
+    $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id', 'left');
+    $builder->join('enterprises_units eu', 'et.unit_id = eu.id', 'left');
 
     if (!empty($data['district_id'])) {
       $builder->where("et.district_id  = '" . $data['district_id'] . "'");
@@ -191,12 +200,22 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($data['year_id'])) {
       $builder->where("et.year_id  = '" . $data['year_id'] . "'");
     }
+    if (!empty($data['unit_id'])) {
+      $builder->where("et.unit_id  = '" . $data['unit_id'] . "'");
+    }
 
     if (!empty($data['filter_search'])) {
-      $builder->where("sb.is_program=1 AND 
-      sd.name LIKE '%{$data['filter_search']}%' OR
-      sd.id = '{$data['filter_search']}'");
+      $search = $data['filter_search'];
+
+      $builder->where(" 
+      dy.name LIKE '%$search%' OR
+          sd.name LIKE '%$search%' OR
+          sm.name LIKE '%$search%' OR
+          eu.name LIKE '%$search%' OR
+          txn_dtl.period LIKE '%$search%'");
     }
+   
+
 
     // echo $this->db->getLastQuery();exit;
   }
@@ -302,7 +321,27 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($filter['month_id'])) {
       $pmonth = $filter['month_id'] - 1;
     }
+    $avgMonth = 0;
+    if (!empty($filter['month_id'])) {
+      $avgMonth = $filter['month_id'] ;
+    }
+    // echo $avgMonth;
     $sql = "SELECT
+    t1.unit_id,
+    t1.unit_name,
+    t1.total_units_upto,
+    t1.total_units_mon,
+    t1.total_units_cumm,
+    t1.turnover_upto,
+    t1.turnover_mon,
+    t1.turnover_cumm,
+    t1.expn_upto,
+    t1.expn_mon,
+    t1.expn_cumm,
+    t1.incm_upto,
+    t1.incm_mon,
+    COALESCE(t1.turnover_cumm /$avgMonth, 0) avg_turnover
+     FROM (SELECT
       units.unit_id,
       units.unit_name,
       COALESCE(func_unit_upto.total_units, 0) total_units_upto,
@@ -315,7 +354,8 @@ class EstablishmentTransactionDetailsModel extends Model
       COALESCE(txn_mon.expense, 0) expn_mon,
       COALESCE(trxn_upto.expense, 0) + COALESCE(txn_mon.expense, 0) expn_cumm,
       COALESCE(trxn_upto.turn_over, 0) - COALESCE(trxn_upto.expense, 0) incm_upto,
-      COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon
+      COALESCE(txn_mon.turn_over, 0) - COALESCE(txn_mon.expense, 0) incm_mon,
+      func_unit_upto.month_id
     FROM (SELECT
     eu.id unit_id,
     eu.name unit_name
@@ -323,7 +363,8 @@ class EstablishmentTransactionDetailsModel extends Model
     ORDER BY eu.name) units
     LEFT JOIN (SELECT
         e.unit_id,
-        COUNT(e.id) total_units
+        COUNT(e.id) total_units,
+        sm.id month_id
       FROM enterprises e
         LEFT JOIN dashboard_years dy
           ON DATE(e.mou_date) BETWEEN DATE(dy.start_date) AND DATE(dy.end_date)
@@ -430,7 +471,7 @@ class EstablishmentTransactionDetailsModel extends Model
     }
 
     $sql .= " GROUP BY et.unit_id) txn_mon
-    ON txn_mon.unit_id = units.unit_id";
+    ON txn_mon.unit_id = units.unit_id)t1";
     // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }

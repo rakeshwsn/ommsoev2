@@ -91,7 +91,7 @@ class Enterprise extends AdminController
 		$unit_id =$this->request->getGet('unit_id');
 
 		$data['enterprisesList'] = $enterprisesmodel->getDataBYUnit($year_id, $unit_id);
-
+// dd($data);
 
 		if ($this->request->getGet('unit_id') && ($this->request->getGet('year_id'))) {
 

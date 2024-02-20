@@ -21,11 +21,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
+use PhpParser\Node\Stmt\Label;
 
 class EstablishmentTransaction extends AdminController
 {
-    private $establishmenTransaction;
+    // private $establishmenTransaction;
     private $establishmentTxnsDtls;
     private $yearModel;
     private $monthModel;
@@ -37,7 +37,7 @@ class EstablishmentTransaction extends AdminController
 
     public function __construct()
     {
-        $this->establishmenTransaction = new EstablishmentTransactionModel();
+        // $this->establishmenTransaction = new EstablishmentTransactionModel();
         $this->establishmentTxnsDtls = new EstablishmentTransactionDetailsModel();
         $this->yearModel = new YearModel();
         $this->monthModel = new MonthModel();
@@ -49,29 +49,29 @@ class EstablishmentTransaction extends AdminController
     }
     private $columns = [
         'Machinary' => [
-            'no_of_days_functional' => 'No. of Days Functional',
-            'total_turnover' => 'Total turnover / sale value',
-            'produced' => 'Quintals of Produce processed',
-            'total_expend' => 'Total expenditure',
-            'under_maintenance' => 'No. of times under maintenance',
+            'no_of_days_functional' => ['label' => 'No. of Days Functional', 'rules' => 'number'],
+            'total_turnover' => ['label' => 'Total turnover / sale value', 'rules' => 'decimal'],
+            'produced' => ['label' => 'Quintals of Produce processed', 'rules' => 'decimal'],
+            'total_expend' => ['label' => 'Total expenditure', 'rules' => 'decimal'],
+            'under_maintenance' => ['label' => 'No. of times under maintenance', 'rules' => 'number'],
         ],
         'Food' => [
-            'no_of_days_functional' => 'No. of Days Functional',
-            'total_turnover' => 'Total turnover / sale value',
-            'total_expend' => 'Total expenditure',
-            'event_attend' => 'No. of event attend',
+            'no_of_days_functional' => ['label' => 'No. of Days Functional', 'rules' => 'number'],
+            'total_turnover' => ['label' => 'Total turnover / sale value', 'rules' => 'decimal'],
+            'total_expend' => ['label' => 'Total expenditure', 'rules' => 'decimal'],
+            'event_attend' => ['label' => 'No. of event attend', 'rules' => 'number'],
         ],
         'CHC' => [
-            'farmer_user' => 'NO. of farmer user',
-            'service_charge' => 'Value of service charge collected (in rupees)',
-            'total_expend' => 'Expenditure if any(rupees)',
+            'farmer_user' => ['label' => 'NO. of farmer user', 'rules' => 'number'],
+            'service_charge' => ['label' => 'Value of service charge collected (in rupees)', 'rules' => 'decimal'],
+            'total_expend' => ['label' => 'Expenditure if any(rupees)', 'rules' => 'decimal'],
         ],
         'CMSC' => [
-            'farmer_user' => 'NO. of farmer user',
-            'seed_support' => 'Quantity of seed supported (in quintals)',
-            'seed_store' => 'Quantity of seed in store (in quintals)',
-            'service_charge' => 'Value of service charges & sale of seed',
-            'total_expend' => 'Expenditure if any (in rupees)',
+            'farmer_user' => ['label' => 'NO. of farmer user', 'rules' => 'number'],
+            'seed_support' => ['label' => 'Quantity of seed supported (in quintals)', 'rules' => 'decimal'],
+            'seed_store' => ['label' => 'Quantity of seed in store (in quintals)', 'rules' => 'decimal'],
+            'service_charge' => ['label' => 'Value of service charges & sale of seed', 'rules' => 'decimal'],
+            'total_expend' => ['label' =>  'Expenditure if any (in rupees)', 'rules' => 'decimal'],
         ],
     ];
 
@@ -155,6 +155,7 @@ class EstablishmentTransaction extends AdminController
 
         $requestData = $_REQUEST;
         $totalData = $this->establishmentTxnsDtls->getTotals();
+        
         $totalFiltered = $totalData;
         // This array use for filter data 
         $filter_data = array(
@@ -171,7 +172,6 @@ class EstablishmentTransaction extends AdminController
         );
 
         $totalFiltered = $this->establishmentTxnsDtls->getTotals($filter_data);
-
         $filteredData = $this->establishmentTxnsDtls->periodswisetrans($filter_data);
         $datatable = array();
         foreach ($filteredData as $result) {
@@ -190,7 +190,7 @@ class EstablishmentTransaction extends AdminController
                 $result->village_name,
                 $result->month_name,
                 $result->year_name,
-                $result->period,            
+                $result->period,
                 $action,
             );
         }
@@ -296,6 +296,7 @@ class EstablishmentTransaction extends AdminController
 
                 $data['entranses'] = $entranses;
             }
+            // dd($data);
             return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
         }
     }
@@ -309,7 +310,7 @@ class EstablishmentTransaction extends AdminController
             $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
             $group->units = $units;
         }
-      
+
         $month_id = $this->request->getGet('month_id');
         $year_id = $this->request->getGet('year_id');
         $district_id = $this->request->getGet('district_id');
@@ -510,7 +511,7 @@ class EstablishmentTransaction extends AdminController
                 'period' => $period,
             ];
 
-            $exists = $this->establishmenTransaction->isExists($data);
+            $exists = $this->enterprisesModel->isExists($data);
 
             if ($exists) {
                 $status = false;
@@ -537,7 +538,7 @@ class EstablishmentTransaction extends AdminController
                                 'period' => (int)$period,
                             ];
 
-                            $transaction_id = $this->establishmenTransaction->insert($data);
+                            $transaction_id = $this->enterprisesModel->insert($data);
 
                             $data = [
                                 'enterprise_id' => (int)$transaction[1],
@@ -554,7 +555,7 @@ class EstablishmentTransaction extends AdminController
                                 $data[$key] = (float)$transaction[$col++];
                             }
 
-                            $this->establishmenTransaction->insert($data);
+                            $this->enterprisesModel->insert($data);
                             $status = true;
                             $message = 'Uploaded successfully';
                         }
