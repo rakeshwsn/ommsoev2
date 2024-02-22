@@ -2,7 +2,7 @@
 added by rakesh N -->
 <table class="table">
     <thead>
-        <tr style="background-color:blanchedalmond;">
+        <tr style="background-color:#FABC5B;">
             <th scope="col">slno</th>
             <th scope="col">Unit Name</th>
             <th scope="col">WSHG</th>
