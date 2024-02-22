@@ -192,6 +192,7 @@ class Dashboard extends ResourceController
 
 		//generate table
 		$data['table'] = view('Api\Dashboard\Views\dashboardTable', $data);
+		$data['tableWshg'] = view('Api\Dashboard\Views\dashboardWshgTable', $data);
 
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 		exit;
