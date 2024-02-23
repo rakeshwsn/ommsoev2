@@ -1,18 +1,4 @@
 <div class="main-container">
-    <!--<div class="block">
-        <div class="block-header block-header-default">
-            <h3 class="block-title">Summary</h3>
-            <div class="block-content">
-                <table id="area-coverage-summary">
-                    <tr>
-                        <th>Week</th>
-                        <th>Total GPs</th>
-                        <th>Total GPs</th>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    </div>-->
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title">Filter</h3>
@@ -26,20 +12,20 @@
                                 <label class="form-control-label">Block: <span class="tx-danger">*</span></label>
                                 <?= form_dropdown('block_id', $filter_blocks, $block_id, "id='filter_block' class='form-control js-select2'"); ?>
                             </div>
-                        </div><!-- col-4 -->
+                        </div>
                         <div class="col-lg-3">
                             <div class="form-group mg-b-10-force">
                                 <label class="form-control-label">Week: <span class="tx-danger">*</span></label>
                                 <?= form_dropdown('start_date', $weeks, $week_start_date, "id='filter_week' class='form-control js-select2'"); ?>
                             </div>
-                        </div><!-- col-4 -->
+                        </div>
                         <div class="col-lg-3 center">
                             <label class="form-control-label">&nbsp;</label>
                             <div class="form-layout-footer">
                                 <button id="btn-filter" class="btn btn-primary">Filter</button>
-                            </div><!-- form-layout-footer -->
+                            </div>
                         </div>
-                    </div><!-- row -->
+                    </div>
                 </div>
             </form>
         </div>
@@ -122,80 +108,52 @@
                 </thead>
                 <tbody>
                     <?php if ($blocks) { ?>
-                        <?php foreach ($blocks as $block) { ?>
+                        <?php foreach ($blocks as $key => $block) { ?>
                             <tr>
                                 <td>
-                                    <?= $block['slno'] ?>
+                                    <?= $key + 1 ?>
                                 </td>
                                 <td>
-                                    <?= $block['gp'] ?>
+                                    <?= $block->gp ?>
                                 </td>
                                 <td>
-                                    <?= $block['farmers_covered'] ?>
+                                    <?= $block->farmers_covered ?>
                                 </td>
                                 <td>
-                                    <?= $block['nursery_raised'] ?>
+                                    <?= $block->nursery_raised ?>
                                 </td>
                                 <td>
-                                    <?= $block['balance_smi'] ?>
+                                    <?= $block->balance_smi ?>
                                 </td>
                                 <td>
-                                    <?= $block['balance_lt'] ?>
+                                    <?= $block->balance_lt ?>
                                 </td>
+                                
+                                
+                                    <? foreach ($block->achievements as $achievement) {
+                                        $crop_p = $crop_practices[$achievement->crop_id];
+                                        
+                                        foreach($crop_p as $p){?>
+                                        <td> <?= $achievement->{$p} ?></td>
+                                        <?}?>
+                                    <? } ?>
+                               <td> <?= $block->total_ragi; ?></td>
+                               <td> <?= $block->total_non_ragi; ?></td>
                                 <td>
-                                    <?= $block['ragi_smi'] ?>
+                                    <?= $block->follow_up; ?>
                                 </td>
-                                <td>
-                                    <?= $block['ragi_lt'] ?>
+                                 <td>
+                                     <?= $block->total_area; ?>
                                 </td>
-                                <td>
-                                    <?= $block['ragi_ls'] ?>
+                                 <td>
+                                     <?= $block->total_crop_div; ?>
                                 </td>
-                                <td>
-                                    <?= $block['little_millet_lt'] ?>
+                                 <td>
+                                    <?= $block->rice_fallow; ?>
                                 </td>
-                                <td>
-                                    <?= $block['little_millet_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['foxtail_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['sorghum_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['kodo_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['barnyard_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['pearl_ls'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['total_ragi'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['total_non_ragi'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['total_fc'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['total_area'] ?>
-                                </td>
-                                <td>
-                                    <?= $block['total_crop_div'] ?>
-                                </td>
-                                <?php if ($season == 'Rabi') { ?>
-                                    <td>
-                                        <?= $block['total_rfc'] ?>
-                                    </td>
-                                <?php } ?>
-                                <td>
-                                    <div class="btn-group btn-group-sm pull-right">
-                                        <?= $block['action'] ?>
-                                    </div>
+                                
+                                 <td>
+                                    <?= $block->action; ?>
                                 </td>
                             </tr>
                         <?php } ?>

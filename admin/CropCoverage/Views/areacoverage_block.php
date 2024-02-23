@@ -105,47 +105,47 @@
                                     ?>
                                     <tr>
                                         <td>
-                                            <?= $block['week'] ?>
+                                            <?= $block->start_date ?>
                                         </td>
                                         <td>
-                                            <?= $block['gp'] ?>
+                                            <?= $block->gp ?>
                                         </td>
                                         <td>
-                                            <?= $block['farmers_covered'] ?>
+                                            <?= $block->farmers_covered ?>
                                         </td>
                                         <td>
-                                            <?= $block['nursery_raised'] ?>
+                                            <?= $block->nursery_raised ?>
                                         </td>
                                         <td>
-                                            <?= $block['balance_smi'] ?>
+                                            <?= $block->balance_smi ?>
                                         </td>
                                         <td>
-                                            <?= $block['balance_lt'] ?>
+                                            <?= $block->balance_lt ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_ragi'] ?>
+                                            <?= $block->total_ragi ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_non_ragi'] ?>
+                                            <?= $block->total_non_ragi ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_fc'] ?>
+                                            <?= $block->follow_up ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_area'] ?>
+                                            <?= $block->total_area ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_crop_div_area'] ?>
+                                            <?= $block->total_crop_div ?>
                                         </td>
                                         <td>
-                                            <?= $block['total_rfc'] ?>
+                                            <?= $block->rice_fallow ?>
                                         </td>
                                         <td>
-                                            <?= $block['status'] ?>
+                                            <?= $block->status ?>
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm pull-right">
-                                                <?= $block['action'] ?>
+                                                <?= $block->action ?>
                                             </div>
                                         </td>
                                     </tr>

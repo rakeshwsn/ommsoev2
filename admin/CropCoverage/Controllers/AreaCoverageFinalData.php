@@ -27,7 +27,7 @@ class AreaCoverageFinalData extends AdminController
     private $practicesModel;
     private $acModel;
     private $fdDocModel;
-
+    private $yearModel;
     private $gpModel;
     private $fdModel;
 
@@ -42,6 +42,7 @@ class AreaCoverageFinalData extends AdminController
         $this->fdDocModel = new FinalDataDocModel();
         $this->practicesModel = new PracticesModel();
         $this->targetModel = new TargetModel();
+        $this->yearModel = new YearModel();
 
     }
     public function Index()
@@ -147,14 +148,14 @@ class AreaCoverageFinalData extends AdminController
 
         $data['blocks'] = [];
         if ($data['district_id']) {
-            $data['blocks'] = (new BlockModel())->where('district_id', $data['district_id'])
+            $data['blocks'] = $this->blockModel->where('district_id', $data['district_id'])
                 ->orderBy('name')->asArray()->findAll();
         }
         // echo $data['district_id'];
         // exit;
 
         if ($action == 'download') {
-            $data['fin_year'] = (new YearModel())->find($data['year_id'])->name;
+            $data['fin_year'] = $this->yearModel->find($data['year_id'])->name;
             $data['table'] = view('Admin\CropCoverage\Views\finaldata_table', $data);
             $filename = 'AreaCoverageFinalReport_' . $data['current_season'] . '_' . $data['fin_year'] . '_' . date('Y-m-d His') . '.xlsx';
 

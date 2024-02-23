@@ -100,10 +100,57 @@ class AreaCoverage extends AdminController
                 'season' => getCurrentSeason(),
                 'start_date' => $data['get_date']
             ];
+            $data['start_date'] = $data['get_date'];
+            // printr($filter);
+            // exit;
 
+            //$blocks = $this->acModel->getAreaCoverage($filter);
+            $gps = $this->acModel->getAreaCoverageBlock($filter);
+            // printr($gps);
+            // exit;
+            $blocks = [];
+            foreach ($gps as $gp) {
+                $gp->total_ragi = 0;
+                $gp->total_non_ragi = 0;
+                $achievements = $this->acModel->getAchivementByCCID((int) $gp->cc_id);
 
-            $blocks = $this->acModel->getAreaCoverage($filter);
-            // printr($blocks);
+                $action = '';
+                $week = '';
+                $action = '';
+                $week = '';
+                if ($gp->start_date) {
+                    $href = admin_url('areacoverage/edit?id=' . $gp->cc_id);
+                    $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
+                                            <i class="fa fa-list"></i></a>';
+
+                    $week = date('d F', strtotime($gp->start_date)) . '-' . date('d F', strtotime($gp->end_date));
+                }
+
+                $status = $gp->status;
+                if (!isset($status)) {
+                    $status = 3;
+                }
+                foreach ($achievements as $achievement) {
+                    if ($achievement->crop_type) {
+                        $gp->total_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
+                    } else {
+                        $gp->total_non_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
+                    }
+                }
+                $rice_fallow = $this->acModel->getRiceFallowByCCID((int) $gp->cc_id);
+                $follow_up = $this->acModel->getFollowUpByCCID((int) $gp->cc_id);
+
+                $gp->rice_fallow = $rice_fallow;
+                $gp->follow_up = $follow_up;
+                $gp->total_area = $gp->total_ragi + $gp->total_non_ragi + $gp->follow_up;
+                $gp->achievements = $achievements;
+                $gp->action = $action;
+                $gp->status = '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>';
+                $gp->week = $week;
+                $blocks[] = $gp;
+            }
+            $data['blocks'] = $blocks;
+            // printr($data['blocks']);
             // exit;
             $weekDate = $this->acModel->getWeekDate();
             $data['start_date'] = '';
@@ -137,96 +184,97 @@ class AreaCoverage extends AdminController
                 $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
                 $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_rfc_area = $total_total_area = $total_crop_div_area = 0;
 
-            $data['blocks'] = [];
+            //$data['blocks'] = [];
 
-            foreach ($blocks as $block) {
-                $status = $block->status;
-                if (!isset($status)) {
-                    $status = 3;
-                }
-                $action = '';
-                $week = '';
-                if ($block->start_date) {
-                    $href = admin_url('areacoverage/edit?id=' . $block->cc_id);
-                    $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
-                                            <i class="fa fa-list"></i></a>';
-                    $week = date('d F', strtotime($block->start_date));
-                }
+            // foreach ($blocks as $block) {
+            //     $status = $block->status;
+            //     if (!isset($status)) {
+            //         $status = 3;
+            //     }
+            //     $action = '';
+            //     $week = '';
+            //     if ($block->start_date) {
+            //         $href = admin_url('areacoverage/edit?id=' . $block->cc_id);
+            //         $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
+            //                                 <i class="fa fa-list"></i></a>';
+            //         $week = date('d F', strtotime($block->start_date));
+            //     }
 
-                $total_area = $block->fc_area +
-                    $block->ragi_smi +
-                    $block->ragi_lt +
-                    $block->ragi_ls +
-                    $block->little_millet_lt +
-                    $block->little_millet_ls +
-                    $block->foxtail_ls +
-                    $block->sorghum_ls +
-                    $block->kodo_ls +
-                    $block->barnyard_ls +
-                    $block->pearl_ls;
-                $total_ragi = $block->ragi_smi +
-                    $block->ragi_lt +
-                    $block->ragi_ls;
-                $total_crop_div_area = $block->crop_div_ragi +
-                    $block->crop_div_non_ragi;
+            //     $total_area = $block->fc_area +
+            //         $block->ragi_smi +
+            //         $block->ragi_lt +
+            //         $block->ragi_ls +
+            //         $block->little_millet_lt +
+            //         $block->little_millet_ls +
+            //         $block->foxtail_ls +
+            //         $block->sorghum_ls +
+            //         $block->kodo_ls +
+            //         $block->barnyard_ls +
+            //         $block->pearl_ls;
+            //     $total_ragi = $block->ragi_smi +
+            //         $block->ragi_lt +
+            //         $block->ragi_ls;
+            //     $total_crop_div_area = $block->crop_div_ragi +
+            //         $block->crop_div_non_ragi;
 
-                $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
+            //     $total_non_ragi = bcsub(bcsub($total_area, $total_ragi, 2), $block->fc_area, 2);
 
-                $data['blocks'][] = [
-                    'week' => $week,
-                    'gp' => $block->gp,
-                    'farmers_covered' => $block->farmers_covered,
-                    'nursery_raised' => $block->nursery_raised,
-                    'balance_smi' => $block->balance_smi,
-                    'balance_lt' => $block->balance_lt,
-                    'ragi_smi' => $block->ragi_smi,
-                    'ragi_lt' => $block->ragi_lt,
-                    'ragi_ls' => $block->ragi_ls,
-                    'little_millet_lt' => $block->little_millet_lt,
-                    'little_millet_ls' => $block->little_millet_ls,
-                    'foxtail_ls' => $block->foxtail_ls,
-                    'sorghum_ls' => $block->sorghum_ls,
-                    'kodo_ls' => $block->kodo_ls,
-                    'barnyard_ls' => $block->barnyard_ls,
-                    'pearl_ls' => $block->pearl_ls,
-                    'total_ragi' => $total_ragi,
-                    'total_non_ragi' => $total_non_ragi,
-                    'total_fc' => $block->fc_area,
-                    'total_area' => $total_area,
-                    'total_crop_div_area' => $total_crop_div_area,
-                    'total_rfc' => $block->rfc_area,
-                    'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
-                    'action' => $action,
-                ];
+            //     $data['blocks'][] = [
+            //         'week' => $week,
+            //         'gp' => $block->gp,
+            //         'farmers_covered' => $block->farmers_covered,
+            //         'nursery_raised' => $block->nursery_raised,
+            //         'balance_smi' => $block->balance_smi,
+            //         'balance_lt' => $block->balance_lt,
+            //         'ragi_smi' => $block->ragi_smi,
+            //         'ragi_lt' => $block->ragi_lt,
+            //         'ragi_ls' => $block->ragi_ls,
+            //         'little_millet_lt' => $block->little_millet_lt,
+            //         'little_millet_ls' => $block->little_millet_ls,
+            //         'foxtail_ls' => $block->foxtail_ls,
+            //         'sorghum_ls' => $block->sorghum_ls,
+            //         'kodo_ls' => $block->kodo_ls,
+            //         'barnyard_ls' => $block->barnyard_ls,
+            //         'pearl_ls' => $block->pearl_ls,
+            //         'total_ragi' => $total_ragi,
+            //         'total_non_ragi' => $total_non_ragi,
+            //         'total_fc' => $block->fc_area,
+            //         'total_area' => $total_area,
+            //         'total_crop_div_area' => $total_crop_div_area,
+            //         'total_rfc' => $block->rfc_area,
+            //         'status' => '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>',
+            //         'action' => $action,
+            //     ];
 
-                $total_farmers_covered = $block->farmers_covered;
-                $total_nursery_raised = $block->nursery_raised;
-                $total_balance_smi = $block->balance_smi;
-                $total_balance_lt = $block->balance_lt;
-                $total_ragi_smi += $block->ragi_smi;
-                $total_ragi_lt += $block->ragi_lt;
-                $total_ragi_ls += $block->ragi_ls;
-                $total_little_millet_lt += $block->little_millet_lt;
-                $total_little_millet_ls += $block->little_millet_ls;
-                $total_foxtail_ls += $block->foxtail_ls;
-                $total_sorghum_ls += $block->sorghum_ls;
-                $total_kodo_ls += $block->kodo_ls;
-                $total_barnyard_ls += $block->barnyard_ls;
-                $total_pearl_ls += $block->pearl_ls;
-                $total_total_ragi += $total_ragi;
-                $total_total_non_ragi += $total_non_ragi;
-                $total_fc_area += $block->fc_area;
-                $total_rfc_area += $block->rfc_area;
-                $total_crop_div_area += $total_crop_div_area;
-                $total_total_area += $total_area;
-            }
+            //     $total_farmers_covered = $block->farmers_covered;
+            //     $total_nursery_raised = $block->nursery_raised;
+            //     $total_balance_smi = $block->balance_smi;
+            //     $total_balance_lt = $block->balance_lt;
+            //     $total_ragi_smi += $block->ragi_smi;
+            //     $total_ragi_lt += $block->ragi_lt;
+            //     $total_ragi_ls += $block->ragi_ls;
+            //     $total_little_millet_lt += $block->little_millet_lt;
+            //     $total_little_millet_ls += $block->little_millet_ls;
+            //     $total_foxtail_ls += $block->foxtail_ls;
+            //     $total_sorghum_ls += $block->sorghum_ls;
+            //     $total_kodo_ls += $block->kodo_ls;
+            //     $total_barnyard_ls += $block->barnyard_ls;
+            //     $total_pearl_ls += $block->pearl_ls;
+            //     $total_total_ragi += $total_ragi;
+            //     $total_total_non_ragi += $total_non_ragi;
+            //     $total_fc_area += $block->fc_area;
+            //     $total_rfc_area += $block->rfc_area;
+            //     $total_crop_div_area += $total_crop_div_area;
+            //     $total_total_area += $total_area;
+            // }
         }
         // printr($blocks);
         // exit;
         if ($this->user->block_id) {
             return $this->template->view('Admin\CropCoverage\Views\areacoverage_block', $data);
         } else {
-            echo "Please login as a FA";
+            return redirect()->to(admin_url())
+                ->with('message', 'Please Login As a Block Admin');
         }
     }
 
@@ -722,6 +770,8 @@ class AreaCoverage extends AdminController
             $area += $fup['area'];
         }
         $data['fups_total'] = $area;
+        // printr($data['fups_total']);
+        // exit;
         $data['practices'] = $_practices;
         $rfarea = 0;
         foreach ($data['ricefallows'] as $ricefallow) {
@@ -729,7 +779,7 @@ class AreaCoverage extends AdminController
         }
         $data['rfc_total'] = $rfarea;
 
-        // printr($data['practices']);
+        // printr($data['rfc_total']);
         // exit;
         if ($return_data) {
             return $data;
