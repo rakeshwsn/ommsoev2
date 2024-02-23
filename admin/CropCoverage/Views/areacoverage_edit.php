@@ -129,25 +129,25 @@
                     <tbody>
                         <tr>
                             <td>
-                                Total Ragi
+                                Total Crop Diversification Ragi
                             </td>
                             <td>
-                                <input type="text" name="crop_coverage[crop_div_ragi]" value="<?= $crop_coverage['crop_div_ragi'] ?>" class="form-control financial">
+                                <input type="text" name="crop_div[crop_div_ragi]" value="<?= $crop_coverage['crop_div_ragi'] ?>" class="form-control financial">
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                Total Non Ragi
+                                Total Crop Diversification Non Ragi
                             </td>
                             <td>
-                                 <input type="text" name="crop_coverage[crop_div_non_ragi]" value="<?= $crop_coverage['crop_div_non_ragi'] ?>" class="form-control financial">
+                                 <input type="text" name="crop_div[crop_div_non_ragi]" value="<?= $crop_coverage['crop_div_non_ragi'] ?>" class="form-control financial">
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
                     <tr>
                         <td>Total</td>
-                        <td id="total-crop-diversification"><?=$total_div_crop; ?></td>
+                        <td id="total-crop-diversification">0</td>
                     </tr>
                     </tfoot>
                 </table>
@@ -175,7 +175,7 @@
                     <tfoot>
                     <tr>
                         <td>Total</td>
-                        <td id="total-rfc"><?=$rfc_total?></td>
+                        <td id="total-rfc"><?= $rfc_total ?></td>
                     </tr>
                     </tfoot>
                 </table>
@@ -232,6 +232,13 @@
             });
             $('#total-fup').text(tot);
         });
+        $('[name^="ricefallow"]').keyup(function (e) {
+            var tot=0;
+            $('[name^="ricefallow"]').each(function (i,element) {
+                tot += parseFloat($(element).val() || 0);
+            });
+            $('#total-rfc').text(tot);
+        });
     });
     //rakesh
     function numOnly() {
@@ -285,5 +292,16 @@
         });
     });
     <?php } ?>
+</script>
+<script>
+    $('[name^="crop_div"]').keyup(function () {
+        var total = 0;
+
+        $('[name^="crop_div"]').each(function (i, element) {
+            total += parseFloat($(element).val() || 0);
+        });
+
+        $('#total-crop-diversification').text(total.toFixed(2));
+    });
 </script>
 

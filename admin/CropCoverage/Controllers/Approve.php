@@ -19,7 +19,7 @@ class Approve extends AdminController
     private $districtModel;
     private $cropsModel;
     private $practicesModel;
-    private $areacoveragemodel;
+    private $acModel;
 
     function __construct()
     {
@@ -28,7 +28,7 @@ class Approve extends AdminController
         $this->districtModel = new DistrictModel();
         $this->cropsModel = new CropsModel;
         $this->practicesModel = new PracticesModel;
-        $this->areacoveragemodel = new AreaCoverageModel();
+        $this->acModel = new AreaCoverageModel();
     }
 
     public function index()
@@ -77,7 +77,7 @@ class Approve extends AdminController
         $data['currentDay'] = date('l');
         // $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday',));
 
-        $week_dates = $this->areacoveragemodel->getWeekDate();
+        $week_dates = $this->acModel->getWeekDate();
 
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $start_date = $this->request->getGet('start_date');
@@ -88,7 +88,7 @@ class Approve extends AdminController
         }
         //$start_date = $data['start_date'];
 
-        $acModel = new AreaCoverageModel();
+
         //update status
         if ($this->request->getMethod(1) == 'POST') {
             // echo "<pre>";
@@ -99,7 +99,7 @@ class Approve extends AdminController
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
-            $acModel->where('district_id', $district_id)
+            $this->acModel->where('district_id', $district_id)
                 ->where('start_date', $start_date)->set($status)->update();
             return redirect()->to(admin_url('areacoverage/approve/district?district_id=' . $district_id . '&start_date=' . $start_date))
                 ->with('message', 'Status has been updated.');
@@ -114,8 +114,8 @@ class Approve extends AdminController
             'start_date' => $data['start_date']
         ];
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
-        // printr($blocks);
+        $blocks = $this->acModel->getAreaCoverage($filter);
+        //printr($blocks);
         // exit;
 
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
@@ -221,7 +221,7 @@ class Approve extends AdminController
             'action' => ''
         ];
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
@@ -230,7 +230,7 @@ class Approve extends AdminController
         }
         // printr($blocks);
         // exit;
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = '';
@@ -258,7 +258,7 @@ class Approve extends AdminController
             }
         }
 
-        $district_status = $acModel->where('district_id', $district_id)
+        $district_status = $this->acModel->where('district_id', $district_id)
             ->where('start_date', $start_date)->first();
 
         $data['status'] = '';
@@ -291,7 +291,7 @@ class Approve extends AdminController
 
         $start_date = $this->request->getGet('start_date');
 
-        $dates = $this->areacoveragemodel->getWeekDate($start_date);
+        $dates = $this->acModel->getWeekDate($start_date);
         $data['currentDay'] = date('l');
         $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
 
@@ -302,20 +302,297 @@ class Approve extends AdminController
             ];
             $status = (int) $this->request->getPost('status');
             $remarks = $this->request->getPost('remarks');
-            $this->areacoveragemodel->setStatus($filter, $status, $remarks);
+            $this->acModel->setStatus($filter, $status, $remarks);
 
             $this->session->setFlashdata('message', 'The area coverage data has been approved');
             return redirect()->to(admin_url('areacoverage/approve'));
         }
 
-        $acModel = new AreaCoverageModel();
+
         //update status
         if ($this->request->getMethod(1) == 'POST') {
             $status = [
                 'status' => $this->request->getPost('status'),
                 'remarks' => $this->request->getPost('remarks'),
             ];
-            $acModel->where('block_id', $block_id)
+            $this->acModel->where('block_id', $block_id)
+                ->where('start_date', $start_date)->set($status)->update();
+            return redirect()->to(admin_url('areacoverage/approve/block?block_id=' . $block_id . '&start_date=' . $start_date))
+                ->with('message', 'Status has been updated.');
+        }
+
+        $filter = [
+            'block_id' => $block_id,
+            'start_date' => $dates['start_date']
+        ];
+        $crops = $this->cropsModel->findAll();
+        // printr($crops);
+        // exit;
+
+        $gps = $this->acModel->getAreaCoverageBlock($filter);
+
+        $practices = $this->practicesModel->findAll();
+        $data['crop_practices'] = $crop_practices = $this->acModel->getCropPractices();
+
+        $blocks = [];
+        foreach ($gps as $gp) {
+            $gp->total_ragi = 0;
+            $gp->total_non_ragi = 0;
+            $achievements = $this->acModel->getAchivementByCCID((int) $gp->cc_id);
+
+            $action = '';
+            $week = '';
+            $action = '';
+            $week = '';
+            if ($gp->start_date) {
+                $href = admin_url('areacoverage/edit?id=' . $gp->cc_id);
+                $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
+                                            <i class="fa fa-list"></i></a>';
+
+                $week = date('d F', strtotime($gp->start_date)) . '-' . date('d F', strtotime($gp->end_date));
+            }
+
+            $status = $gp->status;
+            if (!isset($status)) {
+                $status = 3;
+            }
+            foreach ($achievements as $achievement) {
+                if ($achievement->crop_type) {
+                    $gp->total_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
+                } else {
+                    $gp->total_non_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
+                }
+            }
+            $rice_fallow = $this->acModel->getRiceFallowByCCID((int) $gp->cc_id);
+            $follow_up = $this->acModel->getFollowUpByCCID((int) $gp->cc_id);
+
+            $gp->rice_fallow = $rice_fallow;
+            $gp->follow_up = $follow_up;
+            $gp->total_area = $gp->total_ragi + $gp->total_non_ragi + $gp->follow_up;
+            $gp->achievements = $achievements;
+            $gp->action = $action;
+            $gp->status = $this->statuses[$status];
+            $gp->week = $week;
+            $blocks[] = $gp;
+        }
+
+
+
+        //printr($blocks);
+        //exit;
+
+
+
+        $data['from_date'] = $dates['start_date'];
+        $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
+            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
+            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
+            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
+            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_div_area = $total_rfc_area = 0;
+
+        $data['blocks'] = $blocks;
+        $data['approved'] = false;
+
+        $week = '';
+        // printr($blocks);
+        // exit;
+        /*
+
+            // $this->calcTotals($block);
+
+
+            $data['blocks'][] = [
+                'slno' => $slno++,
+                'cc_id' => $block->cc_id,
+                'gp' => $block->gp,
+                'farmers_covered' => $block->farmers_covered,
+                'nursery_raised' => $block->nursery_raised,
+                'balance_smi' => $block->balance_smi,
+                'balance_lt' => $block->balance_lt,
+                'ragi_smi' => $block->ragi_smi,
+                'ragi_lt' => $block->ragi_lt,
+                'ragi_ls' => $block->ragi_ls,
+                'little_millet_lt' => $block->little_millet_lt,
+                'little_millet_ls' => $block->little_millet_ls,
+                'foxtail_ls' => $block->foxtail_ls,
+                'sorghum_ls' => $block->sorghum_ls,
+                'kodo_ls' => $block->kodo_ls,
+                'barnyard_ls' => $block->barnyard_ls,
+                'pearl_ls' => $block->pearl_ls,
+                'total_ragi' => $block->total_ragi,
+                'total_non_ragi' => $block->total_non_ragi,
+                'total_fc' => $block->fc_area,
+                'total_area' => $block->total_area,
+                'total_rfc' => $block->rfc_area,
+                'total_crop_div' => $total_crop_div,
+                'status' => $this->statuses[$status],
+                'status_color' => $this->colors[$status],
+                'action' => $action,
+            ];
+
+            //calc total
+            $total_farmers_covered += $block->farmers_covered;
+            $total_nursery_raised += $block->nursery_raised;
+            $total_balance_smi += $block->balance_smi;
+            $total_balance_lt += $block->balance_lt;
+            $total_ragi_smi += $block->ragi_smi;
+            $total_ragi_lt += $block->ragi_lt;
+            $total_ragi_ls += $block->ragi_ls;
+            $total_little_millet_lt += $block->little_millet_lt;
+            $total_little_millet_ls += $block->little_millet_ls;
+            $total_foxtail_ls += $block->foxtail_ls;
+            $total_sorghum_ls += $block->sorghum_ls;
+            $total_kodo_ls += $block->kodo_ls;
+            $total_barnyard_ls += $block->barnyard_ls;
+            $total_pearl_ls += $block->pearl_ls;
+            $total_total_ragi += $block->total_ragi;
+            $total_total_non_ragi += $block->total_non_ragi;
+            $total_fc_area += $block->fc_area;
+            $total_total_area += $block->total_area;
+            $total_rfc_area += $block->rfc_area;
+            $total_crop_div_area += $total_crop_div;
+            $data['approved'] = $block->status == 1;
+        }*/
+
+        /*$data['blocks'][] = (object) [
+            'slno' => '',
+            'cc_id' => '',
+            'gp' => '<strong>Total</strong>',
+            'farmers_covered' => $total_farmers_covered,
+            'nursery_raised' => $total_nursery_raised,
+            'balance_smi' => $total_balance_smi,
+            'balance_lt' => $total_balance_lt,
+            'ragi_smi' => $total_ragi_smi,
+            'ragi_lt' => $total_ragi_lt,
+            'ragi_ls' => $total_ragi_ls,
+            'little_millet_lt' => $total_little_millet_lt,
+            'little_millet_ls' => $total_little_millet_ls,
+            'foxtail_ls' => $total_foxtail_ls,
+            'sorghum_ls' => $total_sorghum_ls,
+            'kodo_ls' => $total_kodo_ls,
+            'barnyard_ls' => $total_barnyard_ls,
+            'pearl_ls' => $total_pearl_ls,
+            'total_ragi' => $total_total_ragi,
+            'total_non_ragi' => $total_total_non_ragi,
+            'total_fc' => $total_fc_area,
+            'total_area' => $total_total_area,
+            'total_rfc' => $total_rfc_area,
+            'total_crop_div' => $total_crop_div_area,
+            'action' => ''
+        ];*/
+
+        $data['crop_practices'] = $this->acModel->getCropPractices();
+        $crops = $this->cropsModel->findAll();
+
+        $data['crops'] = [];
+        foreach ($crops as $crop) {
+            $data['crops'][$crop->id] = $crop->crops;
+        }
+        $data['to_date'] = $dates['end_date'];
+        $data['week'] = $week;
+
+        $data['approval'] = true;
+        $form_data = $this->getForm();
+        $data['approve_form'] = view('\Admin\Transaction\Views\approve_form', $form_data);
+
+
+        $block = $this->blockModel->find($block_id);
+        $blocks = $this->blockModel->where('district_id', $block->district_id)->findAll();
+
+        $data['filter_blocks'] = [];
+        foreach ($blocks as $block) {
+            if ($block->id == $block_id) {
+                $data['filter_blocks'][$block->id] = $block->name;
+            }
+        }
+        $data['block_id'] = $block_id;
+
+        $weeks = $this->acModel->getWeeks();
+
+        $data['weeks'] = [];
+        $week_start_date = $start_date;
+        foreach ($weeks as $week) {
+            //dropdown weeks
+            if (strtotime($week['start_date']) <= strtotime('today')) {
+                $data['weeks'][$week['start_date']] = $week['start_date'];
+            }
+        }
+        $data['crop_practices'] = $this->acModel->getCropPractices();
+
+        $data['week_start_date'] = $week_start_date;
+
+        $district_status = $this->acModel->where('block_id', $block_id)
+            ->where('start_date', $start_date)->first();
+        // printr($district_status);
+        // exit;
+        $data['status'] = '';
+        $data['remarks'] = '';
+        $data['status_color'] = '';
+        if ($district_status) {
+            $data['status'] = $this->statuses[$district_status->status];
+            $data['status_color'] = $this->colors[$district_status->status];
+            $data['remarks'] = $district_status->remarks;
+        }
+
+        return $this->template->view('Admin\CropCoverage\Views\approve_block', $data);
+    }
+    private function calcTotals(&$block)
+    {
+
+        $block->total_area = (double) $block->fc_area +
+            (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls +
+            (double) $block->little_millet_lt +
+            (double) $block->little_millet_ls +
+            (double) $block->foxtail_ls +
+            (double) $block->sorghum_ls +
+            (double) $block->kodo_ls +
+            (double) $block->barnyard_ls +
+            (double) $block->pearl_ls;
+
+        $block->total_ragi = (double) $block->ragi_smi +
+            (double) $block->ragi_lt +
+            (double) $block->ragi_ls;
+
+        $block->fc_area = doubleval($block->fc_area);
+
+        $block->total_non_ragi = bcsub(bcsub($block->total_area, $block->total_ragi, 2), $block->fc_area, 2);
+    }
+
+    public function blockold()
+    { //gpwise
+        $data['heading_title'] = lang('Approve Area Coverage');
+        $data['season'] = getCurrentSeason();
+        $block_id = $this->request->getGet('block_id');
+
+        $start_date = $this->request->getGet('start_date');
+
+        $dates = $this->acModel->getWeekDate($start_date);
+        $data['currentDay'] = date('l');
+        $data['isActiveDay'] = in_array($data['currentDay'], array('Saturday', 'Sunday', 'Monday'));
+
+        if ($this->request->getMethod(1) == 'POST') {
+            $filter = [
+                'block_id' => $block_id,
+                'start_date' => $dates['start_date']
+            ];
+            $status = (int) $this->request->getPost('status');
+            $remarks = $this->request->getPost('remarks');
+            $this->acModel->setStatus($filter, $status, $remarks);
+
+            $this->session->setFlashdata('message', 'The area coverage data has been approved');
+            return redirect()->to(admin_url('areacoverage/approve'));
+        }
+
+
+        //update status
+        if ($this->request->getMethod(1) == 'POST') {
+            $status = [
+                'status' => $this->request->getPost('status'),
+                'remarks' => $this->request->getPost('remarks'),
+            ];
+            $this->acModel->where('block_id', $block_id)
                 ->where('start_date', $start_date)->set($status)->update();
             return redirect()->to(admin_url('areacoverage/approve/block?block_id=' . $block_id . '&start_date=' . $start_date))
                 ->with('message', 'Status has been updated.');
@@ -326,7 +603,7 @@ class Approve extends AdminController
             'start_date' => $dates['start_date']
         ];
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        $blocks = $this->acModel->getAreaCoverage($filter);
         // printr($blocks);
         // exit;
 
@@ -439,7 +716,7 @@ class Approve extends AdminController
             'action' => ''
         ];
 
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
@@ -465,7 +742,7 @@ class Approve extends AdminController
         }
         $data['block_id'] = $block_id;
 
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = $start_date;
@@ -478,7 +755,7 @@ class Approve extends AdminController
 
         $data['week_start_date'] = $week_start_date;
 
-        $district_status = $acModel->where('block_id', $block_id)
+        $district_status = $this->acModel->where('block_id', $block_id)
             ->where('start_date', $start_date)->first();
         // printr($district_status);
         // exit;
@@ -552,7 +829,7 @@ class Approve extends AdminController
             $data['district_id'] = '';
         }
 
-        $weekDate = $this->areacoveragemodel->getWeekDate();
+        $weekDate = $this->acModel->getWeekDate();
         if ($this->request->getGet('start_date')) {
             $data['start_date'] = $this->request->getGet('start_date');
         } else if ($weekDate) {
@@ -569,7 +846,7 @@ class Approve extends AdminController
         // printr($filter);
         // exit;
 
-        $blocks = $this->areacoveragemodel->getAreaCoverage($filter);
+        $blocks = $this->acModel->getAreaCoverage($filter);
         // printr($blocks);
         // exit;
         $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
@@ -684,14 +961,14 @@ class Approve extends AdminController
         ];
         // printr($data['districts']);
         // exit;
-        $data['crop_practices'] = $this->areacoveragemodel->getCropPractices();
+        $data['crop_practices'] = $this->acModel->getCropPractices();
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];
         foreach ($crops as $crop) {
             $data['crops'][$crop->id] = $crop->crops;
         }
-        $weeks = $this->areacoveragemodel->getWeeks();
+        $weeks = $this->acModel->getWeeks();
 
         $data['weeks'] = [];
         $week_start_date = '';
@@ -733,28 +1010,7 @@ class Approve extends AdminController
         ]);
     }
 
-    private function calcTotals(&$block)
-    {
-        $block->total_area = (double) $block->fc_area +
-            (double) $block->ragi_smi +
-            (double) $block->ragi_lt +
-            (double) $block->ragi_ls +
-            (double) $block->little_millet_lt +
-            (double) $block->little_millet_ls +
-            (double) $block->foxtail_ls +
-            (double) $block->sorghum_ls +
-            (double) $block->kodo_ls +
-            (double) $block->barnyard_ls +
-            (double) $block->pearl_ls;
 
-        $block->total_ragi = (double) $block->ragi_smi +
-            (double) $block->ragi_lt +
-            (double) $block->ragi_ls;
-
-        $block->fc_area = doubleval($block->fc_area);
-
-        $block->total_non_ragi = bcsub(bcsub($block->total_area, $block->total_ragi, 2), $block->fc_area, 2);
-    }
 }
 
 ?>
