@@ -2,7 +2,7 @@
     <table class="minimalistBlack mg-b-10 table-bordered1 table-striped1 border-dark" border="1">
         <thead>
             <tr>
-                <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="10">
+                <th style="background-color:#e3a11e;font-weight: bold; text-align: center; " colspan="11">
                     <h4>MPR Of Enterprises Established</h4>
                 </th>
             </tr>
@@ -31,7 +31,7 @@
             <tr class="subhead">
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " rowspan="3">Type of Unit </th>
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="3">No. of Functional Unit </th>
-                <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="6">Transaction Data </th>
+                <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="7">Transaction Data </th>
             </tr>
             <tr class="subhead">
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " rowspan="2">Up to Previous Month </th>
@@ -40,6 +40,8 @@
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">Up to Previous Month </th>
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">During the Month </th>
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " colspan="2">Cumulative </th>
+                <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black " rowspan="2">Average </th>
+
             </tr>
             <tr class="subhead">
                 <th style="background-color:#1ee3a1;font-weight: bold; text-align: center;border: 1px solid black ">Total Turnover (in Rs)</th>
@@ -64,6 +66,8 @@
                     <td><?= $distwisetxn['expn_mon'] ?></td>
                     <td><?= $distwisetxn['turnover_cumm'] ?></td>
                     <td><?= $distwisetxn['expn_cumm'] ?></td>
+                    <td><?= $distwisetxn['avg_turnover'] ?></td>
+
                 </tr>
             <?php  } ?>
         </tbody>

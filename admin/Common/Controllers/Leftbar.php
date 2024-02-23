@@ -459,7 +459,7 @@ class Leftbar extends AdminController
         $enterprises = [];
 
 
-        if ($this->user->hasPermission("enterprises")) {
+        if ($this->user->hasPermission("enterprises/unit")) {
             $enterprises[] = [
                 "name" => 'Enterprises Units',
                 "href" => admin_url("enterprises/unit"),
@@ -476,7 +476,7 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
-        if ($this->user->hasPermission("enterprises")) {
+        if ($this->user->hasPermission("enterprises/report")) {
             $enterprises[] = [
                 "name" => 'Enterprise Establishment Report',
                 "href" => admin_url("enterprises/report"),
@@ -484,7 +484,7 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
-        if ($this->user->hasPermission("enterprises")) {
+        if ($this->user->hasPermission("enterprises/transaction")) {
             $enterprises[] = [
                 "name" => 'Enterprises Transaction',
                 "href" => admin_url("enterprises/transaction"),
@@ -492,7 +492,7 @@ class Leftbar extends AdminController
                 "children" => [],
             ];
         }
-        if ($this->user->hasPermission("enterprises")) {
+        if ($this->user->hasPermission("enterprises/enttxnreport")) {
             $enterprises[] = [
                 "name" => 'Enterprise Transaction Report',
                 "href" => admin_url("enterprises/enttxnreport"),

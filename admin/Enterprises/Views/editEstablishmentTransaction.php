@@ -65,8 +65,6 @@
         </form>
     </div>
 
-
-
     <div class="block">
         <div class="block-header block-header-default">
             <h3 class="block-title"> Edit Transaction Data</h3>
@@ -82,7 +80,7 @@
                                         if ($key == $entranses['unit_group_name']) {  ?>
                                             <tr>
                                                 <?php foreach ($columns as $column) { ?>
-                                                    <th><?= $column ?></th>
+                                                    <th><?= $column['label'] ?></th>
                                                 <?php } ?>
                                             </tr>
                                         <?php } ?>
@@ -90,18 +88,19 @@
                                 </thead>
                                 <tbody>
                                     <tr class="odd">
-
                                         <?php foreach ($unit_groups as $key => $columns) {
                                             if ($key == $entranses['unit_group_name']) {  ?>
                                                 <?php foreach ($columns as $key => $column) { ?>
-                                                    <td><input type="text" id="unit_group" name="<?= $key ?>" class="form-control" value="<?= $entranses[$key] ?>" required></td>
+                                                    <td>
+                                                        <input type="text" id="<?= $key ?>" name="<?= $key ?>" class="form-control numbers" value="<?= $entranses[$key] ?>" required>
+                                                        <p class="errorTxt text-danger m-0">&nbsp;</p>
+                                                    </td>
                                                 <?php } ?>
                                             <?php } ?>
                                         <?php } ?>
                                     </tr>
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                     <div class="form-group text-right">
@@ -109,13 +108,8 @@
                     </div>
                 </form>
             </div>
-
         </div>
-
     </div>
-
-
-
 </div>
 <style>
     #loading-overlay {
@@ -129,42 +123,55 @@
     }
 </style>
 <?php js_start(); ?>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+
 <script>
     $(document).ready(function() {
-        jQuery.validator.addMethod("numbersonly", function(value, element) {
-            return this.optional(element) || /^(\d+(\.\d+)?)?$/.test(value);
+        jQuery.validator.addMethod("number", function(value, element) {
+            return this.optional(element) || /^(\d{1,10})$/.test(value);
         }, "Please enter only numbers");
-      
+        jQuery.validator.addMethod("decimal", function(value, element) {
+            return this.optional(element) || /^(\d{1,10})(\.\d{0,2})?$/.test(value);
+        }, "Please enter only numbers");
         $("#establishmentEditForm").validate({
             ignore: [],
             rules: {
                 <?php foreach ($unit_groups as $key => $columns) {
-                    if ($key == $entranses['unit_group_name'])  { ?>
-                        <?php foreach ($columns as $key => $column)  { ?>
-                        
-                            <?= $key ?>: {
-                                required: true,
-                                numbersonly: true
-                            },
-                        <?php } ?>
-                    <?php } ?>
-                <?php }?>
-             },
-            messages: {
-                <?php foreach ($unit_groups as $key => $columns) {
                     if ($key == $entranses['unit_group_name']) { ?>
                         <?php foreach ($columns as $key => $column) { ?>
-                           
+
                             <?= $key ?>: {
-                                numbersonly: "Please enter only numbers"
+                                required: true,
+                                <?= $column['rules'] ?>: true
                             },
                         <?php } ?>
                     <?php } ?>
                 <?php } ?>
+            },
+            messages: {
+                <?php foreach ($unit_groups as $key => $columns) {
+                    if ($key == $entranses['unit_group_name']) { ?>
+                        <?php foreach ($columns as $key => $column) { ?>
+
+                            <?= $key ?>: {
+                                <?= $column['rules'] ?>: "Please enter only numbers"
+                            },
+                        <?php } ?>
+                    <?php } ?>
+                <?php } ?>
+            },
+            errorPlacement: function(error, element) {
+                var placement = $(element).siblings('.errorTxt');
+                if (placement) {
+                    $(placement).html(error)
+                } else {
+                    error.insertAfter(element);
+                }
             }
         });
     });
 </script>
+
 
 
 
