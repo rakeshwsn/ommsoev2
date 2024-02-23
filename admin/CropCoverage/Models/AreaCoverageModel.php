@@ -275,6 +275,80 @@ FROM ac_crop_practices acp
         return [];
     }
 
+    public function getAreaCoverageBlock($filter = [])
+    {
+        // printr($filter);
+        // exit;
+        $sql = "SELECT
+        sg.id gp_id,
+        sg.name gp,
+        aap.crop_coverage_id as cc_id,
+        COALESCE(acc.farmers_covered,0)AS farmers_covered,
+        COALESCE(an.nursery_raised,0)AS nursery_raised,
+        COALESCE(an.balance_smi,0)AS balance_smi,
+        COALESCE(an.balance_lt,0)AS balance_lt,
+      COALESCE(acc.crop_div_ragi, 0) + COALESCE(acc.crop_div_non_ragi, 0) AS total_crop_div,
+        acc.status,
+       COALESCE(acc.start_date, '" . $filter['start_date'] . "') AS start_date,
+        acc.end_date,
+        acc.remarks
+        FROM (SELECT
+            *
+        FROM soe_grampanchayats sg
+        WHERE sg.block_id = {$filter['block_id']}) sg
+        LEFT JOIN ac_crop_coverage acc
+            ON acc.gp_id = sg.id
+            AND acc.start_date = '{$filter['start_date']}'
+        LEFT JOIN ac_nursery an
+            ON acc.id = an.crop_coverage_id
+        LEFT JOIN (SELECT * FROM ac_area_practices aap WHERE aap.crop_id = 1 ) aap
+            ON aap.crop_coverage_id = acc.id 
+        ";
+
+
+
+        return $this->db->query($sql)->getResult();
+
+    }
+
+    public function getAchivementByCCID($cc_id = 0)
+    {
+        $sql = "SELECT
+  ac.id AS crop_id,
+  aap.crop_coverage_id,
+  ac.crops,
+  ac.crop_type,
+  COALESCE(aap.smi,0) AS smi,
+  COALESCE(aap.lt,0) AS lt,
+  COALESCE(aap.ls,0) AS ls
+FROM ac_area_practices aap
+  RIGHT JOIN ac_crops ac
+    ON aap.crop_id = ac.id
+    AND aap.crop_coverage_id = {$cc_id}";
+
+        return $this->db->query($sql)->getResult();
+    }
+
+    public function getRiceFallowByCCID($cc_id = 0)
+    {
+        $sql = "SELECT
+            COALESCE(sum(area),0)AS area
+        FROM ac_area_rice_fallow aar left join ac_crops ac on aar.crop_id = ac.id
+        WHERE aar.crop_coverage_id = {$cc_id}
+        ";
+        return $this->db->query($sql)->getRowArray()['area'];
+    }
+
+    public function getFollowUpByCCID($cc_id = 0)
+    {
+        $sql = "SELECT
+            COALESCE(sum(area),0)AS area
+        FROM ac_area_follow_up aaf left join ac_crops ac on aaf.crop_id = ac.id
+        WHERE aaf.crop_coverage_id = {$cc_id}
+        ";
+        return $this->db->query($sql)->getRowArray()['area'];
+    }
+
     public function getAreaCoverage($filter = [])
     {
         if (!empty($filter['block_id'])) {
