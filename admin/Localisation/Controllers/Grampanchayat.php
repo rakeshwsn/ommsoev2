@@ -231,7 +231,7 @@ class Grampanchayat extends AdminController
 				->findAll();
 		}
 
-        $data['districts'][0] = 'Select districts';
+		$data['districts'][0] = 'Select districts';
 		foreach ($districts as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
@@ -243,11 +243,7 @@ class Grampanchayat extends AdminController
 		}
 		$blocks = $this->blockModel->where($bfilter)->orderBy('name', 'asc')->findAll();
 
-<<<<<<< HEAD
 		$data['blocks'][0] = 'Select block';
-=======
-        $data['blocks'][0] = 'Select block';
->>>>>>> 0f722972faf942930758f45b7fd02e37d6d4a19d
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}
