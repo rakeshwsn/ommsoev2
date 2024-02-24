@@ -11,6 +11,10 @@ $routes->group('api', ['namespace' => 'Api'], function ($routes) {
     $routes->get('pds_c', 'Dashboard\Controllers\Dashboard::pds');
     $routes->get('establishment', 'Dashboard\Controllers\Dashboard::establishment');
     $routes->get('enterprises2', 'Dashboard\Controllers\Dashboard::enterprise');
+
+    //added by rakesh N
+    $routes->get('enterpriseswshg', 'Dashboard\Controllers\Dashboard::enterprisewshg');
+    //added by rakesh N
     $routes->get('currentyear', 'Dashboard\Controllers\Dashboard::currentyearchart');
 
     //api

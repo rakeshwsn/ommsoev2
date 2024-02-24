@@ -102,4 +102,38 @@ class EnterpriseChartModel extends Model
 
 		return $this->db->query($sql)->getResult();
 	}
+
+
+
+	public function getDistrictwiseEnterprisedata($filter = [])
+	{
+		$sql = "SELECT
+		e.year_id,
+		u.name,
+		u.icons,
+		y.name year,
+		y.id ,
+        d.name district,
+		SUM(e.wshg) total_wshg,
+		SUM(e.fpos) total_fpos,
+		e.unit_id,
+		e.unit_name,
+		e.district_id
+	  FROM dashboard_enterprises e
+	  LEFT JOIN enterprises_units u
+		on u.id = e.unit_id
+		LEFT JOIN dashboard_years y
+		  ON y.id = e.year_id
+		LEFT JOIN soe_districts d
+		  ON d.id = e.district_id
+		  WHERE e.deleted_at IS NULL";
+		if (!empty($filter['district_id'])) {
+			$sql .= " AND district_id=" . $filter['district_id'];
+		}
+
+		$sql .= " GROUP BY e.unit_name  HAVING total_wshg !=0 ";
+	//    echo $sql; exit;
+
+		return $this->db->query($sql)->getResult();
+	}
 }
