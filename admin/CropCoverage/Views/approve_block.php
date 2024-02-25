@@ -157,7 +157,7 @@
                                 </td>
                             </tr>
                         <?php } ?>
-                        <tr>
+                        <tr><td></td>
                                 <td>Total</td>
                                 <td><?=$totals['total_farmers_covered']?></td>
                                 <td><?=$totals['total_nursery_raised']?></td>
