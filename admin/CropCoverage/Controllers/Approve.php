@@ -843,125 +843,143 @@ class Approve extends AdminController
             'season' => $data['season'],
             'start_date' => $data['start_date']
         ];
-        // printr($filter);
-        // exit;
+        //printr($filter);
+        //exit;
 
-        $blocks = $this->acModel->getAreaCoverage($filter);
-        // printr($blocks);
-        // exit;
-        $total_farmers_covered = $total_nursery_raised = $total_balance_smi =
-            $total_balance_lt = $total_ragi_smi = $total_ragi_lt = $total_ragi_ls =
-            $total_little_millet_lt = $total_little_millet_ls = $total_foxtail_ls =
-            $total_sorghum_ls = $total_kodo_ls = $total_barnyard_ls = $total_pearl_ls =
-            $total_total_ragi = $total_total_non_ragi = $total_fc_area = $total_total_area = $total_crop_div_area = $total_rfc_area = 0;
-        $total_gps = 0;
-        $total_blocks = 0;
+        $districts = $this->acModel->getAreaCoverageState($filter);
+
+        $restructuredData=[];
+        foreach ($districts as $district) {
+            // Get the district ID
+            $districtId = $district->district_id;
+
+            // If the district ID doesn't exist in the restructured data array, create a new entry
+            if (!isset($restructuredData[$districtId])) {
+                $restructuredData[$districtId] = [
+                    'crop_coverage_id' => $district->crop_coverage_id,
+                    'district_id' => $districtId,
+                    'district_name' => $district->district_name,
+                    'total_block' => $district->total_block,
+                    'total_gp' => $district->total_gp,
+                    'farmer_covered' => $district->farmer_covered,
+                    'nursery_raised' => $district->nursery_raised,
+                    'balance_smi' => $district->balance_smi,
+                    'balance_lt' => $district->balance_lt,
+                    'crop_div_area' => $district->crop_div_ragi+$district->crop_div_non_ragi,
+                    'start_date' => $district->start_date,
+                    'end_date' => $district->end_date,
+                    'status' => $district->status,
+                    'remarks' => $district->remarks,
+                    'achievements' => [],
+                    'total_ragi'=>0,
+                    'total_non_ragi'=>0,
+                    'follow_area' => $district->follow_area,
+                    'fallow_area' => $district->fallow_area
+                ];
+            }
+
+            // Add crop details to the 'ach' array
+            $restructuredData[$districtId]['achievements'][] = [
+                'crop_id' => $district->crop_id,
+                'crops' => $district->crops,
+                'crop_type' => $district->crop_type,
+                'smi' => $district->smi,
+                'lt' => $district->lt,
+                'ls' => $district->ls
+            ];
+
+            if ($district->crop_type == 1) {
+                $restructuredData[$districtId]['total_ragi'] += $district->smi + $district->ls + $district->lt;
+            }else{
+                $restructuredData[$districtId]['total_non_ragi'] += $district->smi + $district->ls + $district->lt;
+            }
+
+            $restructuredData[$districtId]['total_area'] = $restructuredData[$districtId]['total_ragi'] +
+                                                   $restructuredData[$districtId]['total_non_ragi'] +
+                                                   $restructuredData[$districtId]['follow_area'];
+        }
+
+        $totals = [
+            'total_blocks' => 0,
+            'total_gp' => 0,
+            'total_farmers_covered' => 0,
+            'total_nursery_raised' => 0,
+            'total_balance_smi' => 0,
+            'total_balance_lt' => 0,
+            'total_ragi' => 0,
+            'total_non_ragi' => 0,
+            'total_follow_area' => 0,
+            'total_fallow_area' => 0,
+            'total_area' => 0,
+            'total_crop_div_area' => 0,
+            'achievements_totals' => [] // Add an element for achievements totals
+        ];
+
+
+
 
         $week_text = '';
         $data['districts'] = [];
-        foreach ($blocks as $block) {
+        foreach ($restructuredData as &$district) {
             $action = '';
-            if ($block->start_date) {
-                $href = admin_url('areacoverage/approve/district?district_id=' . $block->district_id . '&start_date=' . $block->start_date);
+            if ($district['start_date']) {
+                $href = admin_url('areacoverage/approve/district?district_id=' . $district['district_id'] . '&start_date=' . $district['start_date']);
                 $action = '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
                                             <i class="fa fa-list"></i></a>';
 
-                $week_text = date('d F', strtotime($block->start_date)) . '-' . date('d F', strtotime($block->end_date));
+                $week_text = date('d F', strtotime($district['start_date'])) . '-' . date('d F', strtotime($district['end_date']));
             }
-            $status = $block->status;
+            $status = $district['status'];
             if (!isset($status)) {
                 $status = 3;
             }
 
-            $this->calcTotals($block);
-            $total_crop_div = $block->crop_div_ragi + $block->crop_div_non_ragi;
-            $data['districts'][] = [
-                'district' => $block->district,
-                'blocks' => $block->total_blocks,
-                'gps' => $block->total_gps,
-                'farmers_covered' => $block->farmers_covered,
-                'nursery_raised' => $block->nursery_raised,
-                'balance_smi' => $block->balance_smi,
-                'balance_lt' => $block->balance_lt,
-                'ragi_smi' => $block->ragi_smi,
-                'ragi_lt' => $block->ragi_lt,
-                'ragi_ls' => $block->ragi_ls,
-                'little_millet_lt' => $block->little_millet_lt,
-                'little_millet_ls' => $block->little_millet_ls,
-                'foxtail_ls' => $block->foxtail_ls,
-                'sorghum_ls' => $block->sorghum_ls,
-                'kodo_ls' => $block->kodo_ls,
-                'barnyard_ls' => $block->barnyard_ls,
-                'pearl_ls' => $block->pearl_ls,
-                'total_ragi' => $block->total_ragi,
-                'total_non_ragi' => $block->total_non_ragi,
-                'total_fc' => $block->fc_area,
-                'total_area' => $block->total_area,
-                'total_rfc' => $block->rfc_area,
-                'total_crop_div' => $total_crop_div,
-                'status' => $this->statuses[$status],
-                'status_color' => $this->colors[$status],
-                'action' => $action,
-            ];
-            // printr($data['districts']);
-            // exit;
-            //calc total
-            $total_blocks += (int) $block->total_blocks;
-            $total_gps += (int) $block->total_gps;
-            $total_farmers_covered += (int) $block->farmers_covered;
-            $total_nursery_raised += $block->nursery_raised;
-            $total_balance_smi += $block->balance_smi;
-            $total_balance_lt += $block->balance_lt;
-            $total_ragi_smi += $block->ragi_smi;
-            $total_ragi_lt += $block->ragi_lt;
-            $total_ragi_ls += $block->ragi_ls;
-            $total_little_millet_lt += $block->little_millet_lt;
-            $total_little_millet_ls += $block->little_millet_ls;
-            $total_foxtail_ls += $block->foxtail_ls;
-            $total_sorghum_ls += $block->sorghum_ls;
-            $total_kodo_ls += $block->kodo_ls;
-            $total_barnyard_ls += $block->barnyard_ls;
-            $total_pearl_ls += $block->pearl_ls;
-            $total_total_ragi += $block->total_ragi;
-            $total_total_non_ragi += $block->total_non_ragi;
-            $total_fc_area += $block->fc_area;
-            $total_total_area += $block->total_area;
-            $total_rfc_area += $block->rfc_area;
-            $total_crop_div_area += $total_crop_div;
+            $district['action'] = $action;
+            $district['status'] = $this->statuses[$status];
+            $district['status_color'] = $this->colors[$status];
+            //$restructuredData[] = $district;
+
+            $totals['total_blocks'] += $district['total_block'];
+            $totals['total_gp'] += $district['total_gp'];
+            $totals['total_farmers_covered'] += $district['farmer_covered'];
+            $totals['total_nursery_raised'] += $district['nursery_raised'];
+            $totals['total_balance_smi'] += $district['balance_smi'];
+            $totals['total_balance_lt'] += $district['balance_lt'];
+            $totals['total_ragi'] += $district['total_ragi'];
+            $totals['total_non_ragi'] += $district['total_non_ragi'];
+            $totals['total_follow_area'] += $district['follow_area'];
+            $totals['total_fallow_area'] += $district['fallow_area'];
+            $totals['total_area'] += $district['total_area'];
+            $totals['total_crop_div_area'] += $district['crop_div_area'];
+
+            // Calculate totals for achievements
+            foreach ($district['achievements'] as $achievement) {
+                $cropId = $achievement['crop_id'];
+                if (!isset($totals['achievements_totals'][$cropId])) {
+                    $totals['achievements_totals'][$cropId] = [
+                        'smi' => 0,
+                        'lt' => 0,
+                        'ls' => 0
+                    ];
+                }
+                $totals['achievements_totals'][$cropId]['smi'] += $achievement['smi'];
+                $totals['achievements_totals'][$cropId]['lt'] += $achievement['lt'] ?: 0;
+                $totals['achievements_totals'][$cropId]['ls'] += $achievement['ls'] ?: 0;
+            }
+
+
 
         }
 
-        $data['districts'][] = [
-            'district' => '<strong>Total</strong>',
-            'gps' => $total_gps,
-            'blocks' => $total_blocks,
-            'farmers_covered' => $total_farmers_covered,
-            'nursery_raised' => $total_nursery_raised,
-            'balance_smi' => $total_balance_smi,
-            'balance_lt' => $total_balance_lt,
-            'ragi_smi' => $total_ragi_smi,
-            'ragi_lt' => $total_ragi_lt,
-            'ragi_ls' => $total_ragi_ls,
-            'little_millet_lt' => $total_little_millet_lt,
-            'little_millet_ls' => $total_little_millet_ls,
-            'foxtail_ls' => $total_foxtail_ls,
-            'sorghum_ls' => $total_sorghum_ls,
-            'kodo_ls' => $total_kodo_ls,
-            'barnyard_ls' => $total_barnyard_ls,
-            'pearl_ls' => $total_pearl_ls,
-            'total_ragi' => $total_total_ragi,
-            'total_non_ragi' => $total_total_non_ragi,
-            'total_fc' => $total_fc_area,
-            'total_area' => $total_total_area,
-            'total_rfc' => $total_rfc_area,
-            'total_crop_div' => $total_crop_div_area,
-            'status' => '',
-            'status_color' => '',
-            'action' => ''
-        ];
-        // printr($data['districts']);
-        // exit;
+
+
+        $data['totals']=$totals;
+
+
+
+        $data['districts'] = $restructuredData;
         $data['crop_practices'] = $this->acModel->getCropPractices();
+
         $crops = $this->cropsModel->findAll();
 
         $data['crops'] = [];

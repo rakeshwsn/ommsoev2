@@ -128,11 +128,8 @@
                                 <td>
                                     <?= $block->balance_lt ?>
                                 </td>
-                                
-                                
                                     <? foreach ($block->achievements as $achievement) {
                                         $crop_p = $crop_practices[$achievement->crop_id];
-                                        
                                         foreach($crop_p as $p){?>
                                         <td> <?= $achievement->{$p} ?></td>
                                         <?}?>
@@ -151,7 +148,7 @@
                                  <td>
                                     <?= $block->rice_fallow; ?>
                                 </td>
-                                
+
                                  <td>
                                     <?= $block->action; ?>
                                 </td>
