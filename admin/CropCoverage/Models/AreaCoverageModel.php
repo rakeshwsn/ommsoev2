@@ -463,7 +463,8 @@ FROM ac_crop_practices acp
 
     }
 
-    public function getAreaCoverageBlock($filter = []){
+    public function getAreaCoverageBlock($filter = [])
+    {
         // printr($filter);
         // exit;
         $sql = "SELECT
@@ -536,8 +537,9 @@ FROM ac_area_practices aap
         return $this->db->query($sql)->getRowArray()['area'];
     }
 
-    public function getAchivementByDistrictID($district_id,$start_date){
-        $sql="SELECT
+    public function getAchivementByDistrictID($district_id, $start_date)
+    {
+        $sql = "SELECT
         COALESCE(aap.crop_coverage_id, 0) AS crop_coverage_id,
         ac.id AS crop_id,
         ac.crops,
@@ -557,7 +559,7 @@ FROM ac_area_practices aap
         return $this->db->query($sql)->getResult();
     }
 
-    public function getRiceFallowByDistrictID($district_id,$start_date)
+    public function getRiceFallowByDistrictID($district_id, $start_date)
     {
         $sql = "SELECT
         aarf.crop_coverage_id,
@@ -572,7 +574,7 @@ FROM ac_area_practices aap
         return $this->db->query($sql)->getRowArray()['area'];
     }
 
-    public function getFollowUpByDistrictID($district_id,$start_date)
+    public function getFollowUpByDistrictID($district_id, $start_date)
     {
         $sql = "SELECT
         aarf.crop_coverage_id,
