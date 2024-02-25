@@ -83,16 +83,16 @@
                             <?php foreach ($districts as $district) { ?>
                                 <tr>
                                     <td>
-                                        <?= $district['district'] ?>
+                                        <?= $district['district_name'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['blocks'] ?>
+                                        <?= $district['total_block'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['gps'] ?>
+                                        <?= $district['total_gp'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['farmers_covered'] ?>
+                                        <?= $district['farmer_covered'] ?>
                                     </td>
                                     <td>
                                         <?= $district['nursery_raised'] ?>
@@ -103,36 +103,15 @@
                                     <td>
                                         <?= $district['balance_lt'] ?>
                                     </td>
-                                    <td>
-                                        <?= $district['ragi_smi'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['ragi_lt'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['ragi_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['little_millet_lt'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['little_millet_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['foxtail_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['sorghum_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['kodo_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['barnyard_ls'] ?>
-                                    </td>
-                                    <td>
-                                        <?= $district['pearl_ls'] ?>
-                                    </td>
+
+                                    <? foreach ($district['achievements'] as $achievement) {
+                                        $crop_p = $crop_practices[$achievement['crop_id']];
+                                        foreach($crop_p as $p){?>
+                                        <td data-method="<?= $p ?>"> <?= $achievement[$p] ?></td>
+                                        <?}?>
+                                    <? } ?>
+
+
                                     <td>
                                         <?= $district['total_ragi'] ?>
                                     </td>
@@ -140,17 +119,18 @@
                                         <?= $district['total_non_ragi'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['total_fc'] ?>
+                                        <?= $district['follow_area'] ?>
                                     </td>
                                     <td>
                                         <?= $district['total_area'] ?>
                                     </td>
                                     <td>
-                                        <?= $district['total_crop_div'] ?>
+                                        <?= $district['crop_div_area'] ?>
                                     </td>
+
                                     <?php if ($season == 'Rabi') { ?>
                                         <td>
-                                            <?= $district['total_rfc'] ?>
+                                            <?= $district['fallow_area'] ?>
                                         </td>
                                     <?php } ?>
                                     <td><label class="badge badge-<?= $district['status_color'] ?>">
@@ -163,6 +143,31 @@
                                     </td>
                                 </tr>
                             <?php } ?>
+                            <tr>
+                                <td>Total</td>
+                                <td><?=$totals['total_blocks']?></td>
+                                <td><?=$totals['total_gp']?></td>
+                                <td><?=$totals['total_farmers_covered']?></td>
+                                <td><?=$totals['total_nursery_raised']?></td>
+                                <td><?=$totals['total_balance_smi']?></td>
+                                <td><?=$totals['total_balance_lt']?></td>
+                                <? foreach ($totals['achievements_totals'] as $crop_id=>$achievement) {
+                                    $crop_p = $crop_practices[$crop_id];
+                                    foreach($crop_p as $p){?>
+                                    <td> <?= $achievement[$p] ?></td>
+                                    <?}?>
+                                <?}?>
+                                <td><?=$totals['total_ragi']?></td>
+                                <td><?=$totals['total_non_ragi']?></td>
+                                <td>  <?=$totals['total_follow_area']?></td>
+                                <td>  <?=$totals['total_area']?></td>
+                                <td>  <?=$totals['total_crop_div_area']?></td>
+                                <?php if ($season == 'Rabi') { ?>
+                                    <td>  <?=$totals['total_fallow_area']?></td>
+                                <?php } ?>
+                                <td></td>
+                                </td></td>
+                            </tr>
                         <?php } else { ?>
                             <tr>
                                 <td colspan="4">Data not available.</td>
