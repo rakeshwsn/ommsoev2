@@ -463,35 +463,233 @@ FROM ac_crop_practices acp
 
     }
 
+    public function getAreaCoverageDistrict($filter = [])
+    {
+        $sql = "
+        SELECT
+          t2.crop_coverage_id,
+          t1.block_id,
+          sb.name block_name,
+          t1.total_gp,
+          COALESCE(t2.farmer_covered, 0) farmer_covered,
+          COALESCE(t2.nursery_raised, 0) nursery_raised,
+          COALESCE(t2.balance_smi, 0) balance_smi,
+          COALESCE(t2.balance_lt, 0) balance_lt,
+          COALESCE(t2.crop_div_ragi, 0) crop_div_ragi,
+          COALESCE(t2.crop_div_non_ragi, 0) crop_div_non_ragi,
+          t2.start_date,
+          t2.end_date,
+          t2.status,
+          t2.remarks,
+          t5.crop_id,
+          t5.crops,
+          t5.crop_type,
+          t5.smi,
+          t5.lt,
+          t5.ls,
+          t3.area follow_area,
+          t4.area fallow_area
+        FROM (SELECT
+            v1.block_id,
+            COUNT(v1.gp_id) total_gp
+          FROM (SELECT
+              sg.block_id,
+              sg.id gp_id
+            FROM soe_grampanchayats sg
+            WHERE sg.district_id = {$filter['district_id']}
+            AND sg.deleted_at IS NULL) AS v1
+          GROUP BY v1.block_id) t1
+          LEFT JOIN (SELECT
+              acc.id,
+              acc.block_id,
+              an.crop_coverage_id,
+              SUM(acc.farmers_covered) farmer_covered,
+              SUM(acc.crop_div_ragi) crop_div_ragi,
+              SUM(acc.crop_div_non_ragi) crop_div_non_ragi,
+              SUM(an.nursery_raised) nursery_raised,
+              SUM(an.balance_smi) balance_smi,
+              SUM(an.balance_lt) balance_lt,
+              acc.start_date,
+              acc.end_date,
+              acc.status,
+              acc.remarks
+            FROM ac_crop_coverage acc
+              LEFT JOIN ac_nursery an
+                ON acc.id = an.crop_coverage_id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.district_id = {$filter['district_id']}
+            GROUP BY acc.block_id) t2
+            ON t1.block_id = t2.block_id
+          LEFT JOIN (SELECT
+              acc.block_id,
+              SUM(aafu.area) area
+            FROM ac_area_follow_up aafu
+              LEFT JOIN ac_crop_coverage acc
+                ON aafu.crop_coverage_id = acc.id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.district_id = {$filter['district_id']}
+            GROUP BY acc.block_id) t3
+            ON t1.block_id = t3.block_id
+          LEFT JOIN (SELECT
+              acc.block_id,
+              SUM(aarf.area) area
+            FROM ac_area_rice_fallow aarf
+              LEFT JOIN ac_crop_coverage acc
+                ON aarf.crop_coverage_id = acc.id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.district_id = {$filter['district_id']}
+            GROUP BY acc.block_id) t4
+            ON t1.block_id = t4.block_id
+          LEFT JOIN (SELECT
+              ac.block_id,
+              ac.crop_id,
+              ac.crops,
+              ac.crop_type,
+              aap.lt,
+              aap.ls,
+              aap.smi
+
+            FROM (SELECT
+                sb.id block_id,
+                ac.id crop_id,
+                ac.crops,
+                ac.crop_type
+              FROM soe_blocks sb
+                CROSS JOIN ac_crops ac
+              WHERE sb.district_id = {$filter['district_id']}
+              AND sb.is_program = 1) ac
+              LEFT JOIN (SELECT
+                  acc.block_id,
+                  aap.crop_id,
+                  SUM(aap.lt) lt,
+                  SUM(aap.smi) smi,
+                  SUM(aap.ls) ls
+                FROM ac_area_practices aap
+                  LEFT JOIN ac_crop_coverage acc
+                    ON acc.id = aap.crop_coverage_id
+                WHERE acc.start_date = '{$filter['start_date']}'
+                AND acc.district_id = {$filter['district_id']}
+                GROUP BY aap.crop_id,
+                         acc.block_id) aap
+                ON aap.block_id = ac.block_id
+                AND aap.crop_id = ac.crop_id) t5
+            ON t1.block_id = t5.block_id
+          RIGHT JOIN (SELECT
+              id,
+              name
+            FROM soe_blocks
+            WHERE district_id = {$filter['district_id']}
+            AND is_program = 1) sb
+            ON sb.id = t1.block_id";
+        return $this->db->query($sql)->getResult();
+    }
+
     public function getAreaCoverageBlock($filter = [])
     {
         // printr($filter);
         // exit;
-        $sql = "SELECT
-        sg.id gp_id,
-        sg.name gp,
-        aap.crop_coverage_id as cc_id,
-        COALESCE(acc.farmers_covered,0)AS farmers_covered,
-        COALESCE(an.nursery_raised,0)AS nursery_raised,
-        COALESCE(an.balance_smi,0)AS balance_smi,
-        COALESCE(an.balance_lt,0)AS balance_lt,
-      COALESCE(acc.crop_div_ragi, 0) + COALESCE(acc.crop_div_non_ragi, 0) AS total_crop_div,
-        acc.status,
-       COALESCE(acc.start_date, '" . $filter['start_date'] . "') AS start_date,
-        acc.end_date,
-        acc.remarks
+        $sql = "
+        SELECT
+          t2.crop_coverage_id,
+          t1.id gp_id,
+          t1.name gp_name,
+          COALESCE(t2.farmer_covered, 0) farmer_covered,
+          COALESCE(t2.nursery_raised, 0) nursery_raised,
+          COALESCE(t2.balance_smi, 0) balance_smi,
+          COALESCE(t2.balance_lt, 0) balance_lt,
+          COALESCE(t2.crop_div_ragi, 0) crop_div_ragi,
+          COALESCE(t2.crop_div_non_ragi, 0) crop_div_non_ragi,
+          t2.start_date,
+          t2.end_date,
+          t2.status,
+          t2.remarks,
+          t5.crop_id,
+          t5.crops,
+          t5.crop_type,
+          t5.smi,
+          t5.lt,
+          t5.ls,
+          t3.area follow_area,
+          t4.area fallow_area
         FROM (SELECT
-            *
-        FROM soe_grampanchayats sg
-        WHERE sg.block_id = {$filter['block_id']}) sg
-        LEFT JOIN ac_crop_coverage acc
-            ON acc.gp_id = sg.id
-            AND acc.start_date = '{$filter['start_date']}'
-        LEFT JOIN ac_nursery an
-            ON acc.id = an.crop_coverage_id
-        LEFT JOIN (SELECT * FROM ac_area_practices aap WHERE aap.crop_id = 1 ) aap
-            ON aap.crop_coverage_id = acc.id
-        ";
+            sg.id,
+            sg.name
+          FROM soe_grampanchayats sg
+          WHERE sg.block_id = {$filter['block_id']}) t1
+          LEFT JOIN (SELECT
+              acc.id,
+              acc.gp_id,
+              an.crop_coverage_id,
+              SUM(acc.farmers_covered) farmer_covered,
+              SUM(acc.crop_div_ragi) crop_div_ragi,
+              SUM(acc.crop_div_non_ragi) crop_div_non_ragi,
+              SUM(an.nursery_raised) nursery_raised,
+              SUM(an.balance_smi) balance_smi,
+              SUM(an.balance_lt) balance_lt,
+              acc.start_date,
+              acc.end_date,
+              acc.status,
+              acc.remarks
+            FROM ac_crop_coverage acc
+              LEFT JOIN ac_nursery an
+                ON acc.id = an.crop_coverage_id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.block_id = {$filter['block_id']}
+            GROUP BY acc.gp_id) t2
+            ON t1.id = t2.gp_id
+          LEFT JOIN (SELECT
+              acc.gp_id,
+              SUM(aafu.area) area
+            FROM ac_area_follow_up aafu
+              LEFT JOIN ac_crop_coverage acc
+                ON aafu.crop_coverage_id = acc.id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.gp_id = {$filter['block_id']}
+            GROUP BY acc.gp_id) t3
+            ON t1.id = t3.gp_id
+          LEFT JOIN (SELECT
+              acc.gp_id,
+              SUM(aarf.area) area
+            FROM ac_area_rice_fallow aarf
+              LEFT JOIN ac_crop_coverage acc
+                ON aarf.crop_coverage_id = acc.id
+            WHERE acc.start_date = '{$filter['start_date']}'
+            AND acc.gp_id = {$filter['block_id']}
+            GROUP BY acc.gp_id) t4
+            ON t1.id = t4.gp_id
+          LEFT JOIN (SELECT
+              ac.gp_id,
+              ac.crop_id,
+              ac.crops,
+              ac.crop_type,
+              aap.lt,
+              aap.ls,
+              aap.smi
+
+            FROM (SELECT
+                sg.id gp_id,
+                ac.id crop_id,
+                ac.crops,
+                ac.crop_type
+              FROM soe_grampanchayats sg
+                CROSS JOIN ac_crops ac
+              WHERE sg.block_id = {$filter['block_id']}) ac
+              LEFT JOIN (SELECT
+                  acc.gp_id,
+                  aap.crop_id,
+                  SUM(aap.lt) lt,
+                  SUM(aap.smi) smi,
+                  SUM(aap.ls) ls
+                FROM ac_area_practices aap
+                  LEFT JOIN ac_crop_coverage acc
+                    ON acc.id = aap.crop_coverage_id
+                WHERE acc.start_date = '{$filter['start_date']}'
+                AND acc.block_id = {$filter['block_id']}
+                GROUP BY aap.crop_id,
+                         acc.gp_id) aap
+                ON aap.gp_id = ac.gp_id
+                AND aap.crop_id = ac.crop_id) t5
+            ON t1.id = t5.gp_id";
 
 
 
