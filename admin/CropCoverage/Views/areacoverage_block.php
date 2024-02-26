@@ -97,64 +97,60 @@
                             </tr>
                         </thead>
                         <tbody id="table-body">
-                            <?php
-                            // printr($blocks);
-                            // exit;
-                            if (!empty($blocks)) {
-                                foreach ($blocks as $block) {
-                                    ?>
+
+                            <?php if ($gps) { ?>
+                                <?php foreach ($gps as $key => $gp) { ?>
                                     <tr>
                                         <td>
-                                            <?= $block->start_date ?>
+                                        <?= $gp['start_date'] ?>
                                         </td>
                                         <td>
-                                            <?= $block->gp ?>
+                                            <?= $gp['gp_name'] ?>
                                         </td>
                                         <td>
-                                            <?= $block->farmers_covered ?>
+                                            <?= $gp['farmer_covered'] ?>
                                         </td>
                                         <td>
-                                            <?= $block->nursery_raised ?>
+                                            <?= $gp['nursery_raised'] ?>
                                         </td>
                                         <td>
-                                            <?= $block->balance_smi ?>
+                                            <?= $gp['balance_smi'] ?>
                                         </td>
                                         <td>
-                                            <?= $block->balance_lt ?>
+                                            <?= $gp['balance_lt'] ?>
+                                        </td>
+
+                                       <td> <?= $gp['total_ragi']; ?></td>
+                                       <td> <?= $gp['total_non_ragi']; ?></td>
+                                        <td>
+                                            <?= $gp['follow_area']; ?>
+                                        </td>
+                                         <td>
+                                             <?= $gp['total_area']; ?>
+                                        </td>
+                                         <td>
+                                             <?= $gp['crop_div_area']; ?>
+                                        </td>
+                                        <?php if ($season == 'Rabi') { ?>
+                                                <td>
+                                                    <?= $gp['fallow_area'] ?>
+                                                </td>
+                                            <?php } ?>
+
+                                        <td>
+                                            <?= $gp['status']; ?>
                                         </td>
                                         <td>
-                                            <?= $block->total_ragi ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->total_non_ragi ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->follow_up ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->total_area ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->total_crop_div ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->rice_fallow ?>
-                                        </td>
-                                        <td>
-                                            <?= $block->status ?>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm pull-right">
-                                                <?= $block->action ?>
-                                            </div>
+                                            <?= $gp['action']; ?>
                                         </td>
                                     </tr>
-                                    <?php
-                                }
-                            } else {
-                                echo "Data is not available.";
-                            }
-                            ?>
+                                <?php } ?>
+
+                                <?php } else { ?>
+                        <tr>
+                            <td colspan="4">Data not available.</td>
+                        </tr>
+                    <?php } ?>
                         </tbody>
                     </table>
                 </div>

@@ -108,48 +108,84 @@ class AreaCoverage extends AdminController
             $gps = $this->acModel->getAreaCoverageBlock($filter);
             // printr($gps);
             // exit;
-            $blocks = [];
+
+            $restructuredData=[];
             foreach ($gps as $gp) {
-                $gp->total_ragi = 0;
-                $gp->total_non_ragi = 0;
-                $achievements = $this->acModel->getAchivementByCCID((int) $gp->cc_id);
+                // Get the district ID
+                $gpId = $gp->gp_id;
 
-                $action = '';
-                $week = '';
-                $action = '';
-                $week = '';
-                if ($gp->start_date) {
-                    $href = admin_url('areacoverage/edit?id=' . $gp->cc_id);
-                    $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
-                                            <i class="fa fa-list"></i></a>';
-
-                    $week = date('d F', strtotime($gp->start_date)) . '-' . date('d F', strtotime($gp->end_date));
+                // If the district ID doesn't exist in the restructured data array, create a new entry
+                if (!isset($restructuredData[$gpId])) {
+                    $restructuredData[$gpId] = [
+                        'crop_coverage_id' => $gp->crop_coverage_id,
+                        'gp_id' => $gpId,
+                        'gp_name' => $gp->gp_name,
+                        'farmer_covered' => $gp->farmer_covered,
+                        'nursery_raised' => $gp->nursery_raised,
+                        'balance_smi' => $gp->balance_smi,
+                        'balance_lt' => $gp->balance_lt,
+                        'crop_div_area' => $gp->crop_div_ragi+$gp->crop_div_non_ragi,
+                        'start_date' => $gp->start_date,
+                        'end_date' => $gp->end_date,
+                        'status' => $gp->status,
+                        'remarks' => $gp->remarks,
+                        'achievements' => [],
+                        'total_ragi'=>0,
+                        'total_non_ragi'=>0,
+                        'follow_area' => $gp->follow_area,
+                        'fallow_area' => $gp->fallow_area
+                    ];
                 }
 
-                $status = $gp->status;
+                // Add crop details to the 'ach' array
+                $restructuredData[$gpId]['achievements'][] = [
+                    'crop_id' => $gp->crop_id,
+                    'crops' => $gp->crops,
+                    'crop_type' => $gp->crop_type,
+                    'smi' => $gp->smi,
+                    'lt' => $gp->lt,
+                    'ls' => $gp->ls
+                ];
+
+                if ($gp->crop_type == 1) {
+                    $restructuredData[$gpId]['total_ragi'] += $gp->smi + $gp->ls + $gp->lt;
+                }else{
+                    $restructuredData[$gpId]['total_non_ragi'] += $gp->smi + $gp->ls + $gp->lt;
+                }
+
+                $restructuredData[$gpId]['total_area'] = $restructuredData[$gpId]['total_ragi'] +
+                                                    $restructuredData[$gpId]['total_non_ragi'] +
+                                                    $restructuredData[$gpId]['follow_area'];
+            }
+
+            $data['gps'] = [];
+
+            foreach ($restructuredData as &$gp) {
+                $action = '';
+                if ($gp['start_date']) {
+                    $href = admin_url('areacoverage/edit?id=' . $gp['crop_coverage_id']);
+                    $action .= '<a href="' . $href . '" class="btn btn-sm btn-info" data-toggle="tooltip" data-title="View">
+                                                <i class="fa fa-list"></i></a>';
+
+                    $week_text = date('d F', strtotime($gp['start_date'])) . '-' . date('d F', strtotime($gp['end_date']));
+                }
+                $status = $gp['status'];
                 if (!isset($status)) {
                     $status = 3;
                 }
-                foreach ($achievements as $achievement) {
-                    if ($achievement->crop_type) {
-                        $gp->total_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
-                    } else {
-                        $gp->total_non_ragi += $achievement->ls + $achievement->smi + $achievement->lt;
-                    }
-                }
-                $rice_fallow = $this->acModel->getRiceFallowByCCID((int) $gp->cc_id);
-                $follow_up = $this->acModel->getFollowUpByCCID((int) $gp->cc_id);
 
-                $gp->rice_fallow = $rice_fallow;
-                $gp->follow_up = $follow_up;
-                $gp->total_area = $gp->total_ragi + $gp->total_non_ragi + $gp->follow_up;
-                $gp->achievements = $achievements;
-                $gp->action = $action;
-                $gp->status = '<label class="badge badge-' . $this->colors_ac[$status] . '">' . $this->statuses[$status] . '</label>';
-                $gp->week = $week;
-                $blocks[] = $gp;
+                $gp['action'] = $action;
+                $gp['status'] = $this->statuses[$status];
+                $gp['status_color'] = $this->colors[$status];
+                //$restructuredData[] = $district;
+
+
+
             }
-            $data['blocks'] = $blocks;
+
+
+            $data['gps'] = $restructuredData;
+
             // printr($data['blocks']);
             // exit;
             $weekDate = $this->acModel->getWeekDate();
