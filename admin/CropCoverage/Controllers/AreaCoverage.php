@@ -106,10 +106,10 @@ class AreaCoverage extends AdminController
 
             //$blocks = $this->acModel->getAreaCoverage($filter);
             $gps = $this->acModel->getAreaCoverageBlock($filter);
-           // printr($gps);
-           // exit;
+            // printr($gps);
+            // exit;
 
-            $restructuredData=[];
+            $restructuredData = [];
             foreach ($gps as $gp) {
                 // Get the district ID
                 $gpId = $gp->gp_id;
@@ -124,14 +124,14 @@ class AreaCoverage extends AdminController
                         'nursery_raised' => $gp->nursery_raised,
                         'balance_smi' => $gp->balance_smi,
                         'balance_lt' => $gp->balance_lt,
-                        'crop_div_area' => $gp->crop_div_ragi+$gp->crop_div_non_ragi,
+                        'crop_div_area' => $gp->crop_div_ragi + $gp->crop_div_non_ragi,
                         'start_date' => $gp->start_date,
                         'end_date' => $gp->end_date,
                         'status' => $gp->status,
                         'remarks' => $gp->remarks,
                         'achievements' => [],
-                        'total_ragi'=>0,
-                        'total_non_ragi'=>0,
+                        'total_ragi' => 0,
+                        'total_non_ragi' => 0,
                         'follow_area' => $gp->follow_area,
                         'fallow_area' => $gp->fallow_area
                     ];
@@ -149,13 +149,13 @@ class AreaCoverage extends AdminController
 
                 if ($gp->crop_type == 1) {
                     $restructuredData[$gpId]['total_ragi'] += $gp->smi + $gp->ls + $gp->lt;
-                }else{
+                } else {
                     $restructuredData[$gpId]['total_non_ragi'] += $gp->smi + $gp->ls + $gp->lt;
                 }
 
                 $restructuredData[$gpId]['total_area'] = $restructuredData[$gpId]['total_ragi'] +
-                                                    $restructuredData[$gpId]['total_non_ragi'] +
-                                                    $restructuredData[$gpId]['follow_area'];
+                    $restructuredData[$gpId]['total_non_ragi'] +
+                    $restructuredData[$gpId]['follow_area'];
             }
 
             $data['gps'] = [];
@@ -646,8 +646,8 @@ class AreaCoverage extends AdminController
         if ($this->request->getMethod(1) == 'POST') {
             $master = [
                 'farmers_covered' => $this->request->getPost('crop_coverage')['farmers_covered'],
-                'crop_div_ragi' => $this->request->getPost('crop_coverage')['crop_div_ragi'],
-                'crop_div_non_ragi' => $this->request->getPost('crop_coverage')['crop_div_non_ragi'],
+                'crop_div_ragi' => $this->request->getPost('crop_div')['crop_div_ragi'],
+                'crop_div_non_ragi' => $this->request->getPost('crop_div')['crop_div_non_ragi'],
                 'status' => 0,
                 'remarks' => ''
             ];
