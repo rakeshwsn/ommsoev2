@@ -150,14 +150,15 @@
                                             <?= $gp['fallow_area'] ?>
                                         </td>
                                     <?php } ?>
-                                 
+
 
                                  <td>
                                     <?= $gp['action']; ?>
                                 </td>
                             </tr>
                         <?php } ?>
-                        <tr><td></td>
+                        <tr>
+                            <td></td>
                                 <td>Total</td>
                                 <td><?=$totals['total_farmers_covered']?></td>
                                 <td><?=$totals['total_nursery_raised']?></td>
