@@ -302,7 +302,7 @@ class Dashboard extends AdminController
 
     protected function receipt_check($check_type = '')
     {
-        $fr = true;
+        $fr = false;
         $frcModel = new FRCheckModel();
         $check_type = $this->request->getGet('check_type') ?: $check_type;
         if(getCurrentMonthId()){
