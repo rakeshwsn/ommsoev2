@@ -106,8 +106,8 @@ class AreaCoverage extends AdminController
 
             //$blocks = $this->acModel->getAreaCoverage($filter);
             $gps = $this->acModel->getAreaCoverageBlock($filter);
-            // printr($gps);
-            // exit;
+           // printr($gps);
+           // exit;
 
             $restructuredData=[];
             foreach ($gps as $gp) {

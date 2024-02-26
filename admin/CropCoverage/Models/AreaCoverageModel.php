@@ -644,7 +644,7 @@ FROM ac_crop_practices acp
               LEFT JOIN ac_crop_coverage acc
                 ON aafu.crop_coverage_id = acc.id
             WHERE acc.start_date = '{$filter['start_date']}'
-            AND acc.gp_id = {$filter['block_id']}
+            AND acc.block_id = {$filter['block_id']}
             GROUP BY acc.gp_id) t3
             ON t1.id = t3.gp_id
           LEFT JOIN (SELECT
@@ -654,7 +654,7 @@ FROM ac_crop_practices acp
               LEFT JOIN ac_crop_coverage acc
                 ON aarf.crop_coverage_id = acc.id
             WHERE acc.start_date = '{$filter['start_date']}'
-            AND acc.gp_id = {$filter['block_id']}
+            AND acc.block_id = {$filter['block_id']}
             GROUP BY acc.gp_id) t4
             ON t1.id = t4.gp_id
           LEFT JOIN (SELECT
