@@ -219,31 +219,31 @@ class Grampanchayat extends AdminController
 			$data['district_id'] = $this->user->district_id;
 		}
 
-        //Get userwise districts
-        if($this->user->district_id){
-            $districts = $this->districtModel
-                ->where('id',$this->user->district_id)
-                ->orderBy('name', 'asc')
-                ->findAll();
-        } else {
-            $districts = $this->districtModel
-                ->orderBy('name', 'asc')
-                ->findAll();
-        }
+		//Get userwise districts
+		if ($this->user->district_id) {
+			$districts = $this->districtModel
+				->where('id', $this->user->district_id)
+				->orderBy('name', 'asc')
+				->findAll();
+		} else {
+			$districts = $this->districtModel
+				->orderBy('name', 'asc')
+				->findAll();
+		}
 
-        $data['districts'][0] = 'Select districts';
+		$data['districts'][0] = 'Select districts';
 		foreach ($districts as $dist) {
 			$data['districts'][$dist->id] = $dist->name;
 		}
 
 		//Blocks start
-        $bfilter = ['district_id' => $data['district_id']];
-        if($this->user->block_id){
-            $bfilter['id'] = $this->user->block_id;
-        }
+		$bfilter = ['district_id' => $data['district_id']];
+		if ($this->user->block_id) {
+			$bfilter['id'] = $this->user->block_id;
+		}
 		$blocks = $this->blockModel->where($bfilter)->orderBy('name', 'asc')->findAll();
 
-        $data['blocks'][0] = 'Select block';
+		$data['blocks'][0] = 'Select block';
 		foreach ($blocks as $block) {
 			$data['blocks'][$block->id] = $block->name;
 		}

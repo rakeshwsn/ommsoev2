@@ -193,6 +193,9 @@ class Dashboard extends ResourceController
 		//generate table
 		$data['table'] = view('Api\Dashboard\Views\dashboardTable', $data);
 
+		// below line used some purpose but now its not required by rakesh N
+		// $data['tableWshg'] = view('Api\Dashboard\Views\dashboardWshgTable', $data);
+
 		echo json_encode($data, JSON_NUMERIC_CHECK);
 		exit;
 	}
@@ -471,5 +474,31 @@ class Dashboard extends ResourceController
 
 		// dd($data);
 		return $this->respond($data);
+	}
+
+
+	public function enterprisewshg()
+	{
+		$yearModel = new YearModel();
+		$districtmodel = new DistrictModel();
+
+		$enterprisemodel = new EnterpriseChartModel();
+
+
+		$filter = [];
+		$district_id = 0;
+		if ($this->request->getGet('district_id')) {
+			$data['district_id'] = $this->request->getGet('district_id');
+			$filter['district_id'] = $this->request->getGet('district_id');
+			$district_id = $this->request->getGet('district_id');
+		}
+
+
+		$enterprises = $enterprisemodel->getDistrictwiseEnterprisedata($filter);
+
+
+
+		echo json_encode($enterprises, JSON_NUMERIC_CHECK);
+		exit;
 	}
 }

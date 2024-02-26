@@ -6,10 +6,8 @@
                     <?= $heading_title; ?>
                 </h3>
                 <div class="block-options">
-                    <?php if ($permission_add == 7): ?>
-                        <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
-                            class="btn btn-primary ajaxaction">Add/Edit</a>
-                    <?php endif; ?>
+                    <a href="<?= $add; ?>" data-toggle="tooltip" title="add"
+                        class="btn btn-primary ajaxaction">Add/Edit</a>
                 </div>
             </div>
             <div class="block-content block-content-full">
