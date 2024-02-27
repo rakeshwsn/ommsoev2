@@ -33,15 +33,16 @@ class Dashboard extends AdminController
     {
         $data = [];
 
+        // if get request and is current month exists
         if (!$this->request->isAJAX()) {
             $data['fr_check'] = $this->receipt_check('fr');
             $data['or_check'] = $this->receipt_check('or');
         } else {
-            return $this->receipt_check(); //only for ajax call
+            return $this->receipt_check(); //only for ajax post request
         }
 
         $data['fr_url'] = site_url(Url::transactionAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
-        $data['or_url'] = site_url(Url::otherReceiptAdd) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
+        $data['or_url'] = site_url(Url::otherReceipt) . '?month=' . getCurrentMonthId() . '&year=' . getCurrentYearId() . '&txn_type=fund_receipt&agency_type_id=' . $this->user->agency_type_id;
 
         $data['abstract_url'] = admin_url('dashboard/getabstractdetails');
 
@@ -301,24 +302,26 @@ class Dashboard extends AdminController
 
     protected function receipt_check($check_type = '')
     {
-
+        $fr = false;
         $frcModel = new FRCheckModel();
         $check_type = $this->request->getGet('check_type') ?: $check_type;
-        $data = [
-            'month' => getCurrentMonthId(),
-            'year' => getCurrentYearId(),
-            'district_id' => $this->user->district_id,
-            'block_id' => $this->user->block_id,
-            'fund_agency_id' => $this->user->fund_agency_id,
-            'agency_type_id' => $this->user->agency_type_id,
-            'check_type' => $check_type
-        ];
+        if(getCurrentMonthId()){
+            $data = [
+                'month' => getCurrentMonthId(),
+                'year' => getCurrentYearId(),
+                'district_id' => $this->user->district_id,
+                'block_id' => $this->user->block_id,
+                'fund_agency_id' => $this->user->fund_agency_id,
+                'agency_type_id' => $this->user->agency_type_id,
+                'check_type' => $check_type
+            ];
 
-        $fr = $frcModel->where($data)->first();
+            $fr = $frcModel->where($data)->first();
+        }
 
+        //post request
         if ($this->request->isAJAX()) {
             $choice = $this->request->getGet('choice');
-
 
             if ($choice == 'yes') {
                 $data['status'] = 1;
@@ -380,7 +383,6 @@ class Dashboard extends AdminController
         ]);
 
         $filter['transaction_type'] = 'fund_receipt';
-
 
         $data['fr'] = $this->reportModel->getTransactionTotal($filter);
 

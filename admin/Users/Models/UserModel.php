@@ -254,7 +254,7 @@ FROM soe_allow_uploads sau
         ON u.block_id = sb.id
       LEFT JOIN soe_districts sd
         ON u.district_id = sd.id
-    WHERE u.deleted_at IS NULL AND sb.is_program=1";
+    WHERE u.deleted_at IS NULL AND (sb.is_program = 1 OR sb.is_program IS NULL)";
         if (!empty($filter['agency_type_id'])) {
             $sql .= " AND u.user_group_id = " . $filter['agency_type_id'];
         } else {
