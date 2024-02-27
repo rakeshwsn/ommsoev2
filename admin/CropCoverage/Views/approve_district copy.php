@@ -111,13 +111,13 @@
                             <?php foreach ($blocks as $block) { ?>
                                 <tr>
                                     <td>
-                                        <?= $block['block_name'] ?>
+                                        <?= $block['block'] ?>
                                     </td>
                                     <td>
-                                        <?= $block['total_gp'] ?>
+                                        <?= $block['gps'] ?>
                                     </td>
                                     <td>
-                                        <?= $block['farmer_covered'] ?>
+                                        <?= $block['farmers_covered'] ?>
                                     </td>
                                     <td>
                                         <?= $block['nursery_raised'] ?>
@@ -128,15 +128,36 @@
                                     <td>
                                         <?= $block['balance_lt'] ?>
                                     </td>
-
-                                    <? foreach ($block['achievements'] as $achievement) {
-                                        $crop_p = $crop_practices[$achievement['crop_id']];
-                                        foreach($crop_p as $p){?>
-                                        <td data-method="<?= $p ?>"> <?= $achievement[$p] ?></td>
-                                        <?}?>
-                                    <? } ?>
-
-
+                                    <td>
+                                        <?= $block['ragi_smi'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['ragi_lt'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['ragi_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['little_millet_lt'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['little_millet_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['foxtail_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['sorghum_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['kodo_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['barnyard_ls'] ?>
+                                    </td>
+                                    <td>
+                                        <?= $block['pearl_ls'] ?>
+                                    </td>
                                     <td>
                                         <?= $block['total_ragi'] ?>
                                     </td>
@@ -144,23 +165,24 @@
                                         <?= $block['total_non_ragi'] ?>
                                     </td>
                                     <td>
-                                        <?= $block['follow_area'] ?>
+                                        <?= $block['total_fc'] ?>
                                     </td>
                                     <td>
                                         <?= $block['total_area'] ?>
                                     </td>
-                                    <td>
-                                        <?= $block['crop_div_area'] ?>
-                                    </td>
 
+                                    <td>
+                                        <?= $block['total_crop_div'] ?>
+                                    </td>
                                     <?php if ($season == 'Rabi') { ?>
                                         <td>
-                                            <?= $block['fallow_area'] ?>
+                                            <?= $block['total_rfc'] ?>
                                         </td>
                                     <?php } ?>
-                                    <td><label class="badge badge-<?= $block['status_color'] ?>">
-                                            <?= $block['status'] ?>
-                                        </label></td>
+
+                                    <td>
+                                        <?= $block['status'] ?>
+                                    </td>
                                     <td>
                                         <div class="btn-group btn-group-sm pull-right">
                                             <?= $block['action'] ?>
@@ -168,30 +190,6 @@
                                     </td>
                                 </tr>
                             <?php } ?>
-                            <tr>
-                                <td>Total</td>
-                                <td><?=$totals['total_gp']?></td>
-                                <td><?=$totals['total_farmers_covered']?></td>
-                                <td><?=$totals['total_nursery_raised']?></td>
-                                <td><?=$totals['total_balance_smi']?></td>
-                                <td><?=$totals['total_balance_lt']?></td>
-                                <? foreach ($totals['achievements_totals'] as $crop_id=>$achievement) {
-                                    $crop_p = $crop_practices[$crop_id];
-                                    foreach($crop_p as $p){?>
-                                    <td> <?= $achievement[$p] ?></td>
-                                    <?}?>
-                                <?}?>
-                                <td><?=$totals['total_ragi']?></td>
-                                <td><?=$totals['total_non_ragi']?></td>
-                                <td>  <?=$totals['total_follow_area']?></td>
-                                <td>  <?=$totals['total_area']?></td>
-                                <td>  <?=$totals['total_crop_div_area']?></td>
-                                <?php if ($season == 'Rabi') { ?>
-                                    <td>  <?=$totals['total_fallow_area']?></td>
-                                <?php } ?>
-                                <td></td>
-                                </td></td>
-                            </tr>
                         <?php } else { ?>
                             <tr>
                                 <td colspan="4">Data not available.</td>
