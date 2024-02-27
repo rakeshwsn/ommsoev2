@@ -349,7 +349,7 @@ class EnterprisesModel extends Model
                e.block_id) res
       ON blkunit.block_id = res.block_id
       AND blkunit.unit_id = res.unit_id
-      and blkunit.is_program = 1";
+      ";
 
         if (!empty($filter['district_id'])) {
             $sql .= " WHERE blkunit.district_id = " . $filter['district_id'];

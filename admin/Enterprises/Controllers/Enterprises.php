@@ -705,10 +705,12 @@ class Enterprises extends AdminController
     public function getLgdGps()
     {
         $block_id = $this->request->getGet('block_id');
+       
         // get all LGD gps of the block selected
-        $block = (new LgdBlocksModel())->where('block_id', $block_id)->first();
+        $block = (new BlockModel())->where('id', $block_id)->findAll();
+    // printr($block);exit;
 
-        $data['gps'] = $this->lgdGpModel->where('block_lgd_code', $block->lgd_code)->orderBy('name', 'asc')->asArray()->findAll();
+        $data['gps'] = $this->lgdGpModel->where('block_lgd_code', $block[0]->lgd_code)->orderBy('name', 'asc')->asArray()->findAll();
         $data['label'] = 'Select Gp';
         $data['id'] = 'gp_id';
         $data['gp_id'] = '';
