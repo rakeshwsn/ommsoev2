@@ -305,6 +305,7 @@ class EstablishmentTransaction extends AdminController
     {
 
         $unit_groups = $this->entUnitGrpModel->findAll();
+        
         $worksheet_unit = [];
         foreach ($unit_groups as $group) {
             $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
@@ -338,6 +339,7 @@ class EstablishmentTransaction extends AdminController
                     'district_id' => $district_id,
                     'unit_id' => $unit['id']
                 ]);
+                
                 $unit['enterprises'] = $enterprises;
                 $group->columns = [];
 
@@ -433,8 +435,14 @@ class EstablishmentTransaction extends AdminController
                         }
                     }
                     $sheetindex++;
+
                 }
             }
+        }
+
+        //if sheetindex is 0 then there are no enterprises
+        if ($sheetindex == 0) {
+            return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'No enterprises found.');
         }
 
         //remove the default worksheet
@@ -445,7 +453,7 @@ class EstablishmentTransaction extends AdminController
         );
 
         //start protection
-
+        
         $spreadsheet->setActiveSheetIndex(0);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

@@ -40,7 +40,7 @@
                 <th>village_id</th>
                 <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Name SHG </th>
                 <?php foreach ($columns as $key => $column) { ?>
-                    <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; "><?= $column ?></th>
+                    <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; "><?= $column['label'] ?></th>
                 <?php } ?>
             </tr>
         </thead>
