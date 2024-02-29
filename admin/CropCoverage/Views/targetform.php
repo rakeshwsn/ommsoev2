@@ -38,6 +38,7 @@
                         </th>
                     <?php endforeach; ?>
                     <th>FOLLOW UP CROPS</th>
+                    <th>Rice Fallow CROPS</th>
                 </tr>
             </thead>
             <tbody>
@@ -73,6 +74,13 @@
                                 value="<?= $crop['followup']['value'] ?>" oninput="calculateTotals()">
 
                         </td>
+                        <td>
+                            <input type="number" step=".01" data-practice="5"
+                                id="rice_fallow_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>; ?>"
+                                name="rice_fallow[<?= $crop['id'] ?>][rice_fallow]" class="crop-input"
+                                value="<?= $crop['rice_fallow']['value'] ?>" oninput="calculateTotals()">
+
+                        </td>
 
                     </tr>
                 <?php endforeach; ?>
@@ -82,6 +90,7 @@
                     <td><input type="number" id="total-lt" class="total-input" readonly></td>
                     <td><input type="number" id="total-ls" class="total-input" readonly></td>
                     <td><input type="number" id="total-followup" class="total-input" readonly></td>
+                    <td><input type="number" id="total-rice_fallow" class="total-input" readonly></td>
                 </tr>
             </tbody>
         </table>
@@ -106,6 +115,7 @@
         var totalLT = 0;
         var totalLS = 0;
         var totalFOLLOWUP = 0;
+        var totalRICEFALLOW = 0;
 
         for (var i = 0; i < cropInputs.length; i++) {
             validateField(cropInputs[i]); // Validate the input field
@@ -125,6 +135,10 @@
                 else if (practice === '4') {
                     totalFOLLOWUP += value;
                 }
+                else if (practice === '5') {
+                    totalRICEFALLOW += value;
+
+                }
             }
         }
 
@@ -132,6 +146,8 @@
         document.getElementById('total-lt').value = totalLT.toFixed(2);
         document.getElementById('total-ls').value = totalLS.toFixed(2);
         document.getElementById('total-followup').value = totalFOLLOWUP.toFixed(2);
+        document.getElementById('total-followup').value = totalFOLLOWUP.toFixed(2);
+        document.getElementById('total-rice_fallow').value = totalRICEFALLOW.toFixed(2);
     }
 
     document.addEventListener('DOMContentLoaded', calculateTotals);
