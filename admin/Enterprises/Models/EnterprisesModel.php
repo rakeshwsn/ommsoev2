@@ -228,7 +228,7 @@ class EnterprisesModel extends Model
         COALESCE(res.total_units, 0) total_units,
         res.management_unit_type,
         res.date_estd,
-        res.year_id,
+        res.budget_fin_yr_id,
         res.month
         FROM (SELECT
         eu.id unit_id,
@@ -243,7 +243,7 @@ class EnterprisesModel extends Model
         e.district_id,
         e.management_unit_type,
         e.date_estd,
-        dy.id year_id,
+        e.budget_fin_yr_id,
         MONTH(e.date_estd) month
       FROM enterprises e
         LEFT JOIN dashboard_years dy
@@ -252,7 +252,7 @@ class EnterprisesModel extends Model
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
         if (!empty($filter['year_id']) && $filter['year_id']) {
-            $sql .= " AND dy.id = " . $filter['year_id'];
+            $sql .= " AND e.budget_fin_yr_id = " . $filter['year_id'];
         }
         if (!empty($filter['month']) && $filter['month']) {
             $sql .= " AND sm.id = " . $filter['month'];
@@ -299,7 +299,7 @@ class EnterprisesModel extends Model
         COALESCE(res.total_units, 0) total_units,
         res.management_unit_type,
         res.date_estd,
-        res.year_id,
+        res.budget_fin_yr_id,
         res.month
      FROM (SELECT
         eu.id unit_id,
@@ -316,7 +316,7 @@ class EnterprisesModel extends Model
         e.block_id,
         e.management_unit_type,
         e.date_estd,
-        dy.id year_id,
+        e.budget_fin_yr_id,
         MONTH(e.date_estd) month
       FROM enterprises e
         LEFT JOIN dashboard_years dy
@@ -325,7 +325,7 @@ class EnterprisesModel extends Model
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
         if (!empty($filter['year_id'])) {
-            $sql .= " AND dy.id = " . $filter['year_id'];
+            $sql .= " AND e.budget_fin_yr_id = " . $filter['year_id'];
         }
         if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];
@@ -378,7 +378,7 @@ class EnterprisesModel extends Model
         COALESCE(res.total_units, 0) total_units,
         res.management_unit_type,
         res.date_estd,
-        res.year_id,
+        res.budget_fin_yr_id,
         res.month
      FROM (SELECT
       gp.id gp_id,
@@ -412,7 +412,7 @@ class EnterprisesModel extends Model
         e.gp_id, e.block_id,
         e.management_unit_type,
         e.date_estd,
-        dy.id year_id,
+        e.budget_fin_yr_id,
         MONTH(e.date_estd) month
       FROM enterprises e
       LEFT JOIN dashboard_years dy
@@ -424,7 +424,7 @@ class EnterprisesModel extends Model
             $sql .= " AND e.block_id = " . $filter['block_id'];
         }
         if (!empty($filter['year_id'])) {
-            $sql .= " AND dy.id = " . $filter['year_id'];
+            $sql .= " AND e.budget_fin_yr_id= " . $filter['year_id'];
         }
         if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];
@@ -448,7 +448,8 @@ class EnterprisesModel extends Model
       ON  coalesce(res.gp_id,0) = coalesce(gpunits.gp_id,0)
       AND gpunits.block_id=res.block_id AND gpunits.unit_id=res.unit_id
       ORDER BY unit_id, gp";
-
+// echo $sql;
+// exit;
         return $this->db->query($sql)->getResult();
     }
 
