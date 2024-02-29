@@ -305,7 +305,6 @@ class EstablishmentTransaction extends AdminController
 
     public function download()
     {
-
         $unit_groups = $this->entUnitGrpModel->findAll();
         
         $worksheet_unit = [];
@@ -331,7 +330,7 @@ class EstablishmentTransaction extends AdminController
             'district_id' => $district_id,
             'period' => $period
         ];
-        
+
         //loop through all unit groups --sheets
         foreach ($unit_groups as $group) {
 
@@ -341,12 +340,55 @@ class EstablishmentTransaction extends AdminController
                     'district_id' => $district_id,
                     'unit_id' => $unit['id']
                 ]);
-                
+            }
+            $group->enterprises = $enterprises;
+        }
+        dd($unit_groups);
+    }
+
+    public function download2()
+    {
+        $unit_groups = $this->entUnitGrpModel->findAll();
+
+        $worksheet_unit = [];
+        foreach ($unit_groups as $group) {
+            $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
+            $group->units = $units;
+        }
+
+        $month_id = $this->request->getGet('month_id');
+        $year_id = $this->request->getGet('year_id');
+        $district_id = $this->request->getGet('district_id');
+        $period = $this->request->getGet('period');
+        $month_name = $this->monthModel->find($month_id)->name;
+        $year_name = $this->yearModel->find($year_id)->name;
+        $filename = 'EntTxnTemplate_' . $month_name . '_' . $year_name . '_' . date('Y-m-d_His') . '.xlsx';
+        $sheetindex = 0;
+        $reader = new Html();
+        $doc = new \DOMDocument();
+        $spreadsheet = new Spreadsheet();
+        $data = [
+            'month_id' => $month_id,
+            'year_id' => $year_id,
+            'district_id' => $district_id,
+            'period' => $period
+        ];
+
+        //loop through all unit groups --sheets
+        foreach ($unit_groups as $group) {
+
+            // fetch enterprises by district_id and unit_id
+            foreach ($group->units as &$unit) {
+                $enterprises = $this->enterprisesModel->getBy([
+                    'district_id' => $district_id,
+                    'unit_id' => $unit['id']
+                ]);
+
                 // $unit['enterprises'] = $enterprises;
                 $group->columns = [];
                 //if enterprises are available then add columns
                 if ($enterprises) {
-                    
+
                     $group->columns = $this->columns[$unit['unit_group']];
 
                     $data['columns'] = $this->columns[$unit['unit_group']];
@@ -356,9 +398,11 @@ class EstablishmentTransaction extends AdminController
                     $data['heading_title'] = "Enterprise Transaction " . ucfirst($title) . " Data";
 
                     $data['enterprises'] = $enterprises;
-                    
-                    $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
 
+                    $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
+echo $htmltable;
+echo "<br>";
+continue;
                     $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
                     $worksheet = $spreadsheet->createSheet($sheetindex);
@@ -435,11 +479,8 @@ class EstablishmentTransaction extends AdminController
                                 $worksheet->getStyle($range)->applyFromArray($fillColor);
                             }
                         }
-
-                        
                     }
                     $sheetindex++;
-
                 }
             }
         }
@@ -458,7 +499,7 @@ class EstablishmentTransaction extends AdminController
         );
 
         //start protection
-        
+
         $spreadsheet->setActiveSheetIndex(0);
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
