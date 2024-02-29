@@ -105,7 +105,7 @@ FROM mis_submissions ms
     ON b.id = ms.block_id
   LEFT JOIN soe_districts d
     ON d.id = ms.district_id
-WHERE ms.deleted_at IS NULL AND b.is_program=1";
+WHERE ms.deleted_at IS NULL AND (b.is_program=1 OR b.is_program IS NULL)";
         
         if (!empty($filter['user_id'])) {
             $sql .= " AND ms.user_id=".$filter['user_id'];
