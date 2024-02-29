@@ -490,7 +490,8 @@ class EnterprisesModel extends Model
 
     public function getBy($filter)
     {
-        $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,gp.name grampanchayat,e.village_id,v.name village,
+        $sql = "SELECT e.id enterprise_id,e.block_id,b.name `block`,e.gp_id,
+        gp.name grampanchayat,e.village_id,v.name village,
         e.management_unit_type,e.managing_unit_name shg_name,eu.id unit_id,
         eu.name unit_name FROM enterprises e
         LEFT JOIN enterprises_units eu ON e.unit_id=eu.id
