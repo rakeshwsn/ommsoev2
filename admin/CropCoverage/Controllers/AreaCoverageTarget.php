@@ -144,6 +144,11 @@ class AreaCoverageTarget extends AdminController
 
 
 			$this->targetModel->addFollowUpCrops($data, $target_id);
+			$data['rice_fallow_data'] = $this->request->getPost('rice_fallow');
+
+			// printr($data['rice_fallow_data']);
+			// exit;
+			$this->targetModel->addRiceFallowCrops($data, $target_id);
 
 
 			$this->session->setFlashdata('message', 'Target Updated Successfully.');
@@ -198,7 +203,7 @@ class AreaCoverageTarget extends AdminController
 				// If the crop_id exists, get the crop values from $crop array
 				$crop_values = $data['croppractices'][$crop_id];
 
-				$fields = ['smi', 'lt', 'ls', 'followup'];
+				$fields = ['smi', 'lt', 'ls', 'followup', 'rice_fallow'];
 
 				// Initialize an empty array to store the values for 'smi', 'lt', and 'ls'
 				$values = array();
@@ -214,6 +219,7 @@ class AreaCoverageTarget extends AdminController
 				$practice['lt'] = $values['lt'];
 				$practice['ls'] = $values['ls'];
 				$practice['followup'] = $values['followup'];
+				$practice['rice_fallow'] = $values['rice_fallow'];
 
 				// Add the updated $practice array to the $output array
 				$output[] = $practice;

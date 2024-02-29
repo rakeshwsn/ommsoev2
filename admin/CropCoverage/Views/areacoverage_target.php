@@ -70,10 +70,11 @@
                         <?php endif; ?>
                     <?php endforeach; ?>
                     <th colspan="7" class="cl-head">Follow Up Crops (with out incentive)(in Ha)</th>
+                    <th colspan="7" class="cl-head">Rice Fallow Crops(in Ha)</th>
                     <th rowspan="2" class="cl-head">Total Ragi</th>
                     <th rowspan="2" class="cl-head">Total Non-Ragi</th>
-
                     <th rowspan="2" class="cl-head">Total Follow up Crops</th>
+                    <th rowspan="2" class="cl-head">Total Rice Fallow Crops</th>
                     <th rowspan="2" class="cl-head">Total Target</th>
 
 
@@ -85,6 +86,11 @@
                                 <?= $practice; ?>
                             </th>
                         <?php endforeach; ?>
+                    <?php endforeach; ?>
+                    <?php foreach ($heading as $crop => $practices): ?>
+                        <th class="cl-head">
+                            <?= $crop; ?>
+                        </th>
                     <?php endforeach; ?>
                     <?php foreach ($heading as $crop => $practices): ?>
                         <th class="cl-head">
@@ -127,14 +133,15 @@
                             <?= $disttarget["SORGHUM_LS"]; ?>
                         </td>
                         <td>
-                            <?= $disttarget["PEARL_MILLET_LS"]; ?>
+                            <?= $disttarget["KODO_MILLET_LS"]; ?>
                         </td>
                         <td>
                             <?= $disttarget["BARNYARD_MILLET_LS"]; ?>
                         </td>
                         <td>
-                            <?= $disttarget["KODO_MILLET_LS"]; ?>
+                            <?= $disttarget["PEARL_MILLET_LS"]; ?>
                         </td>
+
                         <td>
                             <?= $disttarget["RAGI_FOLLOWUP"]; ?>
                         </td>
@@ -148,13 +155,34 @@
                             <?= $disttarget["SORGHUM_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $disttarget["PEARL_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["KODO_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td>
                             <?= $disttarget["BARNYARD_MILLET_FOLLOWUP"]; ?>
                         </td>
                         <td>
-                            <?= $disttarget["KODO_MILLET_FOLLOWUP"]; ?>
+                            <?= $disttarget["PEARL_MILLET_FOLLOWUP"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["ragi_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["little_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["foxtail_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["sorghum_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["kodo_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["barnyard_rice_fallow"]; ?>
+                        </td>
+                        <td>
+                            <?= $disttarget["pearl_rice_fallow"]; ?>
                         </td>
                         <td id="dist-ragi" class="dist-ragi">
                             <?= $disttarget["RAGI_SMI"] + $disttarget["RAGI_LT"] + $disttarget["RAGI_LS"]; ?>
@@ -166,6 +194,10 @@
                         <td id="dist-follow-up" class="dist-follow-up">
                             <?= $disttarget["RAGI_FOLLOWUP"] + $disttarget["LITTLE_MILLET_FOLLOWUP"] + $disttarget["FOXTAIL_MILLET_FOLLOWUP"] + $disttarget["SORGHUM_FOLLOWUP"] + $disttarget["PEARL_MILLET_FOLLOWUP"] + $disttarget["BARNYARD_MILLET_FOLLOWUP"] + $disttarget["KODO_MILLET_FOLLOWUP"]; ?>
                         </td>
+                        <td id="dist-rice-fallow" class="dist-rice-fallow">
+                            <?= $disttarget["ragi_rice_fallow"] + $disttarget["little_rice_fallow"] + $disttarget["foxtail_rice_fallow"] + $disttarget["sorghum_rice_fallow"] + $disttarget["kodo_rice_fallow"] + $disttarget["barnyard_rice_fallow"] + $disttarget["pearl_rice_fallow"]; ?>
+                        </td>
+
                         <td id="dist-sum-crop" class="dist-sum-crop"> </td>
 
                     </tr>
@@ -299,7 +331,28 @@
                         echo $totalSorghumFollowupSum; // Display the total SORGHUM_FOLLOWUP sum
                         ?>
                     </td>
-
+                    <td class="total-kodo-millet-followup cl-head">
+                        <?php
+                        $totalKodoMilletFollowupSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of KODO_MILLET_FOLLOWUP values for each row
+                            $kodoMilletFollowupSum = $disttarget["KODO_MILLET_FOLLOWUP"];
+                            $totalKodoMilletFollowupSum += $kodoMilletFollowupSum;
+                        }
+                        echo $totalKodoMilletFollowupSum; // Display the total KODO_MILLET_FOLLOWUP sum
+                        ?>
+                    </td>
+                    <td class="total-barnyard-millet-followup cl-head">
+                        <?php
+                        $totalBarnyardMilletFollowupSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of BARNYARD_MILLET_FOLLOWUP values for each row
+                            $barnyardMilletFollowupSum = $disttarget["BARNYARD_MILLET_FOLLOWUP"];
+                            $totalBarnyardMilletFollowupSum += $barnyardMilletFollowupSum;
+                        }
+                        echo $totalBarnyardMilletFollowupSum; // Display the total BARNYARD_MILLET_FOLLOWUP sum
+                        ?>
+                    </td>
                     <td class="total-pearl-millet-followup cl-head">
                         <?php
                         $totalPearlMilletFollowupSum = 0;
@@ -312,30 +365,87 @@
                         ?>
                     </td>
 
-                    <td class="total-barnyard-millet-followup cl-head">
-                        <?php
-                        $totalBarnyardMilletFollowupSum = 0;
-                        foreach ($distwisetarget as $disttarget) {
-                            // Calculate the sum of BARNYARD_MILLET_FOLLOWUP values for each row
-                            $barnyardMilletFollowupSum = $disttarget["BARNYARD_MILLET_FOLLOWUP"];
-                            $totalBarnyardMilletFollowupSum += $barnyardMilletFollowupSum;
-                        }
-                        echo $totalBarnyardMilletFollowupSum; // Display the total BARNYARD_MILLET_FOLLOWUP sum
-                        ?>
-                    </td>
 
-                    <td class="total-kodo-millet-followup cl-head">
+
+
+                    <td class="total-ragi-rice-fallow cl-head">
                         <?php
-                        $totalKodoMilletFollowupSum = 0;
+                        $totalRagiRiceFallowSum = 0;
                         foreach ($distwisetarget as $disttarget) {
-                            // Calculate the sum of KODO_MILLET_FOLLOWUP values for each row
-                            $kodoMilletFollowupSum = $disttarget["KODO_MILLET_FOLLOWUP"];
-                            $totalKodoMilletFollowupSum += $kodoMilletFollowupSum;
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $ragiRiceFallowSum = $disttarget["ragi_rice_fallow"];
+                            $totalRagiRiceFallowSum += $ragiRiceFallowSum;
                         }
-                        echo $totalKodoMilletFollowupSum; // Display the total KODO_MILLET_FOLLOWUP sum
+                        echo $totalRagiRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
+                        ?>
+
+                    </td>
+                    <td class="total-little-rice-fallow cl-head">
+                        <?php
+                        $totalLittleRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $littleRiceFallowSum = $disttarget["little_rice_fallow"];
+                            $totalLittleRiceFallowSum += $littleRiceFallowSum;
+                        }
+                        echo $totalLittleRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
                         ?>
                     </td>
-                    <td colspan="3" class="cl-head">Total Target</td>
+                    <td class="total-foxtail-rice-fallow cl-head">
+                        <?php
+                        $totalFoxtailRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $foxtailRiceFallowSum = $disttarget["foxtail_rice_fallow"];
+                            $totalFoxtailRiceFallowSum += $foxtailRiceFallowSum;
+                        }
+                        echo $totalFoxtailRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
+                        ?>
+                    </td>
+                    <td class="total-sorghum-rice-fallow cl-head">
+                        <?php
+                        $totalSorghumRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $sorghumRiceFallowSum = $disttarget["sorghum_rice_fallow"];
+                            $totalSorghumRiceFallowSum += $sorghumRiceFallowSum;
+                        }
+                        echo $totalSorghumRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
+                        ?>
+                    </td>
+                    <td class="total-kodo-rice-fallow cl-head">
+                        <?php
+                        $totalKodoRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            $kodoRiceFallowSum = $disttarget["kodo_rice_fallow"];
+                            $totalKodoRiceFallowSum += $kodoRiceFallowSum;
+                        }
+                        echo $totalKodoRiceFallowSum;
+                        ?>
+                    </td>
+                    <td class="total-barnyard-rice-fallow cl-head">
+                        <?php
+                        $totalBarnyardRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $barnyardRiceFallowSum = $disttarget["barnyard_rice_fallow"];
+                            $totalBarnyardRiceFallowSum += $barnyardRiceFallowSum;
+                        }
+                        echo $totalBarnyardRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
+                        ?>
+                    </td>
+                    <td class="total-pearl-rice-fallow cl-head">
+                        <?php
+                        $totalPearlRiceFallowSum = 0;
+                        foreach ($distwisetarget as $disttarget) {
+                            // Calculate the sum of RAGI_FOLLOWUP values for each row
+                            $pearlRiceFallowSum = $disttarget["pearl_rice_fallow"];
+                            $totalPearlRiceFallowSum += $pearlRiceFallowSum;
+                        }
+                        echo $totalPearlRiceFallowSum; // Display the total RAGI_FOLLOWUP sum
+                        ?>
+                    </td>
+                    <td colspan="4" class="cl-head">Total Target</td>
                     <td class="all-total cl-head"></td>
                 </tr>
             </tbody>
@@ -345,14 +455,14 @@
     <table id="block-coverage" class="table table-bordered table-striped table-vcenter table-responsive">
         <thead>
             <tr>
-                <th rowspan="2">Block</th>
+                <th rowspan="2" class="cl-head">Block</th>
                 <?php
                 $totalRagi = 0;
                 foreach ($heading as $crop => $practices) {
                     if ($crop === 'RAGI') {
                         $totalRagi = count($practices);
                         ?>
-                        <th colspan="<?= $totalRagi ?>">
+                        <th colspan="<?= $totalRagi ?>" class="cl-head">
                             <?= $crop; ?>
                         </th>
                     <?php } ?>
@@ -360,29 +470,36 @@
 
                 <?php foreach ($heading as $crop => $practices): ?>
                     <?php if ($crop !== 'RAGI'): ?>
-                        <th colspan="<?= count($practices) ?>">
+                        <th colspan="<?= count($practices) ?>" class="cl-head">
                             <?= $crop; ?>
                         </th>
                     <?php endif; ?>
                 <?php endforeach; ?>
-                <th colspan="7">Follow Up Crops (with out incentive)(in Ha)</th>
-                <th rowspan="2">Total Ragi</th>
-                <th rowspan="2">Total Non-Ragi</th>
-                <th rowspan="2">Total Follow up Crops</th>
-                <th rowspan="2">Total Target</th>
+                <th colspan="7" class="cl-head">Follow Up Crops (with out incentive)(in Ha)</th>
+                <th colspan="7" class="cl-head">Rice Fallow Crops(in Ha)</th>
+                <th rowspan="2" class="cl-head">Total Ragi</th>
+                <th rowspan="2" class="cl-head">Total Non-Ragi</th>
+                <th rowspan="2" class="cl-head">Total Follow up Crops</th>
+                <th rowspan="2" class="cl-head">Total Rice Fallow Crops</th>
+                <th rowspan="2" class="cl-head">Total Target</th>
 
-                <th class="text-right no-sort" rowspan="2">Actions</th>
+                <th class="text-right no-sort cl-head" rowspan="2">Actions</th>
             </tr>
             <tr>
                 <?php foreach ($heading as $crop => $practices): ?>
                     <?php foreach ($practices as $practice): ?>
-                        <th>
+                        <th class="cl-head">
                             <?= $practice; ?>
                         </th>
                     <?php endforeach; ?>
                 <?php endforeach; ?>
                 <?php foreach ($heading as $crop => $practices): ?>
-                    <th>
+                    <th class="cl-head">
+                        <?= $crop; ?>
+                    </th>
+                <?php endforeach; ?>
+                <?php foreach ($heading as $crop => $practices): ?>
+                    <th class="cl-head">
                         <?= $crop; ?>
                     </th>
                 <?php endforeach; ?>
@@ -439,13 +556,34 @@
                         <?= $data["SORGHUM_FOLLOWUP"]; ?>
                     </td>
                     <td>
-                        <?= $data["PEARL_MILLET_FOLLOWUP"]; ?>
+                        <?= $data["KODO_MILLET_FOLLOWUP"]; ?>
                     </td>
                     <td>
                         <?= $data["BARNYARD_MILLET_FOLLOWUP"]; ?>
                     </td>
                     <td>
-                        <?= $data["KODO_MILLET_FOLLOWUP"]; ?>
+                        <?= $data["PEARL_MILLET_FOLLOWUP"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["ragi_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["little_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["foxtail_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["sorghum_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["kodo_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["barnyard_rice_fallow"]; ?>
+                    </td>
+                    <td>
+                        <?= $data["pearl_rice_fallow"]; ?>
                     </td>
                     <td id="ragi" class="ragi">
                         <?= $data["RAGI_SMI"] + $data["RAGI_LT"] + $data["RAGI_LS"]; ?>
@@ -455,6 +593,9 @@
                     </td>
                     <td id="follow-up" class="follow-up">
                         <?= $data["RAGI_FOLLOWUP"] + $data["LITTLE_MILLET_FOLLOWUP"] + $data["FOXTAIL_MILLET_FOLLOWUP"] + $data["SORGHUM_FOLLOWUP"] + $data["PEARL_MILLET_FOLLOWUP"] + $data["BARNYARD_MILLET_FOLLOWUP"] + $data["KODO_MILLET_FOLLOWUP"]; ?>
+                    </td>
+                    <td id="rice_fallow" class="rice_fallow">
+                        <?= $data["ragi_rice_fallow"] + $data["little_rice_fallow"] + $data["foxtail_rice_fallow"] + $data["sorghum_rice_fallow"] + $data["kodo_rice_fallow"] + $data["barnyard_rice_fallow"] + $data["pearl_rice_fallow"]; ?>
                     </td>
                     <td id="sum-crop-block" class="sum-crop-block"> </td>
                     <td>
@@ -466,7 +607,8 @@
                 </tr>
             <?php } ?>
             <tr>
-                <td colspan="18" class="text-right">Total District Target</td>
+
+                <td colspan="29" class="text-right">Total District Target</td>
                 <td colspan="5" class="all-total-block"></td>
             </tr>
         </tbody>
@@ -481,8 +623,8 @@
             var column1Value = parseFloat(row.find('.ragi').text());
             var column2Value = parseFloat(row.find('.non-ragi').text());
             var column3Value = parseFloat(row.find('.follow-up').text());
-
-            var sum = column1Value + column2Value + column3Value;
+            var column4Value = parseFloat(row.find('.rice_fallow').text());
+            var sum = column1Value + column2Value + column3Value + column4Value;
 
             row.find('.sum-crop-block').text(sum);
         });
@@ -502,8 +644,8 @@
             var column1Value = parseFloat(row.find('.dist-ragi').text());
             var column2Value = parseFloat(row.find('.dist-non-ragi').text());
             var column3Value = parseFloat(row.find('.dist-follow-up').text());
-
-            var sum = column1Value + column2Value + column3Value;
+            var column4Value = parseFloat(row.find('.dist-rice-fallow').text());
+            var sum = column1Value + column2Value + column3Value + column4Value;
 
             row.find('.dist-sum-crop').text(sum);
         });

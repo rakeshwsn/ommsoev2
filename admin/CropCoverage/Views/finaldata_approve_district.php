@@ -71,8 +71,8 @@
                             <th rowspan="3">Farmer covered under Follow Up Crop</th>
                             <th rowspan="3">Total Follow up Crops</th>
                             <th rowspan="3">Total Area </th>
-                            <th rowspan="3">Status</th>
                             <th rowspan="3">Documents</th>
+                            <th rowspan="3">Status</th>
                         </tr>
                         <tr>
                             <?php foreach ($crop_practices as $crop_id => $practices): ?>
@@ -179,16 +179,15 @@
                                 <td class="all-total-area">
                                     <?= $blockfd->ragi_total_smi + $blockfd->ragi_total_lt + $blockfd->ragi_ls + $blockfd->little_millet_lt + $blockfd->little_millet_ls + $blockfd->foxtail_millet_ls + $blockfd->sorghum_ls + $blockfd->kodo_millet_ls + $blockfd->barnyard_millet_ls + $blockfd->pearl_millet_ls + $blockfd->total_fup ?>
                                 </td>
-
-                                <td>
-                                    <label class="badge badge-<?= $blockfd->status_color; ?>">
-                                        <?= $blockfd->status; ?>
-                                    </label>
-                                </td>
                                 <td>
                                     <a href="<?= base_url('uploads/finaldatadoc/' . $blockfd->filename); ?>">
                                         <?= $blockfd->filename; ?>
                                     </a>
+                                </td>
+                                <td>
+                                    <label class="badge badge-<?= $blockfd->status_color; ?>">
+                                        <?= $blockfd->status; ?>
+                                    </label>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
