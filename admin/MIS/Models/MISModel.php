@@ -47,7 +47,7 @@ FROM mis_submissions ms
     ON m.id = ms.month
   LEFT JOIN user_group ug
     ON ug.id = ms.agency_type_id
-WHERE 1=1 AND b.is_program=1";
+WHERE 1=1 AND (b.is_program=1 OR b.is_program IS NULL)";
         
         $sql .= " AND ms.deleted_at IS NULL";
 

@@ -90,6 +90,29 @@ class TargetModel extends Model
             $this->db->table('ac_target_followup_crop')->insert($followupdata);
         }
     }
+    public function addRiceFallowCrops($data, $target_id)
+    {
+        // printr($data);
+        // exit;
+        // Crop master table
+
+        $this->db->table('ac_target_rice_fallow')->where('target_id', $target_id)->delete();
+
+        // Crop coverage target table
+        foreach ($data['rice_fallow_data'] as $crop_id => $area) {
+            $ricefallowdata = array(
+                "target_id" => $target_id,
+                "crop_id" => $crop_id,
+
+                //Check if 'FOLLOWUP' key exists
+                "rice_fallow" => isset($area['rice_fallow']) ? $area['rice_fallow'] : 0
+            );
+            // printr($ricefallowdata);
+            // exit;
+
+            $this->db->table('ac_target_rice_fallow')->insert($ricefallowdata);
+        }
+    }
 
     public function viewBlockTarget($filter = [])
     {
@@ -116,7 +139,14 @@ class TargetModel extends Model
   COALESCE(followup.SORGHUM_FOLLOWUP, 0.00) AS SORGHUM_FOLLOWUP,
   COALESCE(followup.PEARL_MILLET_FOLLOWUP, 0.00) AS PEARL_MILLET_FOLLOWUP,
   COALESCE(followup.BARNYARD_MILLET_FOLLOWUP, 0.00) AS BARNYARD_MILLET_FOLLOWUP,
-  COALESCE(followup.KODO_MILLET_FOLLOWUP, 0.00) AS KODO_MILLET_FOLLOWUP
+  COALESCE(followup.KODO_MILLET_FOLLOWUP, 0.00) AS KODO_MILLET_FOLLOWUP,
+  COALESCE(atrf.ragi_rice_fallow, 0.00) AS ragi_rice_fallow,
+  COALESCE(atrf.little_rice_fallow, 0.00) AS little_rice_fallow,
+  COALESCE(atrf.foxtail_rice_fallow, 0.00) AS foxtail_rice_fallow,
+  COALESCE(atrf.sorghum_rice_fallow, 0.00) AS sorghum_rice_fallow,
+  COALESCE(atrf.pearl_rice_fallow, 0.00) AS pearl_rice_fallow,
+  COALESCE(atrf.barnyard_rice_fallow, 0.00) AS barnyard_rice_fallow,
+  COALESCE(atrf.kodo_rice_fallow, 0.00) AS kodo_rice_fallow
 FROM (
   SELECT *
   FROM soe_blocks sb
@@ -171,7 +201,16 @@ LEFT JOIN (
     MAX(CASE WHEN crop_id = 7 THEN followup END) AS KODO_MILLET_FOLLOWUP
   FROM ac_target_followup_crop
   GROUP BY target_id
-) followup ON block_target.target_id = followup.target_id ORDER BY block_name
+) followup ON block_target.target_id = followup.target_id  LEFT JOIN (SELECT
+      target_id,
+      MAX(CASE WHEN crop_id = 1 THEN rice_fallow END) AS ragi_rice_fallow,
+      MAX(CASE WHEN crop_id = 2 THEN rice_fallow END) AS little_rice_fallow,
+      MAX(CASE WHEN crop_id = 3 THEN rice_fallow END) AS foxtail_rice_fallow,
+      MAX(CASE WHEN crop_id = 4 THEN rice_fallow END) AS sorghum_rice_fallow,
+      MAX(CASE WHEN crop_id = 5 THEN rice_fallow END) AS kodo_rice_fallow,
+      MAX(CASE WHEN crop_id = 6 THEN rice_fallow END) AS barnyard_rice_fallow,
+      MAX(CASE WHEN crop_id = 7 THEN rice_fallow END) AS pearl_rice_fallow
+    FROM ac_target_rice_fallow GROUP BY target_id) atrf ON block_target.target_id=atrf.target_id ORDER BY block_name
 ";
         // echo $sql;
         // exit;
@@ -207,7 +246,15 @@ LEFT JOIN (
     followup.SORGHUM AS SORGHUM_FOLLOWUP,
     followup.PEARL_MILLET AS PEARL_MILLET_FOLLOWUP,
     followup.BARNYARD_MILLET AS BARNYARD_MILLET_FOLLOWUP,
-    followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP
+    followup.KODO_MILLET AS KODO_MILLET_FOLLOWUP,
+    rf.ragi_rice_fallow,
+    rf.little_rice_fallow,
+    rf.foxtail_rice_fallow,
+    rf.sorghum_rice_fallow,
+    rf.kodo_rice_fallow,
+    rf.barnyard_rice_fallow,
+    rf.pearl_rice_fallow
+   
 FROM
     (
         SELECT
@@ -284,7 +331,29 @@ LEFT JOIN
 
         $sql .= " AND atm.deleted_at IS NULL
         GROUP BY atm.district_id
-    ) followup ON followup.district_id = sd.id";
+    ) followup ON followup.district_id = sd.id  LEFT JOIN (SELECT
+      tr.target_id,
+      atm.district_id,
+      SUM(CASE WHEN tr.crop_id = 1 THEN tr.rice_fallow END) AS ragi_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 2 THEN tr.rice_fallow END) AS little_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 3 THEN tr.rice_fallow END) AS foxtail_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 4 THEN tr.rice_fallow END) AS sorghum_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 5 THEN tr.rice_fallow END) AS kodo_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 6 THEN tr.rice_fallow END) AS barnyard_rice_fallow,
+      SUM(CASE WHEN tr.crop_id = 7 THEN tr.rice_fallow END) AS pearl_rice_fallow
+    FROM ac_target_rice_fallow tr
+      LEFT JOIN ac_target_master atm
+        ON tr.target_id = atm.id  WHERE";
+
+        if (!empty($filter['year_id'])) {
+            $sql .= " atm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND atm.season = '" . $filter['season'] . "'";
+        }
+
+        $sql .= " AND atm.deleted_at IS NULL GROUP BY atm.district_id) rf
+    ON rf.district_id = sd.id ORDER BY sd.name";
 
         // echo $sql;
         // exit;
@@ -299,7 +368,8 @@ LEFT JOIN
             cd.smi,
             cd.ls,
             cd.lt,
-            fl.followup
+            fl.followup,
+            rf.rice_fallow
 FROM ac_crops ac
   LEFT JOIN (SELECT
       ata.id,
@@ -346,6 +416,25 @@ FROM ac_crops ac
         }
         $sql .= " AND atm.deleted_at IS NULL) fl
 		 ON ac.id = fl.crop_id
+          LEFT JOIN (SELECT
+      ata.id,
+      ata.crop_id,
+      ata.rice_fallow 
+    FROM ac_target_rice_fallow ata
+      LEFT JOIN ac_target_master atm
+        ON ata.target_id = atm.id
+        WHERE 1 = 1";
+        if (!empty($filter['block_id'])) {
+            $sql .= " AND atm.block_id = " . $filter['block_id'];
+        }
+        if (!empty($filter['year_id'])) {
+            $sql .= " AND atm.year_id = " . $filter['year_id'];
+        }
+        if (!empty($filter['season'])) {
+            $sql .= " AND atm.season = '" . $filter['season'] . "'";
+        }
+        $sql .= " AND atm.deleted_at IS NULL) rf
+          ON ac.id = rf.crop_id
     WHERE ac.crops IS NOT NULL";
         // echo $sql;
         // exit;

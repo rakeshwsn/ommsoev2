@@ -19,7 +19,6 @@
             </div>
         </td>
     </tr>
-    
     <?php foreach ($enterprises as $enterprise) { ?>
         <?php $slno = 1; ?>
         <thead>
@@ -27,23 +26,24 @@
                 <th style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $enterprise->unit_id ?></th>
                 <th colspan="<?php echo (9 + count($columns)); ?>" style="text-align: center; background-color:#EFEF05; font-weight: bold; "><?= $enterprise->unit_name ?></th>
             </tr>
-
             <tr>
                 <td><?= $enterprise->unit_id ?></td>
                 <th style="text-align: center; background-color:#848403 ;border: 5px solid black; font-weight: bold;">ent_id</th>
                 <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Slno</th>
-                <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Block</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Block</th>
                 <th>block_id</th>
-                <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">GP</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">GP</th>
                 <th>gp_id</th>
-                <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Village</th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Village</th>
                 <th>village_id</th>
-                <th contenteditable="false" style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Name SHG </th>
+                <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; ">Name SHG </th>
                 <?php foreach ($columns as $key => $column) { ?>
                     <th style="text-align: center; background-color:#848403;border: 5px solid black; font-weight: bold; "><?= $column['label'] ?></th>
                 <?php } ?>
             </tr>
         </thead>
+
+
         <tbody>
             <?php foreach ($enterprises as $enterprise) { ?>
                 <tr>
