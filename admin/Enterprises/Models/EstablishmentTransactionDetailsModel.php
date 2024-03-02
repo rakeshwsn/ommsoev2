@@ -158,7 +158,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
     }
     // $sql .=  " GROUP BY unit.units";
-
+echo $sql;
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {

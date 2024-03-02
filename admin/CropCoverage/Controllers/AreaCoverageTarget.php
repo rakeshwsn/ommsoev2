@@ -1,4 +1,5 @@
 <?php
+
 namespace Admin\CropCoverage\Controllers;
 
 use Admin\Common\Models\YearModel;
@@ -55,9 +56,19 @@ class AreaCoverageTarget extends AdminController
 		$data['button_edit'] = lang('Edit Target');
 		$data['years'] = getAllYears();
 		$data['seasons'] = $this->acModel->getSeasons();
-		$data['current_season'] = getCurrentSeason();
+		if ($this->request->getGet('season')) {
+			$data['current_season'] = $season = $this->request->getGet('season');
+		} else {
+			$data['current_season'] = strtolower(getCurrentSeason());
+		}
+
+		//$data['get_season'] = $this->request->getGet('season') ?? $data['current_season'];
+		// printr($data['get_season']);
+		// exit;
 		$croppractices = $this->targetModel->getPractices();
 
+		// echo $data['season'];
+		// exit;
 		$data['target_url'] = admin_url('areacoverage/target/filter');
 		if (isset($this->error['warning'])) {
 			$data['error'] = $this->error['warning'];
