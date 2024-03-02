@@ -1,4 +1,38 @@
+<style>
+    .table-fixed-column-outter {
+        position: relative;
+        margin: 2rem auto;
+        max-width: 100%;
+    }
 
+    .table-fixed-column-inner {
+        overflow-x: scroll;
+        overflow-y: visible;
+        /* //width: 400px; */
+        /* margin-left: 100px; */
+
+        .table {
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    .table.table-fixed-column {
+        table-layout: fixed;
+        width: 100%
+    }
+
+    .table td,
+    .table th {
+        width: 100px;
+    }
+
+    .table th:first-child,
+    .table tr td:first-child {
+        /* position: absolute; */
+        left: 0;
+        width: 100px;
+    }
+</style>
 <div class="main-container">
     <div class="block">
         <div class="block-header block-header-default">
@@ -77,89 +111,94 @@
         <div class="block-content block-content-full">
             <div class="row row-sm">
                 <div class="col-lg-12">
-                    <div class="card pd-2 mg-b-5">
+                    <div class="card pd-2 mg-b-5 ">
                         <div class="table-responsive">
-                            <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
-                                <thead class="bg-light text-dark">
-                                    <tr>
-                                        <?php if ($district_id) : ?>
-                                            <th colspan="<?= count($unit_names)+2 ?>"style="text-align:center;">
-                                                District: <?= $district_text; ?> ||
-                                            <?php endif; ?>
-                                            <?php if ($block_id) : ?>
-                                                Block: <?= $block_text; ?> ||
-                                            <?php endif; ?>
-                                            <?php if ($year_id) : ?>
-                                                Year: <?= $year_text; ?> ||
-                                            <?php endif; ?>
-                                            <?php if ($month_id) : ?>
-                                                Month: <?= $month_text; ?> ||
-                                            <?php endif; ?>
-                                            <?php if ($management_unit_type === 'SHG') : ?>
-                                                Unit: <?= $unit_text; ?>
-                                            <?php endif; ?>
-                                            </th>
-                                    </tr>
-
-                                    <tr>
-                                        <th rowspan="2">
-                                            <?php if ($block_id) {
-                                                echo "Grampanchayat";
-                                            } elseif ($district_id) {
-                                                echo "Blocks";
-                                            } else {
-                                                echo "Districts";
-                                            }
-                                            ?>
-
-                                        </th>
-                                        <th colspan="<?= count($unit_names) ?>" class="text-center">Type and No. of Units</th>
-                                        <th rowspan="2">Total</th>
-                                    </tr>
-
-                                    <tr>
-                                        <?php foreach ($unit_names as $unit) : ?>
-                                            <th><?= $unit->name ?></th>
-                                        <?php endforeach; ?>
-
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    <?php if ($block_id) { ?>
-                                        <?php foreach ($gpUnits as $gpUnit) : ?>
+                            <div class="table-fixed-column-outter">
+                                <div class="table-fixed-column-inner">
+                                    <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
+                                        <thead class="bg-light text-dark">
                                             <tr>
-                                                <td><?= $gpUnit['gp'] ?></td>
-                                                <?php foreach ($gpUnit['g_units'] as $gunit) : ?>
-                                                    <td><?= $gunit ?></td>
-                                                <?php endforeach; ?>
+                                                <?php if ($district_id) : ?>
+                                                    <th colspan="<?= count($unit_names) + 2 ?>" style="text-align:center;">
+                                                        District: <?= $district_text; ?> ||
+                                                    <?php endif; ?>
+                                                    <?php if ($block_id) : ?>
+                                                        Block: <?= $block_text; ?> ||
+                                                    <?php endif; ?>
+                                                    <?php if ($year_id) : ?>
+                                                        Year: <?= $year_text; ?> ||
+                                                    <?php endif; ?>
+                                                    <?php if ($month_id) : ?>
+                                                        Month: <?= $month_text; ?> ||
+                                                    <?php endif; ?>
+                                                    <?php if ($management_unit_type === 'SHG') : ?>
+                                                        Unit: <?= $unit_text; ?>
+                                                    <?php endif; ?>
+                                                    </th>
+                                                    
                                             </tr>
-                                        <?php endforeach; ?>
-                                    <?php } else if ($district_id) { ?>
-                                        <?php foreach ($blockUnits as $blockUnit) : ?>
+
                                             <tr>
-                                                <td><?= $blockUnit['block'] ?></td>
-                                                <?php foreach ($blockUnit['b_units'] as $bunit) : ?>
-                                                    <td><?= $bunit ?></td>
-                                                <?php endforeach; ?>
+                                                <th rowspan="2">
+                                                    <?php if ($block_id) {
+                                                        echo "Grampanchayat";
+                                                    } elseif ($district_id) {
+                                                        echo "Blocks";
+                                                    } else {
+                                                        echo "Districts";
+                                                    }
+                                                    ?>
+
+                                                </th>
+                                                <th colspan="<?= count($unit_names) ?>" class="text-center">Type and No. of Units</th>
+                                                <th rowspan="2">Total</th>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    <?php } else { ?>
-                                        <?php foreach ($units as $unit) : ?>
+
                                             <tr>
-                                                <td><?= $unit['district'] ?></td>
-                                                <?php foreach ($unit['units'] as $eunit) : ?>
-                                                    <td><?= $eunit ?></td>
+                                                <?php foreach ($unit_names as $unit) : ?>
+                                                    <th><?= $unit->name ?></th>
                                                 <?php endforeach; ?>
 
                                             </tr>
+                                        </thead>
 
-                                        <?php endforeach; ?>
-                                    <?php } ?>
+                                        <tbody>
 
-                                </tbody>
-                            </table>
+                                            <?php if ($block_id) { ?>
+                                                <?php foreach ($gpUnits as $gpUnit) : ?>
+                                                    <tr>
+                                                        <td><?= $gpUnit['gp'] ?></td>
+                                                        <?php foreach ($gpUnit['g_units'] as $gunit) : ?>
+                                                            <td><?= $gunit ?></td>
+                                                        <?php endforeach; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php } else if ($district_id) { ?>
+                                                <?php foreach ($blockUnits as $blockUnit) : ?>
+                                                    <tr>
+                                                        <td><?= $blockUnit['block'] ?></td>
+                                                        <?php foreach ($blockUnit['b_units'] as $bunit) : ?>
+                                                            <td><?= $bunit ?></td>
+                                                        <?php endforeach; ?>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            <?php } else { ?>
+                                                <?php foreach ($units as $unit) : ?>
+                                                    <tr>
+                                                        <td><?= $unit['district'] ?></td>
+                                                        <?php foreach ($unit['units'] as $eunit) : ?>
+                                                            <td><?= $eunit ?></td>
+                                                        <?php endforeach; ?>
+
+                                                    </tr>
+
+                                                <?php endforeach; ?>
+                                            <?php } ?>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

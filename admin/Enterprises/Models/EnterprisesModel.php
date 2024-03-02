@@ -499,7 +499,7 @@ class EnterprisesModel extends Model
         LEFT JOIN soe_blocks b ON e.block_id=b.id
         LEFT JOIN soe_grampanchayats gp ON e.gp_id=gp.id
         LEFT JOIN villages v ON e.village_id=v.id
-        WHERE e.deleted_at IS NULL AND b.is_program=1";
+        WHERE e.deleted_at IS NULL ";
 
         if (!empty($filter['district_id'])) {
             $sql .= " AND e.district_id= " . (int)$filter['district_id'];
@@ -534,7 +534,7 @@ class EnterprisesModel extends Model
       g.name grampanchayat,
       v.name villages,
       e.district_id
-    FROM enterprises e
+      FROM enterprises e
       LEFT JOIN soe_blocks sb
         ON e.block_id = sb.id
       LEFT JOIN soe_grampanchayats g
@@ -568,5 +568,8 @@ class EnterprisesModel extends Model
       $res = $this->db->get()->row_array();
   
       return $res;
+    }
+    public function getFile($file){
+
     }
 }
