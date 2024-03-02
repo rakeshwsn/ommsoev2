@@ -85,7 +85,7 @@ $validation = \Config\Services::validation();
                 <h3 class="text-left text-dark my-3" style="font-weight: bold !important;">Unit Info</h3>
                 <div class="row">
                     <div class="col-6 form-group mt-15 <?= $validation->hasError('unit_id') ? 'is-invalid' : '' ?> ">
-                        <label for="units">Name/Type of Unit <span class="text-danger">*</span></label>
+                        <label for="units">Name/Type of Unit <span class="text-danger"></span></label>
                         <?php
                         $select_attributes = array(
                             'class' => 'form-control js-select2',
@@ -221,8 +221,8 @@ $validation = \Config\Services::validation();
                         <input type="text" name="unit_budget_amount" class="form-control" id="unit_budget_amount" placeholder=" Amount" value="<?= set_value('unit_budget_amount', $unit_budget_amount) ?>" required>
                     </div>
                     <div class="col-6 form-group <?= $validation->hasError('own_share') ? 'is-invalid' : '' ?>">
-                        <label for="total own share">Investment by the WSHG/FPO<span class="text-danger">*</span></label>
-                        <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>" required>
+                        <label for="total own share">Investment by the WSHG/FPO</label>
+                        <input type="text" name="own_share" class="form-control" id="own_share" placeholder="Enter total own share " value="<?= set_value('own_share', $own_share) ?>">
                     </div>
                 </div>
             </div>
@@ -711,10 +711,7 @@ $validation = \Config\Services::validation();
                     required: true,
                     rupees: true
                 },
-                own_share: {
-                    required: true,
-                    rupees: true
-                },
+              
                 budget_fin_yr_id: {
                     required: true,
                     ddrequired: true
@@ -722,9 +719,7 @@ $validation = \Config\Services::validation();
                 date_estd: {
                     required: true,
                 },
-                mou_date: {
-                    required: true,
-                },
+              
                 purpose_infr_support: {
                     required: function(element) {
                         return $("#is_support_basis_infr").is(":checked");
@@ -746,7 +741,7 @@ $validation = \Config\Services::validation();
 
                 pincode: {
                     digitsOnly: true,
-                    // required: true
+                    required: true
 
                 }
             },

@@ -21,6 +21,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Protection;
 use Mpdf\Tag\Tr;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpParser\Node\Stmt\Label;
@@ -88,9 +89,12 @@ class EstablishmentTransaction extends AdminController
             $data['years'][$year->id] = $year->name;
         }
 
-        $data['year_id'] = $this->yearModel->getCurrentYear()->id;;
         if ($this->request->getGet('year_id')) {
             $data['year_id'] = $this->request->getGet('year_id');
+        }
+        else{
+            $data['year_id'] = $this->yearModel->getCurrentYear()->id;;
+
         }
         $data['months'][0] = 'Select Month';
 
@@ -158,6 +162,7 @@ class EstablishmentTransaction extends AdminController
         $requestData = $_REQUEST;
         $totalData = $this->establishmentTxnsDtls->getTotals();
 
+
         $totalFiltered = $totalData;
         // This array use for filter data 
         $filter_data = array(
@@ -172,8 +177,9 @@ class EstablishmentTransaction extends AdminController
             'start' => $requestData['start'],
             'limit' => $requestData['length'],
         );
-
+printr($filter_data);exit;
         $totalFiltered = $this->establishmentTxnsDtls->getTotals($filter_data);
+        // dd($totalFiltered);
         $filteredData = $this->establishmentTxnsDtls->periodswisetrans($filter_data);
         $datatable = array();
         foreach ($filteredData as $result) {
@@ -206,31 +212,31 @@ class EstablishmentTransaction extends AdminController
 
         return $this->response->setContentType('application/json')->setJSON($json_data);
     }
-    private function filter()
-    {
-        $filter = [];
+    // private function filter()
+    // {
+    //     $filter = [];
 
-        // if $this user has district_id, then filter by district_id
+    //     // if $this user has district_id, then filter by district_id
 
-        if ($this->request->getGet('district_id') > 0) {
-            $filter['district_id'] = $this->request->getGet('district_id');
-        }
-        if ($this->request->getGet('year_id') > 0) {
-            $filter['year_id'] = $this->request->getGet('year_id');
-        }
-        if ($this->request->getGet('month_id') > 0) {
-            $filter['month_id'] = $this->request->getGet('month_id');
-        }
-        if ($this->request->getGet('unit_id') > 0) {
-            $filter['unit_id'] = $this->request->getGet('unit_id');
-        }
-        if ($this->request->getGet('period') != 'all') {
-            $filter['period'] = $this->request->getGet('period');
-        }
+    //     if ($this->request->getGet('district_id') > 0) {
+    //         $filter['district_id'] = $this->request->getGet('district_id');
+    //     }
+    //     if ($this->request->getGet('year_id') > 0) {
+    //         $filter['year_id'] = $this->request->getGet('year_id');
+    //     }
+    //     if ($this->request->getGet('month_id') > 0) {
+    //         $filter['month_id'] = $this->request->getGet('month_id');
+    //     }
+    //     if ($this->request->getGet('unit_id') > 0) {
+    //         $filter['unit_id'] = $this->request->getGet('unit_id');
+    //     }
+    //     if ($this->request->getGet('period') != 'all') {
+    //         $filter['period'] = $this->request->getGet('period');
+    //     }
 
-        $filteredData =  $this->establishmentTxnsDtls->periodswisetrans($filter);
-        return $filteredData;
-    }
+    //     $filteredData =  $this->establishmentTxnsDtls->periodswisetrans($filter);
+    //     return $filteredData;
+    // }
     public function edit()
     {
 
@@ -306,7 +312,7 @@ class EstablishmentTransaction extends AdminController
     public function download()
     {
         $unit_groups = $this->entUnitGrpModel->findAll();
-        
+
         $worksheet_unit = [];
         foreach ($unit_groups as $group) {
             $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
@@ -325,9 +331,9 @@ class EstablishmentTransaction extends AdminController
         $doc = new \DOMDocument();
         $spreadsheet = new Spreadsheet();
 
-
         //loop through all unit groups --sheets
         foreach ($unit_groups as &$group) {
+
             // fetch enterprises by district_id and unit_id
             $total_enterprises = 0;
             foreach ($group->units as &$unit) {
@@ -335,8 +341,10 @@ class EstablishmentTransaction extends AdminController
                     'district_id' => $district_id,
                     'unit_id' => $unit['id']
                 ]);
+
                 $unit['enterprises'] = $enterprises;
                 $total_enterprises += count($enterprises);
+
                 $group->columns = $this->columns[$unit['unit_group']];
             }
             $group->total_enterprises = $total_enterprises;
@@ -349,26 +357,29 @@ class EstablishmentTransaction extends AdminController
             'period' => $period
         ];
 
-        foreach ($unit_groups as $group) {
-            $data['group_name'] = $group->name;
-            $data['group_id'] = $group->id;
+        $hasEnterprises = 0;
+        foreach ($unit_groups as $groups) {
+
+            $data['group_id'] = $groups->id;
             $data['units'] = [];
-            if($group->total_enterprises > 0){
+            if ($groups->total_enterprises > 0) {
+
                 $worksheet = $spreadsheet->createSheet($sheetindex);
-                $worksheet->setTitle($group->name);
+                $worksheet->setTitle($groups->name);
 
-                $data['columns'] = $group->columns;
+                $data['columns'] = $groups->columns;
+                $data['group_name'] = $groups->name;
 
-                foreach ($group->units as $key => $unit) {
-                    if($unit['enterprises']) {
+                foreach ($groups->units as $key => $unit) {
+                    if ($unit['enterprises']) {
                         // heading title
-                        $data['units'][$key]['heading_title'] = ucfirst($unit['name']) ;
+                        $data['units'][$key]['heading_title'] = ucfirst($unit['name']);
                         $data['units'][$key]['enterprises'] = $unit['enterprises'];
                     }
                 }
-            }
-            if($group->total_enterprises > 0){
+
                 $htmltable = view('Admin\Enterprises\Views\excelForm', $data);
+
                 $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
 
                 $reader->setSheetIndex($sheetindex);
@@ -397,15 +408,13 @@ class EstablishmentTransaction extends AdminController
                 $worksheet->getColumnDimension('C')->setWidth(10);
 
                 //hide the id columns
-                if ($worksheet) {
-                    $worksheet->getColumnDimension('A')->setVisible(false);
-                    $worksheet->getColumnDimension('B')->setVisible(false);
-                    $worksheet->getColumnDimension('E')->setVisible(false);
-                    $worksheet->getColumnDimension('G')->setVisible(false);
-                    $worksheet->getColumnDimension('I')->setVisible(false);
-                    $worksheet->getRowDimension('1')->setVisible(false);
-                    $worksheet->getRowDimension('2')->setVisible(false);
-                }
+                $worksheet->getColumnDimension('A')->setVisible(false);
+                $worksheet->getColumnDimension('B')->setVisible(false);
+                $worksheet->getColumnDimension('E')->setVisible(false);
+                $worksheet->getColumnDimension('G')->setVisible(false);
+                $worksheet->getColumnDimension('I')->setVisible(false);
+                $worksheet->getRowDimension('1')->setVisible(false);
+                $worksheet->getRowDimension('2')->setVisible(false);
 
                 foreach ($worksheet->getRowIterator() as $row) {
                     // Find the corresponding row element in the HTML table
@@ -413,7 +422,7 @@ class EstablishmentTransaction extends AdminController
 
                     $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
 
-                    if($rowElement == null){
+                    if ($rowElement == null) {
                         continue;
                     }
 
@@ -449,173 +458,54 @@ class EstablishmentTransaction extends AdminController
                         }
                     }
                 }
-            }
-            $sheetindex++;
-        }
-        //if sheetindex is 0 then there are no enterprises
-        if ($sheetindex == 0) {
-            return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'No enterprises found.');
-        }
 
-        //remove the default worksheet
-        $spreadsheet->removeSheetByIndex(
-            $spreadsheet->getIndex(
-                $spreadsheet->getSheetByName('Worksheet')
-            )
-        );
+                $hasEnterprises++; // Set the flag to true if enterprises are found
 
-        $sheet = $spreadsheet->setActiveSheetIndex(0);
+                $protection = $worksheet->getProtection();
+                $protection->setAlgorithm(Protection::ALGORITHM_SHA_512);
+                $protection->setPassword('PhpSpreadsheet');
+                $protection->setSheet(true);
+                $protection->setSort(false);
+                $protection->setInsertRows(false);
+                $protection->setFormatCells(false);
 
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-        header('Cache-Control: max-age=1');
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit();
-    }
+                $max_rows = $worksheet->getHighestRow();
 
-    public function download1()
-    {
+                //get worksheet name
+                $columns = $this->columns[$groups->name];
 
-        $unit_groups = $this->entUnitGrpModel->findAll();
-
-        $worksheet_unit = [];
-        foreach ($unit_groups as $group) {
-            $units = $this->entunitModel->getAll(['unit_group_id' => $group->id]);
-            $group->units = $units;
-        }
-
-        $month_id = $this->request->getGet('month_id');
-        $year_id = $this->request->getGet('year_id');
-        $district_id = $this->request->getGet('district_id');
-        $period = $this->request->getGet('period');
-        $month_name = $this->monthModel->find($month_id)->name;
-        $year_name = $this->yearModel->find($year_id)->name;
-        $filename = 'EntTxnTemplate_' . $month_name . '_' . $year_name . '_' . date('Y-m-d_His') . '.xlsx';
-        $sheetindex = 0;
-        $reader = new Html();
-        $doc = new \DOMDocument();
-        $spreadsheet = new Spreadsheet();
-        $data = [
-            'month_id' => $month_id,
-            'year_id' => $year_id,
-            'district_id' => $district_id,
-            'period' => $period
-        ];
-
-        //loop through all unit groups
-        foreach ($unit_groups as $group) {
-            $worksheet = $spreadsheet->createSheet($sheetindex);
-            $title = $group->name;
-            $worksheet->setTitle($title);
-
-            $data['heading_title'] = "Enterprise Transaction " . ucfirst($title) . " Data";
-            // fetch enterprises by district_id and unit_id
-            foreach ($group->units as &$unit) {
-                $htmltable = '';
-                $enterprises = $this->enterprisesModel->getBy([
-                    'district_id' => $district_id,
-                    'unit_id' => $unit['id']
-                ]);
-
-                $unit['enterprises'] = $enterprises;
-
-                $group->columns = [];
-                //if enterprises are available then add columns
-                if ($enterprises) {
-                    $group->columns = $this->columns[$unit['unit_group']];
-
-                    $data['columns'] = $this->columns[$unit['unit_group']];
-
-                    // heading title
-                    $title = $unit['unit_group'];
-                    // $data['heading_title'] = "Enterprise Transaction " . ucfirst($title) . " Data";
-
-                    $data['enterprises'] = $enterprises;
-
-                    $htmltable .= view('Admin\Enterprises\Views\excelForm', $data);
-
-                    $htmltable = preg_replace("/&(?!\S+;)/", "&amp;", $htmltable);
-
-                    $reader->setSheetIndex($sheetindex);
-                    $spreadsheet = $reader->loadFromString($htmltable, $spreadsheet);
-
-                    // $worksheet = $spreadsheet->getActiveSheet();
-
-                    // Load HTML content into a DOM object for formatting from class
-                    $doc->loadHTML($htmltable);
-
-                    $rows = $doc->getElementsByTagName('tr');
-                    
-                    // formatting and designing the columns and rows
-                    
-                    //Set auto-size column word wrap for all columns
-                    $highestColumn = $worksheet->getHighestColumn();
-                    if ($worksheet && $highestColumn) {
-                        for ($col = 'A'; $col <= $highestColumn; $col++) {
-                            $worksheet->getColumnDimension($col)->setAutoSize(false);
-                            $worksheet->getStyle($col)->getAlignment()->setWrapText(true);
-                        }
-                    }
-
-                    //set column widths for J
-                    $worksheet->getColumnDimension('J')->setWidth(30);
-                        
-                    //hide the id columns
-                    if ($worksheet) {
-                        $worksheet->getColumnDimension('A')->setVisible(false);
-                        $worksheet->getColumnDimension('B')->setVisible(false);
-                        $worksheet->getColumnDimension('E')->setVisible(false);
-                        $worksheet->getColumnDimension('G')->setVisible(false);
-                        $worksheet->getColumnDimension('I')->setVisible(false);
-                        $worksheet->getRowDimension('1')->setVisible(false);
-                        $worksheet->getRowDimension('2')->setVisible(false);
-                    }
-
-                    foreach ($worksheet->getRowIterator() as $row) {
-                        // Find the corresponding row element in the HTML table
-                        $rowIndex = $row->getRowIndex();
-
-                        $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
-
-                        if($rowElement == null){
-                            continue;
-                        }
-
-                        // Get the class name of the row element
-                       
-                        $className = $rowElement->getAttribute('class');
-
-                        // Check if the class name matches a highlight class from the HTML table
-                        if (preg_match('/highlight-(\w+)/', $className, $matches)) {
-                            $highlightClass = $matches[1];
-
-                            // Set the fill color based on the highlight class
-                            $fillColor = null;
-                            switch ($highlightClass) {
-                                case 'heading1':
-                                    $fillColor = ExcelStyles::heading1();
-                                    break;
-                                case 'heading2':
-                                    $fillColor = ExcelStyles::heading2();
-                                    break;
-                                case 'heading3':
-                                    $fillColor = ExcelStyles::heading3();
-                                    break;
-                                case 'heading4':
-                                    $fillColor = ExcelStyles::fill_yellow();
-                                    break;
+                $col = 'K';
+                foreach ($columns as $key => $column) {
+                    $row = 1;
+                    while ($row <= $max_rows) {
+                        //if a cell is not empty
+                        if (is_numeric($worksheet->getCell("A$row")->getValue())) {
+                            $worksheet->getStyle($col.$row)->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+                            
+                            $validation = $worksheet->getCell($col.$row)->getDataValidation();
+                            $validation->setErrorStyle(DataValidation::STYLE_STOP);
+                            $validation->setAllowBlank(true);
+                            $validation->setShowInputMessage(true);
+                            $validation->setShowErrorMessage(true);
+                            $validation->setErrorTitle('Input error');
+                            $validation->setPromptTitle('Allowed input');
+                            $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
+                            
+                            //set datatype of the current cell as number
+                            if($column['rules']=='number'){
+                                $validation->setType(DataValidation::TYPE_WHOLE);
+                                $validation->setError('Only numbers allowed!');
+                                $validation->setPrompt('Values greater than or equal to 0 are allowed.');
+                            } else if($column['rules']=='decimal'){
+                                $validation->setType(DataValidation::TYPE_DECIMAL);
+                                $validation->setError('Only numbers/decimals allowed!');
+                                $validation->setPrompt('Values greater than or equal to 0 are allowed.');
                             }
 
-                            if ($fillColor) {
-                                $highestColumn = $worksheet->getHighestColumn();
-                                $range = 'A' . $rowIndex . ':' . $highestColumn . $rowIndex;
-                                $worksheet->getStyle($range)->applyFromArray($fillColor);
-                            }
                         }
+                        $row++;
                     }
-                    //$sheetindex++;
+                    $col++;
                 }
             }
 
@@ -623,7 +513,8 @@ class EstablishmentTransaction extends AdminController
         }
 
         //if sheetindex is 0 then there are no enterprises
-        if ($sheetindex == 0) {
+
+        if (!$hasEnterprises) {
             return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'No enterprises found.');
         }
 
@@ -634,51 +525,6 @@ class EstablishmentTransaction extends AdminController
             )
         );
 
-        //start protection
-
-        $sheet = $spreadsheet->setActiveSheetIndex(0);
-
-
-        $protection = $spreadsheet->getActiveSheet()->getProtection();
-        $protection->setAlgorithm(Protection::ALGORITHM_SHA_512);
-        $protection->setPassword('PhpSpreadsheet');
-        $protection->setSheet(true);
-        $protection->setSort(false);
-        $protection->setInsertRows(false);
-        $protection->setFormatCells(false);
-
-        $validation = $sheet->getCell('K6')->getDataValidation();
-        $validation->setType(DataValidation::TYPE_DECIMAL);
-        $validation->setErrorStyle(DataValidation::STYLE_STOP);
-        $validation->setAllowBlank(true);
-        $validation->setShowInputMessage(true);
-        $validation->setShowErrorMessage(true);
-        $validation->setErrorTitle('Input error');
-        $validation->setError('Only numbers/decimals allowed!');
-        $validation->setPromptTitle('Allowed input');
-        $validation->setPrompt('Only numbers greater than or equal to 0 are allowed.');
-        $validation->setOperator(DataValidation::OPERATOR_GREATERTHANOREQUAL);
-        $validation->setFormula1("=0");
-        $unit_groups = $this->columns;
-
-        // foreach ($unit_groups as $key => $columns) {
-        //     if ($key == $title) {
-        //         foreach ($columns as $column) {
-        //             if ($column['label'] == $data['columns']); {
-        //                 $startCell = 'K6';
-        //                 $endCell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($columns) + \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString('K') - 1) . '6';
-        //                 $cells = $startCell . ':' . $endCell;
-
-
-
-        //                 $sheet->getStyle($cells)
-        //                     ->getProtection()
-        //                     ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-        //             }
-        //         }
-        //     }
-        // }
-exit;
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
@@ -697,7 +543,7 @@ exit;
                 'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
                 'max_size[file,1024]',
                 'ext_in[file,xlsx]',
-                'is_unique[file,filename]'
+                
             ]
         ]);
 

@@ -24,7 +24,6 @@ $user = service('user');
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/css/custom.css?v=3.2'); ?>">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/dflip/css/dflip.css?v=1'); ?>">
     <link rel="stylesheet" id="css-main" href="<?= theme_url('assets/dflip/css/themify-icons.css'); ?>">
-    <link rel="stylesheet/less" type="text/css" href="styles.less" />
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/modules/variwide.js"></script>
