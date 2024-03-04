@@ -11,7 +11,7 @@
                     <div class="col-2">
                         <label class="form-label">Year</label>
                         <?php echo form_dropdown('year_id', $years, set_value('year_id', $year_id), ['class' => 'form-control mb-3', 'id' => 'year']); ?>
-                        <span id="em1" class="text-danger"></span>
+                        <span id="em1" ></span>
 
                     </div>
                     <div class="col-2">
@@ -29,16 +29,15 @@
                     <div class="col-2">
                         <label class="form-label">Unit type</label>
                         <?php echo form_dropdown('unit_id', $units, set_value('unit_id', $unit_id), ['class' => 'form-control mb-3', 'id' => 'unit']); ?>
-                        <span id="em3" class="text-danger"></span>
+                        <span id="em4" class="text-danger"></span>
 
                     </div>
                     <div class="col-2">
                         <label class="form-label">Fortnight</label>
                         <select class="form-control" name="period" id="period">
-                            <option value="">all</option>
+                            <option value="0">all</option>
                             <option value="1" <?= $period == "1" ? 'selected' : ''; ?>>1st fortnight</option>
                             <option value="2" <?= $period == "2" ? 'selected' : ''; ?>>2nd fortnight</option>
-
                         </select>
                         <span id="em" class="text-danger"></span>
                     </div>
@@ -123,7 +122,7 @@
 <?php js_start(); ?>
 
 <script type="text/javascript">
-    var download_url = "http://ommsoev2.local/admin/enterprises/download";
+    // var download_url = "http://ommsoev2.local/admin/enterprises/download";
     
     $(function() {
         function main() {
@@ -158,7 +157,7 @@
                 $("#month").focus();
                 return false;
             }
-            if ($("#period").val() === "all") {
+            if ($("#period").val() === "0") {
                 $("#em").html("This field could not be empty!");
                 $("#period").css("border-color", "red");
                 $("#period").focus();
@@ -204,7 +203,7 @@
 
                 },
                 beforeSend: function() {
-                    $('.alert-dismissible, .text-danger').remove();
+                   // $('.alert-dismissible, .text-danger').remove();
                     $("#datatable_wrapper").LoadingOverlay("show");
                 },
                 complete: function() {

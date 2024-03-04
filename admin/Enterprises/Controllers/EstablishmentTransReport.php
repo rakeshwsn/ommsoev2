@@ -117,15 +117,8 @@ class EstablishmentTransReport extends AdminController
 		$data['month_id'] = $filter['month_id']=$this->request->getGet('month_id') ?? ((new MonthModel())->getCurrentMonth())->id;
 		$data['block_id'] = $filter['block_id'] = $this->request->getGet('block_id') ?? 0;
 		$data['management_unit_type'] = $filter['management_unit_type'] = $this->request->getGet('management_unit_type') ?? '';
-		//print_r($filter);
-		// if(!$this->request->getGet('month_id')){
-		// 	$filter['month_id'] = getCurrentMonth()->id;
-		// } else {
-		// 	$filter['month_id'] = $this->request->getGet('month_id');
-		// }
-// dd($filter);
+	
 		$distwisetxnreports = $enetrprisetrxnreprt->unitwisereport($filter);
-		// dd($distwisetxnreports);
 		foreach ($distwisetxnreports as $distwisetxnreport) {
 			$data['distwisetxns'][] = [
 				'unit_name' => $distwisetxnreport->unit_name,
