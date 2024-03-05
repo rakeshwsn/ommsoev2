@@ -604,44 +604,50 @@ class EstablishmentTransaction extends AdminController
 
                 for ($i = 0; $i < $total_sheets; $i++) {
                     $activesheet = $spreadsheet->getSheet($i);
+                    $sheet_name = $spreadsheet->getSheetNames()[$i];
+                    $columns_array = $this->columns[$sheet_name];
 
                     $row_data = $activesheet->toArray();
-                    
 
                     //skip 3 rows
-                    $row_data = array_slice($row_data, 3);
-                    printr($row_data);exit;
-                    foreach ($row_data as $key => $transaction) {
-                        //only rows with gp_id
-                        if (is_numeric($transaction[1]))  {
-                            $data = [
-                                'unit_id' => (int)$transaction[0],
+                    $row_data = array_slice($row_data, 4);
+
+                    $unit_id = [];
+                    foreach ($row_data as $key => $column) {
+                        //only rows with unit_id
+                        if (is_numeric($column[0]))  { //unit_id column is 0
+                            $t_data = [
                                 'year_id' => (int)$year_id,
                                 'district_id' => (int) $district_id,
                                 'month_id' => (int)$month_id,
                                 'period' => (int)$period,
                             ];
-                           
-                            $transaction_id = $this->enterpriseTxnModel->insert($data);
 
-                            $data = [
-                                'enterprise_id' => (int)$transaction[1],
-                                'transaction_id' => (int) $transaction_id,
-                                'block_id' => (int) $transaction[4],
-                                'gp_id' => (int)$transaction[6],
-                                'village_id' => (int) $transaction[8],
-                            ];
+                            if(!in_array($column[0], $unit_id)) { //skip rows with same unit_id
+                                $unit_id[] = $column[0];
+                                $t_data['unit_id'] = $column[0];
+                                $txn_id = $this->enterpriseTxnModel->insert($t_data);
 
-                            //get columns by sheet name
-                            $col = 10;
-                            $columns = $this->columns[$spreadsheet->getSheetNames()[$i]];
-                            foreach ($columns as $key => $value) {
-                                $data[$key] = (float)$transaction[$col++];
+                                //for every unit_id, loop through every rows again
+                                foreach ($row_data as $_column) {
+                                    if(is_numeric($_column[0]) && ($_column[0] == $column[0])) {
+                                        $td_data = [
+                                            'enterprise_id' => (int)$_column[1],
+                                            'transaction_id' => (int) $txn_id,
+                                            'block_id' => (int) $_column[4],
+                                            'gp_id' => (int)$_column[6],
+                                            'village_id' => (int) $_column[8],
+                                        ];
+                                        //get column names by unit_groups
+                                        $col = 10; //value starts from 10th column
+
+                                        foreach ($columns_array as $key => $value) {
+                                            $td_data[$key] = (float)$_column[$col++];
+                                        }
+                                        $this->enterpriseTxnsDtls->insert($td_data);
+                                    }
+                                }
                             }
-
-                            $this->enterpriseTxnsDtls->insert($data);
-                            $status = true;
-                            $message = 'Uploaded successfully';
                         }
                     }
                 }
