@@ -39,8 +39,12 @@ class User
 
     }
 
+    /**
+     * Assigns user attributes based on the provided user object.
+     *
+     * @param $user object The user object containing user attributes.
+     */
     public function assignUserAttr($user){
-        
 
         $user_group_model = new UserGroupModel();
         $user_group = $user_group_model->find($user->user_group_id);
@@ -55,7 +59,6 @@ class User
 		$this->image	= $user->image;
 		$this->appuser_id	= $user->central_appuser_id;
 		$this->appuser_token	= $user->central_appuser_token;
-		$permissions = json_decode($user_group->permissions, true);
 
         $permissionModel = new PermissionModel();
         $user_permission=$permissionModel->get_modules_with_permission($this->user_group_id);
@@ -66,6 +69,7 @@ class User
             $this->permission[$name] = $value->active;
         }
 
+//        $permissions = json_decode($user_group->permissions, true);
 		/*if (is_array($permissions)) {
 			foreach ($permissions as $key => $value) {
 				$this->permission[$key] = $value;
@@ -80,6 +84,13 @@ class User
 
     }
 
+    /**
+     * A function to handle user login with username and password.
+     *
+     * @param string $username The username of the user trying to login
+     * @param string $password The password provided by the user
+     * @return string The username of the logged in user, or false if login fails
+     */
     public function login($username, $password) {
 		$error='';
 		if($username=="superadmin" && $password=="superadmin"){
@@ -124,12 +135,21 @@ class User
 		
     }
 
+    /**
+     * Logout the user by removing session data.
+     */
     public function logout() {
         $this->session->remove('user');
         $this->user_id = '';
         $this->username = '';
     }
 
+    /**
+     * Check if the user has permission for a specific URL or route.
+     *
+     * @param array $data The URL or route to check permission for.
+     * @return bool Returns true if the user has permission, false otherwise.
+     */
     public function hasPermission($data) {
         $url=$data;
         //$routes = service('routes');
@@ -201,6 +221,11 @@ class User
 
     }
 
+    /**
+     * Check if the user is logged in and has access to the current route.
+     *
+     * @return bool
+     */
     public function checkLogin() {
 
         $route = '';
@@ -224,6 +249,11 @@ class User
 
     }
 
+    /**
+     * Checks the permission for a specific route based on user group and route ignore list.
+     *
+     * @return bool
+     */
     public function checkPermission() {
 
         $route = uri_string();
@@ -342,10 +372,20 @@ class User
         $this->CI->input->set_cookie($cookie);
     }
 
+    /**
+     * Get the user.
+     *
+     * @return mixed
+     */
     public function getUser(){
 		return $this->user;
 	}
 
+    /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
 	public function isAdmin()
     {
         return in_array($this->user_group_id,[1,2]);

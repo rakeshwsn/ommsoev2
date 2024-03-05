@@ -2,16 +2,17 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Dashboard\Models\GpsModel;
+use Admin\Dashboard\Models\EnterpriseGpModel;
 use Admin\Dashboard\Models\BlockModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Admin\Enterprises\Models\EstablishmentTransactionModel;
+use Admin\Enterprises\Models\EnterprisesTransactionModel;
 use Admin\Enterprises\Models\EnterprisesUnitModel;
 use Admin\Dashboard\Models\DistrictModel;
 use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Enterprises\Models\EnterpriseGpModel as ModelsEnterpriseGpModel;
 use Admin\Enterprises\Models\EnterpriseUnitGroup;
 use App\Controllers\AdminController;
 use App\Libraries\Export;
@@ -28,27 +29,33 @@ use PhpParser\Node\Stmt\Label;
 
 class EstablishmentTransaction extends AdminController
 {
-    // private $establishmenTransaction;
-    private $establishmentTxnsDtls;
+    private $enterpriseTxnsDtls;
     private $yearModel;
     private $monthModel;
     private $districtModel;
     private $entunitModel;
     private $entUnitGrpModel;
     private $enterprisesModel;
+    private $enterpriseTxnModel;
+    private $blockModel;
+    private $gpModel;
 
 
     public function __construct()
     {
-        // $this->establishmenTransaction = new EstablishmentTransactionModel();
-        $this->establishmentTxnsDtls = new EstablishmentTransactionDetailsModel();
+        $this->enterpriseTxnsDtls = new EstablishmentTransactionDetailsModel();
         $this->yearModel = new YearModel();
+        $this->blockModel = new BlockModel();
         $this->monthModel = new MonthModel();
         $this->districtModel = new DistrictModel();
         $this->entunitModel = new EnterprisesUnitModel();
         $this->entUnitGrpModel = new EnterpriseUnitGroup();
         $this->entunitModel = new EnterprisesUnitModel();
         $this->enterprisesModel = new EnterprisesModel();
+        $this->enterpriseTxnModel = new EnterprisesTransactionModel();
+        $this->gpModel = new ModelsEnterpriseGpModel();
+
+
     }
     private $columns = [
         'Machinary' => [
@@ -143,8 +150,34 @@ class EstablishmentTransaction extends AdminController
         if ($this->request->getGet('period')) {
             $data['period'] = $this->request->getGet('period');
         }
+        $data['blocks'][0] = 'Select Block';
+        // if user block_id is avaliable populate blocks else populate selected district's blocks
+        if ($this->user->block_id) {
+            $blocks =  $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->user->block_id;
 
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        } else {
+            $blocks =  $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->request->getGet('block_id');
 
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        }
+
+        $data['gps'][0] = 'Select GP';
+        // if user block_id is avaliable populate blocks else populate selected district's blocks
+       
+            $gps =  $this->gpModel->where('block_id', $data['block_id'])->orderBy('name', 'asc')->findAll();
+            $data['gp_id'] = $this->request->getGet('gp_id');
+
+            foreach ($gps as $gp) {
+                $data['gps'][$gp->id] = $gp->name;
+            }
+    
 
         $data['trans'] = [];
 
@@ -156,18 +189,24 @@ class EstablishmentTransaction extends AdminController
 
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
+
+    /**
+     * A function to search and retrieve data based on filter criteria from the enterprise transactions details.
+     */
     public function search()
     {
 
         $requestData = $_REQUEST;
-        $totalData = $this->establishmentTxnsDtls->getTotals();
+        $totalData = $this->enterpriseTxnsDtls->getTotals();
 
-
+// printr($totalData);;exit;
         $totalFiltered = $totalData;
         // This array use for filter data 
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
             'district_id' => $requestData['district_id'],
+            'block_id' => $requestData['block_id'],
+            'gp_id' => $requestData['gp_id'],
             'month_id' => $requestData['month_id'],
             'unit_id' => $requestData['unit_id'],
             'year_id' => $requestData['year_id'],
@@ -177,15 +216,15 @@ class EstablishmentTransaction extends AdminController
             'start' => $requestData['start'],
             'limit' => $requestData['length'],
         );
-printr($filter_data);exit;
-        $totalFiltered = $this->establishmentTxnsDtls->getTotals($filter_data);
-        // dd($totalFiltered);
-        $filteredData = $this->establishmentTxnsDtls->periodswisetrans($filter_data);
+
+        $totalFiltered = $this->enterpriseTxnsDtls->getTotals($filter_data);
+       
+        $filteredData = $this->enterpriseTxnsDtls->periodswisetrans($filter_data);
         $datatable = array();
         foreach ($filteredData as $result) {
 
             $action = '<div class="btn-group btn-group-sm pull-right">';
-            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprisestrans/edit?id=' . $result->txn_id) . '"><i class="fa fa-pencil"></i></a>';
+            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprisestrans/edit?id=' . $result->est_id) . '"><i class="fa fa-pencil"></i></a>';
 
             $action .= '</div>';
             // result holds the database column name
@@ -212,6 +251,11 @@ printr($filter_data);exit;
 
         return $this->response->setContentType('application/json')->setJSON($json_data);
     }
+
+    
+    /**
+     * A private function to filter data based on specific conditions.
+     */
     // private function filter()
     // {
     //     $filter = [];
@@ -230,20 +274,22 @@ printr($filter_data);exit;
     //     if ($this->request->getGet('unit_id') > 0) {
     //         $filter['unit_id'] = $this->request->getGet('unit_id');
     //     }
-    //     if ($this->request->getGet('period') != 'all') {
+    //     if ($this->request->getGet('period') >0) {
     //         $filter['period'] = $this->request->getGet('period');
     //     }
 
-    //     $filteredData =  $this->establishmentTxnsDtls->periodswisetrans($filter);
+    //     $filteredData =  $this->enterpriseTxnsDtls->periodswisetrans($filter);
     //     return $filteredData;
     // }
+
     public function edit()
     {
 
         if ($this->request->getMethod(1) == 'POST') {
             $id = $this->request->getGet('id');
+            // dd($id);
             $enterprisetransdata = [];
-            $entdata = $this->establishmentTxnsDtls->idwisetrans($id);
+            $entdata = $this->enterpriseTxnsDtls->idwisetrans($id);
 
             if (!empty($entdata) && isset($entdata[0])) {
                 $entdata = $entdata[0];
@@ -260,7 +306,7 @@ printr($filter_data);exit;
                 }
             }
 
-            $this->establishmentTxnsDtls->update($id, $enterprisetransdata);
+            $this->enterpriseTxnsDtls->update($id, $enterprisetransdata);
 
             return redirect()->to(admin_url('enterprises/transaction'))->with('message', 'update successful');
         }
@@ -274,7 +320,7 @@ printr($filter_data);exit;
         $data['unit_groups'] = $this->columns;
         $id = $this->request->getGet('id');
         if ($id) {
-            $entdata = $this->establishmentTxnsDtls->idwisetrans($id);
+            $entdata = $this->enterpriseTxnsDtls->idwisetrans($id);
             if (!empty($entdata) && isset($entdata[0])) {
                 $entdata = $entdata[0];
 
@@ -304,7 +350,7 @@ printr($filter_data);exit;
 
                 $data['entranses'] = $entranses;
             }
-            // dd($data);
+            // dd($data['entranses']);
             return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
         }
     }
@@ -533,19 +579,28 @@ printr($filter_data);exit;
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit();
+       
     }
 
     public function upload()
     {
-        $input = $this->validate([
-            'file' => [
-                'uploaded[file]',
-                'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
-                'max_size[file,1024]',
-                'ext_in[file,xlsx]',
-                
-            ]
-        ]);
+        try {
+            $input = $this->validate([
+                'file' => [
+                    'uploaded[file]',
+                    'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
+                    'max_size[file,1024]',
+                    'ext_in[file,xlsx]',
+                ],
+            ]);
+        }
+        catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
 
         if (!$input) {
             return $this->response->setJSON([
@@ -556,7 +611,7 @@ printr($filter_data);exit;
         } else {
 
             $file = $this->request->getFile('file');
-
+            
             try {
                 $reader = IOFactory::createReader('Xlsx');
                 $spreadsheet = $reader->load($file);
@@ -576,7 +631,8 @@ printr($filter_data);exit;
             $activesheet = $spreadsheet->getSheet(0);
 
             $row_data = $activesheet->toArray();
-
+                        
+            $year_id_text = $row_data[0][0];
             $year_id = $row_data[1][0];
             $district_id = $row_data[1][1];
             $month_id = $row_data[1][2];
@@ -590,8 +646,18 @@ printr($filter_data);exit;
                 'period' => $period,
             ];
 
-            $exists = $this->enterprisesModel->isExists($data);
-
+            //validate if year_id, district_id, month_id, period exists and year_id_text == "year_id"
+            if($year_id_text != 'year_id' || !$year_id || !$district_id || !$month_id || !$period){
+                $status = false;
+                $message = 'Invalid file. Please download the template and try again.';
+                return $this->response->setJSON([
+                    'status' => $status,
+                    'message' => $message,
+                ]);
+            }
+            
+            $exists = $this->enterpriseTxnModel->isExists($data);
+         
             if ($exists) {
                 $status = false;
                 $message = 'Enterprise data for the given period already exists.';
@@ -600,43 +666,50 @@ printr($filter_data);exit;
 
                 for ($i = 0; $i < $total_sheets; $i++) {
                     $activesheet = $spreadsheet->getSheet($i);
+                    $sheet_name = $spreadsheet->getSheetNames()[$i];
+                    $columns_array = $this->columns[$sheet_name];
 
                     $row_data = $activesheet->toArray();
 
                     //skip 3 rows
-                    $row_data = array_slice($row_data, 3);
+                    $row_data = array_slice($row_data, 4);
 
-                    foreach ($row_data as $key => $transaction) {
-                        //only rows with gp_id
-                        if (is_numeric($transaction[1])) {
-                            $data = [
-                                'unit_id' => (int)$transaction[0],
+                    $unit_id = [];
+                    foreach ($row_data as $key => $column) {
+                        //only rows with unit_id
+                        if (is_numeric($column[0]))  { //unit_id column is 0
+                            $t_data = [
                                 'year_id' => (int)$year_id,
                                 'district_id' => (int) $district_id,
                                 'month_id' => (int)$month_id,
                                 'period' => (int)$period,
                             ];
 
-                            $transaction_id = $this->enterprisesModel->insert($data);
+                            if(!in_array($column[0], $unit_id)) { //skip rows with same unit_id
+                                $unit_id[] = $column[0];
+                                $t_data['unit_id'] = $column[0];
+                                $txn_id = $this->enterpriseTxnModel->insert($t_data);
 
-                            $data = [
-                                'enterprise_id' => (int)$transaction[1],
-                                'transaction_id' => (int) $transaction_id,
-                                'block_id' => (int) $transaction[4],
-                                'gp_id' => (int)$transaction[6],
-                                'village_id' => (int) $transaction[8],
-                            ];
+                                //for every unit_id, loop through every rows again
+                                foreach ($row_data as $_column) {
+                                    if(is_numeric($_column[0]) && ($_column[0] == $column[0])) {
+                                        $td_data = [
+                                            'enterprise_id' => (int)$_column[1],
+                                            'transaction_id' => (int) $txn_id,
+                                            'block_id' => (int) $_column[4],
+                                            'gp_id' => (int)$_column[6],
+                                            'village_id' => (int) $_column[8],
+                                        ];
+                                        //get column names by unit_groups
+                                        $col = 10; //value starts from 10th column
 
-                            //get columns by sheet name
-                            $col = 10;
-                            $columns = $this->columns[$spreadsheet->getSheetNames()[$i]];
-                            foreach ($columns as $key => $value) {
-                                $data[$key] = (float)$transaction[$col++];
+                                        foreach ($columns_array as $key => $value) {
+                                            $td_data[$key] = (float)$_column[$col++];
+                                        }
+                                        $this->enterpriseTxnsDtls->insert($td_data);
+                                    }
+                                }
                             }
-
-                            $this->enterprisesModel->insert($data);
-                            $status = true;
-                            $message = 'Uploaded successfully';
                         }
                     }
                 }
