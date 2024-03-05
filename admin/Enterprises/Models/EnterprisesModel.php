@@ -569,7 +569,5 @@ class EnterprisesModel extends Model
   
       return $res;
     }
-    public function getFile($file){
-
-    }
+  
 }

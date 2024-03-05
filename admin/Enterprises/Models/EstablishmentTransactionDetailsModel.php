@@ -158,7 +158,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
     }
     // $sql .=  " GROUP BY unit.units";
-echo $sql;
+
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {
@@ -325,7 +325,6 @@ echo $sql;
     if (!empty($filter['month_id'])) {
       $avgMonth = $filter['month_id'] ;
     }
-    // echo $avgMonth;
     $sql = "SELECT
     t1.unit_id,
     t1.unit_name,
@@ -360,6 +359,7 @@ echo $sql;
     eu.id unit_id,
     eu.name unit_name
     FROM enterprises_units eu
+    WHERE eu.deleted_at IS NULL
     ORDER BY eu.name) units
     LEFT JOIN (SELECT
         e.unit_id,
