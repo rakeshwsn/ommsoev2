@@ -560,10 +560,12 @@ class Mpr extends AdminController
             $data['blocks'] = $this->block_model->where($filter)->asArray()->findAll();
             $data['filter_panel'] = view('Admin\Reports\Views\district_filter_panel',$data);
         }
+
         if($this->user->agency_type_id==$this->settings->block_user){
             $data['agency_types']=(new UserGroupModel())->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])->asArray()->findAll();
             $data['filter_panel'] = view('Admin\Reports\Views\block_filter_panel',$data);
         }
+
         if($this->user->agency_type_id==$this->settings->ps_user){
 
 //            $data['districts'] = (new DistrictModel())->asArray()->findAll();
@@ -582,6 +584,7 @@ class Mpr extends AdminController
             
             $data['filter_panel'] = view('Admin\Reports\Views\ps_filter_panel',$data);
         }
+
         if($this->user->agency_type_id==11){ // spmu user
 
             $data['fund_agency_id'] = 1;
@@ -600,6 +603,30 @@ class Mpr extends AdminController
                 'fund_agency_id' => $this->request->getGet('fund_agency_id'),
             ])->asArray()->findAll();
             
+            $data['filter_panel'] = view('Admin\Reports\Views\state_filter_panel',$data);
+        }
+
+        if($this->user->isAdmin()){ // admin
+            $data['fund_agency_id'] = 1;
+            if($this->request->getGet('fund_agency_id')){
+                $data['fund_agency_id'] = $this->request->getGet('fund_agency_id');
+            }
+
+            $data['fund_agencies'] = (new BlockModel())->getFundAgencies(['asObject'=>true]);
+
+            $data['agency_types'] = [
+                ''=>'All',
+                '8'=>'WASSAN',
+                '9'=>'NCDS'
+            ];
+
+            $data['districts'] = (new DistrictModel())->getDistrictsByFundAgency($data['fund_agency_id']);
+
+            $data['blocks'] = $this->block_model->where([
+                'district_id' => $this->request->getGet('district_id'),
+                'fund_agency_id' => $this->request->getGet('fund_agency_id'),
+            ])->asArray()->findAll();
+
             $data['filter_panel'] = view('Admin\Reports\Views\state_filter_panel',$data);
         }
     }
