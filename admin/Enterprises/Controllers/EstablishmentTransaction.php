@@ -2,7 +2,7 @@
 
 namespace Admin\Enterprises\Controllers;
 
-use Admin\Dashboard\Models\GpsModel;
+use Admin\Dashboard\Models\EnterpriseGpModel;
 use Admin\Dashboard\Models\BlockModel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Admin\Enterprises\Models\EnterprisesTransactionModel;
@@ -12,6 +12,7 @@ use Admin\Enterprises\Models\EnterprisesModel;
 use Admin\Enterprises\Models\EstablishmentTransactionDetailsModel;
 use Admin\Enterprises\Models\MonthModel;
 use Admin\Dashboard\Models\YearModel;
+use Admin\Enterprises\Models\EnterpriseGpModel as ModelsEnterpriseGpModel;
 use Admin\Enterprises\Models\EnterpriseUnitGroup;
 use App\Controllers\AdminController;
 use App\Libraries\Export;
@@ -28,7 +29,6 @@ use PhpParser\Node\Stmt\Label;
 
 class EstablishmentTransaction extends AdminController
 {
-    // private $establishmenTransaction;
     private $enterpriseTxnsDtls;
     private $yearModel;
     private $monthModel;
@@ -37,13 +37,15 @@ class EstablishmentTransaction extends AdminController
     private $entUnitGrpModel;
     private $enterprisesModel;
     private $enterpriseTxnModel;
+    private $blockModel;
+    private $gpModel;
 
 
     public function __construct()
     {
-        // $this->establishmenTransaction = new EstablishmentTransactionModel();
         $this->enterpriseTxnsDtls = new EstablishmentTransactionDetailsModel();
         $this->yearModel = new YearModel();
+        $this->blockModel = new BlockModel();
         $this->monthModel = new MonthModel();
         $this->districtModel = new DistrictModel();
         $this->entunitModel = new EnterprisesUnitModel();
@@ -51,6 +53,8 @@ class EstablishmentTransaction extends AdminController
         $this->entunitModel = new EnterprisesUnitModel();
         $this->enterprisesModel = new EnterprisesModel();
         $this->enterpriseTxnModel = new EnterprisesTransactionModel();
+        $this->gpModel = new ModelsEnterpriseGpModel();
+
 
     }
     private $columns = [
@@ -146,8 +150,34 @@ class EstablishmentTransaction extends AdminController
         if ($this->request->getGet('period')) {
             $data['period'] = $this->request->getGet('period');
         }
+        $data['blocks'][0] = 'Select Block';
+        // if user block_id is avaliable populate blocks else populate selected district's blocks
+        if ($this->user->block_id) {
+            $blocks =  $this->blockModel->where('id', $this->user->block_id)->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->user->block_id;
 
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        } else {
+            $blocks =  $this->blockModel->where('district_id', $data['district_id'])->orderBy('name', 'asc')->findAll();
+            $data['block_id'] = $this->request->getGet('block_id');
 
+            foreach ($blocks as $block) {
+                $data['blocks'][$block->id] = $block->name;
+            }
+        }
+
+        $data['gps'][0] = 'Select GP';
+        // if user block_id is avaliable populate blocks else populate selected district's blocks
+       
+            $gps =  $this->gpModel->where('block_id', $data['block_id'])->orderBy('name', 'asc')->findAll();
+            $data['gp_id'] = $this->request->getGet('gp_id');
+
+            foreach ($gps as $gp) {
+                $data['gps'][$gp->id] = $gp->name;
+            }
+    
 
         $data['trans'] = [];
 
@@ -156,21 +186,27 @@ class EstablishmentTransaction extends AdminController
 
         $data['excel_link'] = admin_url('enterprisestrans/download');
         $data['upload_url'] = admin_url('enterprisestrans/upload');
-// dd($data);
+
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
+
+    /**
+     * A function to search and retrieve data based on filter criteria from the enterprise transactions details.
+     */
     public function search()
     {
 
         $requestData = $_REQUEST;
         $totalData = $this->enterpriseTxnsDtls->getTotals();
 
-
+// printr($totalData);;exit;
         $totalFiltered = $totalData;
         // This array use for filter data 
         $filter_data = array(
             'filter_search' => $requestData['search']['value'],
             'district_id' => $requestData['district_id'],
+            'block_id' => $requestData['block_id'],
+            'gp_id' => $requestData['gp_id'],
             'month_id' => $requestData['month_id'],
             'unit_id' => $requestData['unit_id'],
             'year_id' => $requestData['year_id'],
@@ -188,7 +224,7 @@ class EstablishmentTransaction extends AdminController
         foreach ($filteredData as $result) {
 
             $action = '<div class="btn-group btn-group-sm pull-right">';
-            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprisestrans/edit?id=' . $result->txn_id) . '"><i class="fa fa-pencil"></i></a>';
+            $action .=         '<a class="btn btn-sm btn-primary" href="' . admin_url('enterprisestrans/edit?id=' . $result->est_id) . '"><i class="fa fa-pencil"></i></a>';
 
             $action .= '</div>';
             // result holds the database column name
@@ -215,36 +251,43 @@ class EstablishmentTransaction extends AdminController
 
         return $this->response->setContentType('application/json')->setJSON($json_data);
     }
-    private function filter()
-    {
-        $filter = [];
 
-        // if $this user has district_id, then filter by district_id
+    
+    /**
+     * A private function to filter data based on specific conditions.
+     */
+    // private function filter()
+    // {
+    //     $filter = [];
 
-        if ($this->request->getGet('district_id') > 0) {
-            $filter['district_id'] = $this->request->getGet('district_id');
-        }
-        if ($this->request->getGet('year_id') > 0) {
-            $filter['year_id'] = $this->request->getGet('year_id');
-        }
-        if ($this->request->getGet('month_id') > 0) {
-            $filter['month_id'] = $this->request->getGet('month_id');
-        }
-        if ($this->request->getGet('unit_id') > 0) {
-            $filter['unit_id'] = $this->request->getGet('unit_id');
-        }
-        if ($this->request->getGet('period') >0) {
-            $filter['period'] = $this->request->getGet('period');
-        }
+    //     // if $this user has district_id, then filter by district_id
 
-        $filteredData =  $this->enterpriseTxnsDtls->periodswisetrans($filter);
-        return $filteredData;
-    }
+    //     if ($this->request->getGet('district_id') > 0) {
+    //         $filter['district_id'] = $this->request->getGet('district_id');
+    //     }
+    //     if ($this->request->getGet('year_id') > 0) {
+    //         $filter['year_id'] = $this->request->getGet('year_id');
+    //     }
+    //     if ($this->request->getGet('month_id') > 0) {
+    //         $filter['month_id'] = $this->request->getGet('month_id');
+    //     }
+    //     if ($this->request->getGet('unit_id') > 0) {
+    //         $filter['unit_id'] = $this->request->getGet('unit_id');
+    //     }
+    //     if ($this->request->getGet('period') >0) {
+    //         $filter['period'] = $this->request->getGet('period');
+    //     }
+
+    //     $filteredData =  $this->enterpriseTxnsDtls->periodswisetrans($filter);
+    //     return $filteredData;
+    // }
+
     public function edit()
     {
 
         if ($this->request->getMethod(1) == 'POST') {
             $id = $this->request->getGet('id');
+            // dd($id);
             $enterprisetransdata = [];
             $entdata = $this->enterpriseTxnsDtls->idwisetrans($id);
 
@@ -307,7 +350,7 @@ class EstablishmentTransaction extends AdminController
 
                 $data['entranses'] = $entranses;
             }
-            // dd($data);
+            // dd($data['entranses']);
             return $this->template->view('Admin\Enterprises\Views\editEstablishmentTransaction', $data);
         }
     }
@@ -536,19 +579,28 @@ class EstablishmentTransaction extends AdminController
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
         exit();
+       
     }
 
     public function upload()
     {
-        
-        $input = $this->validate([
-            'file' => [
-                'uploaded[file]',
-                'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
-                'max_size[file,1024]',
-                'ext_in[file,xlsx]',
-            ]
-        ]);
+        try {
+            $input = $this->validate([
+                'file' => [
+                    'uploaded[file]',
+                    'mime_in[file,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet]',
+                    'max_size[file,1024]',
+                    'ext_in[file,xlsx]',
+                ],
+            ]);
+        }
+        catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status' => false,
+                'message' => 'Invalid file',
+                'errors' => $this->validator->getErrors()
+            ]);
+        }
 
         if (!$input) {
             return $this->response->setJSON([
@@ -559,7 +611,7 @@ class EstablishmentTransaction extends AdminController
         } else {
 
             $file = $this->request->getFile('file');
-
+            
             try {
                 $reader = IOFactory::createReader('Xlsx');
                 $spreadsheet = $reader->load($file);
@@ -579,7 +631,8 @@ class EstablishmentTransaction extends AdminController
             $activesheet = $spreadsheet->getSheet(0);
 
             $row_data = $activesheet->toArray();
-
+                        
+            $year_id_text = $row_data[0][0];
             $year_id = $row_data[1][0];
             $district_id = $row_data[1][1];
             $month_id = $row_data[1][2];
@@ -593,6 +646,16 @@ class EstablishmentTransaction extends AdminController
                 'period' => $period,
             ];
 
+            //validate if year_id, district_id, month_id, period exists and year_id_text == "year_id"
+            if($year_id_text != 'year_id' || !$year_id || !$district_id || !$month_id || !$period){
+                $status = false;
+                $message = 'Invalid file. Please download the template and try again.';
+                return $this->response->setJSON([
+                    'status' => $status,
+                    'message' => $message,
+                ]);
+            }
+            
             $exists = $this->enterpriseTxnModel->isExists($data);
          
             if ($exists) {
@@ -600,7 +663,6 @@ class EstablishmentTransaction extends AdminController
                 $message = 'Enterprise data for the given period already exists.';
             } else {
                 $total_sheets = $spreadsheet->getSheetCount();
-                // printr($total_sheets);exit;
 
                 for ($i = 0; $i < $total_sheets; $i++) {
                     $activesheet = $spreadsheet->getSheet($i);
