@@ -1,4 +1,3 @@
-
 <div class="main-container">
     <div class="block">
         <div class="block-header block-header-default">
@@ -77,13 +76,14 @@
         <div class="block-content block-content-full">
             <div class="row row-sm">
                 <div class="col-lg-12">
-                    <div class="card pd-2 mg-b-5">
+                    <div class="card pd-2 mg-b-5 ">
                         <div class="table-responsive">
+
                             <table id="page_list" class="table table-bordered table-striped table-vcenter js-dataTable-full dataTable no-footer" aria-describedby="page_list_info">
                                 <thead class="bg-light text-dark">
                                     <tr>
                                         <?php if ($district_id) : ?>
-                                            <th colspan="<?= count($unit_names)+2 ?>"style="text-align:center;">
+                                            <th colspan="<?= count($unit_names) + 2 ?>" style="text-align:center;">
                                                 District: <?= $district_text; ?> ||
                                             <?php endif; ?>
                                             <?php if ($block_id) : ?>
@@ -99,6 +99,7 @@
                                                 Unit: <?= $unit_text; ?>
                                             <?php endif; ?>
                                             </th>
+
                                     </tr>
 
                                     <tr>
@@ -161,6 +162,7 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
             </div>

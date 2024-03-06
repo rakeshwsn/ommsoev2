@@ -241,6 +241,7 @@ class Enterprises extends AdminController
 
         return $filteredData;
     }
+    
     public function download()
     {
         $filteredData = $this->filter();
@@ -708,7 +709,7 @@ class Enterprises extends AdminController
        
         // get all LGD gps of the block selected
         $block = (new BlockModel())->where('id', $block_id)->findAll();
-    // printr($block);exit;
+   
 
         $data['gps'] = $this->lgdGpModel->where('block_lgd_code', $block[0]->lgd_code)->orderBy('name', 'asc')->asArray()->findAll();
         $data['label'] = 'Select Gp';
