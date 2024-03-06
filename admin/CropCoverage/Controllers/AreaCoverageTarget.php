@@ -10,6 +10,7 @@ use Admin\CropCoverage\Models\CropsModel;
 use Admin\CropCoverage\Models\PracticesModel;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
+use MicrosoftAzure\Storage\Blob\Models\Block;
 
 class AreaCoverageTarget extends AdminController
 {
@@ -94,9 +95,10 @@ class AreaCoverageTarget extends AdminController
 			// exit;
 		} else {
 			$blockstarget = $this->targetModel->viewBlockTarget($filter);
-			// printr($blockstarget);
-			// exit;
+
 		}
+		// printr($blockstarget);
+		// exit;
 		if ($data['district_id'] === 0) {
 			$data['distwisetarget'] = $distwisetarget;
 		} else {
@@ -132,7 +134,7 @@ class AreaCoverageTarget extends AdminController
 				"district_id" => $this->user->district_id,
 				"block_id" => $data['block_id'],
 				"year_id" => getCurrentYearId(),
-				"season" => getCurrentSeason(),
+				"season" => $this->request->getGet('season') ?? getCurrentSeason(),
 			);
 			// printr($masterdata);
 			// exit;
@@ -179,10 +181,20 @@ class AreaCoverageTarget extends AdminController
 		}
 		$data['crops'] = $this->cropsModel->GetCrops();
 		$data['practices'] = $this->practicesModel->GetPractices();
-
+		if ($this->request->getGet('season')) {
+			$data['season'] = $this->request->getGet('season');
+		} else {
+			$data['season'] = strtolower(getCurrentSeason());
+		}
+		// print_r($data['season']);
+		// exit;
 		$data['district_id'] = $this->user->district_id;
 		$data['block_id'] = $this->request->getGet('block_id');
-
+		// print_r($data['block_id']);
+		// exit;
+		// $data['season'] = $this->request->getGet('season');
+		// print_r($data['season']);
+		// exit;
 		$data['year_id'] = date('Y');
 		// $data['seasons'] = $this->acModel->getSeasons();
 		// $data['current_season'] = strtolower(getCurrentSeason());
@@ -197,7 +209,7 @@ class AreaCoverageTarget extends AdminController
 		$data['practicedata'] = $this->targetModel->getBlockTargets([
 
 			'block_id' => $data['block_id'],
-			'season' => $this->request->getGet('season') ?? getCurrentSeason(),
+			'season' => $data['season'],
 			'year_id' => $this->request->getGet('year_id') ?? getCurrentYearId(),
 		]);
 		// printr($data['practicedata']);
