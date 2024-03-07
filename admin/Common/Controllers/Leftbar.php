@@ -13,6 +13,7 @@ class Leftbar extends AdminController
     public function index()
     {
         $data = [];
+        //printr($this->user->district_id); exit;
 
         // Dashboard
         $data["menus"][] = [
@@ -692,7 +693,14 @@ class Leftbar extends AdminController
             ];
         }
 
-        if ($this->user->hasPermission("physicalcomponentstarget")) {
+        if ($this->user->hasPermission("physicalcomponentstarget") && $this->user->district_id != 0) {
+            $mprcomponent[] = [
+                "name" => "MPR Achivemets",
+                "href" => admin_url("physicalcomponentstarget"),
+                "heading" => 0,
+                "children" => [],
+            ];
+        } else {
             $mprcomponent[] = [
                 "name" => "MPR Target",
                 "href" => admin_url("physicalcomponentstarget"),
