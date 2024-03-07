@@ -662,13 +662,14 @@
             var column4Value = parseFloat(row.find('.rice_fallow').text()) || 0;
             var sum = column1Value + column2Value + column3Value + column4Value;
 
-            row.find('.sum-crop-block').text(sum);
+            row.find('.sum-crop-block').text(sum.toFixed(2));
         });
 
         var totalSum = 0;
         $('.sum-crop-block').each(function () {
             totalSum += parseFloat($(this).text());
         });
+        totalSum = totalSum.toFixed(2);
 
         $('.all-total-block').text(totalSum);
     });
