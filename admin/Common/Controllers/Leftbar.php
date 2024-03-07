@@ -695,7 +695,7 @@ class Leftbar extends AdminController
 
         if ($this->user->hasPermission("physicalcomponentstarget") && $this->user->district_id != 0) {
             $mprcomponent[] = [
-                "name" => "MPR Achivemets",
+                "name" => "MPR Achivements",
                 "href" => admin_url("physicalcomponentstarget"),
                 "heading" => 0,
                 "children" => [],
