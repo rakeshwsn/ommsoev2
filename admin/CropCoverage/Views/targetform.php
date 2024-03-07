@@ -38,7 +38,9 @@
                         </th>
                     <?php endforeach; ?>
                     <th>FOLLOW UP CROPS</th>
-                    <th>Rice Fallow CROPS</th>
+                    <?php if ($season === "Rabi") { ?>
+                        <th>Rice Fallow CROPS</th>
+                    <?php } ?>
                 </tr>
             </thead>
             <tbody>
@@ -74,13 +76,14 @@
                                 value="<?= $crop['followup']['value'] ?>" oninput="calculateTotals()">
 
                         </td>
-                        <td>
-                            <input type="number" step=".01" data-practice="5"
-                                id="rice_fallow_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>; ?>"
-                                name="rice_fallow[<?= $crop['id'] ?>][rice_fallow]" class="crop-input"
-                                value="<?= $crop['rice_fallow']['value'] ?>" oninput="calculateTotals()">
-
-                        </td>
+                        <?php if ($season === "Rabi") { ?>
+                            <td>
+                                <input type="number" step=".01" data-practice="5"
+                                    id="rice_fallow_<?= $crop['id']; ?>_practice_<?= $practice['id']; ?>; ?>"
+                                    name="rice_fallow[<?= $crop['id'] ?>][rice_fallow]" class="crop-input"
+                                    value="<?= $crop['rice_fallow']['value'] ?>" oninput="calculateTotals()">
+                            </td>
+                        <?php } ?>
 
                     </tr>
                 <?php endforeach; ?>
@@ -90,7 +93,9 @@
                     <td><input type="number" id="total-lt" class="total-input" readonly></td>
                     <td><input type="number" id="total-ls" class="total-input" readonly></td>
                     <td><input type="number" id="total-followup" class="total-input" readonly></td>
-                    <td><input type="number" id="total-rice_fallow" class="total-input" readonly></td>
+                    <?php if ($season === "Rabi") { ?>
+                        <td><input type="number" id="total-rice_fallow" class="total-input" readonly></td>
+                    <?php } ?>
                 </tr>
             </tbody>
         </table>
@@ -160,42 +165,4 @@
             calculateTotals();
         });
     }
-</script>
-
-
-
-
-<script>
-    $(document).ready(function () {
-        $('#district').change(function () {
-            var districtId = $(this).val();
-
-            // Clear block dropdown
-            $('#block').html('');
-
-            // Make AJAX request to fetch blocks
-            $.ajax({
-                url: '<?= admin_url("/areacoverage/fetch-blocks"); ?>/', // Replace with the URL for fetching blocks
-                method: 'POST',
-                data: { districtId: districtId },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success) {
-                        // Populate block dropdown with options
-                        var blocks = response.blocks;
-                        $.each(blocks, function (key, block) {
-                            $('#block').append('<option value="' + block.id + '">' + block.name + '</option>');
-                        });
-                    } else {
-                        // Handle error case
-                        console.error(response.message);
-                    }
-                },
-                error: function (xhr, textStatus, errorThrown) {
-                    // Handle error case
-                    console.error(textStatus + ': ' + errorThrown);
-                }
-            });
-        });
-    });
 </script>

@@ -70,7 +70,7 @@
                         <th rowspan="3">#</th>
                         <th rowspan="3">GP</th>
                         <th rowspan="3">No. of Farmer Covered (for Nursery and Sowing)</th>
-                        <th rowspan="3">Nursery Raised (in Ha.)</th>
+                        <th rowspan="3">Nursery Raised For Covearge Of Area(In Hectare)</th>
                         <th rowspan="3">SMI - Balance Nursery Raised (in Ha.)</th>
                         <th rowspan="3">LT - Balance Nursery Raised (in Ha.)
                         </th>

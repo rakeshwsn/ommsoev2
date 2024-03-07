@@ -72,7 +72,7 @@ $validation = \Config\Services::validation();
                     <div class="col-6 form-group">
                         <label for="pincode">Pin code<span class="text-danger">*</span></label>
                         <div class="input-group">
-                            <input type="text" name="pincode" class="form-control" id="pincode" placeholder="Enter Pincode" value="<?= set_value('pincode', $pincode) ?>">
+                            <input type="text" name="pincode" class="form-control" id="pincode" placeholder="Enter Pincode" value="<?= set_value('pincode', $pincode) ?>" maxlength="6">
                         </div>
                     </div>
                 </div>

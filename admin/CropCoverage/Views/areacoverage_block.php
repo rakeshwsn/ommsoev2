@@ -81,7 +81,7 @@
                                 <th>Week</th>
                                 <th>GP</th>
                                 <th>Total Farmer</th>
-                                <th>Nursery Raised</th>
+                                <th>Nursery Raised For Covearge Of Area(In Hectare)</th>
                                 <th>Balance SMI</th>
                                 <th>Balance LT</th>
                                 <th>Total Ragi</th>
@@ -102,7 +102,7 @@
                                 <?php foreach ($gps as $key => $gp) { ?>
                                     <tr>
                                         <td>
-                                        <?= $gp['start_date'] ?>
+                                            <?= $gp['start_date'] ?>
                                         </td>
                                         <td>
                                             <?= $gp['gp_name'] ?>
@@ -120,22 +120,26 @@
                                             <?= $gp['balance_lt'] ?>
                                         </td>
 
-                                       <td> <?= $gp['total_ragi']; ?></td>
-                                       <td> <?= $gp['total_non_ragi']; ?></td>
+                                        <td>
+                                            <?= $gp['total_ragi']; ?>
+                                        </td>
+                                        <td>
+                                            <?= $gp['total_non_ragi']; ?>
+                                        </td>
                                         <td>
                                             <?= $gp['follow_area']; ?>
                                         </td>
-                                         <td>
-                                             <?= $gp['total_area']; ?>
+                                        <td>
+                                            <?= $gp['total_area']; ?>
                                         </td>
-                                         <td>
-                                             <?= $gp['crop_div_area']; ?>
+                                        <td>
+                                            <?= $gp['crop_div_area']; ?>
                                         </td>
                                         <?php if ($season == 'Rabi') { ?>
-                                                <td>
-                                                    <?= $gp['fallow_area'] ?>
-                                                </td>
-                                            <?php } ?>
+                                            <td>
+                                                <?= $gp['fallow_area'] ?>
+                                            </td>
+                                        <?php } ?>
 
                                         <td>
                                             <?= $gp['status']; ?>
@@ -146,11 +150,11 @@
                                     </tr>
                                 <?php } ?>
 
-                                <?php } else { ?>
-                        <tr>
-                            <td colspan="4">Data not available.</td>
-                        </tr>
-                    <?php } ?>
+                            <?php } else { ?>
+                                <tr>
+                                    <td colspan="4">Data not available.</td>
+                                </tr>
+                            <?php } ?>
                         </tbody>
                     </table>
                 </div>

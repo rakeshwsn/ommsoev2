@@ -563,13 +563,13 @@
                         <?= $data["SORGHUM_LS"]; ?>
                     </td>
                     <td>
-                        <?= $data["PEARL_MILLET_LS"]; ?>
+                        <?= $data["KODO_MILLET_LS"]; ?>
                     </td>
                     <td>
                         <?= $data["BARNYARD_MILLET_LS"]; ?>
                     </td>
                     <td>
-                        <?= $data["KODO_MILLET_LS"]; ?>
+                        <?= $data["PEARL_MILLET_LS"]; ?>
                     </td>
                     <td>
                         <?= $data["RAGI_FOLLOWUP"]; ?>
@@ -632,7 +632,8 @@
                     <td id="sum-crop-block" class="sum-crop-block"> </td>
                     <td>
                         <div class="btn-group btn-group-sm pull-right">
-                            <a class="btn btn-sm btn-primary" href="<?= $edit; ?>?block_id=<?= $data['block_id']; ?>"
+                            <a class="btn btn-sm btn-primary"
+                                href="<?= $edit; ?>?block_id=<?= $data['block_id']; ?>&season=<?= $data['season']; ?>"
                                 title="<?= $button_edit; ?>"><i class="fa fa-pencil"></i></a>
                         </div>
                     </td>
@@ -661,13 +662,14 @@
             var column4Value = parseFloat(row.find('.rice_fallow').text()) || 0;
             var sum = column1Value + column2Value + column3Value + column4Value;
 
-            row.find('.sum-crop-block').text(sum);
+            row.find('.sum-crop-block').text(sum.toFixed(2));
         });
 
         var totalSum = 0;
         $('.sum-crop-block').each(function () {
             totalSum += parseFloat($(this).text());
         });
+        totalSum = totalSum.toFixed(2);
 
         $('.all-total-block').text(totalSum);
     });
@@ -682,6 +684,9 @@
             var column4Value = parseFloat(row.find('.dist-rice-fallow').text()) || 0;
             var sum = column1Value + column2Value + column3Value + column4Value;
 
+            // Limit decimal places to 2
+            sum = sum.toFixed(2);
+
             row.find('.dist-sum-crop').text(sum);
         });
 
@@ -689,6 +694,9 @@
         $('.dist-sum-crop').each(function () {
             totalSum += parseFloat($(this).text());
         });
+
+        // Limit decimal places to 2 for total sum as well
+        totalSum = totalSum.toFixed(2);
 
         $('.all-total').text(totalSum);
     });
@@ -711,11 +719,6 @@
         var year_id = $('#filter_year_id').val();
         var season = $('#filter_season').val();
 
-
-
-        // Perform your filtering logic here
-
-        // Example: Fetch filtered data using AJAX and update the table
         $(document).ready(function () {
             $('[name="year"],[name="season"]').on('change', function () {
                 year_id = $('#year').val();
