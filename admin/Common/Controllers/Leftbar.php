@@ -702,7 +702,7 @@ class Leftbar extends AdminController
             ];
         } else {
             $mprcomponent[] = [
-                "name" => "MPR Target",
+                "name" => "MPR Achievement",
                 "href" => admin_url("physicalcomponentstarget"),
                 "heading" => 0,
                 "children" => [],
