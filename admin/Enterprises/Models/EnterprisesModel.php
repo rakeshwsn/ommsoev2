@@ -325,7 +325,7 @@ class EnterprisesModel extends Model
         ON MONTH(e.date_estd) = sm.number
       WHERE e.deleted_at IS NULL";
         if (!empty($filter['year_id'])) {
-            $sql .= " AND e.budget_fin_yr_id = " . $filter['year_id'];
+            $sql .= " AND dy.id = " . $filter['year_id'];
         }
         if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];
@@ -424,7 +424,7 @@ class EnterprisesModel extends Model
             $sql .= " AND e.block_id = " . $filter['block_id'];
         }
         if (!empty($filter['year_id'])) {
-            $sql .= " AND e.budget_fin_yr_id= " . $filter['year_id'];
+            $sql .= " AND dy.id = " . $filter['year_id'];
         }
         if (!empty($filter['month'])) {
             $sql .= " AND sm.id = " . $filter['month'];

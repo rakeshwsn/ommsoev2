@@ -199,7 +199,6 @@ class EstablishmentTransaction extends AdminController
         $requestData = $_REQUEST;
         $totalData = $this->enterpriseTxnsDtls->getTotals();
 
-// printr($totalData);;exit;
         $totalFiltered = $totalData;
         // This array use for filter data 
         $filter_data = array(
