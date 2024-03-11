@@ -73,6 +73,8 @@ class TargetModel extends Model
     }
     public function addFollowUpCrops($data, $target_id)
     {
+        // printr($data);
+        // exit;
         // Crop master table
 
         $this->db->table('ac_target_followup_crop')->where('target_id', $target_id)->delete();
@@ -95,22 +97,25 @@ class TargetModel extends Model
         // printr($data);
         // exit;
         // Crop master table
+        if (!empty($data['rice_fallow_data'])) {
+            # code...
 
-        $this->db->table('ac_target_rice_fallow')->where('target_id', $target_id)->delete();
+            $this->db->table('ac_target_rice_fallow')->where('target_id', $target_id)->delete();
 
-        // Crop coverage target table
-        foreach ($data['rice_fallow_data'] as $crop_id => $area) {
-            $ricefallowdata = array(
-                "target_id" => $target_id,
-                "crop_id" => $crop_id,
+            // Crop coverage target table
+            foreach ($data['rice_fallow_data'] as $crop_id => $area) {
+                $ricefallowdata = array(
+                    "target_id" => $target_id,
+                    "crop_id" => $crop_id,
 
-                //Check if 'FOLLOWUP' key exists
-                "rice_fallow" => isset($area['rice_fallow']) ? $area['rice_fallow'] : 0
-            );
-            // printr($ricefallowdata);
-            // exit;
+                    //Check if 'FOLLOWUP' key exists
+                    "rice_fallow" => isset($area['rice_fallow']) ? $area['rice_fallow'] : 0
+                );
+                // printr($ricefallowdata);
+                // exit;
 
-            $this->db->table('ac_target_rice_fallow')->insert($ricefallowdata);
+                $this->db->table('ac_target_rice_fallow')->insert($ricefallowdata);
+            }
         }
     }
 
@@ -122,7 +127,7 @@ class TargetModel extends Model
   block.name AS block_name,
   block.id AS block_id,
   COALESCE(block_target.year_id , " . getCurrentYearId() . ") AS year_id,
-  COALESCE(block_target.season,'" . getCurrentSeason() . "') AS season,
+  COALESCE(block_target.season,'" . $filter['season'] . "') AS season,
   COALESCE(block_target.RAGI_SMI, 0.00) AS RAGI_SMI,
   COALESCE(block_target.RAGI_LT, 0.00) AS RAGI_LT,
   COALESCE(block_target.RAGI_LS, 0.00) AS RAGI_LS,
@@ -130,23 +135,25 @@ class TargetModel extends Model
   COALESCE(block_target.LITTLE_MILLET_LS, 0.00) AS LITTLE_MILLET_LS,
   COALESCE(block_target.FOXTAIL_MILLET_LS, 0.00) AS FOXTAIL_MILLET_LS,
   COALESCE(block_target.SORGHUM_LS, 0.00) AS SORGHUM_LS,
-  COALESCE(block_target.PEARL_MILLET_LS, 0.00) AS PEARL_MILLET_LS,
-  COALESCE(block_target.BARNYARD_MILLET_LS, 0.00) AS BARNYARD_MILLET_LS,
   COALESCE(block_target.KODO_MILLET_LS, 0.00) AS KODO_MILLET_LS,
+  COALESCE(block_target.BARNYARD_MILLET_LS, 0.00) AS BARNYARD_MILLET_LS,
+  COALESCE(block_target.PEARL_MILLET_LS, 0.00) AS PEARL_MILLET_LS,
   COALESCE(followup.RAGI_FOLLOWUP, 0.00) AS RAGI_FOLLOWUP,
   COALESCE(followup.LITTLE_MILLET_FOLLOWUP, 0.00) AS LITTLE_MILLET_FOLLOWUP,
   COALESCE(followup.FOXTAIL_MILLET_FOLLOWUP, 0.00) AS FOXTAIL_MILLET_FOLLOWUP,
   COALESCE(followup.SORGHUM_FOLLOWUP, 0.00) AS SORGHUM_FOLLOWUP,
-  COALESCE(followup.PEARL_MILLET_FOLLOWUP, 0.00) AS PEARL_MILLET_FOLLOWUP,
-  COALESCE(followup.BARNYARD_MILLET_FOLLOWUP, 0.00) AS BARNYARD_MILLET_FOLLOWUP,
   COALESCE(followup.KODO_MILLET_FOLLOWUP, 0.00) AS KODO_MILLET_FOLLOWUP,
+  COALESCE(followup.BARNYARD_MILLET_FOLLOWUP, 0.00) AS BARNYARD_MILLET_FOLLOWUP,
+  COALESCE(followup.PEARL_MILLET_FOLLOWUP, 0.00) AS PEARL_MILLET_FOLLOWUP,
   COALESCE(atrf.ragi_rice_fallow, 0.00) AS ragi_rice_fallow,
   COALESCE(atrf.little_rice_fallow, 0.00) AS little_rice_fallow,
   COALESCE(atrf.foxtail_rice_fallow, 0.00) AS foxtail_rice_fallow,
   COALESCE(atrf.sorghum_rice_fallow, 0.00) AS sorghum_rice_fallow,
-  COALESCE(atrf.pearl_rice_fallow, 0.00) AS pearl_rice_fallow,
-  COALESCE(atrf.barnyard_rice_fallow, 0.00) AS barnyard_rice_fallow,
-  COALESCE(atrf.kodo_rice_fallow, 0.00) AS kodo_rice_fallow
+   COALESCE(atrf.kodo_rice_fallow, 0.00) AS kodo_rice_fallow,
+    COALESCE(atrf.barnyard_rice_fallow, 0.00) AS barnyard_rice_fallow,
+  COALESCE(atrf.pearl_rice_fallow, 0.00) AS pearl_rice_fallow
+ 
+ 
 FROM (
   SELECT *
   FROM soe_blocks sb
@@ -163,7 +170,7 @@ LEFT JOIN (
     atm.id AS target_id,
     atm.block_id,
     COALESCE(atm.year_id, " . getCurrentYearId() . ") AS year_id,
-    COALESCE(atm.season, '" . getCurrentSeason() . "') AS season,
+    COALESCE(atm.season, '" . $filter['season'] . "') AS season,
     MAX(CASE WHEN ata.crop_id = 1 THEN ata.smi END) AS RAGI_SMI,
     MAX(CASE WHEN ata.crop_id = 1 THEN ata.lt END) AS RAGI_LT,
     MAX(CASE WHEN ata.crop_id = 1 THEN ata.ls END) AS RAGI_LS,
@@ -171,9 +178,9 @@ LEFT JOIN (
     MAX(CASE WHEN ata.crop_id = 2 THEN ata.ls END) AS LITTLE_MILLET_LS,
     MAX(CASE WHEN ata.crop_id = 3 THEN ata.ls END) AS FOXTAIL_MILLET_LS,
     MAX(CASE WHEN ata.crop_id = 4 THEN ata.ls END) AS SORGHUM_LS,
-    MAX(CASE WHEN ata.crop_id = 5 THEN ata.ls END) AS PEARL_MILLET_LS,
+    MAX(CASE WHEN ata.crop_id = 5 THEN ata.ls END) AS KODO_MILLET_LS,
     MAX(CASE WHEN ata.crop_id = 6 THEN ata.ls END) AS BARNYARD_MILLET_LS,
-    MAX(CASE WHEN ata.crop_id = 7 THEN ata.ls END) AS KODO_MILLET_LS
+    MAX(CASE WHEN ata.crop_id = 7 THEN ata.ls END) AS PEARL_MILLET_LS
   FROM ac_target_master atm
   LEFT JOIN ac_target_area ata ON atm.id = ata.target_id
   
@@ -196,9 +203,9 @@ LEFT JOIN (
     MAX(CASE WHEN crop_id = 2 THEN followup END) AS LITTLE_MILLET_FOLLOWUP,
     MAX(CASE WHEN crop_id = 3 THEN followup END) AS FOXTAIL_MILLET_FOLLOWUP,
     MAX(CASE WHEN crop_id = 4 THEN followup END) AS SORGHUM_FOLLOWUP,
-    MAX(CASE WHEN crop_id = 5 THEN followup END) AS PEARL_MILLET_FOLLOWUP,
+    MAX(CASE WHEN crop_id = 5 THEN followup END) AS KODO_MILLET_FOLLOWUP,
     MAX(CASE WHEN crop_id = 6 THEN followup END) AS BARNYARD_MILLET_FOLLOWUP,
-    MAX(CASE WHEN crop_id = 7 THEN followup END) AS KODO_MILLET_FOLLOWUP
+    MAX(CASE WHEN crop_id = 7 THEN followup END) AS PEARL_MILLET_FOLLOWUP
   FROM ac_target_followup_crop
   GROUP BY target_id
 ) followup ON block_target.target_id = followup.target_id  LEFT JOIN (SELECT

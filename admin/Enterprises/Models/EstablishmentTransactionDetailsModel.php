@@ -118,6 +118,12 @@ class EstablishmentTransactionDetailsModel extends Model
     if (!empty($filter['district_id'])) {
       $sql .= " AND txn_dtl.district_id = " . $filter['district_id'];
     }
+    if (!empty($filter['block_id'])) {
+      $sql .= " AND txn_dtl.block_id = " . $filter['block_id'];
+    }
+    if (!empty($filter['gp_id'])) {
+      $sql .= " AND txn_dtl.gp_id = " . $filter['gp_id'];
+    }
     if (!empty($filter['month_id'])) {
       $sql .= " AND txn_dtl.month_id = " . $filter['month_id'];
     }
@@ -158,7 +164,7 @@ class EstablishmentTransactionDetailsModel extends Model
       $sql .= " LIMIT " . (int)$filter['start'] . "," . (int)$filter['limit'];
     }
     // $sql .=  " GROUP BY unit.units";
-
+// echo $sql;
     if (isset($filter['id'])) {
       return $this->db->query($sql)->getRow();
     } else {
@@ -174,6 +180,7 @@ class EstablishmentTransactionDetailsModel extends Model
 
     // Add condition to check if deleted_at is not null
     $builder->where('etd.deleted_at IS  NULL');
+   
     $count = $builder->countAllResults();
 
     return $count;
@@ -184,12 +191,19 @@ class EstablishmentTransactionDetailsModel extends Model
     $builder->join('soe_months sm', 'et.month_id = sm.id', 'left');
     $builder->join('soe_districts sd', 'et.district_id = sd.id', 'left');
     $builder->join('soe_blocks sb', 'etd.block_id = sb.id', 'left');
+    $builder->join('soe_grampanchayats g', 'etd.gp_id = g.id', 'left');
     $builder->join('villages v', 'etd.village_id = v.id', 'left');
     $builder->join('soe_grampanchayats sg', 'etd.gp_id = sg.id', 'left');
     $builder->join('enterprises_units eu', 'et.unit_id = eu.id', 'left');
 
     if (!empty($data['district_id'])) {
       $builder->where("et.district_id  = '" . $data['district_id'] . "'");
+    }
+    if (!empty($data['block_id'])) {
+      $builder->where("etd.block_id  = '" . $data['block_id'] . "'");
+    }
+    if (!empty($data['gp_id'])) {
+      $builder->where("etd.gp_id  = '" . $data['gp_id'] . "'");
     }
     if (!empty($data['month_id'])) {
       $builder->where("et.month_id  = '" . $data['month_id'] . "'");
@@ -305,7 +319,7 @@ class EstablishmentTransactionDetailsModel extends Model
       FROM enterprises_units eu
         LEFT JOIN enterprise_unit_group eug
           ON eu.unit_group_id = eug.id) eu_unit
-      ON eu_unit.unit_id = txn_dtl.unit_id WHERE sb.is_program=1 AND txn_id = $id ";
+      ON eu_unit.unit_id = txn_dtl.unit_id WHERE sb.is_program=1 AND txn_dtl.est_id = $id ";
     // echo $sql;exit;
     return $this->db->query($sql)->getResult();
   }
