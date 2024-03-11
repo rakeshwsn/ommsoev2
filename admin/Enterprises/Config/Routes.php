@@ -44,14 +44,14 @@ $routes->group('admin', ['namespace' => 'Admin', 'filter' => 'login'], function 
     $routes->add('enterprises/report/blocks', 'Enterprises\Controllers\EstablishmentReport::ajaxBlocks');
     
     $routes->get('enterprises/enttxnreport', 'Enterprises\Controllers\EstablishmentTransReport::index');
-    $routes->add('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
+    $routes->get('enttxnreport/blocks', 'Enterprises\Controllers\EstablishmentTransReport::ajaxBlocks');
 
     // $routes->get('entexcelreport/download', 'Enterprises\Controllers\EstablishmentReport::excelDownload');
-    $routes->add('demo', 'Enterprises\Controllers\EstablishmentReport::demo');
-    $routes->add('estmaster', 'Enterprises\Controllers\EnterprisesMaster::index');
-    $routes->add('distwisethr', 'Enterprises\Controllers\DistWiseThr::index');
+    $routes->get('demo', 'Enterprises\Controllers\EstablishmentReport::demo');
+    $routes->get('estmaster', 'Enterprises\Controllers\EnterprisesMaster::index');
+    $routes->get('distwisethr', 'Enterprises\Controllers\DistWiseThr::index');
     
-    $routes->add('dwlndthr', 'Enterprises\Controllers\DistWiseThr::download_thr');
+    $routes->get('dwlndthr', 'Enterprises\Controllers\DistWiseThr::download_thr');
 
 
 });

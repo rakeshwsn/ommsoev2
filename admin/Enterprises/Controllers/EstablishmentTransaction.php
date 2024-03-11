@@ -159,6 +159,14 @@ class EstablishmentTransaction extends AdminController
 // dd($data);
         return $this->template->view('Admin\Enterprises\Views\establishmentTransaction', $data);
     }
+
+    /**
+     * Search function to filter and retrieve data based on user input.
+     *
+     * @param None
+     * @throws None
+     * @return JSON response with filtered data for DataTables.
+     */
     public function search()
     {
 
@@ -215,6 +223,7 @@ class EstablishmentTransaction extends AdminController
 
         return $this->response->setContentType('application/json')->setJSON($json_data);
     }
+
     private function filter()
     {
         $filter = [];
@@ -240,6 +249,7 @@ class EstablishmentTransaction extends AdminController
         $filteredData =  $this->enterpriseTxnsDtls->periodswisetrans($filter);
         return $filteredData;
     }
+
     public function edit()
     {
 
@@ -271,6 +281,7 @@ class EstablishmentTransaction extends AdminController
 
         return $this->getForm();
     }
+
     private function getForm()
     {
         helper('form');
@@ -540,7 +551,6 @@ class EstablishmentTransaction extends AdminController
 
     public function upload()
     {
-        
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
