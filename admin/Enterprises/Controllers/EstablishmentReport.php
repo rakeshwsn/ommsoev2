@@ -56,7 +56,7 @@ class EstablishmentReport extends AdminController
 		}
 		//unit text
 		$management_unit_type = $this->request->getGet('management_unit_type');
-		// dd($management_unit_type);
+
 		if ($management_unit_type === "FPO") {
 			$data['unit_text'] = "FPO";
 		} elseif ($management_unit_type === "SHG") {
