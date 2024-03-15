@@ -4,18 +4,32 @@ namespace Admin\Common\Models;
 
 use CodeIgniter\Model;
 
-class CommonModel extends Model {
-
-    public function getAgencyTypes($as_array=false){
-        $res = $this->db
-            ->table('soe_agency_types')
+class AgencyTypeModel extends Model
+{
+    /**
+     * Gets a list of agency types.
+     *
+     * @param bool $asArray If true, returns the result as an array. Otherwise, returns an object.
+     * @return array|object
+     */
+    public function getAgencyTypes(bool $asArray = false)
+    {
+        // Run the query
+        $db = $this->db;
+        $query = $db->table('soe_agency_types')
             ->orderBy('name')
             ->get();
-        if($as_array){
-            return $res->getResultArray();
+
+        // Check for errors
+        if ($query === false) {
+            throw new \RuntimeException($db->error()['message'], $db->error()['code']);
+        }
+
+        // Return the result
+        if ($asArray) {
+            return $query->getResultArray();
         } else {
-            return $res->getResult();
+            return $query->getResult();
         }
     }
-
 }
