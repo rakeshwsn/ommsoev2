@@ -8,8 +8,16 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class ExcelStyles {
 
+    const STYLE_HEADING1 = 'heading1';
+    const STYLE_HEADING2 = 'heading2';
+    const STYLE_HEADING3 = 'heading3';
+    const STYLE_BORDER = 'border';
+    const STYLE_FILL_YELLOW = 'fill_yellow';
+    const STYLE_FILL_GREY = 'fill_grey';
+    const STYLE_FILL_BLUE = 'fill_blue';
+
     protected static $style = [
-        'heading1'=>[
+        self::STYLE_HEADING1 => [
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -30,7 +38,7 @@ class ExcelStyles {
                 ],
             ],
         ],
-        'heading2'=>[
+        self::STYLE_HEADING2 => [
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -50,7 +58,7 @@ class ExcelStyles {
                 ],
             ],
         ],
-        'heading3'=>[
+        self::STYLE_HEADING3 => [
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -70,7 +78,7 @@ class ExcelStyles {
                 ],
             ],
         ],
-        'border' => [
+        self::STYLE_BORDER => [
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -78,7 +86,7 @@ class ExcelStyles {
                 ],
             ],
         ],
-        'fill_yellow' => [
+        self::STYLE_FILL_YELLOW => [
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => [
@@ -86,7 +94,7 @@ class ExcelStyles {
                 ]
             ],
         ],
-        'fill_grey' => [
+        self::STYLE_FILL_GREY => [
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => [
@@ -94,7 +102,7 @@ class ExcelStyles {
                 ]
             ],
         ],
-        'fill_blue' => [
+        self::STYLE_FILL_BLUE => [
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => [
@@ -107,31 +115,35 @@ class ExcelStyles {
         ],
     ];
 
-    public static function heading1(){
-        return self::$style['heading1'];
+    public static function createHeadingStyle(string $headingLevel): array
+    {
+        return [
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'color' => ['rgb' => 'C0C0C0'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ];
     }
 
-    public static function heading2(){
-        return self::$style['heading2'];
+    public static function heading1(): array
+    {
+        return self::createHeadingStyle(self::STYLE_HEADING1);
     }
 
-    public static function heading3(){
-        return self::$style['heading3'];
-    }
+    public static function heading2(): array
+    {
 
-    public static function border(){
-        return self::$style['border'];
-    }
-
-    public static function fill_yellow(){
-        return self::$style['fill_yellow'];
-    }
-
-    public static function fill_grey(){
-        return self::$style['fill_grey'];
-    }
-
-    public static function fill_blue(){
-        return self::$style['fill_blue'];
-    }
-}
