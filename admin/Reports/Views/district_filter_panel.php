@@ -15,16 +15,16 @@
                         </tr>
                         <tr>
                             <td>
-                                <label for="year">Year</label>
-                                <select class="form-control" id="year" name="year" required>
+                                <label for="year">Year <span class="text-danger" aria-required="true">*</span></label>
+                                <select class="form-control" id="year" name="year" required placeholder="Select Year">
                                     <?php foreach ($years as $year) { ?>
                                         <option value="<?=$year['id']?>" <?=($year['id']==$year_id)?'selected':''?>><?=$year['name']?></option>
                                     <?php } ?>
                                 </select>
                             </td>
                             <td>
-                                <label for="month">Month</label>
-                                <select class="form-control" id="month" name="month">
+                                <label for="month">Month <span class="text-danger" aria-required="true">*</span></label>
+                                <select class="form-control" id="month" name="month" required placeholder="Select Month">
                                     <?php foreach ($months as $month) { ?>
                                         <option value="<?=$month['id']?>" <?=($month['id']==$month_id)?'selected':''?>><?=$month['name']?></option>
                                     <?php } ?>
@@ -52,7 +52,7 @@
                             </td>
                             <td>
                                 <label for="btn-filter">Filter</label>
-                                <button id="btn-filter" class="btn btn-outline btn-primary" name="filter_btn"><i class="fa fa-filter"></i> Filter</button>
+                                <button id="btn-filter" class="btn btn-outline btn-primary" name="filter_btn" id="filter-btn"><i class="fa fa-filter"></i> Filter</button>
                             </td>
                         </tr>
                     </table>
