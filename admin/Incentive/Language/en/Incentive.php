@@ -1,12 +1,15 @@
 <?php
-// Text
+
+// Define the text constants for the application
 return [
-	'heading_title'        => 'INCENTIVE',
-	'button_add'           => 'Add Incentive Data',
-	'button_upload'        => 'Upload Incentive Data',
-    'button_delete'        => 'Delete Incentive Data',
-    'button_view'        => 'View all Incentive Data'
+    'incentive' => [
+        'heading_title' => 'Incentive',
+        'button' => [
+            'add' => 'Add Incentive Data',
+            'upload' => 'Upload Incentive Data',
+            'delete' => 'Delete Incentive Data',
+            'view' => 'View all Incentive Data'
+        ]
+    ]
 ];
-
-
 
