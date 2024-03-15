@@ -1,27 +1,42 @@
-<?php 
-namespace Front\Common\Controllers;
+<?php
+
+namespace App\Controllers;
+
 use CodeIgniter\Controller;
+use CodeIgniter\HTTP\URI;
 
-class Map extends Controller {
-   
-    public function index() {
-		$data['map_url'] = base_url('common/map/data');
-		$data['svg_map'] = view('svg_map');
-		$data['gps'] = [
-			'total_gps' => 0,
-			'total_villages' => 0
-		];
-		$data['total_farmers'] = 0;
-		return view('map', $data);
-	}
-	
-	public function plain() {
-		$data = [];
-		return view('plain_map', $data);
-	}
-	
-	public function data() {
-		
-	}
+class Map extends Controller
+{
+    protected $base_url;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->base_url = (new URI())->getBaseURL();
+    }
+
+    public function index()
+    {
+        $data = [
+            'mapUrl' => $this->base_url . 'common/map/data',
+            'svgMap' => view('svg_map'),
+            'gps' => [
+                'totalGps' => 0,
+                'totalVillages' => 0
+            ],
+            'totalFarmers' => 0
+        ];
+
+        return view('map', $data);
+    }
+
+    public function plain()
+    {
+        return view('plain_map');
+    }
+
+    public function data()
+    {
+        // Add your data retrieval and processing logic here
+    }
 }
