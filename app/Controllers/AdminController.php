@@ -5,10 +5,12 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Psr\Log\LoggerInterface;
+use CodeIgniter\HTTP\Files\UploadedFile;
+use CodeIgniter\Session\Session;
+use Config\Services;
 
 /**
- * Class BaseController
+ * Class AdminController
  *
  * BaseController provides a convenient place for loading components
  * and performing functions that are needed by all your controllers.
@@ -17,18 +19,25 @@ use Psr\Log\LoggerInterface;
  *
  * For security be sure to declare any new methods as protected or private.
  */
-
 class AdminController extends Controller
 {
-	/**
-	 * An array of helpers to be loaded automatically upon
-	 * class instantiation. These helpers will be available
-	 * to all other controllers that extend BaseController.
-	 *
-	 * @var array
-	 */
-	protected $helpers = ['aio','form','date','general','number'];
-    public $statuses = ['Not Approved','Approved','Rejected','Not Uploaded','Not Required'];
+    /**
+     * An array of helpers to be loaded automatically upon
+     * class instantiation. These helpers will be available
+     * to all other controllers that extend BaseController.
+     *
+     * @var array
+     */
+    protected $helpers = ['aio', 'form', 'date', 'general', 'number'];
+
+    public $statuses = [
+        'Not Approved',
+        'Approved',
+        'Rejected',
+        'Not Uploaded',
+        'Not Required'
+    ];
+
     public $colors = [
         'warning',
         'success',
@@ -36,75 +45,53 @@ class AdminController extends Controller
         'danger',
         'primary',
     ];
-	
 
-	protected $template;
+    protected $template;
 
-	protected $user;
-	
-	protected $session;
+    protected $user;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param RequestInterface  $request
-	 * @param ResponseInterface $response
-	 * @param LoggerInterface   $logger
-	 */
-	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-	{
-		// Do Not Edit This Line
-		parent::initController($request, $response, $logger);
+    protected $session;
+
+    /**
+     * Constructor.
+     *
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @param LoggerInterface   $logger
+     */
+    public function __construct(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        // Do Not Edit This Line
+        parent::__construct($request, $response, $logger);
+
         $this->settings = new \Config\Settings();
-		$this->template = service('template');
-        $this->user = service('user');
-		$this->session = service('session');
-		$this->uri = service('uri');
-		
-		//dd($this->template);
-		$this->template->set_theme('admin');
-		$this->template->set('header',true);
-        $this->template->set('site_name',$this->settings->config_site_title);
+        $this->template = Services::template();
+        $this->user = Services::user();
+        $this->session = Services::session();
+        $this->uri = Services::uri();
 
-        $ckfinderdata = [
-			'root'  	=> WRITEPATH,
-			'baseUrl'   => base_url('writable/uploads')
-		];
-		$_SESSION['ckfinder']=$ckfinderdata;
-		//--------------------------------------------------------------------
-		// Preload any models, libraries, etc, here.
-		//--------------------------------------------------------------------
-		// E.g.: $this->session = \Config\Services::session();
-	}
+        $this->template->setTheme('admin');
+        $this->template->set('header', true);
+        $this->template->set('site_name', $this->settings->config_site_title);
 
-	public function _remap($method, ...$params)
-   	{
-		
-		//print_r($params);
-		$router = service('router');
-		
-		//$controller_full_name = explode('\\', $router->controllerName());
-        //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
-        //Checks if it's a 404 or not
-        if(!$this->user->checkPermission()){
+        $ckfinderData = [
+            'root' => WRITEPATH,
+            'baseUrl' => base_url('writable/uploads')
+        ];
 
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-        }else if (method_exists($this, $method)) {
-			return call_user_func_array(array($this, $method),$params);
+        $_SESSION['ckfinder'] = $ckfinderData;
+    }
+
+    public function _remap($method, ...$params)
+    {
+        $router = Services::router();
+
+        if (!$this->user->checkPermission()) {
+            show_404();
+        } else if (method_exists($this, $method)) {
+            return call_user_func_array([$this, $method], $params);
         } else {
-
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+            show_404();
         }
-		
-		/*if($this->user->checkLogin()){
-			return Modules::run("common/login/index",$params);		
-		}else if(!$this->user->checkPermission()){
-			return modules::run("common/errors/index",$params);		
-		}else if (method_exists($this, $method)){
-			return call_user_func_array(array($this, $method), $params);
-		}else{
-			return modules::run("common/errors/index",$params);
-		}*/
-		//show_404();
     }
 }
