@@ -3,6 +3,7 @@
 namespace Admin\Components\Models;
 
 use CodeIgniter\Model;
+use CodeIgniter\Database\RawSql;
 
 class ComponentsModel extends Model
 {
@@ -25,41 +26,44 @@ class ComponentsModel extends Model
     {
         $builder = $this->db->table("{$this->table} sc");
 
-        if (!empty($filter['filter_search'])) {
-            $builder->where("(
-                sc.description LIKE '%{$filter['filter_search']}%'
-                OR sc.slug LIKE '%{$filter['filter_search']}%'
-                OR sc.row_type LIKE '%{$filter['filter_search']}%'
-                OR sc.tags LIKE '%{$filter['filter_search']}%')"
-            );
-        }
-
-        if (isset($filter['sort']) && $filter['sort']) {
-            $sort = $filter['sort'];
-        } else {
-            $sort = "sc.slug";
-        }
-
-        if (isset($filter['order']) && ($filter['order'] == 'desc')) {
-            $order = "desc";
-        } else {
-            $order = "asc";
-        }
-
-        $builder->orderBy($sort, $order);
-
-        if (isset($filter['start']) || isset($filter['limit'])) {
-            if ($filter['start'] < 0) {
-                $filter['start'] = 0;
-            }
-
-            if ($filter['limit'] < 1) {
-                $filter['limit'] = 10;
-            }
-            $builder->limit((int)$filter['limit'], (int)$filter['start']);
-        }
+        $this->applyFilterSearch($builder, $filter);
+        $this->applySorting($builder, $filter);
+        $this->applyPagination($builder, $filter);
 
         return $builder;
+    }
+
+    private function applyFilterSearch( $builder, $filter ) {
+        if ( !empty($filter['filter_search']) ) {
+            $searchTerm = $filter['filter_search'];
+            $builder->where(
+                new RawSql("sc.description LIKE '%?%' OR sc.slug LIKE '%?%' OR sc.row_type LIKE '%?%' OR sc.tags LIKE '%?%'", [$searchTerm, $searchTerm, $searchTerm, $searchTerm])
+            );
+        }
+    }
+
+    private function applySorting( $builder, $filter ) {
+        $sort = isset($filter['sort']) && $filter['sort'] ? $filter['sort'] : "sc.slug";
+        $order = isset($filter['order']) && ($filter['order'] == 'desc') ? "desc" : "asc";
+
+        $builder->orderBy($sort, $order);
+    }
+
+    private function applyPagination( $builder, $filter ) {
+        if ( isset($filter['start']) || isset($filter['limit']) ) {
+            $start = isset($filter['start']) ? (int)$filter['start'] : 0;
+            $limit = isset($filter['limit']) ? (int)$filter['limit'] : 10;
+
+            if ( $start < 0 ) {
+                $start = 0;
+            }
+
+            if ( $limit < 1 ) {
+                $limit = 10;
+            }
+
+            $builder->limit($limit, $start);
+        }
     }
 
     public function getTotal($data = [])
@@ -86,13 +90,7 @@ class ComponentsModel extends Model
         $builder->join('soe_components_assign sca', 'sca.component_id = sc.id', 'left');
         $builder->join('soe_budgets sb', 'sb.component_id = sc.id AND sb.fund_agency_id = sc.fund_agency_id', 'left');
 
-        if (!empty($filter['user_group'])) {
-            $user_group = (array)$filter['user_group'];
-            $builder->whereIn('sb.agency_type_id', $user_group);
-        } else {
-            $builder->where('sb.agency_type_id IS NULL');
-        }
-
+        $this->applyUserGroupFilter($builder, $filter);
         $builder->where('sc.fund_agency_id', $filter['fund_agency_id']);
         $builder->groupBy('sca.component_id');
 
@@ -104,5 +102,14 @@ class ComponentsModel extends Model
         }
 
         return $res;
+    }
+
+    private function applyUserGroupFilter( $builder, $filter ) {
+        if ( !empty($filter['user_group']) ) {
+            $user_group = (array)$filter['user_group'];
+            $builder->whereIn('sb.agency_type_id', $user_group);
+        } else {
+            $builder->where('sb.agency_type_id IS NULL');
+        }
     }
 }
