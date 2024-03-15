@@ -5,6 +5,7 @@ namespace App\Controllers\Admin\Users;
 use App\Controllers\AdminController;
 use App\Models\Admin\Users\UserGroupModel;
 use App\Models\Admin\Permission\PermissionModel;
+use Config\Services;
 
 class Usergroup extends AdminController
 {
@@ -21,30 +22,29 @@ class Usergroup extends AdminController
 
     public function index()
     {
-        $this->data['title'] = lang('Users.heading_title');
         return $this->getList();
     }
 
     protected function getList()
     {
-        $this->data['breadcrumbs'] = [
-            [
-                'text' => lang('Usergroup.heading_title'),
-                'href' => admin_url('usergroup')
+        $this->data = [
+            'breadcrumbs' => [
+                [
+                    'text' => lang('Usergroup.heading_title'),
+                    'href' => admin_url('usergroup')
+                ],
             ],
+            'add' => admin_url('usergroup/add'),
+            'delete' => admin_url('usergroup/delete'),
+            'datatable_url' => admin_url('usergroup/search'),
+            'title' => lang('Users.heading_title'),
+            'text_list' => lang('Usergroup.text_list'),
+            'text_no_results' => lang('Usergroup.text_no_results'),
+            'text_confirm' => lang('Usergroup.text_confirm'),
+            'button_add' => lang('Usergroup.button_add'),
+            'button_edit' => lang('Usergroup.button_edit'),
+            'button_delete' => lang('Usergroup.button_delete'),
         ];
-
-        $this->data['add'] = admin_url('usergroup/add');
-        $this->data['delete'] = admin_url('usergroup/delete');
-        $this->data['datatable_url'] = admin_url('usergroup/search');
-
-        $this->data['heading_title'] = lang('Usergroup.heading_title');
-        $this->data['text_list'] = lang('Usergroup.text_list');
-        $this->data['text_no_results'] = lang('Usergroup.text_no_results');
-        $this->data['text_confirm'] = lang('Usergroup.text_confirm');
-        $this->data['button_add'] = lang('Usergroup.button_add');
-        $this->data['button_edit'] = lang('Usergroup.button_edit');
-        $this->data['button_delete'] = lang('Usergroup.button_delete');
 
         if (isset($this->error['warning'])) {
             $this->data['error'] = $this->error['warning'];
@@ -65,20 +65,19 @@ class Usergroup extends AdminController
 
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
             $this->usergroupModel->insert($this->request->getPost());
-            $this->session->setFlashdata('message', 'Member Saved Successfully.');
-
+            $this->setMessage('success', 'Member Saved Successfully.');
             return redirect()->to(base_url('admin/usergroup'));
         }
 
-        $this->getForm();
+        return $this->getForm();
     }
 
     protected function validateForm()
     {
-        $validation = \Config\Services::validation();
+        $validation = Services::validation();
         $rules = $this->usergroupModel->validationRules;
 
-        if ($this->validate($rules)) {
+        if ($validation->run($rules)) {
             return true;
         } else {
             $this->error['warning'] = "Warning: Please check the form carefully for errors!";
@@ -124,12 +123,12 @@ class Usergroup extends AdminController
         if ($this->request->getMethod(1) === 'POST' && $this->validateForm()) {
             $id = $this->uri->getSegment(4);
             $this->usergroupModel->update($id, $this->request->getPost());
-            $this->session->setFlashdata('message', 'Member Updated Successfully.');
+            $this->setMessage('success', 'Member Updated Successfully.');
 
             return redirect()->to(base_url('admin/usergroup'));
         }
 
-        $this->getForm();
+        return $this->getForm();
     }
 
     public function delete()
@@ -139,8 +138,9 @@ class Usergroup extends AdminController
         } else {
             $selected = (array)$this->uri->getSegment(4);
         }
+
         $this->usergroupModel->delete($selected);
-        $this->session->setFlashdata('message', 'Usergroup deleted Successfully.');
+        $this->setMessage('success', 'Usergroup deleted Successfully.');
         return redirect()->to(base_url('admin/usergroup'));
     }
 
@@ -157,5 +157,10 @@ class Usergroup extends AdminController
     protected function get_access_methods($class)
     {
         // ... (same as the original code)
+    }
+
+    protected function setMessage($type, $message)
+    {
+        session()->setFlashdata($type, $message);
     }
 }
