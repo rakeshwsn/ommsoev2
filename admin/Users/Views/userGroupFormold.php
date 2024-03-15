@@ -9,7 +9,7 @@ $validation = \Config\Services::validation();
                     <h3 class="block-title"><?php echo $text_form; ?></h3>
                     <div class="block-options">
                         <button type="submit" name="save" class="btn btn-primary">Save</button>
-                        <a href="<?php echo $cancel; ?>" id="cancel-button" data-toggle="tooltip" title="Cancel" class="btn btn-primary">Cancel</a>
+                        <button type="reset" name="cancel" id="cancel-button" data-toggle="tooltip" title="Cancel" class="btn btn-primary">Cancel</button>
                     </div>
                 </div>
                 <div class="block-content">
@@ -17,7 +17,7 @@ $validation = \Config\Services::validation();
                         <label class="col-lg-2 col-form-label" for="example-hf-email">Name</label>
                         <div class="col-lg-10 <?=$validation->hasError('name')?'is-invalid':''?>">
                             <input type="hidden" name="id" id="id" value="<?=$id?>"/>
-                            <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name), 'required' => 'required')); ?>
+                            <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name), 'autofocus' => 'autofocus', 'autocomplete' => 'off', 'required' => 'required')); ?>
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('name'); ?></div>
                         </div>
                     </div>
@@ -25,14 +25,15 @@ $validation = \Config\Services::validation();
                     <div class="form-group row required">
                         <label class="col-sm-2 control-label" for="input-usergroup-group">Designation</label>
                         <div class="col-md-10 <?=$validation->hasError('designation')?'is-invalid':''?>">
-                            <?php echo form_input(array('class'=>'form-control','name' => 'description', 'id' => 'description', 'placeholder'=>'Description','value' => set_value('description', $description), 'required' => 'required')); ?>
-                            <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('description'); ?></div>
+                            <label for="input-usergroup-group" class="visually-hidden">Designation</label>
+                            <?php echo form_input(array('class'=>'form-control','name' => 'description', 'id' => 'description', 'placeholder'=>'Description','value' => set_value('description', $description), 'required' => 'required', 'aria-describedby' => 'descriptionError')); ?>
+                            <div class="invalid-feedback animated fadeInDown" id="descriptionError"><?= $validation->getError('description'); ?></div>
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-sm-2 control-label" for="input-status">Status</label>
                         <div class="col-md-10">
-                            <?php  echo form_dropdown('status', array('1'=>'Enable','0'=>'Disable'), set_value('status',$status),array('class'=>'form-control','id' => 'input-status')); ?>
+                            <?php  echo form_dropdown('status', array('1'=>'Enable','0'=>'Disable'), set_value('status',$status),array('class'=>'form-control','id' => 'input-status', 'aria-label' => 'Status')); ?>
                         </div>
                     </div>
                 </div>
@@ -41,43 +42,15 @@ $validation = \Config\Services::validation();
         <div class="col-12">
             <div class="block">
                 <div class="block-content">
-                    <form action="<?=base_url()?>" class="form-horizontal" role="form" method="post" id="roletype">
-                        <table id="" class="table table-striped table-bordered table-hover dataTable no-footer">
+                    <form action="<?=base_url()?>" class="form-horizontal" role="form" method="post" id="roletype" aria-describedby="roletypeError">
+                        <table id="role-type-table" class="table table-striped table-bordered table-hover dataTable no-footer" aria-label="Role Type Table">
                             <thead>
                             <tr>
-                                <th class="col-lg-1">Sl No</th>
-                                <th class="col-lg-3">Module Name</th>
-                                <th class="col-lg-1">Add</th>
-                                <th class="col-lg-1">Edit</th>
-                                <th class="col-lg-1">Delete</th>
-                                <th class="col-lg-1">View</th>
-                                <th class="col-lg-1">Download</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-                            $i = 1;
-                            foreach($permissions as $module=>$data) { ?>
-
-                            <tr class="bg-primary">
-                                <td data-title="#" colspan="7" align="center">
-                                    <?=$module?>
-                                </td>
-                            </tr>
-                            <?php foreach($data as $per){?>
-                            <tr>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="permissions[<?=$i?>][module]" value="1" id="" <?=set_checkbox('permissions['.$i.'][module]', '1', false)?>>
-                                </td>
-                                <td data-title="#" >
-                                    <?=$per['controller']?>
-                                </td>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="permissions[<?=$i?>][add]" value="1" id="" <?=set_checkbox('permissions['.$i.'][add]', '1', false)?>>
-                                </td>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="permissions[<?=$i?>][edit]" value="1" id="" <?=set_checkbox('permissions['.$i.'][edit]', '1', false)?>>
-                                </td>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="permissions[<?=$i?>][delete]" value="1" id="" <?=set_checkbox('permissions['.$i.'][delete]', '1', false)?>>
-                                
+                                <th class="col-lg-1" scope="col">Sl No</th>
+                                <th class="col-lg-3" scope="col">Module Name</th>
+                                <th class="col-lg-1" scope="col">Add</th>
+                                <th class="col-lg-1" scope="col">Edit</th>
+                                <th class="col-lg-1" scope="col">Delete</th>
+                                <th class="col-lg-1" scope="col">View</th>
+                                <th class="col-lg-1" scope="col">Download</th>
+                            
