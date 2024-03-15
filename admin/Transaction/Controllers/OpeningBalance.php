@@ -9,41 +9,26 @@ use App\Controllers\AdminController;
 use Config\Settings;
 use Config\Url;
 
-class OpeningBalance extends AdminController {
-
-	public function index() {
-
+class OpeningBalance extends AdminController
+{
+    public function index()
+    {
         $obModel = new ClosingbalanceModel();
 
-        $fund_agency_id = 0;
-        if($this->user->agency_type_id==$this->settings->block_user){
-            $fund_agency_id = (new BlockModel())->find($this->user->block_id)->fund_agency_id;
-        }
-        if($this->user->agency_type_id==$this->settings->district_user){
-//            $fund_agency_id = (new DistrictModel())->find($this->user->district_id)->fund_agency_id;
-            $fund_agency_id = $this->user->fund_agency_id;
-        }
+        // Get the fund agency ID based on the user's agency type
+        $fund_agency_id = $this->getFundAgencyId();
 
-	    if($this->request->getMethod(1)=='POST'){
+        // If the request method is POST
+        if ($this->request->getMethod() === 'post') {
+            // Validate the request data
+            $this->validate([
+                'advance' => 'required',
+                'bank' => 'required',
+                'cash' => 'required'
+            ]);
 
-	        $ob = [
-	            'month' => 0,
-                'year' => 0,
-                'block_id' => $this->user->block_id,
-                'district_id' => $this->user->district_id,
-                'user_id' => $this->user->user_id,
-                'status' => 1,
-                'advance' => $this->request->getPost('advance'),
-                'bank' => $this->request->getPost('bank'),
-                'cash' => $this->request->getPost('cash'),
-                'agency_type_id' => $this->user->agency_type_id,
-                'fund_agency_id' => $fund_agency_id,
-            ];
-
-            $obModel->insert($ob);
-
-            //insert for cbo if block user
-            if($this->user->agency_type_id==$this->settings->block_user) {
+            // If the validation passes, insert the opening balance data
+            if ($this->validator->withRequest($this->request)->passes()) {
                 $ob = [
                     'month' => 0,
                     'year' => 0,
@@ -54,27 +39,60 @@ class OpeningBalance extends AdminController {
                     'advance' => $this->request->getPost('advance'),
                     'bank' => $this->request->getPost('bank'),
                     'cash' => $this->request->getPost('cash'),
-                    'agency_type_id' => $this->settings->cbo_user,
+                    'agency_type_id' => $this->user->agency_type_id,
                     'fund_agency_id' => $fund_agency_id,
                 ];
-                $obModel->insert($ob);
-            }
 
-	        return redirect()->to(Url::dashboard);
+                $obModel->insert($ob);
+
+                // If the user is a block user, insert the opening balance data for CBO
+                if ($this->user->agency_type_id === $this->settings->block_user) {
+                    $ob = [
+                        'month' => 0,
+                        'year' => 0,
+                        'block_id' => $this->user->block_id,
+                        'district_id' => $this->user->district_id,
+                        'user_id' => $this->user->user_id,
+                        'status' => 1,
+                        'advance' => $this->request->getPost('advance'),
+                        'bank' => $this->request->getPost('bank'),
+                        'cash' => $this->request->getPost('cash'),
+                        'agency_type_id' => $this->settings->cbo_user,
+                        'fund_agency_id' => $fund_agency_id,
+                    ];
+                    $obModel->insert($ob);
+                }
+
+                // Redirect to the dashboard
+                return redirect()->to(Url::dashboard);
+            }
         }
 
+        // Set the message and helper
+        $data['message'] = 'Please enter opening balance to continue. This is one time setup.';
+        helper('form');
+
+        // Set the date and view data
         $month_num = date('m');
+        $date = date('d/m', mktime(0, 0, 0, $month_num, 1)) . '/' . getCurrentYear();
+        $data['date'] = $date;
 
-        $date = date('d/m',mktime(0,0,0,$month_num,1)).'/'.getCurrentYear();
+        // Render the view
+        return $this->template->view('Admin\Transaction\Views\opening_balance', $data);
+    }
 
-//	    $this->template->setMetaTitle('Opening balance');
-//	    $this->template->setPageHeading('Opening balance as on '.$date);
+    /**
+     * Get the fund agency ID based on the user's agency type
+     *
+     * @return int
+     */
+    private function getFundAgencyId()
+    {
+        $fund_agency_id = 0;
 
-	    $data['message'] = 'Please enter opening balance to continue. This is one time setup.';
+        if ($this->user->agency_type_id === $this->settings->block_user) {
+            $blockModel = new BlockModel();
+            $fund_agency_id = $blockModel->find($this->user->block_id)->fund_agency_id;
+        }
 
-	    helper('form');
-
-        return $this->template->view('Admin\Transaction\Views\opening_balance',$data);
-	}
-
-}
+        if ($this->user->agency_type_id === $this->settings->district_user) {
