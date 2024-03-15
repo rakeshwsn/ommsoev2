@@ -2,6 +2,8 @@
 
 namespace App\Libraries;
 
+use Config\Services;
+
 class OdkCentralAuth
 {
     /**
@@ -25,11 +27,12 @@ class OdkCentralAuth
     private int $expires;
 
     /**
-     * @var \Config\Services
+     * @var Services
      */
-    private \Config\Services $client;
+    private Services $client;
 
     /**
      * OdkCentralAuth constructor.
-     */
-
+     * @param string $apiUrl
+     * @param string $email
+    
