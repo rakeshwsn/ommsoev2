@@ -21,6 +21,13 @@ class TransactionModel extends Model
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
 
+    protected $joinTables = [
+        'soe_years' => 'year',
+        'soe_blocks' => 'block_id',
+        'soe_districts' => 'district_id',
+        'user_group' => 'agency_type_id'
+    ];
+
     public function __construct()
     {
         parent::__construct();
@@ -29,13 +36,30 @@ class TransactionModel extends Model
 
     public function getAll($filter = [])
     {
-        $builder = $this->db->table('soe_transactions st');
-        $builder->select('st.*, y.name year, b.name block, d.name district, ug.name agency_type');
-        $builder->join('soe_years y', 'y.id = st.year', 'left');
-        $builder->join('soe_blocks b', 'b.id = st.block_id', 'left');
-        $builder->join('soe_districts d', 'd.id = st.district_id', 'left');
-        $builder->join('user_group ug', 'ug.id = st.agency_type_id', 'left');
+        $builder = $this->db->table($this->table);
 
+        $builder->select('st.*, y.name year, b.name block, d.name district, ug.name agency_type');
+        $builder->join($this->joinTables, $builder->getCompiledSelect(), 'left');
+
+        $this->applyFilters($builder, $filter);
+
+        $query = $builder->get();
+        return $query->getResult();
+    }
+
+    public function getTotal($filter = [])
+    {
+        $builder = $this->db->table($this->table);
+
+        $builder->select('COUNT(*) total');
+        $this->applyFilters($builder, $filter);
+
+        $query = $builder->get();
+        return $query->getRow()->total;
+    }
+
+    protected function applyFilters(Builder $builder, array $filter)
+    {
         if (isset($filter['transaction_type']) && !empty($filter['transaction_type'])) {
             $builder->where('st.transaction_type', $filter['transaction_type']);
         } else {
@@ -43,8 +67,10 @@ class TransactionModel extends Model
         }
 
         if (isset($filter['filter_search']) && !empty($filter['filter_search'])) {
-            $builder->like('y.name', $filter['filter_search']);
-            $builder->orLike('c.name', $filter['filter_search']);
+            $builder->groupStart()
+                ->like('y.name', $filter['filter_search'])
+                ->orLike('c.name', $filter['filter_search'])
+                ->groupEnd();
         }
 
         if (isset($filter['agency_type_id']) && !empty($filter['agency_type_id'])) {
@@ -73,38 +99,8 @@ class TransactionModel extends Model
                 $builder->limit($filter['limit']);
             }
         }
-
-        $query = $builder->get();
-        return $query->getResult();
-    }
-
-    public function getTotal($filter = [])
-    {
-        $builder = $this->db->table('soe_transactions st');
-        $builder->select('COUNT(*) total');
-
-        if (isset($filter['transaction_type']) && !empty($filter['transaction_type'])) {
-            $builder->where('st.transaction_type', $filter['transaction_type']);
-        } else {
-            $builder->where('st.transaction_type !=', 'refund');
-        }
-
-        if (isset($filter['agency_type_id']) && !empty($filter['agency_type_id'])) {
-            $builder->where('st.agency_type_id', $filter['agency_type_id']);
-        }
-
-        if (isset($filter['user_id']) && !empty($filter['user_id'])) {
-            $builder->where('st.user_id', $filter['user_id']);
-        }
-
-        if (isset($filter['filter_search']) && !empty($filter['filter_search'])) {
-            $builder->like('y.name', $filter['filter_search']);
-            $builder->orLike('c.name', $filter['filter_search']);
-        }
-
-        $query = $builder->get();
-        return $query->getRow()->total;
     }
 
     // Add other methods as needed
 }
+
