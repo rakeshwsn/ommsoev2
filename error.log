@@ -1,24 +1,27 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-require __DIR__ . '/../app/Config/Constants.php';
+// Define the root directory of the application
+const APP_PATH = __DIR__ . '/../app';
+const WRITABLE_PATH = __DIR__ . '/../writable';
+const CONFIG_PATH = APP_PATH . '/Config';
+
+// Autoload the Composer dependencies
 require __DIR__ . '/../vendor/autoload.php';
 
-use CodeIgniter\Environment;
-use CodeIgniter\Runtime\Path;
+// Load the environment and application configuration
+$env = new \CodeIgniter\Environment();
+$env->initialize(require CONFIG_PATH . '/App.php');
 
-if (file_exists(Path::find('../app/Config/App.php'))) {
-    (new Environment())->initialize(require Path::find('../app/Config/App.php'));
-} else {
-    exit('Application not found.');
-}
+// Include the bootstrap file
+require CONFIG_PATH . '/bootstrap.php';
 
-require __DIR__ . '/../app/Config/bootstrap.php';
-
-$app = new CodeIgniter\Application(
-    Path::find('../app'),
-    Path::find('../writable'),
-    APP_ENV
+// Create the CodeIgniter application instance
+$app = new \CodeIgniter\Application(
+    APP_PATH,
+    WRITABLE_PATH,
+    $env->get('app.environment')
 );
 
+// Run the application
 $app->run();
