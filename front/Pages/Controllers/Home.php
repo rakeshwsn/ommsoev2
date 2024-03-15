@@ -1,62 +1,69 @@
 <?php
+
 namespace Front\Pages\Controllers;
+
 use Admin\Pages\Models\PagesModel;
 use Admin\Banner\Models\BannerModel;
 use App\Controllers\BaseController;
 
 class Home extends BaseController
 {
-	private $error = array();
-    function __construct(){
-		$this->pageModel = new PagesModel(); 
-        $this->bannerModel = new BannerModel();        
-	}
-    public function index()
-	{
-		$data=array();
-		$Page = $this->pageModel->find(1);
-       // print_r($Page);
-      	if (isset($Page) && !empty($Page)){  
-         	if ($Page->status != 'published'){
-            	if ($Page->status != 'draft'){
-                    throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
-				}
-         	}
-         	$this->template->set_meta_title($Page->title);
-         	//$data['heading_title'] = $Page->title;
-			$data['content'] = html_entity_decode($Page->content, ENT_QUOTES, 'UTF-8');
-            $this->template->set('site_name',$this->settings->config_site_title);
+    /**
+     * @var PagesModel
+     */
+    private $pageModel;
 
+    /**
+     * @var BannerModel
+     */
+    private $bannerModel;
+
+    /**
+     * Home constructor.
+     * @param PagesModel $pageModel
+     * @param BannerModel $bannerModel
+     */
+    public function __construct(PagesModel $pageModel, BannerModel $bannerModel)
+    {
+        $this->pageModel = $pageModel;
+        $this->bannerModel = $bannerModel;
+    }
+
+    /**
+     * @return string
+     */
+    public function index(): string
+    {
+        $data = [];
+
+        $page = $this->pageModel->find(1) ?? [];
+
+        if (!empty($page)) {
+            if ($page['status'] !== 'published') {
+                if ($page['status'] !== 'draft') {
+                    throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+                }
+            }
+
+            $this->template->set_meta_title($page['title']);
+            $data['content'] = html_entity_decode($page['content'], ENT_QUOTES, 'UTF-8');
+            $this->template->set('site_name', trim($this->settings->config_site_title));
         }
 
-		$data['banners'] = [];
+        $data['banners'] = array_map(fn ($banner) => [
+            'image' => upload_url($banner['image']),
+            'title' => $banner['title'],
+            'link' => $banner['link'],
+            'description' => $banner['description'],
+        ], $this->bannerModel->getBannerImages(3) ?? []);
 
-        foreach ($this->bannerModel->getBannerImages(3) as $banner) {
-            $data['banners'][] = [
-                'image' => upload_url($banner['image']),
-                'title' => $banner['title'],
-                'link' => $banner['link'],
-                'description' => $banner['description'],
-            ];
-		}
-		
-		$data['sliders'] = [];
+        $data['sliders'] = array_map(fn ($slider) => [
+            'image' => upload_url($slider['image']),
+            'title' => $slider['title'],
+            'link' => $slider['link'],
+            'description' => $slider['description'],
+        ], $this->bannerModel->getBannerImages(4) ?? []);
 
-        foreach ($this->bannerModel->getBannerImages(4) as $slider) {
-            $data['sliders'][] = [
-                'image' => upload_url($slider['image']),
-                'title' => $slider['title'],
-                'link' => $slider['link'],
-                'description' => $slider['description'],
-            ];
-		}
-		$this->template->add_package(['lightgallery'],true);
-        
-		$this->template->add_javascript('themes/default/assets/js/plugins.js');
-		$this->template->set('header',true);
-		$this->template->set('home',true);
-		return $this->template->view('Front\Pages\Views\home',$data);
-		
-	}
-
-}
+        $this->template->add_package(['lightgallery'], true);
+        $this->template->add_javascript('themes/default/assets/js/plugins.js');
+        $this->template
