@@ -39,4 +39,26 @@ class SlugModel extends Model
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
-}
+
+	/**
+	 * Get slug by given value
+	 *
+	 * @param string $value
+	 * @return array
+	 */
+	public function getByValue(string $value): array
+	{
+		return $this->where('slug', $value)->first();
+	}
+
+	/**
+	 * Get slug by given keyword
+	 *
+	 * @param string $keyword
+	 * @return array
+	 */
+	public function getByKeyword(string $keyword): array
+	{
+		return $this->where('keyword', $keyword)->first();
+	}
+
