@@ -1,65 +1,79 @@
 <?php
-namespace Admin\Users\Controllers;
-use Admin\Localisation\Models\BlockModel;
-use Admin\Localisation\Models\DistrictModel;
-use Admin\Users\Models\UserModel;
+
+namespace App\Controllers\Admin\Users;
+
 use App\Controllers\AdminController;
+use App\Models\UserModel;
+use Config\Services;
 use Config\Url;
 
-class Profile extends AdminController{
+class Profile extends AdminController
+{
+    protected $userModel;
 
-    protected $error;
-    public function index() {
+    public function __construct()
+    {
+        $this->userModel = new UserModel();
+    }
 
-        $this->template->add_package(['uploader','jquery_loading'],true);
-        $userModel = new UserModel();
-        $user = $userModel->find($this->user->user_id);
+    public function index()
+    {
+        $this->template->addPackage(['uploader', 'jquery_loading'], true);
 
-        if($this->request->getMethod(1)=='POST' && $this->validateForm()){
-            $user->firstname = $this->request->getPost('firstname');
-            $user->email = $this->request->getPost('email');
-            $user->phone = $this->request->getPost('phone');
-//            $user->district_id = $this->request->getPost('district_id');
-//            $user->block_id = $this->request->getPost('block_id');
-            $user->agency_name = $this->request->getPost('agency_name');
+        $userId = $this->user->user_id;
+        $user = $this->userModel->find($userId);
 
-            if($this->request->getPost('password')) {
-                $user->password = $this->request->getPost('password');
+        if ($this->request->getMethod() === 'post' && $this->validateForm()) {
+            $data = [
+                'firstname' => $this->request->getPost('firstname'),
+                'email' => $this->request->getPost('email'),
+                'phone' => $this->request->getPost('phone'),
+                'agency_name' => $this->request->getPost('agency_name'),
+            ];
+
+            if ($this->request->getPost('password')) {
+                $data['password'] = $this->request->getPost('password');
             }
 
-            $userModel->save($user);
+            $this->userModel->update($userId, $data);
 
-            return redirect()->to(Url::profile)->with('message','Profile information updated.');
+            return redirect()->to(Url::profile())->with('message', 'Profile information updated.');
         }
 
         $data['profile_image'] = 'https://raticupr.sirv.com/Images/no-image.jpg';
-        if($user->image){
+        if ($user->image) {
             $data['profile_image'] = site_url($user->image);
         }
+
         $data['agency_name'] = $user->agency_name;
         $data['firstname'] = $user->firstname;
         $data['email'] = $user->email;
         $data['phone'] = $user->phone;
         $data['district_id'] = $user->district_id;
         $data['block_id'] = $user->block_id;
+
+        $districtModel = new \Admin\Localisation\Models\DistrictModel();
+        $blockModel = new \Admin\Localisation\Models\BlockModel();
+
         $data['district'] = '';
-        if($user->district_id){
-            $data['district'] = (new DistrictModel())->find($user->district_id)->name;
+        if ($user->district_id) {
+            $data['district'] = $districtModel->find($user->district_id)->name;
         }
+
         $data['block'] = '';
-        if($user->block_id){
-            $data['block'] = (new BlockModel())->find($user->block_id)->name;
+        if ($user->block_id) {
+            $data['block'] = $blockModel->find($user->block_id)->name;
         }
 
-        $data['validation'] = \Config\Services::validation();
+        $data['validation'] = Services::validation();
 
-        $data['upload_url'] = site_url(Url::profileUpload);
+        $data['upload_url'] = site_url(Url::profileUpload());
 
-        return $this->template->view('Admin\Users\Views\profile',$data);
+        return $this->template->view('Admin\Users\Views\profile', $data);
     }
 
-    public function upload() {
-
+    public function upload()
+    {
         $input = $this->validate([
             'file' => [
                 'uploaded[file]',
@@ -68,6 +82,7 @@ class Profile extends AdminController{
                 'ext_in[file,jpg,png,jpeg,JPG,PNG,JPEG]',
             ]
         ]);
+
         $filepath = 'images/profile/';
 
         if (!$input) {
@@ -81,44 +96,41 @@ class Profile extends AdminController{
             $file->move($filepath);
 
             $data = [
-                'status'=>true,
-                'image'=> base_url($filepath.$file->getName()),
+                'status' => true,
+                'image' => base_url($filepath . $file->getName()),
                 'filename' => $file->getName(),
-                'filepath' => $filepath.$file->getName()
+                'filepath' => $filepath . $file->getName()
             ];
-            $userModel = new UserModel();
-            $user = $userModel->find($this->user->user_id);
-            $user->image = $filepath.$file->getName();
-            $userModel->save($user);
+
+            $this->userModel->update($this->user->user_id, ['image' => $filepath . $file->getName()]);
         }
+
         return $this->response->setJSON($data);
     }
 
-    protected function validateForm() {
-        if($this->request->getPost('password')) {
+    protected function validateForm()
+    {
+        if ($this->request->getPost('password')) {
             $rules = [
-                "password" => [
-                    "label" => "Password",
-                    "rules" => "min_length[5]|max_length[20]"
+                'password' => [
+                    'label' => 'Password',
+                    'rules' => 'min_length[5]|max_length[20]',
                 ],
-                "password_confirm" => [
-                    "label" => "Confirm Password",
-                    "rules" => "matches[password]"
-                ]
+                'password_confirm' => [
+                    'label' => 'Confirm Password',
+                    'rules' => 'matches[password]',
+                ],
             ];
 
             if ($this->validate($rules)) {
                 return true;
             } else {
-                //printr($validation->getErrors());
                 $this->error['warning'] = "Warning: Please check the form carefully for errors!";
-                $this->session->setFlashdata('message', $this->error['warning']);
+                session()->setFlashdata('message', $this->error['warning']);
                 return false;
             }
         }
+
         return !$this->error;
     }
 }
-
-/* End of file hmvc.php */
-/* Location: ./application/widgets/hmvc/controllers/hmvc.php */
