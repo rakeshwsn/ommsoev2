@@ -18,8 +18,8 @@ trait TreeTrait
      */
     public function getTree(array $filter = []): string
     {
-        $compModel = new ComponentModel();
-        $comps = $compModel->getAll($filter);
+        $componentModel = new ComponentModel();
+        $comps = $componentModel->getAll($filter);
         $tree = $this->buildTree($comps);
 
         return $this->nestedHTMLTree($tree);
@@ -30,8 +30,8 @@ trait TreeTrait
      */
     public function getTreeArray(): array
     {
-        $compModel = new ComponentModel();
-        $comps = $compModel->getAll();
+        $componentModel = new ComponentModel();
+        $comps = $componentModel->getAll();
 
         return $this->treeBuildHelper($comps);
     }
@@ -56,8 +56,8 @@ trait TreeTrait
         $fnBuilder = function ($siblings) use (&$fnBuilder, $grouped, $idCol) {
             foreach ($siblings as $k => $sibling) {
                 $id = $sibling[$idCol];
-                if (isset($grouped[$k])) {
-                    $sibling['children'] = $fnBuilder($grouped[$k]);
+                if (isset($grouped[$id])) {
+                    $sibling['children'] = $fnBuilder($grouped[$id]);
                 }
                 $siblings[$k] = $sibling;
             }
@@ -86,17 +86,20 @@ trait TreeTrait
             if (isset($component['children']) && !empty($component['children'])) {
                 $this->calculateAbstractSum($component['children']);
 
-                $sum = [
-                    'ob_phy' => 0,
-                    'ob_fin' => 0,
-                    'bud_phy' => 0,
-                    'bud_fin' => 0,
-                    'fr_upto_phy' => 0,
-                    'fr_upto_fin' => 0,
-                    'fr_mon_phy' => 0,
-                    'fr_mon_fin' => 0,
-                    'fr_cum_phy' => 0,
-                    'fr_cum_fin' => 0,
-                    'exp_upto_phy' => 0,
-                    'exp_upto_fin' => 0,
-                    'exp_mon_phy' => 
+                $component['ob_phy'] += $component['children'][0]['ob_phy'];
+                $component['ob_fin'] += $component['children'][0]['ob_fin'];
+                $component['bud_phy'] += $component['children'][0]['bud_phy'];
+                $component['bud_fin'] += $component['children'][0]['bud_fin'];
+                $component['fr_upto_phy'] += $component['children'][0]['fr_upto_phy'];
+                $component['fr_upto_fin'] += $component['children'][0]['fr_upto_fin'];
+                $component['fr_mon_phy'] += $component['children'][0]['fr_mon_phy'];
+                $component['fr_mon_fin'] += $component['children'][0]['fr_mon_fin'];
+                $component['fr_cum_phy'] += $component['children'][0]['fr_cum_phy'];
+                $component['fr_cum_fin'] += $component['children'][0]['fr_cum_fin'];
+                $component['exp_upto_phy'] += $component['children'][0]['exp_upto_phy'];
+                $component['exp_upto_fin'] += $component['children'][0]['exp_upto_fin'];
+                $component['exp_mon_phy'] += $component['children'][0]['exp_mon_phy'];
+                $component['exp_mon_fin'] += $component['children'][0]['exp_mon_fin'];
+                $component['exp_cum_phy'] += $component['children'][0]['exp_cum_phy'];
+                $component['exp_cum_fin'] += $component['children'][0]['exp_cum_fin'];
+           
