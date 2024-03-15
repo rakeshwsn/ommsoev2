@@ -22,18 +22,19 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td><?=$summary['year']?></td>
-                    <td><?=$summary['month']?></td>
-                    <td><?=$summary['agency_type']?></td>
-                    <td><?=$summary['ob']?></td>
-                    <td><?=$summary['fr']?></td>
-                    <td><?=$summary['mt']?></td>
-                    <td><?=$summary['exp']?></td>
-                    <td><?=$summary['bal']?></td>
-                    <?php if(isset($approval) && $approval): ?>
-                        <td><button class="btn btn-primary" id="btn-action"><?=$status?></button> </td>
+                    <td><?php echo $summary['year']; ?></td>
+                    <td><?php echo $summary['month']; ?></td>
+                    <td><?php echo $summary['agency_type']; ?></td>
+                    <td><?php echo $summary['ob']; ?></td>
+                    <td><?php echo $summary['fr']; ?></td>
+                    <td><?php echo $summary['mt']; ?></td>
+                    <td><?php echo $summary['exp']; ?></td>
+                    <td><?php echo $summary['bal']; ?></td>
+                    <?php if (isset($approval) && $approval): ?>
+                        <td><button class="btn btn-primary" id="btn-action" type="button" title="<?php echo $status; ?>">
+                                <?php echo $status; ?></button></td>
                     <?php else: ?>
-                        <td><?=$status?></td>
+                        <td><?php echo $status; ?></td>
                     <?php endif; ?>
                 </tr>
                 </tbody>
@@ -57,61 +58,31 @@
                 <tbody>
                 <tr>
                     <td>Advance</td>
-                    <td><input class="form-control amount" value="<?=$advance?>" disabled name="advance"></td>
+                    <td><input class="form-control amount" value="<?php echo $advance; ?>" disabled min="0" step="0.01"
+                              placeholder="0.00" aria-label="Advance amount" tabindex="-1"></td>
                     <td class="dm-uploader">
-                        <?php if($advance_file_url) { ?>
-                            <?=$advance_file_url?>
-                        <?php } ?>
+                        <?php if ($advance_file_url): ?>
+                            <img src="<?php echo $advance_file_url; ?>" alt="Advance attachment">
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <tr>
                     <td>Bank (including bank interest)</td>
-                    <td><input class="form-control amount" name="bank" value="<?=$bank?>" disabled></td>
+                    <td><input class="form-control amount" name="bank" value="<?php echo $bank; ?>" disabled min="0"
+                              step="0.01" placeholder="0.00" aria-label="Bank amount" tabindex="-1"></td>
                     <td>
-                        <?php if($bank_file_url) { ?>
-                            <?=$bank_file_url?>
-                        <?php } ?>
+                        <?php if ($bank_file_url): ?>
+                            <img src="<?php echo $bank_file_url; ?>" alt="Bank attachment">
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <tr>
                     <td>Cash</td>
-                    <td><input class="form-control amount" name="cash" value="<?=$cash?>" disabled></td>
+                    <td><input class="form-control amount" name="cash" value="<?php echo $cash; ?>" disabled min="0"
+                              step="0.01" placeholder="0.00" aria-label="Cash amount" tabindex="-1"></td>
                     <td class="dm-uploader">
-                        <?php if($cash_file_url) { ?>
-                            <?=$cash_file_url?>
-                        <?php } ?>
+                        <?php if ($cash_file_url): ?>
+                            <img src="<?php echo $cash_file_url; ?>" alt="Cash attachment">
+                        <?php endif; ?>
                     </td>
-                </tr>
-                <tr>
-                    <td>Total</td>
-                    <td><input class="form-control" id="total" disabled></td>
-                    <td></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</section>
-<!-- content -->
-
-<?php js_start(); ?>
-<script>
-
-    function calcTotal(){
-        total = 0;
-        $('.amount').each(function (k,v) {
-            val = parseFloat($(this).val()) || 0;
-            total += val
-        })
-        $('#total').val(total.toFixed(2));
-    }
-    $(function () {
-        calcTotal();
-    });
-</script>
-<?php if(isset($approval)) {
-    echo $approve_form;
-} ?>
-
-<?php js_end(); ?>
+                </tr
