@@ -1,21 +1,43 @@
 <?php
-namespace Admin\Reports\Config;
-if(!isset($routes))
+
+namespace App\Config;
+
+use Config\Services;
+
+class Routes
 {
-    $routes = \Config\Services::routes(true);
+    public function __construct()
+    {
+        $this->routes = Services::routes(true);
+    }
+
+    public function defineRoutes()
+    {
+        $this->defineAdminRoutes();
+        $this->defineApiRoutes();
+    }
+
+    protected function defineAdminRoutes()
+    {
+        $this->routes->group(env('app.adminRoute'), [
+            'namespace' => 'Admin\Reports\Controllers',
+        ], function ($routes) {
+            $routes->get('pendingstatus', 'Reports::pendingStatus');
+        });
+    }
+
+    protected function defineApiRoutes()
+    {
+        $this->routes->group('api', [
+            'namespace' => 'Admin\Reports\Controllers\Api',
+        ])->group('', function ($routes) {
+            $routes->get('mpr', 'Mpr::index');
+            $routes->get('mpr/filters', 'Mpr::filters');
+            $routes->get('getBlocks', 'GetBlocks::index');
+            $routes->get('getAreaCoverage', 'GetAreaCoverage::index');
+        })->group('mpr1', function ($routes) {
+            $routes->get('', 'Mpr::mpr3');
+            $routes->get('filters', 'Mpr::mprFilters');
+        });
+    }
 }
-
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin'], function ($routes) {
-    $routes->get('pendingstatus', 'Reports\Controllers\Reports::pendingStatus');
-});
-
-$routes->group('api', ['namespace' => 'Admin'],function($routes){
-    $routes->get('mpr','Reports\Controllers\Api::mpr');
-    $routes->get('mpr/filters','Reports\Controllers\Api::mprFilters');
-    $routes->get('getBlocks','Reports\Controllers\Api::getBlocks');
-    $routes->get('getAreaCoverage','Reports\Controllers\Api::getAreaCoverage');
-
-    $routes->get('mpr1', 'Reports\Controllers\Api::mpr3');
-    $routes->get('mpr1/filter','Reports\Controllers\Api::mprFilters');
-
-});
