@@ -13,7 +13,7 @@ class Images extends BaseConfig
      *
      * @var string
      */
-    public string $defaultHandler = 'gd';
+    public string $defaultHandler = GDHandler::class;
 
     /**
      * The path to the image library.
@@ -26,7 +26,7 @@ class Images extends BaseConfig
     /**
      * The available handler classes.
      *
-     * @var array<string, string>
+     * @var array<class-string, string>
      */
     public array $handlers = [
         GDHandler::class => 'gd',
