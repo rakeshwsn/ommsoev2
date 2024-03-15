@@ -2,57 +2,31 @@
 
 namespace Admin\Permission\Models;
 
+use CodeIgniter\Database\Query;
 use CodeIgniter\Model;
 
 class PermissionModel extends Model
 {
-    protected $DBGroup              = 'default';
-    protected $table                = 'permission';
-    protected $primaryKey           = 'id';
-    protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
-    protected $returnType           = 'object';
-    protected $useSoftDeletes       = false;
-    protected $protectFields        = false;
-    //protected $allowedFields        = [];
+    protected $DBGroup = 'default';
+    protected $table = 'permission';
+    protected $primaryKey = 'id';
+    protected $returnType = 'object';
 
-    // Dates
-    protected $useTimestamps        = false;
-    protected $dateFormat           = 'datetime';
-    protected $createdField         = 'created_at';
-    protected $updatedField         = 'updated_at';
-    protected $deletedField         = 'deleted_at';
-
-    // Validation
-    protected $validationRules      = [
-        'name' => array(
-            'label' => 'Subject',
-            'rules' => 'trim|required|max_length[100]'
-        ),
-
+    protected $allowedFields = [
+        'name',
+        'description',
     ];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
 
-    // Callbacks
-    protected $allowCallbacks       = true;
-    protected $beforeInsert         = [];
-    protected $afterInsert          = [];
-    protected $beforeUpdate         = [];
-    protected $afterUpdate          = [];
-    protected $beforeFind           = [];
-    protected $afterFind            = [];
-    protected $beforeDelete         = [];
-    protected $afterDelete          = [];
+    protected $validationRules = [
+        'name' => 'trim|required|max_length[100]',
+    ];
 
+    public function getAll(array $data = []): array
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
 
-    public function getAll($data = array()){
-        //printr($data);
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
-
-        $builder->select("*");
+        $builder->select('*');
 
         if (isset($data['sort']) && $data['sort']) {
             $sort = $data['sort'];
@@ -75,33 +49,50 @@ class PermissionModel extends Model
             if ($data['limit'] < 1) {
                 $data['limit'] = 10;
             }
-            $builder->limit((int)$data['limit'],(int)$data['start']);
+            $builder->limit((int)$data['limit'], (int)$data['start']);
         }
-        //$builder->where($this->deletedField, null);
 
-        $res = $builder->get()->getResult();
-
-        return $res;
+        try {
+            $query = $builder->get();
+            return $query->getResultArray();
+        } catch (DatabaseException $e) {
+            log_message('error', $e->getMessage());
+            return [];
+        }
     }
 
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
-        $count = $builder->countAllResults();
-        return $count;
+    public function getTotal(array $data = []): int
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
+
+        try {
+            return $builder->countAllResults();
+        } catch (DatabaseException $e) {
+            log_message('error', $e->getMessage());
+            return 0;
+        }
     }
 
-    private function filter($builder,$data){
-
+    private function filter(Query $builder, array $data): void
+    {
         if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
+            $builder->where("name LIKE '%" . $data['filter_search'] . "%'");
         }
     }
 
-    public function get_modules_with_permission($id=null){
-        $query = "Select p1.id,p1.name,p1.description, (case when p2.user_group_id = $id then 'yes' else 'no' end) as active From permission p1 left join user_group_permission p2 ON p1.id = p2.permission_id and p2.user_group_id =$id";
-        return $this->db->query($query)->getResult();
+    public function getModulesWithPermission($id = null): array
+    {
+        $builder = $this->db->table($this->table);
+        $alias = $builder->getAliasedBuilder()->getAlias();
+
+        $subquery = $this->db->table('user_group_permission')
+            ->select('permission_id')
+            ->where('user_group_id', $id);
+
+        return $builder
+            ->select("$alias.id, $alias.name, $alias.description, (CASE WHEN $alias.id IN ($subquery) THEN 'yes' ELSE 'no' END) as active")
+            ->get()
+            ->getResultArray();
     }
 }
