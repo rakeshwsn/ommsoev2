@@ -1,32 +1,30 @@
-<?
+<?php
+
 namespace App\Libraries;
+
 use CodeIgniter\API\ResponseTrait;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class OdkCentralRequest
 {
+    use ResponseTrait;
 
     public $api_url;
-
     private $token;
-
     private $client;
-
-    private $response;
 
     /**
      * Init
-     *
      */
-    public function __construct() {
-
+    public function __construct(RequestInterface $request, ResponseInterface $response)
+    {
         $this->api_url = env('odk.url');
-
         $auth = new OdkCentralAuth();
-
         $this->token = $auth->getAccessToken();
-
         $this->client = \Config\Services::curlrequest();
-
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**
@@ -38,22 +36,7 @@ class OdkCentralRequest
      */
     public function get(string $endpoint, array $params = [], array $headers = [])
     {
-
-        $params['headers']=$headers;
-        //print_r($params);
-        try {
-            $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                            ->get($this->api_url . $endpoint, $params);
-                                        
-           
-        } catch (\Exception $exception) {
-
-            return $exception;
-
-        }
-
-        return $this->response();
-
+        return $this->requestHandler('get', $endpoint, $params, $headers);
     }
 
     /**
@@ -65,26 +48,11 @@ class OdkCentralRequest
      */
     public function getBody(string $endpoint, array $params = [], array $headers = [])
     {
-
-        $params['headers']=$headers;
-        $response='';
-        try {
-
-            $response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                     ->get($this->api_url . $endpoint, $params);
-
-
-        } catch (\Exception $exception) {
-
-            return $exception;
-
-        }
-
-        return $response;
-
+        return $this->requestHandler('get', $endpoint, $params, $headers, true);
     }
 
-    /** POST METHOD
+    /**
+     * POST METHOD
      *
      * @param string $endpoint
      * @param array $params
@@ -93,48 +61,11 @@ class OdkCentralRequest
      */
     public function post(string $endpoint, array $params = [], array $headers = [], $file = null)
     {
-        //print_r($file);
-        $response='';
-        $parameter=[];
-       // $parameter['headers']=$headers;
-        $parameter['http_errors']= false;
-        $parameter['json']=$params;
-        //print_r($parameter);
-        if(!is_null($file)) {
-            
-            try {
-
-                $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                         ->setBody($file)
-                                         ->post($this->api_url . $endpoint);
-                                         
-
-            } catch (\Exception $exception) {
-                
-                return $exception;
-
-            }
-
-        } else {
-            
-            try {
-
-                $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                     ->post($this->api_url . $endpoint, $parameter);
-                //print_r($this->response);
-            } catch (\Exception $exception) {
-                return $exception;
-
-            }
-
-        }
-
-        return $this->response();
-
+        return $this->requestHandler('post', $endpoint, $params, $headers, $file);
     }
 
-
-    /** PATCH METHOD
+    /**
+     * PATCH METHOD
      *
      * @param string $endpoint
      * @param array $params
@@ -142,56 +73,23 @@ class OdkCentralRequest
      */
     public function patch(string $endpoint, array $params = [], array $headers = [])
     {
-        $parameter['http_errors']= false;
-        $parameter['json']=$params;
-        try {
-            $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                    ->patch($this->api_url . $endpoint,$parameter);
-
-        } catch (\Exception $exception) {
-
-            return $exception;
-
-        }
-
-        return $this->response();
-
+        return $this->requestHandler('patch', $endpoint, $params, $headers);
     }
 
-    /** PUT METHOD
+    /**
+     * PUT METHOD
      *
      * @param string $endpoint
      * @param array $params
      * @param array $headers
      */
-    public function put(string $endpoint,  $params, array $headers = [])
+    public function put(string $endpoint, $params, array $headers = [])
     {
-
-        //echo $this->token;
-        $parameter['http_errors']= false;
-        $parameter['headers']= $headers;
-        if(is_array($params)){
-            $parameter['json']=$params;
-        }else{
-            $parameter['body']=$params;
-        }
-        //print_r($parameter);
-        try {
-            $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                            ->setBody($params)
-                                            ->put($this->api_url . $endpoint,$parameter);
-
-        } catch (\Exception $exception) {
-
-            return $exception;
-
-        }
-
-        return $this->response();
-
+        return $this->requestHandler('put', $endpoint, $params, $headers);
     }
 
-    /** DELETE METHOD
+    /**
+     * DELETE METHOD
      *
      * @param string $endpoint
      * @param array $params
@@ -199,24 +97,11 @@ class OdkCentralRequest
      */
     public function delete(string $endpoint, array $params = [], array $headers = [])
     {
-
-        try {
-            $this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                            ->delete($this->api_url . $endpoint,$params);
-
-            
-
-        } catch (\Exception $exception) {
-
-            return $exception;
-
-        }
-
-        return $this->response();
-
+        return $this->requestHandler('delete', $endpoint, $params, $headers);
     }
 
-    /** DOWNLOAD METHOD
+    /**
+     * DOWNLOAD METHOD
      *
      * @param string $endpoint
      * @param array $params
@@ -224,32 +109,55 @@ class OdkCentralRequest
      */
     public function download(string $endpoint, array $params = [], array $headers = [])
     {
-		//$parameter['http_errors']= false;
-        //$parameter['json']=$params;
+        return $this->requestHandler('get', $endpoint, $params, $headers, true, true);
+    }
+
+    /**
+     * Handle all request types
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array $params
+     * @param array $headers
+     * @param bool $raw
+     * @param bool $download
+     */
+    private function requestHandler(
+        string $method,
+        string $endpoint,
+        array $params = [],
+        array $headers = [],
+        bool $raw = false,
+        bool $download = false
+    ) {
         try {
-			$this->response = $this->client->setHeader("Authorization","Bearer ".$this->token)
-                                            ->get($this->api_url . $endpoint,$params);
+            $this->client->setHeader("Authorization", "Bearer " . $this->token);
+            $response = $this->client->{$method}($this->api_url . $endpoint, $params, $headers);
 
+            if ($download) {
+                return $this->response->setStatusCode($response->getStatusCode())
+                    ->setContentType($response->getHeaderLine('Content-Type'))
+                    ->setBody($response->getBody())
+                    ->send();
+            }
 
-           
+            if ($raw) {
+                return $response->getBody();
+            }
+
+            $body = $response->getBody();
+
+            if (empty($body)) {
+                return [];
+            }
+
+            return json_decode($body, true);
 
         } catch (\Exception $exception) {
-
-            return $exception;
-
+            return $this->getResponse(
+                ['status' => 500, 'error' => $exception->getMessage()],
+                false
+            );
         }
-		return $this->response();
-        //return \Response::make($this->response->body(), $this->response->status(), $this->response->headers());
-
     }
-
-    /** Return the formated response
-     *
-     */
-    public function response() {
-        $body= $this->response->getBody();
-		//print_r($body);
-        return json_decode($body,true);
-    }
-
 }
