@@ -12,6 +12,7 @@ use Admin\Transaction\Models\ClosingbalanceModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 use App\Controllers\AdminController;
+use CodeIgniter\HTTP\URI;
 
 class ClosingBalance extends AdminController
 {
@@ -39,28 +40,27 @@ class ClosingBalance extends AdminController
             'user_id' => $this->user->user_id,
         ];
 
-        if ($this->user->agency_type_id === $this->settings->block_user || $this->user->agency_type_id === $this->settings->cbo_user) {
-            $filter['block_id'] = $this->user->block_id;
-        }
-
-        if ($this->user->agency_type_id === $this->settings->district_user) {
-            $filter['district_id'] = $this->user->district_id;
-        }
+        $this->applyUserFilter($filter);
 
         $data['months'] =  $this->cbModel->getLedgerReport($filter);
 
-        foreach ($data['months'] as &$month) {
-            $month->status = $this->setStatusLabel($month->status);
-            $month->edit_url = $this->setEditUrl($month);
-        }
+        $this->addStatusAndUrlToMonths($data['months']);
 
         $data['year_id'] = $yearId;
         $data['agency_type_id'] = $agencyTypeId;
-        $data['fund_agencies'] = $this->setFundAgencies($fundAgencyId);
-        $data['agency_types'] = $this->setAgencyTypes();
+        $data['fund_agencies'] = $this->getFundAgencies($fundAgencyId);
+        $data['agency_types'] = $this->getAgencyTypes();
         $data['message'] = $this->session->getFlashdata('message');
 
         return $this->template->view('Admin\Transaction\Views\closingbalance', $data);
+    }
+
+    private function addStatusAndUrlToMonths(array &$months): void
+    {
+        foreach ($months as &$month) {
+            $month->status = $this->setStatusLabel($month->status);
+            $month->edit_url = $this->setEditUrl($month);
+        }
     }
 
     private function setStatusLabel(?int $status): string
@@ -81,11 +81,13 @@ class ClosingBalance extends AdminController
 
     private function setEditUrl(array $month): string
     {
-        return Url::closingBalanceEdit
-            . '/' . $month['year_id']
-            . '/' . $month['month_id']
-            . '/' . $month['agency_type_id']
-            . '/' . $month['fund_agency_id'];
+        return (new URI($this->request))
+            ->setPath(Url::closingBalanceEdit)
+            ->setSegment(4, $month['year_id'])
+            ->setSegment(5, $month['month_id'])
+            ->setSegment(6, $month['agency_type_id'])
+            ->setSegment(7, $month['fund_agency_id'])
+            ->getURL();
     }
 
     private function checkPermission(): void
@@ -98,14 +100,25 @@ class ClosingBalance extends AdminController
         }
     }
 
-    private function setFundAgencies(?int $fundAgencyId): array
+    private function applyUserFilter(array &$filter): void
+    {
+        if (in_array($this->user->agency_type_id, [$this->settings->block_user, $this->settings->cbo_user])) {
+            $filter['block_id'] = $this->user->block_id;
+        }
+
+        if ($this->user->agency_type_id === $this->settings->district_user) {
+            $filter['district_id'] = $this->user->district_id;
+        }
+    }
+
+    private function getFundAgencies(?int $fundAgencyId): array
     {
         $blockModel = new BlockModel();
 
+        $filter = [];
+
         if ($this->user->agency_type_id === $this->settings->block_user || $this->user->agency_type_id === $this->settings->cbo_user) {
-            $filter = ['block_id' => $this->user->block_id];
-        } else {
-            $filter = [];
+            $filter['block_id'] = $this->user->block_id;
         }
 
         if ($this->user->district_id) {
@@ -117,7 +130,7 @@ class ClosingBalance extends AdminController
         return array_combine(array_column($fundAgencies, 'fund_agency_id'), array_column($fundAgencies, 'name'));
     }
 
-    private function setAgencyTypes(): array
+    private function getAgencyTypes(): array
     {
         if ($this->user->agency_type_id === $this->settings->block_user) {
             $agencyTypes = (new UserGroupModel())->getBlockUsers();
@@ -133,4 +146,8 @@ class ClosingBalance extends AdminController
         int $month,
         int $agencyTypeId,
         int $fundAgencyId
-    ):
+    ): void
+    {
+        // Add your info action code here
+    }
+}
