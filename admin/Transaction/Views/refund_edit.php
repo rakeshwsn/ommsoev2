@@ -56,7 +56,7 @@
             <h3 class="block-title">Transaction Details</h3>
         </div>
         <div class="block-content block-content-full">
-            <?php if($show_form) { echo form_open();} ?>
+            <?php if($show_form) { echo form_open('controller/method');} ?>
             <div class="tableFixHead">
                 <table class="table custom-table " id="txn-table">
                     <thead>
@@ -81,7 +81,7 @@
             <?php if($show_form): ?>
             <div class="row">
                 <div class="col mt-4">
-                    <button type="submit" class="btn btn-alt-primary float-right">Submit</button>
+                    <button type="submit" class="btn btn-alt-primary float-right" id="submit-btn">Submit</button>
                 </div>
             </div>
                 <?php echo form_close(); ?>
@@ -100,89 +100,9 @@
             parent_id = $(ctx).closest('tr').data('parent');
 
             //grand total
-            gt_mon_phy = 0;
-            gt_cum_phy = 0;
+            grandTotalMonPhy = 0;
+            grandTotalCumPhy = 0;
             $('.mon_phy').each(function () {
-                mon_phy = parseInt($(this).find('input').val()) || 0;
-                gt_mon_phy += mon_phy;
+                monPhy = parseInt($(this).find('input').val(), 10) || 0;
+                grandTotalMonPhy += monPhy;
 
-                upto_phy = parseInt($(this).closest('tr').find('.upto_phy').text()) || 0;
-                gt_cum_phy += (upto_phy+mon_phy)
-            });
-            $('#gt_mon_phy').text(gt_mon_phy);
-            $('#gt_cum_phy').text(gt_cum_phy);
-
-            //sub total
-            sub_mon_phy = 0;
-            sub_cum_phy = 0;
-            $('tr[data-parent="'+parent_id+'"]').each(function () {
-                mon_phy = parseInt($(this).find('.mon_phy').find('input').val()) || 0;
-                sub_mon_phy += mon_phy;
-
-                upto_phy = parseInt($(this).closest('tr').find('.upto_phy').text()) || 0;
-                sub_cum_phy += (upto_phy+mon_phy);
-            });
-            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_mon_phy').text(sub_mon_phy);
-            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_cum_phy').text(sub_cum_phy);
-
-            //update cum_phy of the row
-            upto_phy = parseInt($(parent).find('.upto_phy').text()) || 0;
-            mon_phy = parseInt($(this).find('input').val()) || 0;
-            cum_phy = upto_phy+mon_phy;
-
-            $(parent).find('.cum_phy').text(cum_phy);
-        });
-
-        $('.mon_fin').keyup(function (e) {
-            var ctx = $(this);
-            parent = $(ctx).closest('tr');
-            parent_id = $(ctx).closest('tr').data('parent');
-
-            //grand total
-            gt_mon_fin = 0;
-            gt_cum_fin = 0;
-            $('.mon_fin').each(function () {
-                mon_fin = parseFloat($(this).find('input').val()) || 0;
-                gt_mon_fin += mon_fin;
-
-                upto_fin = parseFloat($(this).closest('tr').find('.upto_fin').text()) || 0;
-                gt_cum_fin += upto_fin+mon_fin
-            });
-            $('#gt_mon_fin').text(gt_mon_fin);
-            $('#gt_cum_fin').text(gt_cum_fin);
-
-            //sub total
-            sub_mon_fin = 0;
-            sub_cum_fin = 0;
-            $('tr[data-parent="'+parent_id+'"]').each(function () {
-                mon_fin = parseFloat($(this).find('.mon_fin').find('input').val()) || 0;
-                sub_mon_fin += mon_fin;
-
-                upto_fin = parseFloat($(this).closest('tr').find('.upto_fin').text()) || 0;
-                sub_cum_fin += upto_fin+mon_fin;
-            });
-            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_mon_fin').text(sub_mon_fin);
-            $('tr[data-parent="'+parent_id+'"].subtotal').find('.sub_cum_fin').text(sub_cum_fin);
-
-            //update cum_fin of the row
-            upto_fin = parseFloat($(parent).find('.upto_fin').text()) || 0;
-            mon_fin = parseFloat($(this).find('input').val()) || 0;
-            cum_fin = upto_fin+mon_fin;
-
-            $(parent).find('.cum_fin').text(cum_fin);
-        });
-
-        var $th = $('.tableFixHead').find('thead th')
-        $('.tableFixHead').on('scroll', function() {
-            $th.css('transform', 'translateY('+ this.scrollTop +'px)');
-        });
-
-    });
-
-</script>
-
-<?php if(isset($approval)) {
-    echo $approve_form;
-} ?>
-
-<?php js_end(); ?>
