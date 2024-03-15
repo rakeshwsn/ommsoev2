@@ -4,19 +4,14 @@
 		<h3>Our Works</h3>
 	</div>
 	<?php if (is_array($sliders)) : ?>
-		<div class="grid grid-four-col kc_image_gallery" id="kehl-grid">
+		<div class="grid grid-four-col kc_image_gallery" id="kehl-grid" role="grid" aria-label="Slider gallery">
 			<div class="grid-sizer">&nbsp;</div>
 			<?php foreach ($sliders as $slider) : ?>
 				<?php if (isset($slider['image'])) : ?>
 					<div class="grid-box fruits">
-						<a class="image-popup-vertical-fit kc-image-link" href="<?= $slider['image'] ?>">
-							<img alt="Slider Image" src="<?= $slider['image'] ?>" height="200" width="300" /> 
-						</a>
-					</div>
-				<?php endif; ?>
-			<?php endforeach; ?>
-		</div>
-	<?php else : ?>
-		<p>No sliders found.</p>
-	<?php endif; ?>
-</div>
+						<figure>
+							<a class="image-popup-vertical-fit kc-image-link" href="<?= htmlspecialchars($slider['image']) ?>">
+								<img src="<?= htmlspecialchars($slider['image']) ?>" alt="<?= htmlspecialchars(isset($slider['title']) ? $slider['title'] : 'Slider image') ?>" height="200" width="300" />
+								<?php if (isset($slider['title'])) : ?>
+									<figcaption><?= htmlspecialchars($slider['title']) ?></figcaption>
+					
