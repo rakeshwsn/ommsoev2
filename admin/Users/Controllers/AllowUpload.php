@@ -1,103 +1,136 @@
 <?php
+
 namespace Admin\Users\Controllers;
+
 use Admin\Common\Models\AllowuploadModel;
 use Admin\Localisation\Models\DistrictModel;
 use Admin\Users\Models\UserGroupModel;
 use Admin\Users\Models\UserModel;
 use App\Controllers\AdminController;
+use Config\Services;
 use Config\Url;
 
-class AllowUpload extends AdminController{
-	private $error = array();
+class AllowUpload extends AdminController
+{
+    /**
+     * @var AllowuploadModel
+     */
+    private $allowuploadModel;
 
-	public function index(){
+    /**
+     * @var DistrictModel
+     */
+    private $districtModel;
 
-	    //datepicker
-        $this->template->add_package(['datepicker'],true);
+    /**
+     * @var UserGroupModel
+     */
+    private $userGroupModel;
 
-	    $year = getCurrentYearId();
-	    $month = getCurrentMonthId();
+    /**
+     * @var UserModel
+     */
+    private $userModel;
 
-	    if($this->request->getGet('year')){
-	        $year = $this->request->getGet('year');
-        }
-	    if($this->request->getGet('month')){
-	        $month = $this->request->getGet('month');
-        }
-        $district_id = '';
-	    if($this->request->getGet('district_id')){
-	        $district_id = $this->request->getGet('district_id');
-        }
-        $agency_type_id = '';
-	    if($this->request->getGet('agency_type_id')){
-	        $agency_type_id = $this->request->getGet('agency_type_id');
-        }
+    /**
+     * @var array
+     */
+    private $error = [];
 
-        $data['districts'] = (new DistrictModel())->asArray()->findAll();
+    /**
+     * AllowUpload constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->allowuploadModel = new AllowuploadModel();
+        $this->districtModel = new DistrictModel();
+        $this->userGroupModel = new UserGroupModel();
+        $this->userModel = new UserModel();
+    }
 
-        $data['agency_types'] = (new UserGroupModel())->whereIn('id', [5,7,8, 9])
-            ->orderBy('name')->asArray()->findAll();
+    /**
+     * Display the allow upload page
+     */
+    public function index(): string
+    {
+        //datepicker
+        $this->template->addPackage(['datepicker'], true);
 
+        $year = getCurrentYearId();
+        $month = getCurrentMonthId();
+        $districtId = $this->request->getGet('district_id');
+        $agencyTypeId = $this->request->getGet('agency_type_id');
+
+        $data['districts'] = $this->districtModel->findAll();
+        $data['agency_types'] = $this->userGroupModel
+            ->whereIn('id', [5, 7, 8, 9])
+            ->orderBy('name')
+            ->findAll();
         $data['users'] = [];
 
-	    if($month && ($district_id || $agency_type_id)){
-            $userModel = new UserModel();
-	        $filter = [
-	            'year' => $year,
-	            'month' => $month,
-	            'district_id' => $district_id,
-	            'agency_type_id' => $agency_type_id,
+        if ($month && ($districtId || $agencyTypeId)) {
+            $filter = [
+                'year' => $year,
+                'month' => $month,
+                'district_id' => $districtId,
+                'agency_type_id' => $agencyTypeId,
             ];
-            $users = $userModel->getUserUploadMonths($filter);
+            $users = $this->userModel->getUserUploadMonths($filter);
 
-            foreach($users as $user){
+            foreach ($users as $user) {
                 $data['users'][] = [
                     'upload_id' => $user->upload_id,
                     'district' => $user->district,
                     'block' => $user->block,
                     'user_id' => $user->user_id,
                     'firstname' => $user->firstname,
-                    'from_date' => ymdToDmy($user->from_date),
-                    'to_date' => ymdToDmy($user->to_date),
-                    'extended_date' => $user->extended_date ? ymdToDmy($user->extended_date):'',
+                    'from_date' => $user->from_date->format('d/m/Y'),
+                    'to_date' => $user->to_date->format('d/m/Y'),
+                    'extended_date' => $user->extended_date ? $user->extended_date->format('d/m/Y') : '',
                 ];
             }
         }
 
         $data['year_id'] = $year;
         $data['month_id'] = $month;
-        $data['district_id'] = $district_id;
-        $data['agency_type_id'] = $agency_type_id;
+        $data['district_id'] = $districtId;
+        $data['agency_type_id'] = $agencyTypeId;
         $data['allow_upload_url'] = Url::userAllowUpload;
 
-        return $this->template->view('Admin\Users\Views\allow_upload',$data);
+        return $this->template->view('Admin\Users\Views\allow_upload', $data);
+    }
 
-	}
-
-    public function update() {
-        $user_id = $this->request->getPost('user_id');
-        $upload_id = $this->request->getPost('upload_id');
-        $to_date = $this->request->getPost('to_date');
-
-        $allowuploadModel = new AllowuploadModel();
-
-        $id = $allowuploadModel->extendDate([
-            'user_id' => $user_id,
-            'upload_id' => $upload_id,
-            'to_date' => dmyToYmd($to_date),
+    /**
+     * Update the allow upload date
+     *
+     * @param int $userId
+     * @param int $uploadId
+     * @param string $toDate
+     * @return \CodeIgniter\HTTP\Response
+     */
+    public function update(int $userId, int $uploadId, string $toDate): \CodeIgniter\HTTP\Response
+    {
+        $validation = Services::validation();
+        $validation->setRules([
+            'user_id' => 'required|integer',
+            'upload_id' => 'required|integer',
+            'to_date' => 'required|date',
         ]);
 
-        if($id){
-            $json_data = [
-                'status' => true
-            ];
-        } else {
-            $json_data = [
-                'status' => false
-            ];
+        if (!$validation->withRequest($this->request)->run()) {
+            return Services::response()->setJSON([
+                'status' => false,
+                'errors' => $validation->getErrors(),
+            ])->setStatusCode(400);
         }
-        return $this->response->setJSON($json_data);
 
-	}
+        $id = $this->allowuploadModel->extendDate([
+            'user_id' => $userId,
+            'upload_id' => $uploadId,
+            'to_date' => dmyToYmd($toDate),
+        ]);
 
-}
+        if ($id) {
+            return Services::response()->setJSON([
+                'status'
