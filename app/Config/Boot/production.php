@@ -2,13 +2,23 @@
 
 /*
  |--------------------------------------------------------------------------
- | ERROR DISPLAY
+ | ERROR REPORTING
  |--------------------------------------------------------------------------
- | Don't show ANY in production environments. Instead, let the system catch
- | it and display a generic error message.
+ | Report all errors except E_NOTICE and E_STRICT in development environment
+ | and display no errors in production environment.
  */
-ini_set('display_errors', '0');
-error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+$environment = (php_sapi_name() === 'cli') ? env('APP_ENV') : 'production';
+switch ($environment) {
+    case 'development':
+        error_reporting(-1);
+        ini_set('display_errors', 1);
+        break;
+    case 'production':
+    default:
+        ini_set('display_errors', 0);
+        error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED);
+        break;
+}
 
 /*
  |--------------------------------------------------------------------------
@@ -18,4 +28,4 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE &
  | the system. It's not widely used currently, and may not survive
  | release of the framework.
  */
-defined('CI_DEBUG') || define('CI_DEBUG', false);
+defined('CI_DEBUG') || define('CI_DEBUG', $environment === 'development');
