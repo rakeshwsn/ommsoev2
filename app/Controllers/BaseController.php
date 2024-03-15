@@ -5,7 +5,10 @@ namespace App\Controllers;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Psr\Log\LoggerInterface;
+use CodeIgniter\HTTP\URI;
+use CodeIgniter\Log\LoggerInterface;
+use Config\Services;
+use Config\Settings;
 
 /**
  * Class BaseController
@@ -17,19 +20,26 @@ use Psr\Log\LoggerInterface;
  *
  * For security be sure to declare any new methods as protected or private.
  */
-
 class BaseController extends Controller
 {
-	/**
-	 * An array of helpers to be loaded automatically upon
-	 * class instantiation. These helpers will be available
-	 * to all other controllers that extend BaseController.
-	 *
-	 * @var array
-	 */
-	protected $helpers = ['aio','form','shortcode','function','number'];
-    public $statuses = ['Not Approved','Approved','Rejected','Not Uploaded','Not Required'];
-    public $colors = [
+    /**
+     * An array of helpers to be loaded automatically upon
+     * class instantiation. These helpers will be available
+     * to all other controllers that extend BaseController.
+     *
+     * @var array
+     */
+    protected array $helpers = ['aio', 'form', 'shortcode', 'function', 'number'];
+
+    public array $statuses = [
+        'Not Approved',
+        'Approved',
+        'Rejected',
+        'Not Uploaded',
+        'Not Required',
+    ];
+
+    public array $colors = [
         'warning',
         'success',
         'secondary',
@@ -37,67 +47,47 @@ class BaseController extends Controller
         'primary',
     ];
 
-	protected $template;
-	protected $settings;
+    protected \CodeIgniter\Template\Template $template;
 
-	protected $user;
-	
-	protected $session;
+    protected Settings $settings;
 
-	protected $db;
+    protected \App\Models\UserModel $user;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param RequestInterface  $request
-	 * @param ResponseInterface $response
-	 * @param LoggerInterface   $logger
-	 */
-	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
-	{
-		// Do Not Edit This Line
-		parent::initController($request, $response, $logger);
+    protected \CodeIgniter\Session\Session $session;
 
-        $this->settings = new \Config\Settings();
+    protected URI $uri;
 
-		$this->template = service('template');
-		$this->template->set('home',false);
-        $this->user = service('user');
-		$this->session = service('session');
-		$this->uri = service('uri');
-		//dd($this->template);
-		$this->template->set_theme('default');
+    /**
+     * Constructor.
+     *
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @param LoggerInterface   $logger
+     */
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        // Do Not Edit This Line
+        parent::initController($request, $response, $logger);
 
-		
-		//--------------------------------------------------------------------
-		// Preload any models, libraries, etc, here.
-		//--------------------------------------------------------------------
-		// E.g.: $this->session = \Config\Services::session();
-	}
+        $this->settings = new Settings();
 
-	public function _remap($method, ...$params)
-   	{
-		$router = service('router');
-		
-		//$controller_full_name = explode('\\', $router->controllerName());
-        //$view_folder = strtolower($this->directory . '/' . end($controller_full_name));
-        //Checks if it's a 404 or not
+        $this->template = new \CodeIgniter\Template\Template();
+        $this->template->set('home', false);
+        $this->user = new \App\Models\UserModel();
+        $this->session = Services::session();
+        $this->uri = Services::uri();
+
+        $this->template->setTheme('default');
+    }
+
+    public function _remap($method, ...$params)
+    {
+        $router = Services::router();
+
         if (method_exists($this, $method)) {
-			return $this->$method(...$params);
-			//return call_user_func_array(array($this, $method), $params);
+            return $this->$method(...$params);
         } else {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
-		
-		/*if($this->user->checkLogin()){
-			return Modules::run("common/login/index",$params);		
-		}else if(!$this->user->checkPermission()){
-			return modules::run("common/errors/index",$params);		
-		}else if (method_exists($this, $method)){
-			return call_user_func_array(array($this, $method), $params);
-		}else{
-			return modules::run("common/errors/index",$params);
-		}*/
-		//show_404();
     }
 }
