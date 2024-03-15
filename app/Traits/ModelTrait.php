@@ -2,22 +2,40 @@
 
 namespace App\Traits;
 
-
+use PDO;
 use Config\Database;
 
 trait ModelTrait
 {
-    private $_db;
+    /**
+     * @var PDO
+     */
+    private $ _db;
 
-    public function init()
+    /**
+     * @var \Config\Settings
+     */
+    private $settings;
+
+    /**
+     * ModelTrait constructor.
+     * @param Database $db
+     */
+    public function __construct(Database $db)
     {
-        $this->_db = db_connect();
-        $this->settings =  new \Config\Settings();
-        return $this;
+        $this->_db = $db->connect();
+        if (!$this->_db) {
+            throw new \RuntimeException('Database connection failed');
+        }
+        $this->settings = new \Config\Settings();
     }
 
-    public function getFieldNames()
+    /**
+     * @return array
+     */
+    public function getFieldNames(): array
     {
-        return $this->_db->getFieldNames($this->table);
+        $fieldNames = $this->_db->getFieldNames($this->table);
+        return array_values($fieldNames);
     }
 }
