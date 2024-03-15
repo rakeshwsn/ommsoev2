@@ -15,20 +15,14 @@ class Menu
         $this->user = service('user');
     }
 
-    public function nav_menu(array $data): string
+    public function navMenu(array $data): string
     {
-        $menu_model = new MenuModel();
-        $menu = $menu_model->getMenus($data);
+        $menuModel = new MenuModel();
+        $menu = $menuModel->getMenus($data);
 
-        if ($data['theme_location'] === "admin") {
-            $menus = $this->getNestedMenus($menu, 'admin');
-            $nav = $this->create_admin_nav($menus, $data);
-        } else {
-            $menus = $this->getNestedMenus($menu);
-            $nav = $this->create_nav($menus, $data);
-        }
+        $menus = $this->getNestedMenus($menu, $data['theme_location']);
 
-        return $nav;
+        return $this->createNav($menus, $data);
     }
 
     private function getNestedMenus(array $elements, string $parentId = '0', string $type = 'frontend'): array
@@ -37,19 +31,28 @@ class Menu
         $sessionPermission = ($type === 'admin') ? $this->user->getPermissions() : [];
 
         foreach ($elements as $element) {
-            if (
-                ($element->url === '#' || ($type === 'admin' && isset($sessionPermission[$element->url]) && $sessionPermission[$element->url] !== "no"))
-                && (string)$element->parent_id === (string)$parentId
-            ) {
-                $sub = $this->getNestedMenus($elements, $element->id, $type);
-                if ($sub) {
-                    $element->sub = $sub;
+            $canAccess = ($element->url === '#' || ($type === 'admin' && isset($sessionPermission[$element->url]) && $sessionPermission[$element->url] !== "no"));
+
+            if ($canAccess && (string)$element->parent_id === (string)$parentId) {
+                $subMenus = $this->getNestedMenus($elements, $element->id, $type);
+
+                if (!empty($subMenus)) {
+                    $element->sub = $subMenus;
                 }
+
                 $tree[] = $element;
             }
         }
 
         return $tree;
+    }
+
+    private function createNav(array $menus, array $data): string
+    {
+        // Implement the creation of the navigation menu here
+        // ...
+
+        return $nav;
     }
 
     // ... rest of the code
