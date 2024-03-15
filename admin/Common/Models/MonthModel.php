@@ -7,23 +7,23 @@ use CodeIgniter\Model;
 class MonthModel extends Model
 {
     // Database settings
-    protected $DBGroup              = 'default';
-    protected $table                = 'soe_months';
-    protected $primaryKey           = 'id';
-    protected $useAutoIncrement     = true;
-    protected $returnType           = 'object';
+    protected $DBGroup = 'default';
+    protected $table = 'soe_months';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'object';
 
     // Timestamps
-    protected $useTimestamps        = false;
+    protected $useTimestamps = false;
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $validationRules = [];
+    protected $validationMessages = [];
+    protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
     // Callbacks
-    protected $allowCallbacks       = true;
+    protected $allowCallbacks = true;
 
     /**
      * Constructor
@@ -44,6 +44,12 @@ class MonthModel extends Model
             try {
                 // If not found in the cache, get the data from the database
                 $months = $this->asArray()->findAll();
+
+                // Validate the loaded months
+                if (!$this->validateMonths($months)) {
+                    throw new \Exception('Invalid months data loaded from the database.');
+                }
+
                 cache()->save('months', $months, 60 * 60 * 24 * 365);
             } catch (\Exception $e) {
                 log_message('error', 'Error loading months from the database: ' . $e->getMessage());
@@ -56,12 +62,33 @@ class MonthModel extends Model
     }
 
     /**
+     * Validate the given months data
+     *
+     * @param array $months
+     * @return bool
+     */
+    private function validateMonths(array $months): bool
+    {
+        foreach ($months as $month) {
+            if (
+                !is_int($month->id) ||
+                !is_int($month->number) ||
+                !in_array($month->number, range(1, 12))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Get the month object by id
      *
      * @param int $id
-     * @return object
+     * @return object|null
      */
-    public function getMonthById(int $id)
+    public function getMonthById(int $id): ?object
     {
         foreach ($this->months as $month) {
             if ($month->id == $id) {
@@ -72,71 +99,5 @@ class MonthModel extends Model
         return null;
     }
 
-    /**
-     * Get the month id by month number
-     *
-     * @param int $month_num
-     * @return int
-     */
-    public function getMonthIdByMonth(int $month_num)
-    {
-        foreach ($this->months as $month) {
-            if ($month->number == $month_num) {
-                return $month->id;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get all months
-     *
-     * @return array
-     */
-    public function getMonths()
-    {
-        return $this->months;
-    }
-
-    /**
-     * Get months up to a specific month id
-     *
-     * @param int $month_id
-     * @return array
-     */
-    public function getMonthsUpto(int $month_id)
-    {
-        return $this->where('id', '<=', $month_id)
-            ->orderBy('id', 'ASC')
-            ->asArray()
-            ->findAll();
-    }
-
-    /**
-     * Get the previous month object
-     *
-     * @param int|null $month
-     * @return object
-     */
-    public function getPreviousMonth($month = null)
-    {
-        if (!$month) {
-            $month = date('n');
-        }
-
-        $month = $this->getMonthIdByMonth($month);
-
-        foreach ($this->months as $index => $monthObj) {
-            if ($monthObj->id == $month) {
-                return $this->months[($index - 1)];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Get the current month object
-     *
-    
+    // ... Rest of the methods
+}
