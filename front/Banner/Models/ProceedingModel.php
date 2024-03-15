@@ -6,39 +6,48 @@ use CodeIgniter\Model;
 
 class ApiModel extends Model
 {
-    protected $DBGroup              = 'default'; // Specify the database group
-    protected $table                = 'apis';
-    protected $primaryKey           = 'id';
-    protected $useAutoIncrement     = true;
-    protected $returnType           = 'array';
-    protected $useSoftDeletes       = false;
-    protected $protectFields        = true;
-    protected $allowedFields        = [];
+    // Connection settings
+    protected $DBGroup = 'default';
+    protected $table = 'apis';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'array';
 
-    // Dates
-    protected $useTimestamps        = false;
-    protected $dateFormat           = 'datetime';
-    protected $createdField         = 'created_at';
-    protected $updatedField         = 'updated_at';
-    protected $deletedField         = 'deleted_at';
+    // Soft deletes
+    protected $useSoftDeletes = false;
+    protected $protectFields = true;
+
+    // Timestamps
+    protected $useTimestamps = false;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $validationRules = [];
+    protected $validationMessages = [];
+    protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
     // Callbacks
-    protected $allowCallbacks       = true;
-    protected $beforeInsert         = [];
-    protected $afterInsert          = [];
-    protected $beforeUpdate         = [];
-    protected $afterUpdate          = [];
-    protected $beforeFind           = [];
-    protected $afterFind            = [];
-    protected $beforeDelete         = [];
-    protected $afterDelete          = [];
+    protected $allowCallbacks = true;
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
 
+    /**
+     * Get XForm data by form ID
+     *
+     * @param int $form_id The form ID
+     *
+     * @return array The XForm data
+     */
     public function getXform($form_id)
     {
         // Use the query builder to prevent SQL injection attacks
