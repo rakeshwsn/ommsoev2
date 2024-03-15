@@ -14,18 +14,31 @@ class ConfigModel extends Model
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['key', 'value'];
 
     // Dates
-    protected $useTimestamps = false;
+    protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+        'key' => 'required|alpha_dash|min_length[3]|max_length[50]',
+        'value' => 'required'
+    ];
+    protected $validationMessages   = [
+        'key' => [
+            'required' => 'The configuration key is required.',
+            'alpha_dash' => 'The configuration key may only contain letters, numbers, and dashes.',
+            'min_length' => 'The configuration key must be at least 3 characters long.',
+            'max_length' => 'The configuration key must not exceed 50 characters.'
+        ],
+        'value' => [
+            'required' => 'The configuration value is required.'
+        ]
+    ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -40,3 +53,4 @@ class ConfigModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 }
+
