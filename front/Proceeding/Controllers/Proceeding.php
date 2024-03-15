@@ -1,4 +1,5 @@
 <?php
+
 namespace Front\Proceeding\Controllers;
 
 use Admin\Proceeding\Models\ProceedingModel;
@@ -8,43 +9,40 @@ class Proceeding extends BaseController
 {
     private $proceedingModel;
 
-    function __construct()
+    public function __construct()
     {
         $this->proceedingModel = new ProceedingModel();
     }
 
     public function index()
     {
-        $this->template->set_meta_title(lang('Proceeding.heading_title'));
+        $this->template->setMetaTitle(lang('Proceeding.heading_title'));
         return $this->getList();
     }
 
     protected function getList($template = true)
     {
-        $this->template->add_package(array('datatable', 'particle'), true);
+        $this->template->addPackage(['datatable', 'particle'], true);
 
-        $data['datatable_url'] = base_url('proceeding/search');
-
-        $data['heading_title'] = lang('Proceeding.heading_title');
-
-        $data['text_list'] = lang('Proceeding.text_list');
-        $data['text_no_results'] = lang('Proceeding.text_no_results');
-        $data['text_confirm'] = lang('Proceeding.text_confirm');
-
-        $data['button_add'] = lang('Proceeding.button_add');
-        $data['button_edit'] = lang('Proceeding.button_edit');
-        $data['button_delete'] = lang('Proceeding.button_delete');
+        $data = [
+            'datatable_url' => base_url('proceeding/search'),
+            'heading_title' => lang('Proceeding.heading_title'),
+            'text_list' => lang('Proceeding.text_list'),
+            'text_no_results' => lang('Proceeding.text_no_results'),
+            'text_confirm' => lang('Proceeding.text_confirm'),
+            'button_add' => lang('Proceeding.button_add'),
+            'button_edit' => lang('Proceeding.button_edit'),
+            'button_delete' => lang('Proceeding.button_delete'),
+        ];
 
         $selected = $this->request->getPost('selected');
         if ($selected) {
             $data['selected'] = (array)$selected;
         } else {
-            $data['selected'] = array();
+            $data['selected'] = [];
         }
 
-        $this->template->set('header', true);
-        $data['heading_title'] = "Proceeding";
-        $data['meta_title'] = "Proceeding";
+        $this->template->setHeaderData($data);
 
         if (!$template) {
             return $this->template->view('Front\Proceeding\Views\proceeding', $data, true);
@@ -55,18 +53,18 @@ class Proceeding extends BaseController
 
     public function search()
     {
-        $requestData = $_REQUEST;
+        $requestData = $this->request->getGet();
 
         $totalData = $this->proceedingModel->getTotal();
         $totalFiltered = $totalData;
 
-        $filter_data = array(
-            'filter_search' => filter_input(INPUT_REQUEST, 'search[value]'),
-            'order' => filter_input(INPUT_REQUEST, 'order[0][dir]'),
-            'sort' => filter_input(INPUT_REQUEST, 'order[0][column]'),
-            'start' => filter_input(INPUT_REQUEST, 'start'),
-            'limit' => filter_input(INPUT_REQUEST, 'length')
-        );
+        $filter_data = [
+            'filter_search' => $requestData['search']['value'],
+            'order' => $requestData['order'][0]['dir'],
+            'sort' => $requestData['order'][0]['column'],
+            'start' => $requestData['start'],
+            'limit' => $requestData['length'],
+        ];
 
         $totalFiltered = $this->proceedingModel->getTotal($filter_data);
 
@@ -85,7 +83,7 @@ class Proceeding extends BaseController
             'xlsx' => 'excel-download-icon.png',
         ];
 
-        $datatable = array();
+        $datatable = [];
         foreach ($filteredData as $result) {
             $action = '<div class="btn-group btn-group-sm pull-right">';
             $action .= '<a class="btn btn-sm btn-primary" href="' . admin_url('proceeding/edit/' . $result->id) . '"><i class="fa fa-pencil"></i></a>';
@@ -96,4 +94,25 @@ class Proceeding extends BaseController
             $link = '';
             if ($attachment) {
                 $ext = pathinfo($attachment, PATHINFO_EXTENSION);
-                $link = '<a href="' . base_url('uploads/' . $attachment) . '" data-title="Download"><img src="' . base_url('uploads/images/icons/' . $icons[$ext]) . '" width="3
+                $link = '<a href="' . base_url('uploads/' . $attachment) . '" data-title="Download"><img src="' . base_url('uploads/images/icons/' . $icons[$ext]) . '" width="30" height="30" /></a>';
+            }
+
+            $datatable[] = [
+                'id' => $result->id,
+                'name' => $result->name,
+                'description' => $result->description,
+                'attachment' => $link,
+                'action' => $action,
+            ];
+        }
+
+        $response = [
+            'draw' => $requestData['draw'],
+            'recordsTotal' => $totalData,
+            'recordsFiltered' => $totalFiltered,
+            'data' => $datatable,
+        ];
+
+        return $this->response->setJSON($response);
+    }
+}
