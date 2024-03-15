@@ -1,80 +1,42 @@
-<form method="post" id="allotment-form" onsubmit="return false;">
+<form method="post" id="allotment-form" novalidate onsubmit="return false;">
+    <!-- Submit Date -->
     <div class="form-group row">
-        <label class="col-12" for="all-date">Submit Date</label>
+        <label class="col-12 col-form-label" for="sub-date">Submit Date</label>
         <div class="col-lg-12">
             <div class="input-group">
                 <input type="text" class="form-control js-datepicker"
                        id="sub-date"
                        name="date_submit"
-                       placeholder="Date" autocomplete="false"
+                       required autofocus
+                       placeholder="Date" autocomplete="off"
                        data-today-highlight="true" data-date-format="dd/mm/yyyy"
                        value="<?=$date_submit?>"
+                       title="Enter the date of submission in the format dd/mm/yyyy"
+                       aria-label="Submit Date"
+                       aria-describedby="sub-date-status"
+                       minlength="10" maxlength="10"
+                       pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)\d\d)"
+                       inputmode="numeric"
+                       list="date-format"
+                       form="allotment-form"
                 >
+                <datalist id="date-format">
+                    <option label="dd/mm/yyyy">
+                </datalist>
             </div>
+            <small id="sub-date-status" class="status text-muted"></small>
         </div>
     </div>
+
+    <!-- UC Amount -->
     <div class="form-group row">
-        <label class="col-12" for="">UC Amount</label>
+        <label class="col-12 col-form-label" for="all-amount">UC Amount</label>
         <div class="col-lg-12">
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text">
-                        <i class="fa fa-rupee"></i>
+                        <i class="fa fa-rupee" aria-label="Rupee Symbol"></i>
                     </span>
                 </div>
                 <input type="text" class="form-control"
-                       id="all-amount"
-                       name="amount"
-                       placeholder="Amount"
-                       value="<?=$amount?>"
-                >
-            </div>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-12" for="">Letter No.</label>
-        <div class="col-lg-12">
-            <div class="input-group">
-                <input type="text" class="form-control"
-                       id="letter"
-                       name="letter_no"
-                       placeholder="Letter no."
-                       value="<?=$letter_no?>"
-                >
-            </div>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-12" for="">Page No</label>
-        <div class="col-lg-12">
-            <div class="input-group">
-                <input type="text" class="form-control"
-                       id="page"
-                       name="page_no"
-                       placeholder="Page no"
-                       value="<?=$page_no?>"
-                >
-            </div>
-        </div>
-    </div>
-    <div class="form-group row">
-        <label class="col-12" for="">Document</label>
-        <div class="col-lg-12 dm-uploader">
-            <div class="input-group">
-                <input type="text" class="form-control document-name" disabled
-                       value="<?=$document_name?>"
-                >
-            <div role="button" class="btn btn-outline-primary mr-2">
-                <i class="si si-paper-clip"></i>
-                <input type="file">
-            </div>
-            <input type="hidden" class="filepath" value="<?=$document?>" name="document">
-            </div>
-            <?php if($document_url) { ?>
-            <small class="status text-muted"><?=$document_url?></small>
-            <?php } else { ?>
-            <small class="status text-muted">Upload PDF</small>
-            <?php } ?>
-        </div>
-    </div>
-</form>
+                       id="all-amount
