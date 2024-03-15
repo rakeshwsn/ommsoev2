@@ -14,7 +14,7 @@ class FRCheckModel extends Model
 	protected $returnType           = 'object';
 	protected $useSoftDeletes        = false;
 	protected $protectFields        = false;
-	protected $allowedFields        = [];
+	protected $allowedFields        = ['check_type'];
 
 	// Dates
 	protected $useTimestamps        = false;
@@ -24,7 +24,9 @@ class FRCheckModel extends Model
 	protected $deletedField         = 'deleted_at';
 
 	// Validation
-	protected $validationRules      = [];
+	protected $validationRules      = [
+        'check_type' => 'required|in_list[fr,cr]'
+    ];
 	protected $validationMessages   = [];
 	protected $skipValidation       = false;
 	protected $cleanValidationRules = true;
@@ -35,12 +37,14 @@ class FRCheckModel extends Model
 	protected $afterInsert          = [];
 	protected $beforeUpdate         = [];
 	protected $afterUpdate          = [];
-	protected $beforeFind           = []; // remove checkType by niranjan
+	protected $beforeFind           = [];
 	protected $afterFind            = [];
 	protected $beforeDelete         = [];
 	protected $afterDelete          = [];
 
-    public function checkType(){
-        $this->where('check_type','fr');
+    public function checkType($checkType = 'fr'){
+        $this->where('check_type', $checkType);
+        return $this;
     }
 }
+
