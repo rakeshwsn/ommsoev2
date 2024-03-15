@@ -6,17 +6,21 @@ use CodeIgniter\Model;
 
 class Test extends Model
 {
+    // Database connection & table name
     protected $DBGroup = 'default';
     protected $table = 'tests';
     protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
     protected $insertID = 0;
+
+    // Result type
     protected $returnType = 'array';
+
+    // Soft deletes
     protected $useSoftDeletes = false;
     protected $protectFields = true;
-    protected $allowedFields = [];
 
-    // Dates
+    // Timestamps
     protected $useTimestamps = false;
     protected $dateFormat = 'datetime';
     protected $createdField = 'created_at';
@@ -39,4 +43,6 @@ class Test extends Model
     protected $afterFind = [];
     protected $beforeDelete = [];
     protected $afterDelete = [];
+
+    // Add custom methods here
 }
