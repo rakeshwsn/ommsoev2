@@ -141,4 +141,6 @@ class ControllerExtensionDashboardCustomer extends Controller {
             $data['percentage'] = 0;
         }
 
-        $customer_
+        // Added missing variable name
+        $customer_data = $this->model_customer_customer->getTotalCustomers();
+        $data['total
