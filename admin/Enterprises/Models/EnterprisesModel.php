@@ -3,54 +3,52 @@
 namespace Admin\Users\Models;
 
 use CodeIgniter\Model;
+use CodeIgniter\Database\ rawSql;
 
 class UserGroupModel extends Model
 {
-	protected $DBGroup              = 'default';
-	protected $table                = 'user_group';
-	protected $primaryKey           = 'id';
-	protected $useAutoIncrement     = true;
-	protected $insertID             = 0;
-	protected $returnType           = 'object';
+    protected $DBGroup              = 'default';
+    protected $table                = 'user_group';
+    protected $primaryKey           = 'id';
+    protected $useAutoIncrement     = true;
+    protected $returnType           = 'object';
     protected $useSoftDeletes        = true;
     protected $protectFields        = false;
-//	protected $allowedFields        = [];
+    protected $allowedFields        = ['name'];
 
-	// Dates
-	protected $useTimestamps        = false;
-	protected $dateFormat           = 'datetime';
-	protected $createdField         = 'created_at';
-	protected $updatedField         = 'updated_at';
-	protected $deletedField         = 'deleted_at';
+    // Dates
+    protected $useTimestamps        = false;
+    protected $dateFormat           = 'datetime';
+    protected $createdField         = 'created_at';
+    protected $updatedField         = 'updated_at';
+    protected $deletedField         = 'deleted_at';
 
-	// Validation
+    // Validation
     protected $validationRules      = [
-        'name' => array(
-            'label' => 'Name',
-            'rules' => 'trim|required|max_length[100]'
-        ),
+        'name' => 'trim|required|max_length[100]',
     ];
-	protected $validationMessages   = [];
-	protected $skipValidation       = false;
-	protected $cleanValidationRules = true;
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
 
-	// Callbacks
-	protected $allowCallbacks       = true;
-	protected $beforeInsert         = [];
-	protected $afterInsert          = [];
-	protected $beforeUpdate         = [];
-	protected $afterUpdate          = [];
-	protected $beforeFind           = [];
-	protected $afterFind            = [];
-	protected $beforeDelete         = [];
-	protected $afterDelete          = [];
+    // Callbacks
+    protected $allowCallbacks       = true;
+    protected $beforeInsert         = [];
+    protected $afterInsert          = [];
+    protected $beforeUpdate         = [];
+    protected $afterUpdate          = [];
+    protected $beforeFind           = [];
+    protected $afterFind            = [];
+    protected $beforeDelete         = [];
+    protected $afterDelete          = [];
 
-    public function getAll($data = array()){
-        //printr($data);
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getAll($data = [])
+    {
+        $this->filter($data);
 
-        $builder->select("*");
+        $builder = $this->builder();
+
+        $builder->select('*');
 
         if (isset($data['sort']) && $data['sort']) {
             $sort = $data['sort'];
@@ -75,26 +73,32 @@ class UserGroupModel extends Model
             }
             $builder->limit((int)$data['limit'],(int)$data['start']);
         }
-        //$builder->where($this->deletedField, null);
+        $builder->whereNull($this->deletedField);
 
         $res = $builder->get()->getResult();
 
         return $res;
     }
 
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getTotal($data = [])
+    {
+        $this->filter($data);
+
+        $builder = $this->builder();
+
         $count = $builder->countAllResults();
+
         return $count;
     }
 
-    private function filter($builder,$data){
+    private function filter(&$data){
 
         if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
+            $data['where'][] = [
+                'name' => [
+                    'like' => '%'.$data['filter_search'].'%',
+                ],
+            ];
         }
     }
 
@@ -105,10 +109,10 @@ class UserGroupModel extends Model
 
         if (isset($data)) {
             foreach ($data as $key => $value) {
-                $array = array(
+                $array = [
                     'permission_id'=>$value,
                     'user_group_id'=>$id
-                );
+                ];
                 $builder->insert($array);
             }
         }
@@ -119,5 +123,10 @@ class UserGroupModel extends Model
         $this->settings = new \Config\Settings();
         return $this->whereIn('id',[$this->settings->block_user,$this->settings->cbo_user])
             ->asArray()->find();
+    }
+
+    protected function builder()
+    {
+        return $this->db->table($this->table);
     }
 }
