@@ -19,104 +19,104 @@ class Mpr extends AdminController
 
     public function index(string $action = ''): string
     {
-        $data = $this->setDefaultValues();
+        $defaultValues = $this->setDefaultValues();
 
-        $this->setYearId($data);
-        $this->setMonthId($data);
-        $this->setAgencyTypeId($data);
-        $this->setDistrictId($data);
-        $this->setBlockId($data);
+        $this->setYearId($defaultValues);
+        $this->setMonthId($defaultValues);
+        $this->setAgencyTypeId($defaultValues);
+        $this->setDistrictId($defaultValues);
+        $this->setBlockId($defaultValues);
 
         $reportModel = new ReportsModel();
-        $components = $this->getMprComponents($reportModel, $data);
-        $data['components'] = $this->buildTree($components, 'parent', 'component_id');
-        $data['components'] = $this->getTable($data['components'], 'view');
+        $mprComponents = $this->getMprComponents($reportModel, $defaultValues);
+        $defaultValues['components'] = $this->buildTree($mprComponents, 'parent', 'component_id');
+        $defaultValues['components'] = $this->getTable($defaultValues['components'], 'view');
 
-        $this->setDownloadUrl($data);
+        $this->setDownloadUrl($defaultValues);
 
-        return $this->template->view('Admin\Reports\Views\mpr_block', $data);
+        return $this->template->view('Admin\Reports\Views\mpr_block', $defaultValues);
     }
 
     private function setDefaultValues(): array
     {
         return [
-            'year_id' => getCurrentYearId(),
-            'month_id' => getMonthIdByMonth(date('m')),
-            'agency_type_id' => '',
-            'district_id' => '',
-            'block_id' => '',
-            'agency_types' => [],
+            'yearId' => $this->getCurrentYearId(),
+            'monthId' => $this->getMonthIdByMonth(date('m')),
+            'agencyTypeId' => null,
+            'districtId' => null,
+            'blockId' => null,
+            'agencyTypes' => [],
             'districts' => [],
             'blocks' => [],
-            'fund_agencies' => [],
-            'years' => getAllYears(),
-            'months' => getAllMonths(),
-            'filter_panel' => '',
-            'download_url' => '',
+            'fundAgencies' => [],
+            'years' => $this->getAllYears(),
+            'months' => $this->getAllMonths(),
+            'filterPanel' => '',
+            'downloadUrl' => '',
         ];
     }
 
     private function setYearId(array &$data): void
     {
-        if ($this->request->getGet('year')) {
-            $data['year_id'] = (int) $this->request->getGet('year');
+        if ($year = $this->request->getGet('year')) {
+            $data['yearId'] = (int) $year;
         }
     }
 
     private function setMonthId(array &$data): void
     {
-        if ($this->request->getGet('month')) {
-            $data['month_id'] = (int) $this->request->getGet('month');
+        if ($month = $this->request->getGet('month')) {
+            $data['monthId'] = (int) $month;
         }
     }
 
     private function setAgencyTypeId(array &$data): void
     {
-        if ($this->request->getGet('agency_type_id')) {
-            $data['agency_type_id'] = (int) $this->request->getGet('agency_type_id');
+        if ($agencyTypeId = $this->request->getGet('agency_type_id')) {
+            $data['agencyTypeId'] = (int) $agencyTypeId;
         }
     }
 
     private function setDistrictId(array &$data): void
     {
-        if ($this->request->getGet('district_id')) {
-            $data['district_id'] = (int) $this->request->getGet('district_id');
+        if ($districtId = $this->request->getGet('district_id')) {
+            $data['districtId'] = (int) $districtId;
         }
     }
 
     private function setBlockId(array &$data): void
     {
-        if ($this->request->getGet('block_id')) {
-            $data['block_id'] = (int) $this->request->getGet('block_id');
+        if ($blockId = $this->request->getGet('block_id')) {
+            $data['blockId'] = (int) $blockId;
         }
 
         if ($this->user->agency_type_id === $this->settings->block_user) {
-            $data['block_id'] = (int) $this->user->block_id;
+            $data['blockId'] = (int) $this->user->block_id;
         }
     }
 
     private function getMprComponents(ReportsModel $reportModel, array $data): array
     {
         $filter = [
-            'month_id' => $data['month_id'],
-            'year_id' => $data['year_id'],
+            'month_id' => $data['monthId'],
+            'year_id' => $data['yearId'],
         ];
 
         if (isset($data['user'])) {
             $filter['user_id'] = $data['user']->id;
         }
 
-        if ($data['district_id']) {
-            $filter['district_id'] = $data['district_id'];
+        if ($data['districtId']) {
+            $filter['district_id'] = $data['districtId'];
         }
 
-        if ($data['block_id']) {
-            $filter['block_id'] = $data['block_id'];
+        if ($data['blockId']) {
+            $filter['block_id'] = $data['blockId'];
             $filter['user_group'] = $this->settings->block_user;
         }
 
-        if ($data['agency_type_id']) {
-            $filter['agency_type_id'] = $data['agency_type_id'];
+        if ($data['agencyTypeId']) {
+            $filter['agency_type_id'] = $data['agencyTypeId'];
         }
 
         return $reportModel->getMpr($filter);
@@ -124,6 +124,6 @@ class Mpr extends AdminController
 
     private function setDownloadUrl(array &$data): void
     {
-        $data['download_url'] = Url::mprDownload . '?year=' . $data['year_id'] . '&month=' . $data['month_id'] . '&agency_type_id=' . $data['agency_type_id'];
+        $data['downloadUrl'] = Url::mprDownload . '?year=' . $data['yearId'] . '&month=' . $data['monthId'] . '&agency_type_id=' . $data['agencyTypeId'];
     }
 }
