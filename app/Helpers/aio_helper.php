@@ -7,7 +7,7 @@
  *
  * @param mixed $var
  * @param bool  $print_r
- * @return string
+ * @return void
  */
 function dump($var, $print_r = true)
 {
@@ -32,12 +32,12 @@ function dump($var, $print_r = true)
  */
 function array_to_object($array)
 {
-    $Object = new stdClass();
+    $object = (object) [];
     foreach ($array as $key => $value) {
-        $Object->$key = $value;
+        $object->$key = $value;
     }
 
-    return $Object;
+    return $object;
 }
 
 /**
@@ -45,14 +45,12 @@ function array_to_object($array)
  *
  * Converts an object to an array.
  *
- * @param object $Object
+ * @param object $object
  * @return array
  */
-function object_to_array($Object)
+function object_to_array($object)
 {
-    $array = get_object_vars($Object);
-
-    return $array;
+    return json_decode(json_encode($object), true);
 }
 
 /**
@@ -78,10 +76,14 @@ function is_ajax()
  */
 function load_controller($controller, $method = 'index')
 {
-    $class = require_once(APPPATH . 'controllers/' . $controller . '.php');
-    $controller = new $class;
+    $class = "app\\controllers\\$controller";
+    if (class_exists($class)) {
+        $controller = new $class;
 
-    return $controller->$method();
+        return $controller->$method();
+    }
+
+    return null;
 }
 
 /**
@@ -98,17 +100,17 @@ function load_controller($controller, $method = 'index')
  */
 function image_thumb($source_image, $width = 0, $height = 0, $crop = false, $props = [])
 {
-    $CI =& get_instance();
-    $CI->load->library('image_cache');
+    $ci = get_instance();
+    $ci->load->library('image_cache');
 
-    $props['source_image'] = '/' . ltrim($source_image, '/');
+    $props['source_image'] = ltrim($source_image, '/');
     $props['width'] = $width;
     $props['height'] = $height;
     $props['crop'] = $crop;
 
-    $CI->image_cache->initialize($props);
-    $image = $CI->image_cache->image_cache();
-    $CI->image_cache->clear();
+    $ci->image_cache->initialize($props);
+    $image = $ci->image_cache->image_cache();
+    $ci->image_cache->clear();
 
     return $image;
 }
@@ -125,10 +127,10 @@ function image_thumb($source_image, $width = 0, $height = 0, $crop = false, $pro
  */
 function resize($filename, $width, $height)
 {
-    $CI =& get_instance();
-    $CI->load->library('image_lib');
+    $ci = get_instance();
+    $ci->load->library('image_lib');
 
-    if (!file_exists(DIR_UPLOAD . $filename) || realpath(DIR_UPLOAD . $filename) !== realpath($filename)) {
+    if (!file_exists(FCPATH . 'uploads/' . $filename) || realpath(FCPATH . 'uploads/' . $filename) !== realpath($filename)) {
         return;
     }
 
@@ -137,17 +139,17 @@ function resize($filename, $width, $height)
     $image_old = $filename;
     $image_new = 'image-cache' . '/' . substr($filename, 0, strrpos($filename, '.')) . '-' . $width . 'x' . $height . '.' . $extension;
 
-    if (!file_exists(DIR_UPLOAD . $image_new) || filemtime(DIR_UPLOAD . $image_old) > filemtime(DIR_UPLOAD . $image_new)) {
+    if (!file_exists(FCPATH . 'uploads/' . $image_new) || filemtime(FCPATH . 'uploads/' . $image_old) > filemtime(FCPATH . 'uploads/' . $image_new)) {
         $config['image_library'] = 'gd2';
-        $config['source_image'] = DIR_UPLOAD . $image_old;
-        $config['new_image'] = DIR_UPLOAD . $image_new;
+        $config['source_image'] = FCPATH . 'uploads/' . $image_old;
+        $config['new_image'] = FCPATH . 'uploads/' . $image_new;
         $config['maintain_ratio'] = true;
         $config['width'] = $width;
         $config['height'] = $height;
 
-        $CI->image_lib->initialize($config);
-        $CI->image_lib->resize();
-        $CI->image_lib->clear();
+        $ci->image_lib->initialize($config);
+        $ci->image_lib->resize();
+        $ci->image_lib->clear();
     }
 
     return base_url('uploads/' . $image_new);
@@ -181,8 +183,8 @@ function option_array_value($object_array, $key, $value, $default = [])
 {
     $option_array = $default;
 
-    foreach ($object_array as $Object) {
-        $option_array[$Object->$key] = $Object->$value;
+    foreach ($object_array as $object) {
+        $option_array[$object->$key] = $object->$value;
     }
 
     return $option_array;
@@ -191,4 +193,13 @@ function option_array_value($object_array, $key, $value, $default = [])
 /**
  * Theme Partial
  *
+ * Loads a view file from the theme folder.
  *
+ * @param string $path
+ * @param array  $data
+ * @return string
+ */
+function theme_partial($path, $data = [])
+{
+    $ci = get_instance();
+    $ci->load->view('themes/default/' . $path, $data);
