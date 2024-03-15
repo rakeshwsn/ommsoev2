@@ -1,41 +1,38 @@
 <?php
+
 namespace App\Libraries;
 
 use Config\ExcelStyles;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use DOMDocument;
 
 class Export
 {
-    public static function createExcelFromHTML($html,$filename,$return = false){
-
+    public static function createExcelFromHTML($html, $filename, $return = false)
+    {
         $reader = new Html();
-
         $html = preg_replace("/&(?!\S+;)/", "&amp;", $html);
-
         $spreadsheet = $reader->loadFromString($html);
         $spreadsheet->setActiveSheetIndex(0);
-        $worksheet = $spreadsheet->getActiveSheet();
 
-        // Load HTML content into a DOM object
-        $table = new \DOMDocument();
-        $table->loadHTML($html);
-
+        $table = new DOMDocument();
+        @$table->loadHTML($html);
         $rows = $table->getElementsByTagName('tr');
 
-        foreach ($worksheet->getRowIterator() as $row) {
-            // Find the corresponding row element in the HTML table
-            $rowIndex = $row->getRowIndex();
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow();
 
-            $rowElement = $rows->item($rowIndex - 1); // -1 because row indices start at 1 in PhpSpreadsheet
+        foreach ($rows as $rowIndex => $row) {
+            if ($rowIndex < 2) { // Skip the first two rows (header and subheader)
+                continue;
+            }
 
-            // Get the class name of the row element
-            $className = $rowElement->getAttribute('class');
-
-            // Check if the class name matches a highlight class from the HTML table
+            $className = $row->getAttribute('class');
             if (preg_match('/highlight-(\w+)/', $className, $matches)) {
                 $highlightClass = $matches[1];
 
-                // Set the fill color based on the highlight class
                 $fillColor = null;
                 switch ($highlightClass) {
                     case 'heading1':
@@ -53,30 +50,32 @@ class Export
                 }
 
                 if ($fillColor) {
-                    $lastColumnIndex = $worksheet->getHighestColumn();
-                    $range = 'A' . $rowIndex . ':' . $lastColumnIndex . $rowIndex;
-                    $worksheet->getStyle($range)->applyFromArray($fillColor);
-
+                    $cellRange = 'A' . ($rowIndex + 1) . ':' . $worksheet->getHighestColumn() . ($rowIndex + 1);
+                    $worksheet->getStyle($cellRange)->applyFromArray($fillColor);
                 }
             }
         }
 
         // Set auto-size column widths for all columns
-        foreach ($spreadsheet->getActiveSheet()->getColumnIterator() as $column) {
-            $spreadsheet->getActiveSheet()
-                ->getColumnDimension($column->getColumnIndex())
-                ->setAutoSize(false);
+        foreach ($worksheet->getColumnIterator() as $column) {
+            $worksheet->getColumnDimension($column->getColumnIndex())->setAutoSize(true);
         }
 
-    
-        if($return){
+        // Set page orientation and margins
+        $worksheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+        $worksheet->getPageMargins()->setTop(0.75);
+        $worksheet->getPageMargins()->setBottom(0.75);
+        $worksheet->getPageMargins()->setLeft(0.75);
+        $worksheet->getPageMargins()->setRight(0.75);
+
+        if ($return) {
             return $spreadsheet;
-        }else{
+        } else {
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="'. $filename .'"');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
             header('Cache-Control: max-age=0');
 
-            $writer = new Xlsx($spreadsheet);
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
             $writer->save('php://output');
             exit();
         }
