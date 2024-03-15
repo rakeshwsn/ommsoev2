@@ -6,70 +6,50 @@ use CodeIgniter\Model;
 
 class MemberModel extends Model
 {
-    protected $DBGroup              = 'default';
-    protected $table                = 'member';
-    protected $primaryKey           = 'id';
-    protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
-    protected $returnType           = 'object';
-    protected $useSoftDeletes       = false;
-    protected $protectFields        = false;
-    //protected $allowedFields        = [];
+    protected $DBGroup = 'default';
+    protected $table = 'member';
+    protected $primaryKey = 'id';
+    protected $useAutoIncrement = true;
+    protected $returnType = 'object';
+    protected $useSoftDeletes = false;
+    protected $protectFields = false;
 
     // Dates
-    protected $useTimestamps        = false;
-    protected $dateFormat           = 'datetime';
-    protected $createdField         = 'created_at';
-    protected $updatedField         = 'updated_at';
-    protected $deletedField         = 'deleted_at';
+    protected $useTimestamps = false;
+    protected $dateFormat = 'datetime';
+    protected $createdField = 'created_at';
+    protected $updatedField = 'updated_at';
+    protected $deletedField = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [
-        'name' => array(
-            'label' => 'Name',
-            'rules' => 'trim|required|max_length[100]'
-        ),
-
-        'designation' =>array(
-            'label' => 'Designation',
-            'rules' => "required|trim|required|max_length[100]"
-        ),
-
+    protected $validationRules = [
+        'name' => 'trim|required|max_length[100]',
+        'designation' => 'required|trim|max_length[100]'
     ];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
+    protected $validationMessages = [];
+    protected $skipValidation = false;
     protected $cleanValidationRules = true;
 
     // Callbacks
-    protected $allowCallbacks       = true;
-    protected $beforeInsert         = [];
-    protected $afterInsert          = [];
-    protected $beforeUpdate         = [];
-    protected $afterUpdate          = [];
-    protected $beforeFind           = [];
-    protected $afterFind            = [];
-    protected $beforeDelete         = [];
-    protected $afterDelete          = [];
+    protected $allowCallbacks = true;
+    protected $beforeInsert = [];
+    protected $afterInsert = [];
+    protected $beforeUpdate = [];
+    protected $afterUpdate = [];
+    protected $beforeFind = [];
+    protected $afterFind = [];
+    protected $beforeDelete = [];
+    protected $afterDelete = [];
 
+    public function getAll($data = [])
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
 
-    public function getAll($data = array()){
-        //printr($data);
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+        $builder->select('*');
 
-        $builder->select("*");
-
-        if (isset($data['sort']) && $data['sort']) {
-            $sort = $data['sort'];
-        } else {
-            $sort = "name";
-        }
-
-        if (isset($data['order']) && ($data['order'] == 'desc')) {
-            $order = "desc";
-        } else {
-            $order = "asc";
-        }
+        $sort = isset($data['sort']) ? $data['sort'] : 'name';
+        $order = isset($data['order']) && $data['order'] == 'desc' ? 'desc' : 'asc';
         $builder->orderBy($sort, $order);
 
         if (isset($data['start']) || isset($data['limit'])) {
@@ -80,28 +60,30 @@ class MemberModel extends Model
             if ($data['limit'] < 1) {
                 $data['limit'] = 10;
             }
-            $builder->limit((int)$data['limit'],(int)$data['start']);
+            $builder->limit((int)$data['limit'], (int)$data['start']);
         }
-        //$builder->where($this->deletedField, null);
+
+        if (!empty($data['filter_search'])) {
+            $builder->where("name LIKE '%" . $data['filter_search'] . "%'");
+        }
 
         $res = $builder->get()->getResult();
 
         return $res;
     }
 
-    public function getTotal($data = array()) {
-        $builder=$this->db->table($this->table);
-        $this->filter($builder,$data);
+    public function getTotal($data = [])
+    {
+        $builder = $this->db->table($this->table);
+        $this->filter($builder, $data);
+
         $count = $builder->countAllResults();
+
         return $count;
     }
 
-    private function filter($builder,$data){
-
-        if (!empty($data['filter_search'])) {
-            $builder->where("
-				name LIKE '%{$data['filter_search']}%'"
-            );
-        }
+    private function filter($builder, $data)
+    {
+        // Add any additional filters here
     }
 }
