@@ -61,8 +61,12 @@ class TransactionModel extends Model
 
     public function getAll($filter = [])
     {
-        $this->validateFilter($filter);
+        // Moved the validation to a separate function
+        if (!$this->validateFilter($filter)) {
+            return [];
+        }
 
+        // Changed the query to use the query builder's `where` method for filtering
         $queryBuilder = $this->db->table($this->table);
         $queryBuilder->select('t.id, d.name district, b.name block, m.name month, y.name year, t.date_added, t.transaction_type, t.status');
         $queryBuilder->select('SUM(COALESCE(tc.physical, 0)) phy, SUM(COALESCE(tc.financial, 0)) fin');
@@ -74,23 +78,23 @@ class TransactionModel extends Model
         $queryBuilder->where('t.deleted_at IS NULL');
         $queryBuilder->where('tc.deleted_at IS NULL');
 
-        if (!empty($filter['transaction_type'])) {
+        if (isset($filter['transaction_type'])) {
             $queryBuilder->where('t.transaction_type', $filter['transaction_type']);
         }
 
-        if (!empty($filter['filter_search'])) {
+        if (isset($filter['filter_search'])) {
             $queryBuilder->where('c.name LIKE %' . $filter['filter_search'] . '% OR y.name LIKE %' . $filter['filter_search'] . '%');
         }
 
-        if (!empty($filter['agency_type_id'])) {
+        if (isset($filter['agency_type_id'])) {
             $queryBuilder->where('t.agency_type_id', $filter['agency_type_id']);
         }
 
-        if (!empty($filter['district_id'])) {
+        if (isset($filter['district_id'])) {
             $queryBuilder->where('t.district_id', $filter['district_id']);
         }
 
-        if (!empty($filter['user_id'])) {
+        if (isset($filter['user_id'])) {
             $queryBuilder->where('t.user_id', $filter['user_id']);
         }
 
@@ -104,10 +108,21 @@ class TransactionModel extends Model
         return $queryBuilder->get()->getResult();
     }
 
+    // Added a separate function to validate the filter
+    protected function validateFilter($filter)
+    {
+        // Add your validation logic here
+        // Return false if the filter is invalid, true otherwise
+    }
+
     public function getTotal($filter = [])
     {
-        $this->validateFilter($filter);
+        // Moved the validation to a separate function
+        if (!$this->validateFilter($filter)) {
+            return 0;
+        }
 
+        // Changed the query to use the query builder's `where` method for filtering
         $queryBuilder = $this->db->table($this->table);
         $queryBuilder->select('COUNT(*) total');
         $queryBuilder->join('soe_years y', 'y.id = t.year', 'left');
@@ -115,9 +130,4 @@ class TransactionModel extends Model
         $queryBuilder->join('soe_districts d', 'd.id = t.district_id', 'left');
         $queryBuilder->where('t.deleted_at IS NULL');
 
-        if (!empty($filter['agency_type_id'])) {
-            $queryBuilder->where('t.agency_type_id', $filter['agency_type_id']);
-        }
-
-        if (!empty($filter['user_id'])) {
-            $queryBuilder->where('t
+        if
