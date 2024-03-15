@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Controller;
+use CodeIgniter\Exceptions\PageNotFoundException;
 
 $routes = Services::routes();
 
@@ -15,7 +16,9 @@ $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(false);
-$routes->set404Override();
+$routes->set404Override(function () {
+    throw new PageNotFoundException('Your message here');
+});
 $routes->setAutoRoute(true);
 
 // Dashboard routes
@@ -137,4 +140,3 @@ foreach (glob(ROOTPATH . 'front/*', GLOB_ONLYDIR) as $item_dir)
 }
 */
 
-if (file
