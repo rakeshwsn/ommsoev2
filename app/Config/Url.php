@@ -4,69 +4,64 @@ namespace Config;
 
 class Url {
 
-    const baseUrl = '';
-    const dashboard = 'admin';
-    const transaction = 'admin/transaction';
-    const transactionDownloadTemplate = 'admin/transaction/downloadtemplate';
-    const transactionDatatable = 'admin/transaction/search';
-    const transactionUpload = 'admin/transaction/upload';
-    const transactionSetUserType = 'admin/';
-    const transactionEdit = 'admin/transaction/edit';
-    const transactionDelete = 'admin/transaction/delete';
-
-    const transactionAdd = 'admin/transaction/add';
-    const otherReceipt = 'admin/otherreceipt';
-    const otherReceiptSearch = 'admin/otherreceipt/search';
-    const otherReceiptAdd = 'admin/otherreceipt/add';
-
-    const otherReceiptEdit = 'admin/otherreceipt/edit';
-    const closingBalance = 'admin/closingbalance';
-    const closingBalanceEdit = 'admin/closingbalance/info';
-
-    const closingBalanceUpload = 'admin/closingbalance/upload';
-    const componentAgency = 'admin/component/agency';
-    const componentAgencyAssign = 'admin/component/agency/assign';
-    const componentBlock = 'admin/component/block';
-    const componentBlockAssign = 'admin/component/block/assign';
-
-    const componentBudget = 'admin/component/budget';
-
-    const openingBalance = 'admin/openingbalance';
-    const approve = 'admin/approve';
-    const approveTransaction = 'admin/approve/transaction';
-    const approveOtherReceipt = 'admin/approve/otherreceipt';
-    const approveClosingBalance = 'admin/approve/closingbalance';
-    const approveForm = 'admin/approve/getform';
-    const approveMIS = 'admin/approve/mis';
-    const profileUpload = 'profile/upload';
-    const profile = 'profile';
-    const refund = 'admin/transaction/refund';
-    const refundDatatable = 'admin/transaction/refund/search';
-    const refundAdd = 'admin/transaction/refund/add';
-
-    const refundEdit = 'admin/transaction/refund/edit';
-    const allotmentAdd = 'admin/uc/allotment/add';
-    const allotmentEdit = 'admin/uc/allotment/edit';
-    const allotmentInfo = 'admin/uc/allotment/info';
-    const allotmentDelete = 'admin/uc/allotment/delete';
-    const ucSubmitInfo = 'admin/uc/submit/info';
-    const ucSubmitAdd = 'admin/uc/submit/add';
-    const ucSubmitEdit = 'admin/uc/submit/edit';
-    const ucSubmitUpload = 'admin/uc/submit/upload';
-    const mprDownload = 'admin/reports/mpr/download';
-    const abstractMprDownload = 'admin/reports/abstractmpr/download';
-    const mprUpload = 'admin/reports/mprupload/upload';
-    const mis = 'admin/mis';
-    const misAdd = 'admin/mis/add';
-	const misEdit = 'admin/mis/edit';
-	const misDelete = 'admin/mis/delete';
-    const MISUpload = 'admin/mis/upload';
-	const misDatatable = 'admin/mis/search';
-    const getBlocks = 'admin/district/block';
-    const getDistricts = 'admin/district/fundagency';
-    const misIsUploaded = 'admin/transaction/isuploaded';
-    const userAllowUpload = 'admin/users/allowupload/update';
-    const userUploadStatus = 'admin/users/uploadstatus/update';
-
+    public $urls = [
+        'baseUrl' => '',
+        'dashboard' => 'admin',
+        'transaction' => 'admin/transaction',
+        'transactionDownloadTemplate' => 'admin/transaction/downloadtemplate',
+        'transactionDatatable' => 'admin/transaction/search',
+        'transactionUpload' => 'admin/transaction/upload',
+        'transactionSetUserType' => 'admin/',
+        'transactionEdit' => 'admin/transaction/edit',
+        'transactionDelete' => 'admin/transaction/delete',
+        'transactionAdd' => 'admin/transaction/add',
+        'otherReceipt' => 'admin/otherreceipt',
+        'otherReceiptSearch' => 'admin/otherreceipt/search',
+        'otherReceiptAdd' => 'admin/otherreceipt/add',
+        'otherReceiptEdit' => 'admin/otherreceipt/edit',
+        'closingBalance' => 'admin/closingbalance',
+        'closingBalanceEdit' => 'admin/closingbalance/info',
+        'closingBalanceUpload' => 'admin/closingbalance/upload',
+        'componentAgency' => 'admin/component/agency',
+        'componentAgencyAssign' => 'admin/component/agency/assign',
+        'componentBlock' => 'admin/component/block',
+        'componentBlockAssign' => 'admin/component/block/assign',
+        'componentBudget' => 'admin/component/budget',
+        'openingBalance' => 'admin/openingbalance',
+        'approve' => 'admin/approve',
+        'approveTransaction' => 'admin/approve/transaction',
+        'approveOtherReceipt' => 'admin/approve/otherreceipt',
+        'approveClosingBalance' => 'admin/approve/closingbalance',
+        'approveForm' => 'admin/approve/getform',
+        'approveMIS' => 'admin/approve/mis',
+        'profileUpload' => 'profile/upload',
+        'profile' => 'profile',
+        'refund' => 'admin/transaction/refund',
+        'refundDatatable' => 'admin/transaction/refund/search',
+        'refundAdd' => 'admin/transaction/refund/add',
+        'refundEdit' => 'admin/transaction/refund/edit',
+        'allotmentAdd' => 'admin/uc/allotment/add',
+        'allotmentEdit' => 'admin/uc/allotment/edit',
+        'allotmentInfo' => 'admin/uc/allotment/info',
+        'allotmentDelete' => 'admin/uc/allotment/delete',
+        'ucSubmitInfo' => 'admin/uc/submit/info',
+        'ucSubmitAdd' => 'admin/uc/submit/add',
+        'ucSubmitEdit' => 'admin/uc/submit/edit',
+        'ucSubmitUpload' => 'admin/uc/submit/upload',
+        'mprDownload' => 'admin/reports/mpr/download',
+        'abstractMprDownload' => 'admin/reports/abstractmpr/download',
+        'mprUpload' => 'admin/reports/mprupload/upload',
+        'mis' => 'admin/mis',
+        'misAdd' => 'admin/mis/add',
+        'misEdit' => 'admin/mis/edit',
+        'misDelete' => 'admin/mis/delete',
+        'MISUpload' => 'admin/mis/upload',
+        'misDatatable' => 'admin/mis/search',
+        'getBlocks' => 'admin/district/block',
+        'getDistricts' => 'admin/district/fundagency',
+        'misIsUploaded' => 'admin/transaction/isuploaded',
+        'userAllowUpload' => 'admin/users/allowupload/update',
+        'userUploadStatus' => 'admin/users/uploadstatus/update',
+    ];
 
 }
