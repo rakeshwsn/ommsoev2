@@ -1,71 +1,69 @@
 <?php
+
 namespace Admin\Components\Models;
+
 use CodeIgniter\Model;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class ComponentsAgencyAssignModel extends Model
 {
-    protected $DBGroup          = 'default';
-    protected $table            = 'soe_components_agency';
-    protected $primaryKey       = 'id';
-    protected $useAutoIncrement = true;
-    protected $insertID         = 0;
-    protected $returnType       = 'object';
-    protected $useSoftDeletes   = false;
-    protected $protectFields    = false;
-    protected $allowedFields    = [];
+    protected $table = 'soe_components_agency';
+    protected $primaryKey = 'id';
 
-    // Dates
     protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = '';
-    protected $updatedField  = '';
-    protected $deletedField  = 'deleted_at';
+    protected $dateFormat = 'datetime';
 
-    // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
-    protected $skipValidation       = false;
-    protected $cleanValidationRules = true;
+    /**
+     * Get component agency data by component ID.
+     *
+     * @param int $component_id
+     * @return array
+     */
+    public function getComponentAgency(int $component_id): array
+    {
+        $builder = $this->builder($this->table);
+        $builder->where('component_id', $component_id);
 
-    // Callbacks
-    protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
-    protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
-    protected $afterUpdate    = [];
-    protected $beforeFind     = [];
-    protected $afterFind      = [];
-    protected $beforeDelete   = [];
-    protected $afterDelete    = [];
-
-    public function getComponentAgency($component_id){
-        $builder=$this->db->table("component_agency ca");
-        $builder->where("component_id",$component_id);
-        $res = $builder->get()->getResultArray();
-        return $res;
+        try {
+            $res = $builder->get()->getResultArray();
+            return $res;
+        } catch (DatabaseException $e) {
+            // Log the exception or handle it appropriately
+            log_message('error', $e->getMessage());
+            return [];
+        }
     }
 
-    public function saveComponentAgency($components,$fund_agency_id){
-        
-        $agency_data=[];
-        $builder=$this->db->table("soe_components_agency");
-        $builder->where("fund_agency_id",$fund_agency_id);
-        $builder->delete();
-        foreach ($components as $component_id=>$component) {
-            
-            foreach($component['agency_id'] as $agency_type_id){
-                $agency_data[]=array(
-                    "component_id"=>$component_id,
-                    "agency_type_id"=>$agency_type_id,
-                    "fund_agency_id"=>$fund_agency_id
-                );
-                
+    /**
+     * Save component agency assignments.
+     *
+     * @param array $components
+     * @param int $fund_agency_id
+     * @return void
+     */
+    public function saveComponentAgency(array $components, int $fund_agency_id): void
+    {
+        $this->builder($this->table)
+             ->where('fund_agency_id', $fund_agency_id)
+             ->delete();
+
+        $agency_data = [];
+
+        foreach ($components as $component_id => $component) {
+            foreach ($component['agency_id'] as $agency_type_id) {
+                $agency_data[] = [
+                    'component_id' => $component_id,
+                    'agency_type_id' => $agency_type_id,
+                    'fund_agency_id' => $fund_agency_id
+                ];
             }
         }
-        $builder=$this->db->table("soe_components_agency");
-        $builder->insertBatch($agency_data);
-       // dd($agency_data);
-		
+
+        try {
+            $this->builder($this->table)->insertBatch($agency_data);
+        } catch (DatabaseException $e) {
+            // Log the exception or handle it appropriately
+            log_message('error', $e->getMessage());
+        }
     }
-   
 }
