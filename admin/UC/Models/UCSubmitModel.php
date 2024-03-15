@@ -14,11 +14,10 @@ class UCSubmitModel extends Model
     protected $table                = 'soe_uc_submit';
     protected $primaryKey           = 'id';
     protected $useAutoIncrement     = true;
-    protected $insertID             = 0;
     protected $returnType           = 'object';
     protected $useSoftDeletes        = true;
     protected $protectFields        = false;
-    // protected $allowedFields        = [];
+    protected $allowedFields        = [];
 
     // Dates
     protected $useTimestamps        = true;
@@ -35,14 +34,16 @@ class UCSubmitModel extends Model
     // Get recipient ID based on district ID and fund agency ID
     public function getRecipientId(int $district_id, int $fund_agency_id = 1): ?int
     {
-        $sql = "SELECT id FROM soe_uc_recipients r WHERE r.district_id = ? AND r.fund_agency_id = ?";
-        $res = $this->db->query($sql, [$district_id, $fund_agency_id])->getFirstRow();
+        $builder = $this->db->table('soe_uc_recipients r');
+        $builder->where('r.district_id', $district_id);
+        $builder->where('r.fund_agency_id', $fund_agency_id);
+        $query = $builder->get();
 
-        if (!$res) {
+        if ($query->getNumRows() === 0) {
             return null;
         }
 
-        return $res->id;
+        return $query->getRow()->id;
     }
 
     // Get UC report based on filter
@@ -55,16 +56,26 @@ class UCSubmitModel extends Model
         }
 
         if (isset($filter['district_id'])) {
-            $res = $this->getRecipientId($filter['district_id']);
+            $recipient_id = $this->getRecipientId($filter['district_id']);
 
-            if (!$res) {
+            if (!$recipient_id) {
                 return [];
             }
-
-            $recipient_id = $res;
         }
 
-        $sql = "SELECT
+        $builder = $this->db->table('soe_uc_allotment sua');
+        $builder->select('sua.recipient_id, sua.year, SUM(sua.amount) allotment');
+        $builder->where('sua.deleted_at', null);
+        $builder->groupBy('sua.year');
+
+        if ($recipient_id) {
+            $builder->where('sua.recipient_id', $recipient_id);
+        }
+
+        $allotment_query = $builder->get();
+
+        $builder = $this->db->table('soe_uc_submit sus');
+        $builder->select('
             allt.recipient_id,
             allt.year year_id,
             y.name `year`,
@@ -73,50 +84,67 @@ class UCSubmitModel extends Model
             sbmt.letter_no,
             sbmt.uc_submit,
             (allt.allotment - sbmt.uc_submit) balance
-          FROM (SELECT
-                sua.recipient_id,
-                sua.year,
-                SUM(sua.amount) allotment
-              FROM soe_uc_allotment sua
-              WHERE sua.deleted_at IS NULL
-                AND sua.recipient_id = ?
-              GROUP BY sua.year) allt
-            LEFT JOIN (SELECT
-                        sua.recipient_id,
-                        sua.year,
-                        MAX(sus.date_submit) date_submit,
-                        GROUP_CONCAT(sus.letter_no SEPARATOR ', ') letter_no,
-                        SUM(sus.amount) uc_submit
-                      FROM soe_uc_submit sus
-                        LEFT JOIN soe_uc_allotment sua
-                          ON sus.allotment_id = sua.id
-                      WHERE sua.deleted_at IS NULL
-                        AND sus.deleted_at IS NULL
-                      GROUP BY sua.year) sbmt
-              ON allt.year = sbmt.year
-              LEFT JOIN soe_years y ON y.id = allt.year";
+        ');
+        $builder->join('soe_uc_allotment allt', 'allt.year = sus.year', 'left');
+        $builder->join('soe_years y', 'y.id = allt.year', 'left');
+        $builder->where('sus.deleted_at', null);
 
-        return $this->db->query($sql, [$recipient_id])->getResult();
+        if ($recipient_id) {
+            $builder->where('allt.recipient_id', $recipient_id);
+        }
+
+        $builder->groupBy('sus.year');
+
+        $submissions_query = $builder->get();
+
+        $result = [];
+
+        foreach ($allotment_query->getResult() as $allotment) {
+            $row = $submissions_query->getRowWhere('year_id', $allotment->year);
+
+            if ($row) {
+                $result[] = [
+                    'recipient_id' => $allotment->recipient_id,
+                    'year_id' => $allotment->year,
+                    'year' => $row->year,
+                    'allotment' => $allotment->allotment,
+                    'date_submit' => $row->date_submit,
+                    'letter_no' => $row->letter_no,
+                    'uc_submit' => $row->uc_submit,
+                    'balance' => $row->balance,
+                ];
+            }
+        }
+
+        return $result;
     }
 
     // Get submissions based on filter
     public function getSubmissions(array $filter = []): array
     {
-        $sql = "SELECT
+        $builder = $this->db->table('soe_uc_submit sus');
+        $builder->select('
             sus.id uc_id,
             sus.date_submit,
             sus.letter_no,
             sus.page_no,
             sus.amount,
             sus.document
-          FROM soe_uc_submit sus
-            LEFT JOIN soe_uc_allotment sua
-              ON sus.allotment_id = sua.id
-          WHERE sua.deleted_at IS NULL
-            AND sus.deleted_at IS NULL
-            AND sua.year = ?
-            AND sua.recipient_id = ?";
+        ');
+        $builder->join('soe_uc_allotment sua', 'sus.allotment_id = sua.id', 'left');
+        $builder->where('sua.deleted_at', null);
+        $builder->where('sus.deleted_at', null);
 
-        return $this->db->query($sql, [$filter['year'], $filter['recipient_id']])->getResult();
+        if (isset($filter['year'])) {
+            $builder->where('sua.year', $filter['year']);
+        }
+
+        if (isset($filter['recipient_id'])) {
+            $builder->where('sua.recipient_id', $filter['recipient_id']);
+        }
+
+        $query = $builder->get();
+
+        return $query->getResult();
     }
 }
