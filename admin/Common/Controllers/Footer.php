@@ -1,34 +1,38 @@
 <?php
-namespace Admin\Common\Controllers;
+
+namespace App\Controllers\Admin\Common;
+
+use App\Controllers\AdminController;
 use Admin\Localisation\Models\BlockModel;
 use Admin\Localisation\Models\DistrictModel;
-use App\Controllers\AdminController;
 
-class Footer extends AdminController
+class FooterController extends AdminController
 {
-	public function index()
-	{
+    public function index()
+    {
+        $data = [
+            'show_old_portal' => true,
+        ];
 
-        $data['show_old_portal'] = true;
-
-        if($this->user->isLogged()) {
-
+        if ($this->user->isLogged()) {
             $blockModel = new BlockModel();
             $districtModel = new DistrictModel();
 
-            $new_blocks = $blockModel->asArray()->where(['year' => 6])->findAll();
-            $new_dists = $districtModel->getNewDistricts();
+            $newBlocks = $blockModel->asArray()->where(['year' => 6])->findAll();
+            $newDistricts = $districtModel->getNewDistricts();
 
-            if($this->user->district_id && array_search($this->user->district_id, array_column($new_dists, 'district_id')) !== false) {
+            $userDistrictId = $this->user->district_id ?? null;
+            $userBlockId = $this->user->block_id ?? null;
+
+            if ($userDistrictId && in_array($userDistrictId, array_column($newDistricts, 'district_id'))) {
                 $data['show_old_portal'] = false;
             }
-            
-            if($this->user->block_id && array_search($this->user->block_id, array_column($new_blocks, 'id')) !== false) {
+
+            if ($userBlockId && in_array($userBlockId, array_column($newBlocks, 'id'))) {
                 $data['show_old_portal'] = false;
             }
         }
 
-		return view('Admin\Common\Views\footer',$data);
-		
-	}
+        return view('Admin\Common\Views\footer', $data);
+    }
 }
