@@ -42,12 +42,22 @@ class ORCheckModel extends Model
     protected $afterDelete = [];
 
     public function checkType(){
-        $this->where('check_type','or');
+        $this->where('check_type', 'or');
         return $this;
     }
 
     public function getORChecks()
     {
         return $this->checkType()->findAll();
+    }
+
+    protected function checkType(\ArrayAccess $data)
+    {
+        if (isset($data['data']['check_type'])) {
+            $data['where']["check_type"] = $data['data']['check_type'];
+            unset($data['data']['check_type']);
+        }
+
+        return $data;
     }
 }
