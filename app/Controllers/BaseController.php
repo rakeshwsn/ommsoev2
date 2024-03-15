@@ -7,6 +7,9 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\URI;
 use CodeIgniter\Log\LoggerInterface;
+use CodeIgniter\Session\Session;
+use CodeIgniter\Template\Template;
+use CodeIgniter\View\View;
 use Config\Services;
 use Config\Settings;
 
@@ -31,7 +34,7 @@ class BaseController extends Controller
      */
     protected array $helpers = ['aio', 'form', 'shortcode', 'function', 'number'];
 
-    public array $statuses = [
+    protected array $statuses = [
         'Not Approved',
         'Approved',
         'Rejected',
@@ -39,7 +42,7 @@ class BaseController extends Controller
         'Not Required',
     ];
 
-    public array $colors = [
+    protected array $colors = [
         'warning',
         'success',
         'secondary',
@@ -47,15 +50,15 @@ class BaseController extends Controller
         'primary',
     ];
 
-    protected \CodeIgniter\Template\Template $template;
+    protected ?Template $template;
 
     protected Settings $settings;
 
     protected \App\Models\UserModel $user;
 
-    protected \CodeIgniter\Session\Session $session;
+    protected ?Session $session;
 
-    protected URI $uri;
+    protected ?URI $uri;
 
     /**
      * Constructor.
@@ -71,7 +74,7 @@ class BaseController extends Controller
 
         $this->settings = new Settings();
 
-        $this->template = new \CodeIgniter\Template\Template();
+        $this->template = new Template();
         $this->template->set('home', false);
         $this->user = new \App\Models\UserModel();
         $this->session = Services::session();
@@ -80,7 +83,15 @@ class BaseController extends Controller
         $this->template->setTheme('default');
     }
 
-    public function _remap($method, ...$params)
+    /**
+     * Magic method to handle method calls not found in the controller.
+     *
+     * @param string $method
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public function __call(string $method, array $params)
     {
         $router = Services::router();
 
@@ -88,6 +99,32 @@ class BaseController extends Controller
             return $this->$method(...$params);
         } else {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+    }
+
+    /**
+     * Magic method to handle calls to inaccessible methods or properties.
+     *
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        return $this->$name ?? null;
+    }
+
+    /**
+     * Magic method to set a value to inaccessible properties.
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set(string $name, $value): void
+    {
+        if (property_exists($this, $name)) {
+            $this->$name = $value;
         }
     }
 }
