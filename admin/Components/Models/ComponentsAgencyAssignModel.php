@@ -2,16 +2,24 @@
 
 namespace Admin\Components\Models;
 
-use CodeIgniter\Model;
 use CodeIgniter\Database\Exceptions\DatabaseException;
+use CodeIgniter\Model;
 
 class ComponentsAgencyAssignModel extends Model
 {
     protected $table = 'soe_components_agency';
     protected $primaryKey = 'id';
+    protected $returnType = 'array';
 
     protected $useTimestamps = true;
     protected $dateFormat = 'datetime';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $db = \Config\Database::connect();
+        $this->builder($this->table, $db);
+    }
 
     /**
      * Get component agency data by component ID.
@@ -21,14 +29,13 @@ class ComponentsAgencyAssignModel extends Model
      */
     public function getComponentAgency(int $component_id): array
     {
-        $builder = $this->builder($this->table);
+        $builder = $this->builder();
         $builder->where('component_id', $component_id);
 
         try {
             $res = $builder->get()->getResultArray();
             return $res;
         } catch (DatabaseException $e) {
-            // Log the exception or handle it appropriately
             log_message('error', $e->getMessage());
             return [];
         }
@@ -43,9 +50,7 @@ class ComponentsAgencyAssignModel extends Model
      */
     public function saveComponentAgency(array $components, int $fund_agency_id): void
     {
-        $this->builder($this->table)
-             ->where('fund_agency_id', $fund_agency_id)
-             ->delete();
+        $this->deleteByFundAgencyId($fund_agency_id);
 
         $agency_data = [];
 
@@ -60,9 +65,26 @@ class ComponentsAgencyAssignModel extends Model
         }
 
         try {
-            $this->builder($this->table)->insertBatch($agency_data);
+            $this->insertBatch($agency_data);
         } catch (DatabaseException $e) {
-            // Log the exception or handle it appropriately
+            log_message('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Delete records by fund agency ID.
+     *
+     * @param int $fund_agency_id
+     * @return void
+     */
+    private function deleteByFundAgencyId(int $fund_agency_id): void
+    {
+        $builder = $this->builder();
+        $builder->where('fund_agency_id', $fund_agency_id);
+
+        try {
+            $builder->delete();
+        } catch (DatabaseException $e) {
             log_message('error', $e->getMessage());
         }
     }
