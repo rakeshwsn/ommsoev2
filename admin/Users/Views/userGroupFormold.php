@@ -8,8 +8,8 @@ $validation = \Config\Services::validation();
                 <div class="block-header block-header-default">
                     <h3 class="block-title"><?php echo $text_form; ?></h3>
                     <div class="block-options">
-                        <button type="submit" form="form-usergroup" class="btn btn-primary">Save</button>
-                        <a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="Cancel" class="btn btn-primary">Cancel</a>
+                        <button type="submit" name="save" class="btn btn-primary">Save</button>
+                        <a href="<?php echo $cancel; ?>" id="cancel-button" data-toggle="tooltip" title="Cancel" class="btn btn-primary">Cancel</a>
                     </div>
                 </div>
                 <div class="block-content">
@@ -17,7 +17,7 @@ $validation = \Config\Services::validation();
                         <label class="col-lg-2 col-form-label" for="example-hf-email">Name</label>
                         <div class="col-lg-10 <?=$validation->hasError('name')?'is-invalid':''?>">
                             <input type="hidden" name="id" id="id" value="<?=$id?>"/>
-                            <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name))); ?>
+                            <?php echo form_input(array('class'=>'form-control','name' => 'name', 'id' => 'name', 'placeholder'=>'Name','value' => set_value('name', $name), 'required' => 'required')); ?>
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('name'); ?></div>
                         </div>
                     </div>
@@ -25,7 +25,7 @@ $validation = \Config\Services::validation();
                     <div class="form-group row required">
                         <label class="col-sm-2 control-label" for="input-usergroup-group">Designation</label>
                         <div class="col-md-10 <?=$validation->hasError('designation')?'is-invalid':''?>">
-                            <?php echo form_input(array('class'=>'form-control','name' => 'description', 'id' => 'description', 'placeholder'=>'Description','value' => set_value('description', $description))); ?>
+                            <?php echo form_input(array('class'=>'form-control','name' => 'description', 'id' => 'description', 'placeholder'=>'Description','value' => set_value('description', $description), 'required' => 'required')); ?>
                             <div class="invalid-feedback animated fadeInDown"><?= $validation->getError('description'); ?></div>
                         </div>
                     </div>
@@ -67,38 +67,17 @@ $validation = \Config\Services::validation();
                             <?php foreach($data as $per){?>
                             <tr>
                                 <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
+                                    <input type='checkbox' name="permissions[<?=$i?>][module]" value="1" id="" <?=set_checkbox('permissions['.$i.'][module]', '1', false)?>>
                                 </td>
                                 <td data-title="#" >
                                     <?=$per['controller']?>
                                 </td>
                                 <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
+                                    <input type='checkbox' name="permissions[<?=$i?>][add]" value="1" id="" <?=set_checkbox('permissions['.$i.'][add]', '1', false)?>>
                                 </td>
                                 <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
+                                    <input type='checkbox' name="permissions[<?=$i?>][edit]" value="1" id="" <?=set_checkbox('permissions['.$i.'][edit]', '1', false)?>>
                                 </td>
                                 <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
-                                </td>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
-                                </td>
-                                <td data-title="#" >
-                                    <input type='checkbox' name="" value="" id="" onClick='$(this).processCheck();'>
-                                </td>
-                            </tr>
-                            <?}?>
-                            <?}?>
-                            </tbody>
-                        </table>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php echo form_close(); ?>
-<?php js_start(); ?>
-    <script type="text/javascript"><!--
-        //--></script>
-<?php js_end(); ?>
+                                    <input type='checkbox' name="permissions[<?=$i?>][delete]" value="1" id="" <?=set_checkbox('permissions['.$i.'][delete]', '1', false)?>>
+                                
