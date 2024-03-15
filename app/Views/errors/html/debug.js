@@ -2,127 +2,66 @@
 // Tabs
 //--------------------------------------------------------------------
 
-var tabLinks    = new Array();
-var contentDivs = new Array();
+const tabLinks = [];
+const contentDivs = [];
 
-function init()
-{
-	// Grab the tab links and content divs from the page
-	var tabListItems = document.getElementById('tabs').childNodes;
-	console.log(tabListItems);
-	for (var i = 0; i < tabListItems.length; i ++)
-	{
-		if (tabListItems[i].nodeName == "LI")
-		{
-			var tabLink     = getFirstChildWithTagName(tabListItems[i], 'A');
-			var id          = getHash(tabLink.getAttribute('href'));
-			tabLinks[id]    = tabLink;
-			contentDivs[id] = document.getElementById(id);
-		}
-	}
+function init() {
+  const tabListItems = document.getElementById('tabs').children;
 
-	// Assign onclick events to the tab links, and
-	// highlight the first tab
-	var i = 0;
+  Array.from(tabListItems).forEach((item) => {
+    if (item.nodeName === "LI") {
+      const tabLink = item.querySelector('a');
+      const id = getHash(tabLink.dataset.href);
+      tabLinks[id] = tabLink;
+      contentDivs[id] = document.getElementById(id);
+    }
+  });
 
-	for (var id in tabLinks)
-	{
-		tabLinks[id].onclick = showTab;
-		tabLinks[id].onfocus = function () {
-			this.blur()
-		};
-		if (i == 0)
-		{
-			tabLinks[id].className = 'active';
-		}
-		i ++;
-	}
+  tabLinks.forEach((link, i) => {
+    link.addEventListener('click', showTab);
+    link.addEventListener('focus', () => {
+      link.blur();
+    });
+    if (i === 0) {
+      link.classList.add('active');
+    }
+  });
 
-	// Hide all content divs except the first
-	var i = 0;
-
-	for (var id in contentDivs)
-	{
-		if (i != 0)
-		{
-			console.log(contentDivs[id]);
-			contentDivs[id].className = 'content hide';
-		}
-		i ++;
-	}
+  let i = 0;
+  Array.from(contentDivs).forEach((div) => {
+    if (i !== 0) {
+      div.classList.add('content', 'hide');
+    }
+    i++;
+  });
 }
 
 //--------------------------------------------------------------------
 
-function showTab()
-{
-	var selectedId = getHash(this.getAttribute('href'));
+function showTab() {
+  const selectedId = getHash(this.dataset.href);
 
-	// Highlight the selected tab, and dim all others.
-	// Also show the selected content div, and hide all others.
-	for (var id in contentDivs)
-	{
-		if (id == selectedId)
-		{
-			tabLinks[id].className    = 'active';
-			contentDivs[id].className = 'content';
-		}
-		else
-		{
-			tabLinks[id].className    = '';
-			contentDivs[id].className = 'content hide';
-		}
-	}
+  for (const id in contentDivs) {
+    if (id === selectedId) {
+      tabLinks[id].classList.add('active');
+      contentDivs[id].classList.remove('hide');
+    } else {
+      tabLinks[id].classList.remove('active');
+      contentDivs[id].classList.add('hide');
+    }
+  }
 
-	// Stop the browser following the link
-	return false;
+  return false;
 }
 
 //--------------------------------------------------------------------
 
-function getFirstChildWithTagName(element, tagName)
-{
-	for (var i = 0; i < element.childNodes.length; i ++)
-	{
-		if (element.childNodes[i].nodeName == tagName)
-		{
-			return element.childNodes[i];
-		}
-	}
+function getFirstChildWithTagName(element, tagName) {
+  for (let i = 0; i < element.childNodes.length; i++) {
+    if (element.childNodes[i].nodeName === tagName) {
+      return element.childNodes[i];
+    }
+  }
 }
 
-//--------------------------------------------------------------------
-
-function getHash(url)
-{
-	var hashPos = url.lastIndexOf('#');
-	return url.substring(hashPos + 1);
-}
-
-//--------------------------------------------------------------------
-
-function toggle(elem)
-{
-	elem = document.getElementById(elem);
-
-	if (elem.style && elem.style['display'])
-	{
-		// Only works with the "style" attr
-		var disp = elem.style['display'];
-	}
-	else if (elem.currentStyle)
-	{
-		// For MSIE, naturally
-		var disp = elem.currentStyle['display'];
-	}
-	else if (window.getComputedStyle)
-	{
-		// For most other browsers
-		var disp = document.defaultView.getComputedStyle(elem, null).getPropertyValue('display');
-	}
-
-	// Toggle the state of the "display" style
-	elem.style.display = disp == 'block' ? 'none' : 'block';
-
-	return false;
-}
+//--------------------------------
