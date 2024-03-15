@@ -7,11 +7,6 @@ $text = [
     'text_clear'           => 'Clear'
 ];
 
-// Use the export function to return the array as a JSON string
-function export($array) {
-    return json_encode($array, JSON_PRETTY_PRINT);
-}
-
-// Call the export function to print the text array
-echo export($text);
+// Use the json_encode function to directly print the array as a JSON string
+echo json_encode($text, JSON_PRETTY_PRINT);
 
