@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Admin\UC\Controllers;
 
 use Admin\UC\Models\UCAllotmentModel;
@@ -6,231 +9,153 @@ use Admin\UC\Models\UCSubmitModel;
 use App\Controllers\AdminController;
 use Config\Url;
 
-class Submit extends AdminController{
-	
-	public function index(){
-        $this->template->add_package(['jquery_loading','datepicker'],true);
-        $data = [];
+class Submit extends AdminController
+{
+    /**
+     * @var UCSubmitModel
+     */
+    private $ucSubmitModel;
 
-        $ucModel = new UCSubmitModel();
-        $subModel = new UCSubmitModel();
-        // added recipient_id instead of distict(niranjan)
-        if ($this->user->agency_type_id == $this->settings->district_user) {
-            $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
+    /**
+     * @var UCAllotmentModel
+     */
+    private $ucAllotmentModel;
 
-            $filter = ['recipient_id' => $recipient_id];
-        } else {
-            if($this->user->agency_type_id==$this->settings->ps_user){
-                $filter = ['recipient_id' => 23];
-            }
-            if($this->user->agency_type_id==$this->settings->rs_user){
-                $filter = ['recipient_id' => 15];
-            }
-        }
-        $allotments = $ucModel->getUCReport($filter);
+    public function __construct()
+    {
+        $this->ucSubmitModel = new UCSubmitModel();
+        $this->ucAllotmentModel = new UCAllotmentModel();
+    }
 
-        $data['allotments'] = [];
-        $data['total_allotment'] = $data['total_uc_submitted'] = $data['total_uc_balance'] = 0;
-        foreach ($allotments as $allotment) {
-            $data['allotments'][] = [
-                'year' => $allotment->year,
-                'uc_date' => ymdToDmy($allotment->date_submit),
-                'letter_no' => $allotment->letter_no,
-                'allotment' => $allotment->allotment,
-                'uc_submitted' => $allotment->uc_submit,
-                'uc_balance' => $allotment->balance,
-                'action' => '<a href="'.site_url(Url::ucSubmitInfo).'?year_id='.$allotment->year_id.'" class="btn btn-info"><i class="fa fa-send"></i> View</a>'
-            ];
-            $data['total_allotment'] += $allotment->allotment;
-            $data['total_uc_submitted'] += $allotment->uc_submit;
-            $data['total_uc_balance'] += $allotment->balance;
-        }
+    public function index(): string
+    {
+        $this->template->addPackage(['jquery_loading', 'datepicker'], true);
 
-        $data['dmf'] = false;
-        //if dmf district, can add allotment by self
-        if($this->user->fund_agency_id!=1){
-            $data['dmf'] = true;
-            $data['add_url'] = site_url(Url::allotmentAdd);
-        }
+        $filter = $this->getFilter();
+        $allotments = $this->ucAllotmentModel->getUCReport($filter);
+
+        $data = $this->prepareAllotmentData($allotments);
+
+        $data['dmf'] = $this->canAddAllotment();
+        $data['addUrl'] = $data['dmf'] ? site_url(Url::allotmentAdd) : '';
 
         return $this->template->view('Admin\UC\Views\submit', $data);
-	}
+    }
 
-    public function info() {
-	    $data = [];
-        $this->template->add_package(['jquery_loading','datepicker','uploader'],true);
+    public function info(): string
+    {
+        $this->template->addPackage(['jquery_loading', 'datepicker', 'uploader'], true);
 
-	    $year = getCurrentYearId();
-	    if($this->request->getGet('year_id')){
-	        $year = $this->request->getGet('year_id');
-        }
+        $year = $this->getYear();
+        $recipientId = $this->ucSubmitModel->getRecipientId($this->user->district_id, $this->user->fund_agency_id);
 
-	    $allModel = new UCAllotmentModel();
-	    $subModel = new UCSubmitModel();
+        $allotments = $this->ucAllotmentModel->getAllotments(['year' => $year, 'recipient_id' => $recipientId]);
+        $submissions = $this->ucSubmitModel->getSubmissions(['year' => $year, 'recipient_id' => $recipientId]);
 
-	    $recipient_id = $subModel->getRecipientId($this->user->district_id,$this->user->fund_agency_id);
+        $data = $this->prepareSubmissionData($allotments, $submissions, $year);
 
-	    $allotments = $allModel->getAllotments(['year'=>$year,'recipient_id'=>$recipient_id]);
-
-	    $data['allotments'] = [];
-	    $data['ucs'] = [];
-        $data['total_allotment'] = $data['total_uc_submitted'] = 0;
-        foreach ($allotments as $allotment) {
-            $data['allotments'][] = [
-                'year' => $allotment->year,
-                'allotment_date' => ymdToDmy($allotment->allotment_date),
-                'amount' => $allotment->amount,
-                'action' => '<a href="'.site_url(Url::ucSubmitAdd).'?allotment_id='.$allotment->allotment_id.'" class="btn btn-success add-new">Submit UC</a>'
-            ];
-
-            $data['total_allotment'] += $allotment->amount;
-	    }
-
-	    $ucs = $subModel->getSubmissions(['year'=>$year,'recipient_id'=>$recipient_id]);
-
-        foreach ($ucs as $uc) {
-            $data['ucs'][] = [
-                'uc_date' => ymdToDmy($uc->date_submit),
-                'letter_no' => $uc->letter_no,
-                'page_no' => $uc->page_no,
-                'uc_amount' => $uc->amount,
-                'uc_document' => $uc->document ? site_url($uc->document):'',
-                'action' => $this->user->district_id ? site_url(Url::ucSubmitEdit).'?id='.$uc->uc_id:''
-            ];
-
-            $data['total_uc_submitted'] += $uc->amount;
-        }
-
-        $data['upload_url'] = site_url(Url::ucSubmitUpload);
+        $data['uploadUrl'] = site_url(Url::ucSubmitUpload);
 
         return $this->template->view('Admin\UC\Views\submit_info', $data);
-	}
+    }
 
-    public function add() {
-
-        $json_data = [
+    public function add(): string
+    {
+        $jsonData = [
             'status' => false,
         ];
-        if($this->request->getMethod(1)=='POST'){
 
-            $uc = [
-                'allotment_id' => $this->request->getGet('allotment_id'),
-                'date_submit' => dmyToYmd($this->request->getPost('date_submit')),
-                'letter_no' => $this->request->getPost('letter_no'),
-                'page_no' => $this->request->getPost('page_no'),
-                'amount' => $this->request->getPost('amount'),
-                'document' => $this->request->getPost('document')
-            ];
+        if ($this->request->getMethod() === 'POST') {
+            $uc = $this->getUCData();
 
-            (new UCSubmitModel())->insert($uc);
+            $this->ucSubmitModel->insert($uc);
 
-            $json_data = [
+            $jsonData = [
                 'status' => true,
             ];
-            $this->session->setFlashData('message','UC added.');
+            $this->session->setFlashData('message', 'UC added.');
         } else {
-            $json_data = [
-                'status' => true,
-                'title' => 'Add UC Submission',
-                'html' => $this->getForm()
-            ];
+            $jsonData = $this->getFormData('Add UC Submission');
         }
-        return $this->response->setJSON($json_data);
-	}
 
-    public function edit() {
+        return $this->response->setJSON($jsonData);
+    }
 
-        $json_data = [
+    public function edit(): string
+    {
+        $jsonData = [
             'status' => false,
         ];
+
         $id = $this->request->getGet('id');
-	    if($this->request->getMethod(1)=='POST'){
 
-            $uc = [
-                'date_submit' => dmyToYmd($this->request->getPost('date_submit')),
-                'letter_no' => $this->request->getPost('letter_no'),
-                'page_no' => $this->request->getPost('page_no'),
-                'amount' => $this->request->getPost('amount'),
-                'document' => $this->request->getPost('document')
-            ];
+        if ($this->request->getMethod() === 'POST') {
+            $uc = $this->getUCData();
 
-            (new UCSubmitModel())->update($id,$uc);
+            $this->ucSubmitModel->update($id, $uc);
 
-            $json_data = [
+            $jsonData = [
                 'status' => true,
             ];
-            $this->session->setFlashData('message','UC updated.');
+            $this->session->setFlashData('message', 'UC updated.');
         } else {
-            $json_data = [
-                'status' => true,
-                'title' => 'Edit UC Submission',
-                'html' => $this->getForm()
-            ];
+            $jsonData = $this->getFormData('Edit UC Submission');
         }
-        return $this->response->setJSON($json_data);
-	}
 
-    protected function getForm() {
-	    $data = [];
+        return $this->response->setJSON($jsonData);
+    }
 
-        $data['date_submit'] = '';
-        $data['amount'] = '';
-        $data['letter_no'] = '';
-        $data['page_no'] = '';
-        $data['document'] = '';
-        $data['document_name'] = '';
-        $data['document_url'] = '';
+    protected function getForm(): string
+    {
+        $data = [
+            'dateSubmit' => '',
+            'amount' => '',
+            'letterNo' => '',
+            'pageNo' => '',
+            'document' => '',
+            'documentName' => '',
+            'documentUrl' => '',
+        ];
 
-	    if($this->request->getGet('id')) {
-            $submission = (new UCSubmitModel())->find($this->request->getGet('id'));
+        if ($this->request->getGet('id')) {
+            $submission = $this->ucSubmitModel->find($this->request->getGet('id'));
 
-            $data['date_submit'] = ymdToDmy($submission->date_submit);
-            $data['amount'] = $submission->amount;
-            $data['letter_no'] = $submission->letter_no;
-            $data['page_no'] = $submission->page_no;
-            $data['document'] = $submission->document;
+            $data = [
+                'dateSubmit' => ymdToDmy($submission->date_submit),
+                'amount' => $submission->amount,
+                'letterNo' => $submission->letter_no,
+                'pageNo' => $submission->page_no,
+                'document' => $submission->document,
+            ];
+
             if ($submission->document) {
                 $file = DIR_UPLOAD . $submission->document;
                 $fileinfo = pathinfo($file);
                 $filename = $fileinfo['basename'];
-                $data['document_name'] = $filename;
-                $data['document_url'] = '<a href="' . site_url($submission->document) . '">' . $filename . '</a>';
+                $data['documentName'] = $filename;
+                $data['documentUrl'] = '<a href="' . site_url($submission->document) . '">' . $filename . '</a>';
             }
         }
 
         return view('\Admin\UC\Views\submit_form', $data);
     }
 
-    public function upload() {
-        $input = $this->validate([
+    public function upload(): string
+    {
+        $validation = $this->validate([
             'document' => [
                 'uploaded[document]',
                 'mime_in[document,application/pdf]',
-                'max_size[document,12048]',   //rakesh updated filesize to 12mb -- 08/06/23
+                'max_size[document,12048]',
                 'ext_in[document,pdf,PDF]',
-            ]
+            ],
         ]);
 
-        if (!$input) {
+        if (!$validation) {
             $data = [
                 'status' => false,
                 'message' => 'Invalid file',
-                'errors' => $this->validator->getErrors()
+                'errors' => $this->validator->getErrors(),
             ];
         } else {
-            $file = $this->request->getFile('document');
-            $file->move(DIR_UPLOAD . 'uc');
-            $data = [
-                'status'=>true,
-                'message'=> '<a target="_blank" href="'.base_url('uploads/uc/'.$file->getName()).'">'.$file->getName().'</a>',
-                'filename' => $file->getName(),
-                'filepath' => 'uploads/uc/'.$file->getName()
-            ];
-        }
-        return $this->response->setJSON($data);
-    }
-
-}
-
-/* End of file hmvc.php */
-/* Location: ./application/widgets/hmvc/controllers/hmvc.php */
+            $file = $this->request->getFile
