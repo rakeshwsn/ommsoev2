@@ -1,92 +1,35 @@
 <?php
+
 namespace App\Libraries;
 
 class OdkCentralAuth
 {
-
-    private $api_url;
-
-    private $email;
-
-    private $password;
-
-    private $expires = 3600;
-
-    private $client;
-
-
-    public function __construct() {
-
-        $this->api_url = env('odk.url');
-        
-        $this->email = env('odk.email');
-
-        $this->password = env('odk.password');
-
-        $this->client = \Config\Services::curlrequest();
-        
-
-    }
+    /**
+     * @var string
+     */
+    private string $apiUrl;
 
     /**
-     * Generate the access token that will be used to make request to the ODK Central API.
-     *
+     * @var string
      */
-    public function generateAccessToken() {
-
-        $endpoint = "/sessions";
-
-        //echo $this->api_url . $endpoint;
-        $response = $this->client->post($this->api_url . $endpoint, [
-            'json'=>[
-                'email' => $this->email,
-                'password' => $this->password,
-            ]
-        ]);
-
-        $body = $response->getBody();
-       // echo "<pre>";
-        //print_r($body);
-        $token = json_decode($body)->token;
-        cache()->save('ODKAccessToken', $token, $this->expires);
-        return $token;
-       
-    }
-
+    private string $email;
 
     /**
-     * Get the access token.
-     *
-     * @return string
+     * @var string
      */
-    public function getAccessToken() {
-        $cache = \Config\Services::cache();
-        $ODKAccessToken = $cache->get('ODKAccessToken');
-        if (!$ODKAccessToken) {
-            $ODKAccessToken=$this->generateAccessToken();
-        }
-
-        return $ODKAccessToken;
-
-    }
+    private string $password;
 
     /**
-     * Destroy the ODK Central session.
-     *
-     * TODO : check the call and return boolean
-     * 
-     * @return boolean
+     * @var int
      */
-    public function destroyAccessToken() {
+    private int $expires;
 
-        $endpoint = "/sessions";
+    /**
+     * @var \Config\Services
+     */
+    private \Config\Services $client;
 
-        $response = $this->client->setHeader("Authorization","Bearer ".$this->getAccessToken())
-                                            ->delete($this->api_url . $endpoint,[
-                                                'token' =>  $this->getAccessToken()
-                                            ]);
+    /**
+     * OdkCentralAuth constructor.
+     */
 
-        return json_decode($response->getBody());
-    }
-
-}
