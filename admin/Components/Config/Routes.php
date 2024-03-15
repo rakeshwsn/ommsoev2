@@ -1,28 +1,44 @@
 <?php
+
 namespace Admin\Components\Config;
-if(!isset($routes))
-{
-    $routes = \Config\Services::routes(true);
+
+use Config\Services;
+
+$routes = Services::routes(true);
+
+if (!isset($routes)) {
+    $routes = Services::routes(true);
 }
 
-$routes->group(env('app.adminRoute'), ['namespace' => 'Admin','filter' => 'login'], function($routes)
-{
-    $routes->add('components','Components\Controllers\Components::index');
-    $routes->post('components/search','Components\Controllers\Components::search');
-    $routes->add('components/autocomplete','Components\Controllers\Components::autocomplete');
-    $routes->add('components/phase/(:num)','Components\Controllers\Components::phase/$1');
+$routes->group(env('app.adminRoute'), [
+    'namespace' => 'Admin',
+    'filter' => 'login'
+], function ($routes) {
 
-    $routes->add('components/add','Components\Controllers\Components::add');
-    $routes->add('components/edit/(:num)','Components\Controllers\Components::edit/$1');
-    $routes->add('components/delete/(:num)','Components\Controllers\Components::delete/$1');
+    // Components routes
+    $routes->group('components', function ($routes) {
+        $routes->get('', 'Components\Controllers\Components::index');
+        $routes->post('search', 'Components\Controllers\Components::search');
+        $routes->get('autocomplete', 'Components\Controllers\Components::autocomplete');
+        $routes->get('phase/(:num)', 'Components\Controllers\Components::phase/$1');
 
-    $routes->add('components/assign','Components\Controllers\Assign::index');
-    $routes->add('components/assign/(:num)','Components\Controllers\Assign::index/$1');
-    $routes->add('components/assign/add','Components\Controllers\Assign::add');
-    $routes->post('components/assign/delete','Components\Controllers\Assign::delete');
+        $routes->get('add', 'Components\Controllers\Components::add');
+        $routes->get('edit/(:num)', 'Components\Controllers\Components::edit/$1');
+        $routes->delete('delete/(:num)', 'Components\Controllers\Components::delete/$1');
+    });
 
-    $routes->add('components/agencyassign','Components\Controllers\AgencyAssign::index');
-    $routes->add('components/agencyassign/(:num)','Components\Controllers\AgencyAssign::index/$1');
+    // Components assign routes
+    $routes->group('components/assign', function ($routes) {
+        $routes->get('', 'Components\Controllers\Assign::index');
+        $routes->get('(:num)', 'Components\Controllers\Assign::index/$1');
+        $routes->get('add', 'Components\Controllers\Assign::add');
+        $routes->post('delete', 'Components\Controllers\Assign::delete');
+    });
 
+    // Components agency assign routes
+    $routes->group('components/agencyassign', function ($routes) {
+        $routes->get('', 'Components\Controllers\AgencyAssign::index');
+        $routes->get('(:num)', 'Components\Controllers\AgencyAssign::index/$1');
+    });
 
 });
