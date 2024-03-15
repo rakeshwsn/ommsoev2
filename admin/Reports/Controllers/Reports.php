@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace Admin\Reports\Controllers;
 
 use Admin\Common\Models\CommonModel;
@@ -15,131 +16,133 @@ class Reports extends AdminController
 
     private $reportModel;
 
-    public function __construct(){
-		$this->reportModel=new ReportsModel();
+    public function __construct()
+    {
+        $this->reportModel = new ReportsModel();
     }
-    public function index() {
+
+    public function index()
+    {
         $data = [];
         helper(['form']);
         return $this->template->view('Admin\Reports\Views\index', $data);
     }
 
-    public function uploadStatus_old() {
+    public function uploadStatus()
+    {
+        $data = [
+            'districts' => (new DistrictModel())->asArray()->findAll(),
+            'district_id' => $this->request->getGet('district_id', ''),
+        ];
 
-        $data['districts'] = (new DistrictModel())->asArray()->findAll();
-        $data['district_id'] = '';
-        if($this->request->getGet('district_id')){
-            $data['district_id'] = $this->request->getGet('district_id');
-        }
-        $data = array_merge($this->getUploadStatus($data),$data);
+        $data = array_merge($this->getUploadStatus($data), $data);
 
-        return $this->template->view('Admin\Reports\Views\upload_status',$data);
+        return $this->template->view('Admin\Reports\Views\upload_status', $data);
     }
 
-    public function uploadStatus() {
-
-        $data['districts'] = (new DistrictModel())->asArray()->findAll();
-        $data['district_id'] = '';
-        if($this->request->getGet('district_id')){
-            $data['district_id'] = $this->request->getGet('district_id');
-        }
-        $data = array_merge($this->getUploadStatus($data),$data);
-
-        return $this->template->view('Admin\Reports\Views\upload_status',$data);
-
+    public function misStatus($filter)
+    {
+        $statusdata = $this->reportModel->getMisStatus($filter);
+        return $statusdata ? $statusdata->status : '';
     }
 
-    public function misStatus($filter){
-        //print_r($filter);
-        $statusdata=$this->reportModel->getMisStatus($filter);
-        if($statusdata){
-            return $statusdata->status;
-        }
-    }
-
-    public function frStatus($filter){
-        $statusdata=$this->reportModel->getFRStatus($filter);
-        if($statusdata){
-            return $statusdata->status;
-        }
+    public function frStatus($filter)
+    {
+        $statusdata = $this->reportModel->getFRStatus($filter);
+        return $statusdata ? $statusdata->status : '';
     }
 
     public function pendingStatus()
     {
         $reportsModel = new ReportsModel();
 
-        $filter['year_id'] = getCurrentYearId();
+        $filter = [
+            'year_id' => getCurrentYearId(),
+            'month_id' => 0,
+            'district_id' => null,
+            'fund_agency_id' => $this->user->fund_agency_id,
+        ];
+
         if ($this->request->getGet('year_id')) {
             $filter['year_id'] = $this->request->getGet('year_id');
         }
-        $filter['month_id'] = 0;
+
         if ($this->request->getGet('month_id')) {
             $filter['month_id'] = $this->request->getGet('month_id');
         }
-        $filter['district_id'] = null;
+
         if ($this->user->district_id) {
             $filter['district_id'] = $this->user->district_id;
         }
-        $filter['fund_agency_id'] = $this->user->fund_agency_id;
+
         if ($this->request->getGet('fund_agency_id')) {
             $filter['fund_agency_id'] = $this->request->getGet('fund_agency_id');
         }
+
         if ($this->request->getGet('district_id')) {
             $filter['district_id'] = $this->request->getGet('district_id');
         }
 
         $filter['phase'] = [0, 1, 2];
 
-        $data['blocks'] = $reportsModel->getPendingStatuses($filter);
+        $data = [
+            'blocks' => $reportsModel->getPendingStatuses($filter),
+            'statuses' => $this->statuses,
+            'year_id' => $filter['year_id'],
+            'month_id' => $filter['month_id'],
+            'districts' => $this->getDistricts(),
+            'district_id' => $filter['district_id'],
+        ];
 
         foreach ($data['blocks'] as &$block) {
-            if($block['transaction_type']=='expense' || $block['transaction_type']=='fund_receipt'){
-                $block['action'] = site_url(Url::approveClosingBalance);
-
-            }
-            if($block['status']==0){
-                $block['status']= '<label class="badge badge-warning">'.$this->statuses[$block['status']].'</label>';
-            }
-            if($block['status']==1){
-                $block['status']= '<label class="badge badge-success">'.$this->statuses[$block['status']].'</label>';
-            }
-            if($block['status']==2){
-                $block['status']= '<label class="badge badge-danger">'.$this->statuses[$block['status']].'</label>';
-            }
-            if($block['status']==3){
-                $block['status']= '<label class="badge badge-info">'.$this->statuses[$block['status']].'</label>';
-            }
-
-            $block['action'] = '';
-            $url_params = '?txn_type='.$block['transaction_type']
-                .'&txn_id='.$block['transaction_id'];
-            if($block['transaction_type'] =='fund_receipt' || $block['transaction_type'] =='expense'){
-                $block['action'] = site_url(Url::approveTransaction.$url_params);
-            }
-            if($block['transaction_type'] =='other_receipt'){
-                $block['action'] = site_url(Url::approveOtherReceipt.$url_params);
-            }
-            if($block['transaction_type'] =='closing_balance'){
-                $block['action'] = site_url(Url::approveClosingBalance.$url_params);
-            }
-            if($block['transaction_type'] =='mis'){
-                $block['action'] = site_url(Url::approveMIS.$url_params);
-            }
+            $block['action'] = $this->getActionUrl($block);
+            $block['status'] = $this->getStatusLabel($block['status']);
         }
-
-        $data['statuses'] = $this->statuses;
-
-        $data['year_id'] = $filter['year_id'];
-        $data['month_id'] = $filter['month_id'];
-        if ($this->user->district_id) {
-            $data['districts'] = (new DistrictModel())->asArray()
-                ->where('id', $this->user->district_id)->find();
-        } else {
-            $data['districts'] = (new DistrictModel())->asArray()->findAll();
-        }
-        $data['district_id'] = $filter['district_id'];
 
         return $this->template->view('Admin\Reports\Views\pending_status', $data);
     }
 
+    private function getDistricts()
+    {
+        if ($this->user->district_id) {
+            return (new DistrictModel())->asArray()->where('id', $this->user->district_id)->find();
+        }
+
+        return (new DistrictModel())->asArray()->findAll();
+    }
+
+    private function getActionUrl($block)
+    {
+        $url_params = '?txn_type=' . $block['transaction_type'] . '&txn_id=' . $block['transaction_id'];
+
+        switch ($block['transaction_type']) {
+            case 'fund_receipt':
+            case 'expense':
+                return site_url(Url::approveClosingBalance . $url_params);
+            case 'other_receipt':
+                return site_url(Url::approveOtherReceipt . $url_params);
+            case 'closing_balance':
+                return site_url(Url::approveClosingBalance . $url_params);
+            case 'mis':
+                return site_url(Url::approveMIS . $url_params);
+            default:
+                return '';
+        }
+    }
+
+    private function getStatusLabel($status)
+    {
+        switch ($status) {
+            case 0:
+                return '<label class="badge badge-warning">' . $this->statuses[$status] . '</label>';
+            case 1:
+                return '<label class="badge badge-success">' . $this->statuses[$status] . '</label>';
+            case 2:
+                return '<label class="badge badge-danger">' . $this->statuses[$status] . '</label>';
+            case 3:
+                return '<label class="badge badge-info">' . $this->statuses[$status] . '</label>';
+            default:
+                return '';
+        }
+    }
 }
