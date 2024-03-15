@@ -1,6 +1,15 @@
-<style>
-    .w-50p{width:50px;}
-</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .w-50p{width:50px;}
+    </style>
+</head>
+<body>
+
 <!-- Main content -->
 <section class="content">
 
@@ -28,12 +37,11 @@
                     <td><?=$month?> / <?=$year?></td>
                     <td><?=$date_added?></td>
                     <td><?=$status?></td>
-                    
                 </tr>
                 <?php if(!empty($remarks)): ?>
                 <tr>
                     <td>Remarks:</td>
-                    <td colspan="7"><?=$remarks?></td>
+                    <td colspan="5"><?=$remarks?></td>
                 </tr>
                 <?php endif; ?>
                 </tbody>
@@ -45,7 +53,7 @@
             <h3 class="block-title">MIS Details</h3>
         </div>
         <div class="block-content block-content-full">
-            <?php echo form_open(); ?>
+            <?php echo form_open('', ['class' => 'needs-validation', 'novalidate' => '', 'enctype' => 'multipart/form-data']); ?>
             <div class="tableFixHead">
                 <table class="table custom-table " id="txn-table">
                     <thead>
@@ -74,15 +82,20 @@
     </div>
 </section>
 
-<?php js_start(); ?>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
 <script>
-    $(function () {
+    $(document).ready(function() {
+        $('.js-dataTable-full').DataTable();
+    });
 
+    $(function () {
         var $th = $('.tableFixHead').find('thead th')
         $('.tableFixHead').on('scroll', function() {
             $th.css('transform', 'translateY('+ this.scrollTop +'px)');
         });
-
     });
 
     $('.dm-uploader').dmUploader({
@@ -91,15 +104,14 @@
         dataType:'json',
         maxFileSize: 50000000, // 20MB
         multiple: false,
-//        allowedTypes: 'image/*',
-//        extFilter: ['jpg','png','jpeg','JPG','PNG','JPEG'],
+        allowedTypes: 'image/*',
+        extFilter: ['jpg','png','jpeg','JPG','PNG','JPEG'],
         onInit: function(){
             // Plugin is ready to use
             console.log('initialized')
         },
         onComplete: function(){
             // All files in the queue are processed (success or error)
-//            $('.tableFixHead').loading('stop');
             $('.tableFixHead').LoadingOverlay("hide",true);
         },
         onNewFile: function(id, file){
@@ -115,51 +127,5 @@
         },
         onUploadProgress: function(id, percent){
             // Updating file progress
-//            $('.tableFixHead').loading();
             $('.tableFixHead').LoadingOverlay("show");
-        },
-        onUploadSuccess: function(id, data){
-			//console.log(data.message);
-            // A file was successfully uploaded server response
-            if(data.status) {
-				$(this).find('.status').html(data.message);
-                $(this).find('.filepath').val(data.filepath)
-            } else {
-                show_error(this,data.message);
-            }
 
-        },
-        onUploadError: function(id, xhr, status, message){
-            show_error(this,message)
-//            $('.tableFixHead').loading('stop');
-            $('.tableFixHead').LoadingOverlay("hide",true);
-        },
-        onFileSizeError: function(file){
-            // file.name
-            show_error(this,'Invalid file size')
-        },
-        onFileExtError: function(file){
-            // file.name
-            show_error(this,'Invalid file type')
-        },
-        onFileTypeError: function(file){
-            // file.name
-            show_error(this,'Invalid file type')
-
-        }
-    });
-
-    function show_error(obj,msg){
-        $(obj).find('.status').addClass('text-danger').text(msg)
-    }
-    function setProgress(percent) {
-        $('#progress-bar').width(percent+'%')
-        $('#progress-percent').text(percent+'%')
-    }
-</script>
-
-<?php if(isset($approval)) {
-    echo $approve_form;
-} ?>
-
-<?php js_end(); ?>
