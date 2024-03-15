@@ -58,10 +58,14 @@ class IncentiveModel extends Model
         $order = !empty($data['order']) && $data['order'] == 'desc' ? 'desc' : 'asc';
         $builder->orderBy($sort, $order);
 
-        if (isset($data['start']) || isset($data['limit'])) {
-            if ($data['start'] < 0) {
-                $data['start'] = 0;
-            }
+        if (isset($data['start']) && isset($data['limit'])) {
+            $builder->limit($data['limit'], $data['start']);
+        } elseif (isset($data['start'])) {
+            $builder->limit($data['start'], 10); // Set a default limit of 10 if only 'start' is provided
+        } elseif (isset($data['limit'])) {
+            $builder->limit($data['limit']); // Set a default start of 0 if only 'limit' is provided
+        }
 
-            if ($data['limit'] < 1) {
-              
+        return $builder->get()->getResult();
+    }
+}
