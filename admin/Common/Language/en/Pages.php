@@ -1,19 +1,21 @@
 <?php
 
-// Define the array of text values
-$text = [
+// Define the array of text values as a constant
+define('TEXT_VALUES', [
 	'heading_title'                 => 'Pages',
 	'text_image'                    => 'Select Image',
 	'text_clear'                     => 'Clear'
-];
+]);
 
-// Return the array of text values
+// Function to return the array of text values
 function getTextValues(): array
 {
-	global $text;
-	return $text;
+	return TEXT_VALUES;
 }
 
 // Call the function to get the text values
-getTextValues();
+$textValues = getTextValues();
+
+// Use the text values in the code
+echo $textValues['heading_title'];
 
