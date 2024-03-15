@@ -21,7 +21,14 @@ class ComponentsAssignModel extends Model
     protected $updatedField = 'updated_at';
     protected $deletedField = 'deleted_at';
 
-    protected $validationRules = [];
+    protected $validationRules = [
+        'component_id' => 'required|integer',
+        'number' => 'required|integer',
+        'parent' => 'permit_empty|integer',
+        'sort_order' => 'required|integer',
+        'fund_agency_id' => 'required|integer',
+        'row_type' => 'permit_empty|string'
+    ];
 
     public function getAssignComponent($fundAgencyId)
     {
@@ -37,10 +44,11 @@ class ComponentsAssignModel extends Model
 
     public function getMaxSortorder($id)
     {
-        return $this->where('fund_agency_id', $id)
-            ->selectMax('sort_order')
-            ->get()
-            ->getRow()
-            ->sort_order ?? 0;
+        $query = $this->where('fund_agency_id', $id)
+            ->selectMax('sort_order');
+
+        $result = $query->get();
+
+        return $result->getRow() ? $result->getRow()->sort_order : 0;
     }
-}
+
